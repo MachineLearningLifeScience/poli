@@ -1,0 +1,2 @@
+observer = logger.observers.basic_observer
+logger = logger.wandb.wandb_logger
