@@ -31,7 +31,7 @@ class FoldXGFPFactory(AbstractProblemFactory):
         wt = FoldedCandidate(work_dir, wt_pdb_file, [], ResidueTokenizer(), skip_minimization=True, chain='A', wild_name='gfp')
         task = ProxyRFPTask(None, None, None, num_start_examples=512)
         wt_array = np.array([wt])
-        x_array = np.array([""])
+        x_array = np.array([" " * self.get_setup_information().get_max_sequence_length()])
 
         class LamboSasaGFP(BlackBox):
             def _black_box(self, x: np.ndarray) -> np.ndarray:
