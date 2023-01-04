@@ -55,7 +55,7 @@ class FoldXGFPFactory(AbstractProblemFactory):
 
         f = LamboSasaGFP(self.get_setup_information().get_max_sequence_length())
         # TODO: REMOVE
-        X = X[:3, :]
+        #X = X[:3, :]
         y = read_cached_target_values(f, X)
         return f, X, y
 
