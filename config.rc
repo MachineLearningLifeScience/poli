@@ -1,2 +1,3 @@
-observer = logger.observers.basic_observer
-logger = logger.wandb.wandb_logger
+[DEFAULT]
+observer = logger.observers.rudimentary_observer.RudimentaryObserver
+logger = logger.wandb.wandb_logger.WandBLogger

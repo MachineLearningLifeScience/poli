@@ -1,12 +1,14 @@
 import numpy as np
 
-from core.util.abstract_logger import AbstractLogger
 from core.util.abstract_observer import AbstractObserver
+
+BLACKBOX = "blackbox"
+SEQUENCE = "sequence"
 
 
 class RudimentaryObserver(AbstractObserver):
-    def __init__(self, logger: AbstractLogger):
-        self.logger = logger
+    def __init__(self):
+        super().__init__()
         self.step = 0
 
     def observe(self, x: np.ndarray, y: np.ndarray) -> None:
