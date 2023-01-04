@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.poli.core.util.abstract_observer import AbstractObserver
+from poli.core.util.abstract_observer import AbstractObserver
 
 BLACKBOX = "blackbox"
 SEQUENCE = "sequence"
