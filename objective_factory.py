@@ -2,12 +2,9 @@
 This is the main file relevant for users who want to run objective functions.
 """
 import os
-import signal
 import subprocess
 import numpy as np
 from multiprocessing.connection import Listener
-
-from core.registry import INIT_DATA_FILE, INPUT_DATA_FILE, OUTPUT_DATA_FILE
 
 
 def create(name: str, caller_info):
@@ -27,6 +24,6 @@ def create(name: str, caller_info):
         return val
 
     def terminate():
-        conn.close()
+        conn.send(None)
 
     return f, x0, y0, run_info, terminate
