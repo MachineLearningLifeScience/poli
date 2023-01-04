@@ -9,13 +9,19 @@ Main benefit is that this allows to develop algorithms that use (say) tensorflow
 
 Furthermore, this library provides basic logging and plotting functions associated with Bayesian optimization for proteins.
 ## Basic usage
+### Installation
+Run the following from the main directory (where this README file is also located) to install the package in development mode (that is, modifications to the source code is directly visible to file importing it without the need for reinstallation).
+```
+pip install -e .
+```
+
 ### Calling a benchmark
 The main file is `objective_function_factory.py`
 Available objectives are given as shell scripts in `objective_run_scripts`.
 ### Minimal working example
 Optimizing an objective function that just returns a draw from a standard normal.
 ```
-import objective_factory
+import poli.objective_factory
 
 f, x0, y0, run_info, terminate = objective_factory.create("white_noise", caller_info=None)
 print(f(x0[:1, :]))
@@ -37,6 +43,6 @@ This uses the WeightsAndBiases logging backend, and the rudimentary observer log
  * This library depends only on a generic version of `numpy`.
  * Therefore make sure that imports are called only when your objective is actually used.
  * Having an associated shell script for each objective function allows to load different environments for conflicting objective function implementations.
-### Naming conventions
+### Minimal working example
 Since imports are dynamic it is vital that you stick to the naming convention.
 ## Software architecture
