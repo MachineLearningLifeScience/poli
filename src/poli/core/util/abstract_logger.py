@@ -1,4 +1,4 @@
-from src.poli.core.problem_setup_information import ProblemSetupInformation
+from poli.core.problem_setup_information import ProblemSetupInformation
 
 
 class AbstractLogger:

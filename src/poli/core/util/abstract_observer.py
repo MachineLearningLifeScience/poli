@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.poli.core.util.abstract_logger import AbstractLogger
+from poli.core.util.abstract_logger import AbstractLogger
 
 
 class AbstractObserver:
