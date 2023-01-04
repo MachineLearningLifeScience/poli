@@ -1,3 +1,4 @@
 [DEFAULT]
 observer = logger.observers.rudimentary_observer.RudimentaryObserver
-logger = logger.wandb.wandb_logger.WandBLogger
+logger = logger.dummy_logger.DummyLogger
+#logger = logger.wandb.wandb_logger.WandBLogger

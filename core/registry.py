@@ -1,4 +1,3 @@
-#  Copyright (c) 2023.
 import os
 
 from objectives.common import __file__ as common_path

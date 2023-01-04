@@ -20,7 +20,6 @@ class FoldXGFPFactory(AbstractFoldXFactory):
         data_path = os.path.join(COMMONS, "data", "cbas_green_fluorescent_protein")
         wt_pdb_file = os.path.join(data_path, "1ema.pdb")
         X, _, _ = get_experimental_X_y(prefix=data_path)
-
         """
         Fasta sequence of the GFP:
         MSKGEELFTGVVPILVELDGDVNGHKFSVSGEGEGDATYGKLTLKFICTTGKLPVPWPTLVTTFTYGVQCFSRYPDHMKRHDFFKSAMPEGYVQERTIFFKDDGNYKTRAEVKFEGDTLVNRIELKGIDFKEDGNILGHKLEYNYNSHNVYIMADKQKNGIKVNFKIRHNIEDGSVQLADHYQQNTPIGDGPVLLPDNHYLSTQSALSKDPNEKRDHMVLLEFVTAAGITHGMDELYK
@@ -29,20 +28,7 @@ class FoldXGFPFactory(AbstractFoldXFactory):
         X = convert_aas_to_idx_array(X)
 
         work_dir = os.path.join(os.getcwd(), "temp", "foldx")
-        wt = FoldedCandidate(work_dir, wt_pdb_file, [], ResidueTokenizer(),
-                             skip_minimization=True, chain='A', wild_name='gfp')
-        """
-        FoldX complains that the following residues are missing:
-        # incomplete_residues = [6, 26, 52, 101, 107, 122, 124, 131, 132, 156, 157, 158, 162, 212, 214]
-        But this seems not to be the issue.
-        The difference between parsed PDB file and FASTA sequence stems from also a missing 'M' in the beginning and a 
-        missing post sequence:
-        missing_post_sequence = 'THGMDELYK'
-        The authors of the PDB file write something about how this last part was not modelled.
-        Furthermore, there is a mismatch between PDB file and FASTA sequence in position 63 of the PDB.
-        It's an X whereas the FASTA sequence has a TYG.
-        The PDB file also says that something is odd there.
-        """
+        wt = FoldedCandidate(work_dir, wt_pdb_file, [], ResidueTokenizer(), skip_minimization=True, chain='A', wild_name='gfp')
         task = ProxyRFPTask(None, None, None, num_start_examples=512)
         wt_array = np.array([wt])
         x_array = np.array([""])
@@ -50,9 +36,21 @@ class FoldXGFPFactory(AbstractFoldXFactory):
         class LamboSasaGFP(BlackBox):
             def _black_box(self, x: np.ndarray) -> np.ndarray:
                 x_ = convert_idx_array_to_aas(x[:, :63])[0].upper() + convert_idx_array_to_aas(x[:, 66:-9])[0].upper()
+                """
+                FoldX complains that the following residues are missing:
+                # incomplete_residues = [6, 26, 52, 101, 107, 122, 124, 131, 132, 156, 157, 158, 162, 212, 214]
+                But this seems not to be the issue.
+                The difference between parsed PDB file and FASTA sequence stems from also a missing 'M' in the beginning
+                 and a missing post sequence:
+                missing_post_sequence = 'THGMDELYK'
+                The authors of the PDB file write something about how this last part was not modelled.
+                Furthermore, there is a mismatch between PDB file and FASTA sequence in position 63 of the PDB.
+                It's an X whereas the FASTA sequence has a TYG.
+                The PDB file also says that something is odd there.
+                """
                 x_array[0] = x_
                 l = task.make_new_candidates(wt_array, x_array)
-                v = l[0].mutant_total_energy
+                v = -l[0].mutant_total_energy  # we are minimizing, hence the minus
                 return np.array([[v]])
 
         f = LamboSasaGFP(self.get_setup_information().get_max_sequence_length())
