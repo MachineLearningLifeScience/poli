@@ -4,12 +4,13 @@ This is the main file relevant for users who want to run objective functions.
 import os
 import subprocess
 from typing import Callable
-
 import numpy as np
 from multiprocessing.connection import Listener
 
+from poli.core.problem_setup_information import ProblemSetupInformation
 
-def create(name: str, caller_info) -> (Callable[[np.ndarray], np.ndarray], np.ndarray, np.ndarray, str, Callable):
+
+def create(name: str, caller_info) -> (ProblemSetupInformation, Callable[[np.ndarray], np.ndarray], np.ndarray, np.ndarray, str, Callable):
     """
     Instantiantes a black-box function.
     :param name:
@@ -17,6 +18,7 @@ def create(name: str, caller_info) -> (Callable[[np.ndarray], np.ndarray], np.nd
     :param caller_info:
         Optional information about the caller that is forwarded to the logger to initialize the run.
     :return:
+        problem_information: a ProblemSetupInformation object holding basic properties about the problem
         f: an objective function that accepts a numpy array and returns a numpy array
         x0: initial inputs
         y0: f(x0)
@@ -33,14 +35,14 @@ def create(name: str, caller_info) -> (Callable[[np.ndarray], np.ndarray], np.nd
     listener = Listener(address, authkey=b'secret password')
     conn = listener.accept()
     conn.send(caller_info)
-    x0, y0, run_info = conn.recv()
+    x0, y0, problem_information, run_info = conn.recv()
 
-    def f(x: np.ndarray) -> np.ndarray:
-        conn.send(x)
+    def f(x: np.ndarray, context=None) -> np.ndarray:
+        conn.send(x, context)
         val = conn.recv()
         return val
 
     def terminate():
         conn.send(None)
 
-    return f, x0, y0, run_info, terminate
+    return problem_information, f, x0, y0, run_info, terminate

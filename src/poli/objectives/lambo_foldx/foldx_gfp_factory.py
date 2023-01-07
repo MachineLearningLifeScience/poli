@@ -72,7 +72,7 @@ def read_cached_target_values(f, X):
         from time import time
         y = np.zeros([X.shape[0], 1])
         for i in range(X.shape[0]):
-            print("iteration:" + str(i))
+            print(f"iteration: {i}/{X.shape[0]}")
             t = time()
             y[i] = f(X[i:i+1, :])
             print("function evaluation took: " + str(time() - t) + " seconds")

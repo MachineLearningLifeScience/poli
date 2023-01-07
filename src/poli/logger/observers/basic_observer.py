@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.poli.logger.observers.rudimentary_observer import RudimentaryObserver
+from poli.logger.observers.rudimentary_observer import RudimentaryObserver
 
 
 class BasicObserver(RudimentaryObserver):

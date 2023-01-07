@@ -1,13 +1,15 @@
 # TO DO
  * make install script that creates environments and run_scripts 
- * make this a python package
  * add example how to easily exchange loggers and observers
-# Protein Objective Library
+ * consider switching to Hydra (though this creates a dependency that might break in the future)
+# Protein Objective Library (POLi)
 An easy-to-use, plug-and-play library to benchmark protein-related Bayesian optimization algorithms.
 Primarily, this library provides objective functions encapsulating any dependencies.
 Main benefit is that this allows to develop algorithms that use (say) tensorflow without having to worry that the objective was written in (say) torch.
 
-Furthermore, this library provides basic logging and plotting functions associated with Bayesian optimization for proteins.
+On purpose, logging is kept at the objective function side.
+This allows easier benchmarking of algorithms from other authors.
+Algorithmspecific logging can be done internally, on the site of the algorithm if necessary.
 ## Basic usage
 ### Installation
 Run the following from the main directory (where this README file is also located) to install the package in development mode (that is, modifications to the source code is directly visible to file importing it without the need for reinstallation).

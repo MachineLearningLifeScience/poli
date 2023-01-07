@@ -33,7 +33,7 @@ class MyProblemFactory(AbstractProblemFactory):
 """
 Step 2: Write a small shell script such as `my_objective_function.sh` which calls this file.
 
-(The encapsulation in a shell script allows to load for exampe to load a different python environment.)
+(The encapsulation in a shell script allows for example to load a different python environment.)
 
 Done.
 """
