@@ -1,4 +1,0 @@
-[DEFAULT]
-observer = poli.logger.observers.rudimentary_observer.RudimentaryObserver
-logger = poli.logger.dummy_logger.DummyLogger
-#logger = poli.logger.wandb.wandb_logger.WandBLogger

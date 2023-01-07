@@ -33,7 +33,7 @@ def run(objective_name, config_file='config.rc'):
     # instantiate observer
     caller_info = conn.recv()
     observer_script = config['DEFAULT']['observer']
-    if observer_script is not '':
+    if observer_script != '':
         observer: AbstractObserver = ExternalObserver(observer_script)
         observer_info = observer.initialize_observer(objective_factory.get_setup_information(), caller_info)
         f.set_observer(observer)
@@ -45,14 +45,14 @@ def run(objective_name, config_file='config.rc'):
 
     # now wait for objective function calls
     while True:
-        x, context = conn.recv()
-        if x is None:
+        msg = conn.recv()
+        if msg is None:
             break
-        y = f(x, context=context)
+        y = f(*msg)
         # the observer has been called inside f
         # the main reason is that x can be of shape [N, L] whereas observers are guaranteed objects of shape [1, L]
         conn.send(y)
-    if observer_script is not '':
+    if observer_script != '':
         observer.finish()
 
 
