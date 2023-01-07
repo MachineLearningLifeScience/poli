@@ -1,18 +1,13 @@
 import numpy as np
-
-from poli.core.util.abstract_logger import AbstractLogger
+from poli.core.problem_setup_information import ProblemSetupInformation
 
 
 class AbstractObserver:
-    def __init__(self):
-        self.logger = None
+    def observe(self, x: np.ndarray, y: np.ndarray, context=None) -> None:
+        raise NotImplementedError("abstract method")
 
-    def initialize(self, logger: AbstractLogger) -> None:
-        """
-        A separate initialization function to allow parameter-free instantiation.
-        :param logger:
-        """
-        self.logger = logger
+    def initialize_observer(self, problem_setup_info: ProblemSetupInformation, caller_info) -> str:
+        raise NotImplementedError("abstract method")
 
-    def observe(self, x: np.ndarray, y: np.ndarray) -> None:
+    def finish(self) -> None:
         raise NotImplementedError("abstract method")

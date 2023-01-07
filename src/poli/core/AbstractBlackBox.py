@@ -36,7 +36,7 @@ class BlackBox:
             assert(f_.shape[1] == 1)
             assert(isinstance(f, np.ndarray))
             if self.observer is not None:
-                self.observer.observe(x_, f_)
+                self.observer.observe(x_, f_, context)
         return f
 
     def _black_box(self, x):
