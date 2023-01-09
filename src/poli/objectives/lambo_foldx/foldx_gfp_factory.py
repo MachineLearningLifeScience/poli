@@ -1,6 +1,7 @@
 import os
 import warnings
 import numpy as np
+import poli.core.registry
 
 from poli.core.AbstractBlackBox import BlackBox
 from poli.core.AbstractProblemFactory import AbstractProblemFactory
@@ -55,7 +56,7 @@ class FoldXGFPFactory(AbstractProblemFactory):
 
         f = LamboSasaGFP(self.get_setup_information().get_max_sequence_length())
         # TODO: REMOVE
-        #X = X[:3, :]
+        X = X[:5, :]
         y = read_cached_target_values(f, X)
         return f, X, y
 
@@ -78,3 +79,8 @@ def read_cached_target_values(f, X):
             print("function evaluation took: " + str(time() - t) + " seconds")
         np.save(file_name, y)
     return y
+
+
+if __name__ == '__main__':
+    poli.core.registry.register_problem(FoldXGFPFactory().get_setup_information().get_problem_name(),
+                                        os.path.join(os.path.dirname(__file__), 'foldx_gfp.sh'))

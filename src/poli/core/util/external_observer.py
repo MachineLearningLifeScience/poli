@@ -15,14 +15,14 @@ class ExternalObserver(AbstractObserver):
     def observe(self, x: np.ndarray, y: np.ndarray, context=None) -> None:
         self.conn.send([x, y, context])
 
-    def initialize_observer(self, setup_info: ProblemSetupInformation, caller_info) -> str:
+    def initialize_observer(self, setup_info: ProblemSetupInformation, caller_info, x0, y0) -> str:
         cwd = os.getcwd()
         proc = subprocess.Popen(self.observer_script, stdout=None, stderr=None, cwd=cwd)
 
         address = ('localhost', 6001)
         listener = Listener(address, authkey=b'secret password')
         self.conn = listener.accept()
-        self.conn.send([setup_info, caller_info])
+        self.conn.send([setup_info, caller_info, x0, y0])
         observer_info = self.conn.recv()
         return observer_info
 

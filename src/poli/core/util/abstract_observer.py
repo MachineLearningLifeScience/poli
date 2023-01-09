@@ -6,7 +6,7 @@ class AbstractObserver:
     def observe(self, x: np.ndarray, y: np.ndarray, context=None) -> None:
         raise NotImplementedError("abstract method")
 
-    def initialize_observer(self, problem_setup_info: ProblemSetupInformation, caller_info) -> str:
+    def initialize_observer(self, problem_setup_info: ProblemSetupInformation, caller_info, x0: np.ndarray, y0: np.ndarray) -> str:
         raise NotImplementedError("abstract method")
 
     def finish(self) -> None:

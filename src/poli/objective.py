@@ -1,11 +1,10 @@
 import sys
-import configparser
-import warnings
 from multiprocessing.connection import Client
 
 from poli.core import AbstractProblemFactory
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.external_observer import ExternalObserver
+from poli.core.registry import config, _DEFAULT, _OBSERVER
 
 
 def dynamically_instantiate(obj: str):
@@ -15,13 +14,12 @@ def dynamically_instantiate(obj: str):
     return instantiated_object
 
 
-def run(objective_name, config_file='config.rc'):
-    config = configparser.ConfigParser(defaults={
-                         'observer': ''})
-    ls = config.read(config_file)
-    if len(ls) == 0:
-        warnings.warn("Could not find configuration file: %s" % config_file)
-
+def run(objective_name: str) -> None:
+    """
+    Starts an objective function listener loop to wait for requests.
+    :param objective_name:
+        problem factory name including python packages, e.g. package.subpackage.MyFactoryName
+    """
     # make connection with the mother process
     address = ('localhost', 6000)
     conn = Client(address, authkey=b'secret password')
@@ -32,10 +30,10 @@ def run(objective_name, config_file='config.rc'):
 
     # instantiate observer
     caller_info = conn.recv()
-    observer_script = config['DEFAULT']['observer']
+    observer_script = config[_DEFAULT][_OBSERVER]
     if observer_script != '':
         observer: AbstractObserver = ExternalObserver(observer_script)
-        observer_info = observer.initialize_observer(objective_factory.get_setup_information(), caller_info)
+        observer_info = observer.initialize_observer(objective_factory.get_setup_information(), caller_info, x0, y0)
         f.set_observer(observer)
     else:
         observer_info = None
@@ -46,6 +44,7 @@ def run(objective_name, config_file='config.rc'):
     # now wait for objective function calls
     while True:
         msg = conn.recv()
+        # x, context = msg
         if msg is None:
             break
         y = f(*msg)

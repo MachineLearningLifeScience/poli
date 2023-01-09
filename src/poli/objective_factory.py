@@ -8,6 +8,7 @@ import numpy as np
 from multiprocessing.connection import Listener
 
 from poli.core.problem_setup_information import ProblemSetupInformation
+from poli.core.registry import config, _RUN_SCRIPT_LOCATION
 
 
 # TODO: typing information about f out-dated? Would be nice to replace this by a class
@@ -26,24 +27,27 @@ def create(name: str, caller_info) -> (ProblemSetupInformation, Callable[[np.nda
         observer_info: information from the observer_info about the instantiated run (allows the calling algorithm to connect)
         terminate: a function to end the process behind f
     """
-    cwd = os.getcwd()
-    if not name.endswith(".sh"):
-        #cwd = os.path.dirname(__file__)  # execute script in project main folder
-        name = os.path.join(os.path.dirname(__file__), ".", "objective_run_scripts", name + ".sh")
-    proc = subprocess.Popen(name, stdout=None, stderr=None, cwd=cwd)
+    # start objective process
+    objective_run_script = config[name][_RUN_SCRIPT_LOCATION]
+    proc = subprocess.Popen(objective_run_script, stdout=None, stderr=None, cwd=os.getcwd())
 
+    # wait for connection from objective process
     address = ('localhost', 6000)
     listener = Listener(address, authkey=b'secret password')
     conn = listener.accept()
+    # send caller_info
     conn.send(caller_info)
+    # wait for objective process to finish setting up
     x0, y0, problem_information, observer_info = conn.recv()
 
     def f(x: np.ndarray, context=None) -> np.ndarray:
+        # send input and wait for reply
         conn.send([x, context])
         val = conn.recv()
         return val
 
     def terminate():
+        # terminate objective process
         conn.send(None)
 
     return problem_information, f, x0, y0, observer_info, terminate

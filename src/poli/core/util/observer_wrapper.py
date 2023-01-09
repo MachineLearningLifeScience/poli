@@ -10,9 +10,9 @@ def start_observer_process(observer_name):
     conn = Client(address, authkey=b'secret password')
 
     # instantiate observer
-    setup_info, caller_info = conn.recv()
+    setup_info, caller_info, x0, y0 = conn.recv()
     observer: AbstractObserver = dynamically_instantiate(observer_name)
-    observer_info = observer.initialize_observer(setup_info, caller_info)
+    observer_info = observer.initialize_observer(setup_info, caller_info, x0, y0)
 
     # give mother process the signal that we're ready
     conn.send(observer_info)
