@@ -1,3 +1,4 @@
 __pycache__
 .idea
 /src/poli/objectives/lambo_foldx/cached_foldx_values.npy
+/src/poli/config.rc
