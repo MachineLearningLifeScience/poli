@@ -1,6 +1,10 @@
 __author__ = 'Simon Bartels'
+
+import os.path
+
 import numpy as np
 
+import poli.core.registry
 from poli.core.AbstractBlackBox import BlackBox
 from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.core.AbstractProblemFactory import AbstractProblemFactory
@@ -27,3 +31,8 @@ class WhiteNoiseFactory(AbstractProblemFactory):
         x = np.diag(np.arange(11) + 6) @ np.ones([11, self.get_setup_information().get_max_sequence_length()], dtype=np.int)
         y = f(x)
         return f, x, y
+
+
+if __name__ == '__main__':
+    poli.core.registry.register_problem(WhiteNoiseFactory().get_setup_information().get_problem_name(),
+                                        os.path.join(os.path.dirname(__file__), "white_noise.sh"))
