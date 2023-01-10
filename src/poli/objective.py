@@ -47,10 +47,14 @@ def run(objective_name: str) -> None:
         # x, context = msg
         if msg is None:
             break
-        y = f(*msg)
-        # the observer has been called inside f
-        # the main reason is that x can be of shape [N, L] whereas observers are guaranteed objects of shape [1, L]
-        conn.send(y)
+        try:
+            y = f(*msg)
+            # the observer has been called inside f
+            # the main reason is that x can be of shape [N, L] whereas observers are guaranteed objects of shape [1, L]
+            conn.send(y)
+        except Exception as e:
+            conn.send(e)
+            break
     if observer_script != '':
         observer.finish()
 

@@ -18,12 +18,13 @@ class ExternalObserver(AbstractObserver):
     def initialize_observer(self, setup_info: ProblemSetupInformation, caller_info, x0, y0) -> str:
         cwd = os.getcwd()
         proc = subprocess.Popen(self.observer_script, stdout=None, stderr=None, cwd=cwd)
-
         address = ('localhost', 6001)
         listener = Listener(address, authkey=b'secret password')
         self.conn = listener.accept()
         self.conn.send([setup_info, caller_info, x0, y0])
         observer_info = self.conn.recv()
+        if isinstance(observer_info, Exception):
+            raise observer_info
         return observer_info
 
     def finish(self) -> None:

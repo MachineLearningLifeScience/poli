@@ -30,7 +30,7 @@ def create(name: str, caller_info) -> (ProblemSetupInformation, Callable[[np.nda
     # start objective process
     objective_run_script = config[name][_RUN_SCRIPT_LOCATION]
     proc = subprocess.Popen(objective_run_script, stdout=None, stderr=None, cwd=os.getcwd())
-
+    # TODO: add signal listener that intercepts when proc ends
     # wait for connection from objective process
     address = ('localhost', 6000)
     listener = Listener(address, authkey=b'secret password')
@@ -44,6 +44,8 @@ def create(name: str, caller_info) -> (ProblemSetupInformation, Callable[[np.nda
         # send input and wait for reply
         conn.send([x, context])
         val = conn.recv()
+        if isinstance(val, Exception):
+            raise val
         return val
 
     def terminate():
