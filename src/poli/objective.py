@@ -55,8 +55,10 @@ def run(objective_name: str) -> None:
         except Exception as e:
             conn.send(e)
             break
+    conn.close()
     if observer_script != '':
         observer.finish()
+    exit()  # kill other threads, and close file handles
 
 
 if __name__ == '__main__':

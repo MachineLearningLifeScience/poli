@@ -11,6 +11,7 @@ class ExternalObserver(AbstractObserver):
     def __init__(self, observer_script):
         self.observer_script = observer_script
         self.conn = None
+        self.listener = None
 
     def observe(self, x: np.ndarray, y: np.ndarray, context=None) -> None:
         self.conn.send([x, y, context])
@@ -19,8 +20,8 @@ class ExternalObserver(AbstractObserver):
         cwd = os.getcwd()
         proc = subprocess.Popen(self.observer_script, stdout=None, stderr=None, cwd=cwd)
         address = ('localhost', 6001)
-        listener = Listener(address, authkey=b'secret password')
-        self.conn = listener.accept()
+        self.listener = Listener(address, authkey=b'secret password')
+        self.conn = self.listener.accept()
         self.conn.send([setup_info, caller_info, x0, y0])
         observer_info = self.conn.recv()
         if isinstance(observer_info, Exception):
@@ -29,3 +30,5 @@ class ExternalObserver(AbstractObserver):
 
     def finish(self) -> None:
         self.conn.send(None)
+        #self.listener.close()
+        # TODO: terminate proc?

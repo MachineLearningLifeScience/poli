@@ -27,4 +27,6 @@ def start_observer_process(observer_name):
         if msg is None:
             break
         observer.observe(*msg)
+    conn.close()
     observer.finish()
+    exit()  # kill other threads, and close file handles

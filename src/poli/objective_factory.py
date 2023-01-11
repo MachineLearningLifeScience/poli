@@ -51,5 +51,7 @@ def create(name: str, caller_info) -> (ProblemSetupInformation, Callable[[np.nda
     def terminate():
         # terminate objective process
         conn.send(None)
+        #listener.close()
+        #proc.terminate()
 
     return problem_information, f, x0, y0, observer_info, terminate
