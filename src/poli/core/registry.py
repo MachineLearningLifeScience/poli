@@ -1,10 +1,8 @@
 import os
 import configparser
+import warnings
 
-from poli.objectives.common import __file__ as common_path
-
-COMMONS = os.path.dirname(common_path)
-
+from poli.core.abstract_problem_factory import AbstractProblemFactory
 
 _DEFAULT = 'DEFAULT'
 _OBSERVER = 'observer'
@@ -28,9 +26,12 @@ def delete_observer_run_script():
     _write_config()
 
 
-def register_problem(problem_name: str, run_script_location: str):
+def register_problem(problem_factory: AbstractProblemFactory, run_script_location: str):
+    problem_name = problem_factory.get_setup_information().get_problem_name()
     if problem_name not in config.sections():
         config.add_section(problem_name)
+    else:
+        warnings.warn(f"Problem {problem_name} already exists. Overwriting.")
     config[problem_name][_RUN_SCRIPT_LOCATION] = run_script_location
     _write_config()
 
