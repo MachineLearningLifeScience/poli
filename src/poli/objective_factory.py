@@ -10,7 +10,6 @@ from multiprocessing.connection import Listener
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.core.registry import config, _RUN_SCRIPT_LOCATION, _DEFAULT, _OBSERVER
-from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.external_observer import ExternalObserver
 
 
