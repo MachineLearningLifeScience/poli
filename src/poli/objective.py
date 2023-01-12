@@ -2,9 +2,6 @@ import sys
 from multiprocessing.connection import Client
 
 from poli.core import AbstractProblemFactory
-from poli.core.util.abstract_observer import AbstractObserver
-from poli.core.util.external_observer import ExternalObserver
-from poli.core.registry import config, _DEFAULT, _OBSERVER
 
 
 def dynamically_instantiate(obj: str):
@@ -37,17 +34,9 @@ def run(objective_name: str) -> None:
         # x, context = msg
         if msg is None:
             break
-        #try:
         y = f(*msg)
-        # the observer has been called inside f
-        # the main reason is that x can be of shape [N, L] whereas observers are guaranteed objects of shape [1, L]
         conn.send(y)
-        # except Exception as e:
-        #     logging.exception(e)
-        #     conn.send(e)
-        #     break
     conn.close()
-    # TODO: reinsert?
     exit()  # kill other threads, and close file handles
 
 
