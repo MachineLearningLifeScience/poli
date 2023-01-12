@@ -57,12 +57,8 @@ def create(name: str, caller_info) -> (ProblemSetupInformation, AbstractBlackBox
     observer_info = None
     observer_script = config[_DEFAULT][_OBSERVER]
     if observer_script != '':
-        # try:
-            observer: AbstractObserver = ExternalObserver(observer_script)
-            observer_info = observer.initialize_observer(problem_information, caller_info, x0, y0)
-        # except Exception as e:
-        #     warnings.warn("Could not instantiate observer. Exception was: ")
-        #     logging.exception(e)
+        observer: AbstractObserver = ExternalObserver(observer_script)
+        observer_info = observer.initialize_observer(problem_information, caller_info, x0, y0)
 
     f = ExternalBlackBox(problem_information.get_max_sequence_length(), conn)
     f.set_observer(observer)
