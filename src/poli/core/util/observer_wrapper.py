@@ -13,13 +13,9 @@ def start_observer_process(observer_name):
     setup_info, caller_info, x0, y0 = conn.recv()
     # instantiate observer
     observer: AbstractObserver = dynamically_instantiate(observer_name)
-    #try:
     observer_info = observer.initialize_observer(setup_info, caller_info, x0, y0)
     # give mother process the signal that we're ready
     conn.send(observer_info)
-    # except Exception as e:
-    #     conn.send(e)
-    #     return
 
     # now wait for observe calls
     while True:
@@ -30,5 +26,4 @@ def start_observer_process(observer_name):
     observer.finish()
     conn.send(None)
     conn.close()
-    # TODO: reinsert?
     exit()  # kill other threads, and close file handles
