@@ -52,12 +52,12 @@ def create(name: str, caller_info) -> (ProblemSetupInformation, AbstractBlackBox
     # wait for objective process to finish setting up
     x0, y0, problem_information = conn.recv()
 
-    # instantiate observer
+    # instantiate observer (if desired)
     observer = None
     observer_info = None
     observer_script = config[_DEFAULT][_OBSERVER]
     if observer_script != '':
-        observer: AbstractObserver = ExternalObserver(observer_script)
+        observer = ExternalObserver(observer_script)
         observer_info = observer.initialize_observer(problem_information, caller_info, x0, y0)
 
     f = ExternalBlackBox(problem_information.get_max_sequence_length(), conn)
@@ -67,7 +67,8 @@ def create(name: str, caller_info) -> (ProblemSetupInformation, AbstractBlackBox
         # terminate objective process
         conn.send(None)
         # terminate observer
-        observer.finish()
+        if observer is not None:
+            observer.finish()
         #listener.close()  # no need to close the connection, the objective does
         #proc.terminate()
 
