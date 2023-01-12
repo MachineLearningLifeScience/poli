@@ -25,5 +25,5 @@ def start_observer_process(observer_name):
         observer.observe(*msg)
     observer.finish()
     conn.send(None)
-    conn.close()
-    exit()  # kill other threads, and close file handles
+    #conn.close()
+    #exit()  # kill other threads, and close file handles
