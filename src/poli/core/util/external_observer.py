@@ -17,15 +17,17 @@ class ExternalObserver(AbstractObserver):
         self.conn.send([x, y, context])
 
     def initialize_observer(self, setup_info: ProblemSetupInformation, caller_info, x0, y0) -> str:
-        cwd = os.getcwd()
-        proc = subprocess.Popen(self.observer_script, stdout=None, stderr=None, cwd=cwd)
         address = ('localhost', 6001)
         self.listener = Listener(address, authkey=b'secret password')
+        # start observer process
+        proc = subprocess.Popen(self.observer_script, stdout=None, stderr=None, cwd=os.getcwd())
+        # wait for connection
         self.conn = self.listener.accept()
+        # send setup information
         self.conn.send([setup_info, caller_info, x0, y0])
+        # wait for logger handle
         observer_info = self.conn.recv()
-        #if isinstance(observer_info, Exception):
-        #    raise observer_info
+        # forward to objective factory
         return observer_info
 
     def finish(self) -> None:
