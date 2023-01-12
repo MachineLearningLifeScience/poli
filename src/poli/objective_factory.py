@@ -7,14 +7,14 @@ from typing import Callable
 import numpy as np
 from multiprocessing.connection import Listener
 
-from poli.core.AbstractBlackBox import BlackBox
+from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.core.registry import config, _RUN_SCRIPT_LOCATION, _DEFAULT, _OBSERVER
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.external_observer import ExternalObserver
 
 
-class ExternalBlackBox(BlackBox):
+class ExternalBlackBox(AbstractBlackBox):
     def __init__(self, L: int, conn):
         super().__init__(L)
         self.conn = conn
@@ -77,5 +77,3 @@ def create(name: str, caller_info) -> (ProblemSetupInformation, Callable[[np.nda
         #proc.terminate()
 
     return problem_information, f, x0, y0, observer_info, terminate
-
-

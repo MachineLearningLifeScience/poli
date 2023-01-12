@@ -3,8 +3,8 @@ import warnings
 import numpy as np
 import poli.core.registry
 
-from poli.core.AbstractBlackBox import BlackBox
-from poli.core.AbstractProblemFactory import AbstractProblemFactory
+from poli.core.abstract_black_box import AbstractBlackBox
+from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.core.registry import COMMONS
 from poli.objectives.common.lambo.candidate import FoldedCandidate
@@ -17,7 +17,7 @@ class FoldXGFPFactory(AbstractProblemFactory):
     def get_setup_information(self) -> ProblemSetupInformation:
         return ProblemSetupInformation(name="GFP_FOLDX", max_sequence_length=237, aligned=True, alphabet=AA_IDX)
 
-    def create(self) -> (BlackBox, np.ndarray, np.ndarray):
+    def create(self) -> (AbstractBlackBox, np.ndarray, np.ndarray):
         data_path = os.path.join(COMMONS, "data", "cbas_green_fluorescent_protein")
         wt_pdb_file = os.path.join(data_path, "1ema.pdb")
         X, _, _ = get_experimental_X_y(prefix=data_path)
@@ -34,7 +34,7 @@ class FoldXGFPFactory(AbstractProblemFactory):
         wt_array = np.array([wt])
         x_array = np.array([" " * self.get_setup_information().get_max_sequence_length()])
 
-        class LamboSasaGFP(BlackBox):
+        class LamboSasaGFP(AbstractBlackBox):
             def _black_box(self, x: np.ndarray) -> np.ndarray:
                 x_ = convert_idx_array_to_aas(x[:, :63])[0].upper() + convert_idx_array_to_aas(x[:, 66:-9])[0].upper()
                 """

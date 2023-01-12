@@ -3,7 +3,7 @@ import numpy as np
 from poli.core.util.abstract_observer import AbstractObserver
 
 
-class BlackBox:
+class AbstractBlackBox:
     def __init__(self, L: int):
         """
         :param L: length of the inputs (NOT 1hot encoded)
@@ -29,7 +29,7 @@ class BlackBox:
         f = np.zeros([x.shape[0], 1])
         for i in range(x.shape[0]):
             x_ = x[i:i+1, :]
-            f_ = self._black_box(x_)
+            f_ = self._black_box(x_, context)
             f[i] = f_
             assert(len(f_.shape) == 2)
             assert(f_.shape[0] == 1)
@@ -39,5 +39,5 @@ class BlackBox:
                 self.observer.observe(x_, f_, context)
         return f
 
-    def _black_box(self, x):
+    def _black_box(self, x, context=None):
         raise NotImplementedError("abstract method")

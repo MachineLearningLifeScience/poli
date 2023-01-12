@@ -1,6 +1,6 @@
 import numpy as np
 
-from poli.core.AbstractBlackBox import BlackBox
+from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.problem_setup_information import ProblemSetupInformation
 
 
@@ -8,7 +8,7 @@ class AbstractProblemFactory:
     def get_setup_information(self) -> ProblemSetupInformation:
         raise NotImplementedError("abstract method")
 
-    def create(self) -> (BlackBox, np.ndarray, np.ndarray):
+    def create(self) -> (AbstractBlackBox, np.ndarray, np.ndarray):
         """
         Returns a blackbox function and initial observations.
         :return:

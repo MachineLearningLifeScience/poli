@@ -1,7 +1,7 @@
 import sys
 from multiprocessing.connection import Client
 
-from poli.core import AbstractProblemFactory
+from poli.core import abstract_problem_factory
 
 
 def dynamically_instantiate(obj: str):

@@ -2,7 +2,7 @@ import numpy as np
 import os
 
 from src.poli.core import BlackBox
-from src.poli.core import AbstractProblemFactory, ProblemSetupInformation
+from src.poli.core import abstract_problem_factory, ProblemSetupInformation
 from src.poli.objectives.common import __file__ as common_path
 
 
