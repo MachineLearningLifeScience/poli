@@ -20,10 +20,11 @@ def run(objective_name: str) -> None:
     # make connection with the mother process
     address = ('localhost', 6000)
     conn = Client(address, authkey=b'secret password')
+    seed = conn.recv()
 
     # dynamically load objective function module
     objective_factory: AbstractProblemFactory = dynamically_instantiate(objective_name)
-    f, x0, y0 = objective_factory.create()
+    f, x0, y0 = objective_factory.create(seed)
 
     # give mother process the signal that we're ready
     conn.send([x0, y0, objective_factory.get_setup_information()])
@@ -36,8 +37,8 @@ def run(objective_name: str) -> None:
             break
         y = f(*msg)
         conn.send(y)
-    conn.close()
-    exit()  # kill other threads, and close file handles
+    #conn.close()
+    #exit()  # kill other threads, and close file handles
 
 
 if __name__ == '__main__':

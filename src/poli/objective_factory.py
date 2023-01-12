@@ -24,11 +24,13 @@ class ExternalBlackBox(AbstractBlackBox):
         return val
 
 
-def create(name: str, caller_info) -> (ProblemSetupInformation, AbstractBlackBox, np.ndarray, np.ndarray, object, Callable):
+def create(name: str, seed: int = 0, caller_info: dict = None) -> (ProblemSetupInformation, AbstractBlackBox, np.ndarray, np.ndarray, object, Callable):
     """
     Instantiantes a black-box function.
     :param name:
         The name of the objective function or a shell-script for execution.
+    :param seed:
+        Information for the objective in case randomization is involved.
     :param caller_info:
         Optional information about the caller that is forwarded to the logger to initialize the run.
     :return:
@@ -48,6 +50,7 @@ def create(name: str, caller_info) -> (ProblemSetupInformation, AbstractBlackBox
     # wait for connection from objective process
     # TODO: potential (unlikely) race condition! (process might try to connect before listener is ready!)
     conn = listener.accept()
+    conn.send(seed)
     # wait for objective process to finish setting up
     x0, y0, problem_information = conn.recv()
 
