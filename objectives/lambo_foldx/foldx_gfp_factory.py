@@ -22,7 +22,7 @@ class FoldXGFPFactory(AbstractProblemFactory):
         COMMONS = os.path.dirname(common_file)
         data_path = os.path.join(COMMONS, "data", "cbas_green_fluorescent_protein")
         wt_pdb_file = os.path.join(data_path, "1ema.pdb")
-        X, _, _ = get_experimental_X_y(prefix=data_path)
+        X, _, _ = get_experimental_X_y(prefix=data_path, random_state=seed)
         """
         Fasta sequence of the GFP:
         MSKGEELFTGVVPILVELDGDVNGHKFSVSGEGEGDATYGKLTLKFICTTGKLPVPWPTLVTTFTYGVQCFSRYPDHMKRHDFFKSAMPEGYVQERTIFFKDDGNYKTRAEVKFEGDTLVNRIELKGIDFKEDGNILGHKLEYNYNSHNVYIMADKQKNGIKVNFKIRHNIEDGSVQLADHYQQNTPIGDGPVLLPDNHYLSTQSALSKDPNEKRDHMVLLEFVTAAGITHGMDELYK
