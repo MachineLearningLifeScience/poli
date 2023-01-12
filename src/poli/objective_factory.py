@@ -25,8 +25,7 @@ class ExternalBlackBox(AbstractBlackBox):
         return val
 
 
-# TODO: typing information about f out-dated? Would be nice to replace this by a class
-def create(name: str, caller_info) -> (ProblemSetupInformation, Callable[[np.ndarray], np.ndarray], np.ndarray, np.ndarray, str, Callable):
+def create(name: str, caller_info) -> (ProblemSetupInformation, AbstractBlackBox, np.ndarray, np.ndarray, object, Callable):
     """
     Instantiantes a black-box function.
     :param name:
