@@ -13,7 +13,7 @@ class MyObserver(AbstractObserver):
         self.step = 1
 
     def observe(self, x: np.ndarray, y: np.ndarray, context=None) -> None:
-        logging.info(f"step {self.step}: f({x})={y}")
+        logging.fatal(f"observer has been called in step {self.step}: f({x})={y}")
         self.step += 1
 
     def initialize_observer(self, problem_setup_info: ProblemSetupInformation, caller_info: object, x0: np.ndarray, y0: np.ndarray) -> object:
