@@ -19,26 +19,19 @@ pip install -e .
 
 ### Calling a benchmark
 The main file is `objective_function_factory.py`
-Available objectives are given as shell scripts in `objective_run_scripts`.
 ### Minimal working example
 Optimizing an objective function that just returns a draw from a standard normal.
 ```
 import poli.objective_factory
 
-f, x0, y0, run_info, terminate = objective_factory.create("white_noise", caller_info=None)
+f, x0, y0, run_info, terminate = objective_factory.create("WHITE_NOISE", caller_info=None)
 print(f(x0[:1, :]))
 terminate()
 ```
 ### Logging
-In the `config.rc` file you need to define a logger and an observer.
-With the logger you define the logging backend, with the observer you control which quantities will be recorded.
-An example configuration file could look like this:
-```
-[DEFAULT]
-observer = logger.observers.rudimentary_observer.RudimentaryObserver
-logger = logger.wandb.wandb_logger.WandBLogger
-```
-This uses the WeightsAndBiases logging backend, and the rudimentary observer logs for each function evaluation the input  and the value.
+You can define an observer that gets notified everytime the objective function is called.
+For that you have to write a python class that inherits from `AbstractObserver` and a shell script that instantiates your environment. 
+See `adding_an_observer.py` in the `examples` how to do this.
 ### More elaborate example
 ## Adding your own benchmark
 ### Design principles
