@@ -28,18 +28,8 @@ def run(objective_name: str) -> None:
     objective_factory: AbstractProblemFactory = dynamically_instantiate(objective_name)
     f, x0, y0 = objective_factory.create()
 
-    # instantiate observer
-    caller_info = conn.recv()
-    observer_script = config[_DEFAULT][_OBSERVER]
-    if observer_script != '':
-        observer: AbstractObserver = ExternalObserver(observer_script)
-        observer_info = observer.initialize_observer(objective_factory.get_setup_information(), caller_info, x0, y0)
-        f.set_observer(observer)
-    else:
-        observer_info = None
-
     # give mother process the signal that we're ready
-    conn.send([x0, y0, objective_factory.get_setup_information(), observer_info])
+    conn.send([x0, y0, objective_factory.get_setup_information()])
 
     # now wait for objective function calls
     while True:
@@ -47,17 +37,17 @@ def run(objective_name: str) -> None:
         # x, context = msg
         if msg is None:
             break
-        try:
-            y = f(*msg)
-            # the observer has been called inside f
-            # the main reason is that x can be of shape [N, L] whereas observers are guaranteed objects of shape [1, L]
-            conn.send(y)
-        except Exception as e:
-            conn.send(e)
-            break
+        #try:
+        y = f(*msg)
+        # the observer has been called inside f
+        # the main reason is that x can be of shape [N, L] whereas observers are guaranteed objects of shape [1, L]
+        conn.send(y)
+        # except Exception as e:
+        #     logging.exception(e)
+        #     conn.send(e)
+        #     break
     conn.close()
-    if observer_script != '':
-        observer.finish()
+    # TODO: reinsert?
     exit()  # kill other threads, and close file handles
 
 
