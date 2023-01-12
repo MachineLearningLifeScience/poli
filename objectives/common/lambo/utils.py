@@ -5,11 +5,11 @@ import itertools
 
 import numpy as np
 
-import torch
+#import torch
 #from Levenshtein._levenshtein import distance as edit_distance, editops as edit_ops
 
-from scipy.stats import rankdata
-from scipy.special import softmax
+# from scipy.stats import rankdata
+# from scipy.special import softmax
 
 from cachetools import cached, LRUCache
 
@@ -88,8 +88,8 @@ class IntTokenizer:
         return ' '.join(tokens)
 
     def convert_id_to_token(self, token_id):
-        if torch.is_tensor(token_id):
-            token_id = token_id.item()
+        #if torch.is_tensor(token_id):
+        #    token_id = token_id.item()
         assert isinstance(token_id, int)
         return self.inverse_lookup.get(token_id, '[UNK]')
 
@@ -131,13 +131,13 @@ def random_proteins(num, min_len=200, max_len=250):
     return proteins
 
 
-class Expression(torch.nn.Module):
-    def __init__(self, lambda_fn):
-        super().__init__()
-        self.fn = lambda_fn
-
-    def forward(self, x):
-        return self.fn(x)
+# class Expression(torch.nn.Module):
+#     def __init__(self, lambda_fn):
+#         super().__init__()
+#         self.fn = lambda_fn
+#
+#     def forward(self, x):
+#         return self.fn(x)
 
 
 def draw_bootstrap(*arrays, bootstrap_ratio=0.632, min_samples=1):
@@ -168,18 +168,18 @@ def draw_bootstrap(*arrays, bootstrap_ratio=0.632, min_samples=1):
     return res
 
 
-def to_tensor(*arrays, device=torch.device('cpu')):
-    tensors = []
-    for arr in arrays:
-        if isinstance(arr, torch.Tensor):
-            tensors.append(arr.to(device))
-        else:
-            tensors.append(torch.tensor(arr, device=device))
-
-    if len(arrays) == 1:
-        return tensors[0]
-
-    return tensors
+# def to_tensor(*arrays, device=torch.device('cpu')):
+#     tensors = []
+#     for arr in arrays:
+#         if isinstance(arr, torch.Tensor):
+#             tensors.append(arr.to(device))
+#         else:
+#             tensors.append(torch.tensor(arr, device=device))
+#
+#     if len(arrays) == 1:
+#         return tensors[0]
+#
+#     return tensors
 
 
 def batched_call(fn, arg_array, batch_size, *args, **kwargs):

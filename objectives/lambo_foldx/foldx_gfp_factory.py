@@ -6,18 +6,20 @@ import poli.core.registry
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem_setup_information import ProblemSetupInformation
-from poli.core.registry import COMMONS
-from poli.objectives.common.lambo.candidate import FoldedCandidate
-from poli.objectives.common.lambo.utils import ResidueTokenizer
-from poli.objectives.common.lambo.proxy_rfp import ProxyRFPTask
-from poli.objectives.common.cbas.util import get_experimental_X_y, convert_aas_to_idx_array, convert_idx_array_to_aas, AA_IDX
+
+from common.lambo.candidate import FoldedCandidate
+from common.lambo.utils import ResidueTokenizer
+from common.lambo.proxy_rfp import ProxyRFPTask
+from common.cbas.util import get_experimental_X_y, convert_aas_to_idx_array, convert_idx_array_to_aas, AA_IDX
 
 
 class FoldXGFPFactory(AbstractProblemFactory):
     def get_setup_information(self) -> ProblemSetupInformation:
         return ProblemSetupInformation(name="GFP_FOLDX", max_sequence_length=237, aligned=True, alphabet=AA_IDX)
 
-    def create(self) -> (AbstractBlackBox, np.ndarray, np.ndarray):
+    def create(self, seed: int = 0) -> (AbstractBlackBox, np.ndarray, np.ndarray):
+        from common import __file__ as common_file
+        COMMONS = os.path.dirname(common_file)
         data_path = os.path.join(COMMONS, "data", "cbas_green_fluorescent_protein")
         wt_pdb_file = os.path.join(data_path, "1ema.pdb")
         X, _, _ = get_experimental_X_y(prefix=data_path)
@@ -35,7 +37,7 @@ class FoldXGFPFactory(AbstractProblemFactory):
         x_array = np.array([" " * self.get_setup_information().get_max_sequence_length()])
 
         class LamboSasaGFP(AbstractBlackBox):
-            def _black_box(self, x: np.ndarray) -> np.ndarray:
+            def _black_box(self, x: np.ndarray, context=None) -> np.ndarray:
                 x_ = convert_idx_array_to_aas(x[:, :63])[0].upper() + convert_idx_array_to_aas(x[:, 66:-9])[0].upper()
                 """
                 FoldX complains that the following residues are missing:
@@ -82,5 +84,4 @@ def read_cached_target_values(f, X):
 
 
 if __name__ == '__main__':
-    poli.core.registry.register_problem(FoldXGFPFactory().get_setup_information().get_problem_name(),
-                                        os.path.join(os.path.dirname(__file__), 'foldx_gfp.sh'))
+    poli.core.registry.register_problem(FoldXGFPFactory(), os.path.join(os.path.dirname(__file__), 'foldx_gfp.sh'))

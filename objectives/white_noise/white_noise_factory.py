@@ -20,7 +20,8 @@ class WhiteNoiseFactory(AbstractProblemFactory):
     def get_setup_information(self) -> ProblemSetupInformation:
         return ProblemSetupInformation(name="WHITE_NOISE", max_sequence_length=5, aligned=True, alphabet=AA_IDX)
 
-    def create(self) -> (AbstractBlackBox, np.ndarray, np.ndarray):
+    def create(self, seed: int = 0) -> (AbstractBlackBox, np.ndarray, np.ndarray):
+        np.random.seed(seed)
         f = WhiteNoiseBlackBox(self.get_setup_information().get_max_sequence_length())
         x = np.diag(np.arange(11) + 6) @ np.ones([11, self.get_setup_information().get_max_sequence_length()], dtype=np.int)
         y = f(x)
