@@ -3,6 +3,7 @@ import configparser
 import warnings
 
 from poli.core.abstract_problem_factory import AbstractProblemFactory
+from typing import List
 
 _DEFAULT = 'DEFAULT'
 _OBSERVER = 'observer'
@@ -41,7 +42,7 @@ def delete_problem(problem_name: str):
     _write_config()
 
 
-def get_problems() -> list[str]:
+def get_problems() -> List[str]:
     problems = config.sections()
     #problems.remove(_DEFAULT)  # no need to remove default section
     return problems
