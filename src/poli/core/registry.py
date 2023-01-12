@@ -41,6 +41,12 @@ def delete_problem(problem_name: str):
     _write_config()
 
 
+def get_problems() -> list[str]:
+    problems = config.sections()
+    #problems.remove(_DEFAULT)  # no need to remove default section
+    return problems
+
+
 def _write_config():
     with open(config_file, 'w+') as configfile:
         config.write(configfile)
