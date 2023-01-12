@@ -1,18 +1,28 @@
 """
 This is the main file relevant for users who want to run objective functions.
 """
-import logging
 import os
 import subprocess
-import warnings
 from typing import Callable
 import numpy as np
 from multiprocessing.connection import Listener
 
+from poli.core.AbstractBlackBox import BlackBox
 from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.core.registry import config, _RUN_SCRIPT_LOCATION, _DEFAULT, _OBSERVER
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.external_observer import ExternalObserver
+
+
+class ExternalBlackBox(BlackBox):
+    def __init__(self, L: int, conn):
+        super().__init__(L)
+        self.conn = conn
+
+    def _black_box(self, x, context=None):
+        self.conn.send([x, context])
+        val = self.conn.recv()
+        return val
 
 
 # TODO: typing information about f out-dated? Would be nice to replace this by a class
@@ -55,16 +65,8 @@ def create(name: str, caller_info) -> (ProblemSetupInformation, Callable[[np.nda
         #     warnings.warn("Could not instantiate observer. Exception was: ")
         #     logging.exception(e)
 
-    def f(x: np.ndarray, context=None) -> np.ndarray:
-        # send input and wait for reply
-        conn.send([x, context])
-        val = conn.recv()
-        #if isinstance(val, Exception):
-        #    raise val
-        if observer is not None:
-            for i in range(x.shape[0]):
-                observer.observe(x[i:i+1, :], val[i:i+1, :], context)
-        return val
+    f = ExternalBlackBox(problem_information.get_max_sequence_length(), conn)
+    f.set_observer(observer)
 
     def terminate():
         # terminate objective process
@@ -75,3 +77,5 @@ def create(name: str, caller_info) -> (ProblemSetupInformation, Callable[[np.nda
         #proc.terminate()
 
     return problem_information, f, x0, y0, observer_info, terminate
+
+
