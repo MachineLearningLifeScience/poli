@@ -24,11 +24,12 @@ class ExternalObserver(AbstractObserver):
         self.conn = self.listener.accept()
         self.conn.send([setup_info, caller_info, x0, y0])
         observer_info = self.conn.recv()
-        if isinstance(observer_info, Exception):
-            raise observer_info
+        #if isinstance(observer_info, Exception):
+        #    raise observer_info
         return observer_info
 
     def finish(self) -> None:
         self.conn.send(None)
-        #self.listener.close()
+        self.conn.recv()  # wait for observer to finish
+        #self.listener.close()  # no need to close the connection, the observer_wrapper does
         # TODO: terminate proc?
