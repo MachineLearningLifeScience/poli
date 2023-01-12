@@ -22,6 +22,7 @@ class ExternalObserver(AbstractObserver):
         # start observer process
         proc = subprocess.Popen(self.observer_script, stdout=None, stderr=None, cwd=os.getcwd())
         # wait for connection
+        # TODO: potential (unlikely) race condition! (process might try to connect before listener is ready!)
         self.conn = self.listener.accept()
         # send setup information
         self.conn.send([setup_info, caller_info, x0, y0])
