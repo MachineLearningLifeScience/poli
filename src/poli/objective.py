@@ -1,4 +1,5 @@
 import logging
+import os
 import sys
 from multiprocessing.connection import Client
 
@@ -6,6 +7,7 @@ from poli.core.abstract_problem_factory import AbstractProblemFactory
 
 
 def dynamically_instantiate(obj: str):
+    sys.path.append(os.getcwd())
     last_dot = obj.rfind('.')
     try:
         exec("from " + obj[:last_dot] + " import " + obj[last_dot+1:] + " as DynamicObject")
