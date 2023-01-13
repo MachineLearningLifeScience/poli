@@ -1,3 +1,4 @@
+import logging
 import sys
 from multiprocessing.connection import Client
 
@@ -6,8 +7,12 @@ from poli.core.abstract_problem_factory import AbstractProblemFactory
 
 def dynamically_instantiate(obj: str):
     last_dot = obj.rfind('.')
-    exec("from " + obj[:last_dot] + " import " + obj[last_dot+1:] + " as DynamicObject")
-    instantiated_object = eval("DynamicObject()")
+    try:
+        exec("from " + obj[:last_dot] + " import " + obj[last_dot+1:] + " as DynamicObject")
+        instantiated_object = eval("DynamicObject()")
+    except ModuleNotFoundError as e:
+        logging.fatal(f"Python path: {sys.path}")
+        raise e
     return instantiated_object
 
 
