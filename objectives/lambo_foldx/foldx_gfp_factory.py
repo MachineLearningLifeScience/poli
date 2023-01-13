@@ -62,12 +62,12 @@ class FoldXGFPFactory(AbstractProblemFactory):
         f = LamboSasaGFP(self.get_setup_information().get_max_sequence_length())
         # TODO: REMOVE
         X = X[:5, :]
-        y = read_cached_target_values(f, X)
+        y = read_cached_target_values(f, X, seed)
         return f, X, y
 
 
-def read_cached_target_values(f, X):
-    file_name = os.path.join(os.path.dirname(__file__), "cached_foldx_values.npy")
+def read_cached_target_values(f, X, seed):
+    file_name = os.path.join(os.path.dirname(__file__), f"cached_foldx_values_{seed}.npy")
     try:
         y = np.load(file_name)
         if not y.shape[0] == X.shape[0]:
