@@ -7,6 +7,8 @@ from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem_setup_information import ProblemSetupInformation
 
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))  # add subfolder to path
 from common.lambo.candidate import FoldedCandidate
 from common.lambo.utils import ResidueTokenizer
 from common.lambo.proxy_rfp import ProxyRFPTask
