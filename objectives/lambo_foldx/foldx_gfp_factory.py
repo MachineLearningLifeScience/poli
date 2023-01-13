@@ -84,4 +84,6 @@ def read_cached_target_values(f, X):
 
 
 if __name__ == '__main__':
+    import sys
+    sys.path.append(os.path.dirname(os.path.dirname(__file__)))  # add subfolder to path
     poli.core.registry.register_problem(FoldXGFPFactory(), os.path.join(os.path.dirname(__file__), 'foldx_gfp.sh'))
