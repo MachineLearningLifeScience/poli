@@ -21,7 +21,7 @@ class ExternalObserver(AbstractObserver):
         listener, port, password = instantiate_listener()
         self.listener = listener
         # start observer process
-        self.proc = subprocess.Popen([self.observer_script, port, password], stdout=None, stderr=None, cwd=os.getcwd())
+        self.proc = subprocess.Popen([self.observer_script, str(port), password], stdout=None, stderr=None, cwd=os.getcwd())
         # wait for connection
         # TODO: potential (unlikely) race condition! (process might try to connect before listener is ready!)
         self.conn = self.listener.accept()
