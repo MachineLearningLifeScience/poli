@@ -1,11 +1,12 @@
 # TO DO
  * make install script that creates environments and run_scripts 
- * add example how to easily exchange loggers and observers
  * consider switching to Hydra (though this creates a dependency that might break in the future)
 # Protein Objective Library (POLi)
 An easy-to-use, plug-and-play library to benchmark protein-related Bayesian optimization algorithms.
 Primarily, this library provides objective functions encapsulating any dependencies.
 Main benefit is that this allows to develop algorithms that use (say) tensorflow without having to worry that the objective was written in (say) torch.
+
+For any code written by other authors (whether objective function or algorithm) this library allows to benchmark and analyse it without too much interaction.
 
 On purpose, logging is kept at the objective function side.
 This allows easier benchmarking of algorithms from other authors.
@@ -24,14 +25,17 @@ Optimizing an objective function that just returns a draw from a standard normal
 ```
 import poli.objective_factory
 
-f, x0, y0, run_info, terminate = objective_factory.create("WHITE_NOISE", caller_info=None)
+problem_info, f, x0, y0, run_info = objective_factory.create("WHITE_NOISE", caller_info=None)
 print(f(x0[:1, :]))
-terminate()
+f.terminate()
 ```
 ### Logging
 You can define an observer that gets notified everytime the objective function is called.
-For that you have to write a python class that inherits from `AbstractObserver` and a shell script that instantiates your environment. 
+For that you have to write a python class that inherits from `AbstractObserver`. 
 See `adding_an_observer.py` in the `examples` how to do this.
+NOTE: If your observer is NOT at the root of your project, you have to specify the argument `python_paths` accordingly.
+Minimally, you should set `python_paths=[your_project_root]`.
+
 ### More elaborate example
 ## Adding your own benchmark
 ### Design principles
