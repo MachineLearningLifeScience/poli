@@ -1,6 +1,5 @@
 __author__ = 'Simon Bartels'
 
-import os
 import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
@@ -34,13 +33,16 @@ class MyProblemFactory(AbstractProblemFactory):
         return f, x0, f(x0)
 
 
-"""
-Step 3: Write a small shell script such as `my_objective_function.sh` which calls this file.
-(The encapsulation in a shell script allows for example to load a different python environment.)
-
-Done.
-"""
 if __name__ == '__main__':
-    from poli.objective import run
-    problem_factory_name = os.path.basename(__file__)[:-2] + MyProblemFactory.__name__
-    run(problem_factory_name)
+    from poli import objective_factory
+    from poli.core.registry import register_problem
+
+    # (once) we have to register our factory
+    my_problem_factory = MyProblemFactory()
+    register_problem(my_problem_factory, conda_environment_location="")
+
+    # now we can instantiate our objective
+    problem_name = my_problem_factory.get_setup_information().get_problem_name()
+    problem_info, f, x0, y0, run_info = objective_factory.create(problem_name, caller_info=None)
+    print(f(x0[:1, :]))
+    f.terminate()
