@@ -1,10 +1,10 @@
 import os
 import subprocess
 import numpy as np
-from multiprocessing.connection import Listener
 
 from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.core.util.abstract_observer import AbstractObserver
+from poli.core.util.ipc import instantiate_listener
 
 
 class ExternalObserver(AbstractObserver):
@@ -12,15 +12,16 @@ class ExternalObserver(AbstractObserver):
         self.observer_script = observer_script
         self.conn = None
         self.listener = None
+        self.proc = None
 
     def observe(self, x: np.ndarray, y: np.ndarray, context=None) -> None:
         self.conn.send([x, y, context])
 
     def initialize_observer(self, setup_info: ProblemSetupInformation, caller_info, x0, y0) -> str:
-        address = ('localhost', 6001)
-        self.listener = Listener(address, authkey=b'secret password')
+        listener, port, password = instantiate_listener()
+        self.listener = listener
         # start observer process
-        proc = subprocess.Popen(self.observer_script, stdout=None, stderr=None, cwd=os.getcwd())
+        self.proc = subprocess.Popen([self.observer_script, port, password], stdout=None, stderr=None, cwd=os.getcwd())
         # wait for connection
         # TODO: potential (unlikely) race condition! (process might try to connect before listener is ready!)
         self.conn = self.listener.accept()
@@ -33,6 +34,5 @@ class ExternalObserver(AbstractObserver):
 
     def finish(self) -> None:
         self.conn.send(None)
-        self.conn.recv()  # wait for observer to finish
-        #self.listener.close()  # no need to close the connection, the observer_wrapper does
-        # TODO: terminate proc?
+        self.proc.wait()  # wait for observer to finish
+        self.listener.close()

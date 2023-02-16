@@ -1,13 +1,14 @@
+import sys
 from multiprocessing.connection import Client
 
 from poli.core.util.abstract_observer import AbstractObserver
+from poli.core.util.ipc import get_connection
 from poli.objective import dynamically_instantiate
 
 
-def start_observer_process(observer_name):
+def start_observer_process(observer_name, port: int, password: str):
     # make connection with the mother process
-    address = ('localhost', 6001)
-    conn = Client(address, authkey=b'secret password')
+    conn = get_connection(port, password)
 
     # get setup info from external_observer
     setup_info, caller_info, x0, y0 = conn.recv()
@@ -24,6 +25,9 @@ def start_observer_process(observer_name):
             break
         observer.observe(*msg)
     observer.finish()
-    conn.send(None)
     #conn.close()
     #exit()  # kill other threads, and close file handles
+
+
+if __name__ == '__main__':
+    start_observer_process(sys.argv[1], int(sys.argv[2]), sys.argv[3])
