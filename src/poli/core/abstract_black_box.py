@@ -41,3 +41,9 @@ class AbstractBlackBox:
 
     def _black_box(self, x, context=None):
         raise NotImplementedError("abstract method")
+
+    def terminate(self):
+        pass
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.terminate()

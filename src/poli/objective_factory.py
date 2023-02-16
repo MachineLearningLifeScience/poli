@@ -14,14 +14,26 @@ from poli.core.util.external_observer import ExternalObserver
 
 
 class ExternalBlackBox(AbstractBlackBox):
-    def __init__(self, L: int, conn):
+    def __init__(self, L: int, conn, listener, proc):
         super().__init__(L)
         self.conn = conn
+        self.listener = listener
+        self.proc = proc
 
     def _black_box(self, x, context=None):
         self.conn.send([x, context])
         val = self.conn.recv()
         return val
+
+    def terminate(self):
+        # terminate objective process
+        self.conn.send(None)
+        # terminate observer
+        if self.observer is not None:
+            self.observer.finish()
+        # TODO: potentially dangerous to wait here!
+        self.proc.wait()  # wait for objective function process to finish
+        self.listener.close()  # clean up connection
 
 
 def create(name: str, seed: int = 0, caller_info: dict = None) -> (ProblemSetupInformation, AbstractBlackBox, np.ndarray, np.ndarray, object, Callable):
@@ -62,16 +74,7 @@ def create(name: str, seed: int = 0, caller_info: dict = None) -> (ProblemSetupI
         observer = ExternalObserver(observer_script)
         observer_info = observer.initialize_observer(problem_information, caller_info, x0, y0)
 
-    f = ExternalBlackBox(problem_information.get_max_sequence_length(), conn)
+    f = ExternalBlackBox(problem_information.get_max_sequence_length(), conn, listener, proc)
     f.set_observer(observer)
 
-    def terminate():
-        # terminate objective process
-        conn.send(None)
-        # terminate observer
-        if observer is not None:
-            observer.finish()
-        #listener.close()  # no need to close the connection, the objective does
-        #proc.terminate()
-
-    return problem_information, f, x0, y0, observer_info, terminate
+    return problem_information, f, x0, y0, observer_info
