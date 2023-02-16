@@ -1,40 +1,33 @@
 """
 This is the main file relevant for users who want to run objective functions.
 """
-import os
-import subprocess
 from typing import Callable
 import numpy as np
-from multiprocessing.connection import Listener
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.core.registry import config, _RUN_SCRIPT_LOCATION, _DEFAULT, _OBSERVER
 from poli.core.util.external_observer import ExternalObserver
-from poli.core.util.ipc import instantiate_listener
+from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
 
 
 class ExternalBlackBox(AbstractBlackBox):
-    def __init__(self, L: int, conn, listener, proc):
+    def __init__(self, L: int, process_wrapper):
         super().__init__(L)
-        self.conn = conn
-        self.listener = listener
-        self.proc = proc
+        self.process_wrapper = process_wrapper
 
     def _black_box(self, x, context=None):
-        self.conn.send([x, context])
-        val = self.conn.recv()
+        self.process_wrapper.send([x, context])
+        val = self.process_wrapper.recv()
         return val
 
     def terminate(self):
         # terminate objective process
-        self.conn.send(None)
+        self.process_wrapper.send(None)
         # terminate observer
         if self.observer is not None:
             self.observer.finish()
-        # TODO: potentially dangerous to wait here!
-        self.proc.wait()  # wait for objective function process to finish
-        self.listener.close()  # clean up connection
+        self.process_wrapper.close()  # clean up connection
 
 
 def create(name: str, seed: int = 0, caller_info: dict = None) -> (ProblemSetupInformation, AbstractBlackBox, np.ndarray, np.ndarray, object, Callable):
@@ -54,17 +47,14 @@ def create(name: str, seed: int = 0, caller_info: dict = None) -> (ProblemSetupI
         observer_info: information from the observer_info about the instantiated run (allows the calling algorithm to connect)
         terminate: a function to end the process behind f
     """
-    listener, port, password = instantiate_listener()
     # start objective process
-    objective_run_script = config[name][_RUN_SCRIPT_LOCATION]
-    proc = subprocess.Popen([objective_run_script, str(port), password], stdout=None, stderr=None, cwd=os.getcwd())
+    process_wrapper = ProcessWrapper(config[name][_RUN_SCRIPT_LOCATION])
     # TODO: add signal listener that intercepts when proc ends
     # wait for connection from objective process
     # TODO: potential (unlikely) race condition! (process might try to connect before listener is ready!)
-    conn = listener.accept()
-    conn.send(seed)
+    process_wrapper.send(seed)
     # wait for objective process to finish setting up
-    x0, y0, problem_information = conn.recv()
+    x0, y0, problem_information = process_wrapper.recv()
 
     # instantiate observer (if desired)
     observer = None
@@ -74,7 +64,7 @@ def create(name: str, seed: int = 0, caller_info: dict = None) -> (ProblemSetupI
         observer = ExternalObserver(observer_script)
         observer_info = observer.initialize_observer(problem_information, caller_info, x0, y0)
 
-    f = ExternalBlackBox(problem_information.get_max_sequence_length(), conn, listener, proc)
+    f = ExternalBlackBox(problem_information.get_max_sequence_length(), process_wrapper)
     f.set_observer(observer)
 
     return problem_information, f, x0, y0, observer_info

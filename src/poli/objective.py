@@ -1,10 +1,9 @@
 import logging
 import os
 import sys
-from multiprocessing.connection import Client
 
 from poli.core.abstract_problem_factory import AbstractProblemFactory
-from poli.core.util.ipc import get_connection
+from poli.core.util.inter_process_communication.process_wrapper import get_connection
 
 
 def dynamically_instantiate(obj: str):
