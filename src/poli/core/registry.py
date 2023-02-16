@@ -5,7 +5,8 @@ import warnings
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from typing import List
 
-from poli.core.util.objective_management.make_run_script import make_run_script
+from poli.core.util.abstract_observer import AbstractObserver
+from poli.core.util.objective_management.make_run_script import make_run_script, make_observer_script
 
 _DEFAULT = 'DEFAULT'
 _OBSERVER = 'observer'
@@ -17,6 +18,11 @@ config = configparser.ConfigParser(defaults={_OBSERVER: ''})
 ls = config.read(config_file)
 # if len(ls) == 0:
 #     warnings.warn("Could not find configuration file: %s" % config_file)
+
+
+def set_observer(observer: AbstractObserver, conda_environment_location : str=None, python_paths: list[str] = None):
+    run_script_location = make_observer_script(observer, conda_environment_location, python_paths)
+    set_observer_run_script(run_script_location)
 
 
 def set_observer_run_script(script_file_name: str):
