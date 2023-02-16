@@ -11,6 +11,7 @@ from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.core.registry import config, _RUN_SCRIPT_LOCATION, _DEFAULT, _OBSERVER
 from poli.core.util.external_observer import ExternalObserver
+from poli.core.util.ipc import instantiate_listener
 
 
 class ExternalBlackBox(AbstractBlackBox):
@@ -53,11 +54,7 @@ def create(name: str, seed: int = 0, caller_info: dict = None) -> (ProblemSetupI
         observer_info: information from the observer_info about the instantiated run (allows the calling algorithm to connect)
         terminate: a function to end the process behind f
     """
-    address = ('', 0)  #('localhost', 6000)
-    password = _generate_password()
-    listener = Listener(address, authkey=password.encode())
-    # TODO: very hacky way to read out the socket! (but the listener is not very cooperative)
-    port = listener._listener._socket.getsockname()[1]
+    listener, port, password = instantiate_listener()
     # start objective process
     objective_run_script = config[name][_RUN_SCRIPT_LOCATION]
     proc = subprocess.Popen([objective_run_script, str(port), password], stdout=None, stderr=None, cwd=os.getcwd())
@@ -81,8 +78,3 @@ def create(name: str, seed: int = 0, caller_info: dict = None) -> (ProblemSetupI
     f.set_observer(observer)
 
     return problem_information, f, x0, y0, observer_info
-
-
-def _generate_password() -> str:
-    # TODO: actually generate safe password
-    return 'secret password'

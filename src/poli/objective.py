@@ -4,6 +4,7 @@ import sys
 from multiprocessing.connection import Client
 
 from poli.core.abstract_problem_factory import AbstractProblemFactory
+from poli.core.util.ipc import get_connection
 
 
 def dynamically_instantiate(obj: str):
@@ -25,8 +26,7 @@ def run(objective_name: str, port: int, password: str) -> None:
         problem factory name including python packages, e.g. package.subpackage.MyFactoryName
     """
     # make connection with the mother process
-    address = ('', port)
-    conn = Client(address, authkey=password.encode())
+    conn = get_connection(port, password)
     seed = conn.recv()
 
     # dynamically load objective function module
