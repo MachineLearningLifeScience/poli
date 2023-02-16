@@ -25,7 +25,14 @@ def set_observer(observer: AbstractObserver, conda_environment_location : str=No
     set_observer_run_script(run_script_location)
 
 
-def set_observer_run_script(script_file_name: str):
+def set_observer_run_script(script_file_name: str) -> ():
+    """
+    Sets a run_script to be called on observer instantiation.
+    VERY IMPORTANT: the observer script MUST accept port and password as arguments
+    :param script_file_name:
+        path to the script
+    """
+    # VERY IMPORTANT: the observer script MUST accept port and password as arguments
     config[_DEFAULT][_OBSERVER] = script_file_name
     _write_config()
 

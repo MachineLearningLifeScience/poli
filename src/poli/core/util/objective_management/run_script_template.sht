@@ -4,4 +4,5 @@ source $CONDA_BASE/etc/profile.d/conda.sh
 conda activate %s  # environment location
 BASEDIR=$(dirname "$0")
 PYTHONPATH="${PYTHONPATH}:%s"  # additions to the python path
+# it is CRUCIAL that the shell script is given port number and password
 python %s "$1" "$2" # factory name, port number and password

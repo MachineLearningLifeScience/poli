@@ -48,6 +48,7 @@ def create(name: str, seed: int = 0, caller_info: dict = None) -> (ProblemSetupI
         terminate: a function to end the process behind f
     """
     # start objective process
+    # VERY IMPORTANT: the script MUST accept port and password as arguments
     process_wrapper = ProcessWrapper(config[name][_RUN_SCRIPT_LOCATION])
     # TODO: add signal listener that intercepts when proc ends
     # wait for connection from objective process
