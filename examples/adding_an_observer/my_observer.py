@@ -1,11 +1,9 @@
 __author__ = 'Simon Bartels'
-import os
 import numpy as np
 import logging
 
 from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.core.util.abstract_observer import AbstractObserver
-from poli.core.util.observer_wrapper import start_observer_process
 
 
 class MyObserver(AbstractObserver):
@@ -24,5 +22,14 @@ class MyObserver(AbstractObserver):
 
 
 if __name__ == '__main__':
-    observer_name = os.path.basename(__file__)[:-2] + MyObserver.__name__
-    start_observer_process(observer_name)
+    from poli import objective_factory
+    from poli.core.registry import set_observer
+
+    # (once) we have to register our observer
+    set_observer(MyObserver(), conda_environment_location="")
+
+    problem_info, f, x0, y0, run_info = objective_factory.create("MY_PROBLEM", caller_info=None)
+    # call objective function and observe that observer is called
+    print(f"The observer will be called {x0.shape[0]} time(s).")
+    f(x0)
+    f.terminate()
