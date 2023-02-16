@@ -4,4 +4,4 @@ source $CONDA_BASE/etc/profile.d/conda.sh
 conda activate %s  # environment location
 BASEDIR=$(dirname "$0")
 PYTHONPATH="${PYTHONPATH}:%s"  # additions to the python path
-python $BASEDIR/../objective.py %s  # factory name
+python $BASEDIR/../objective.py %s "$1" "$2" # factory name, port number and password

@@ -18,15 +18,15 @@ def dynamically_instantiate(obj: str):
     return instantiated_object
 
 
-def run(objective_name: str) -> None:
+def run(objective_name: str, port: int, password: str) -> None:
     """
     Starts an objective function listener loop to wait for requests.
     :param objective_name:
         problem factory name including python packages, e.g. package.subpackage.MyFactoryName
     """
     # make connection with the mother process
-    address = ('localhost', 6000)
-    conn = Client(address, authkey=b'secret password')
+    address = ('', port)
+    conn = Client(address, authkey=password.encode())
     seed = conn.recv()
 
     # dynamically load objective function module
@@ -49,4 +49,4 @@ def run(objective_name: str) -> None:
 
 
 if __name__ == '__main__':
-    run(sys.argv[1])
+    run(sys.argv[1], int(sys.argv[2]), sys.argv[3])

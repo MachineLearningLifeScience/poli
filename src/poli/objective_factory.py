@@ -53,11 +53,14 @@ def create(name: str, seed: int = 0, caller_info: dict = None) -> (ProblemSetupI
         observer_info: information from the observer_info about the instantiated run (allows the calling algorithm to connect)
         terminate: a function to end the process behind f
     """
-    address = ('localhost', 6000)
-    listener = Listener(address, authkey=b'secret password')
+    address = ('', 0)  #('localhost', 6000)
+    password = _generate_password()
+    listener = Listener(address, authkey=password.encode())
+    # TODO: very hacky way to read out the socket! (but the listener is not very cooperative)
+    port = listener._listener._socket.getsockname()[1]
     # start objective process
     objective_run_script = config[name][_RUN_SCRIPT_LOCATION]
-    proc = subprocess.Popen(objective_run_script, stdout=None, stderr=None, cwd=os.getcwd())
+    proc = subprocess.Popen([objective_run_script, str(port), password], stdout=None, stderr=None, cwd=os.getcwd())
     # TODO: add signal listener that intercepts when proc ends
     # wait for connection from objective process
     # TODO: potential (unlikely) race condition! (process might try to connect before listener is ready!)
@@ -78,3 +81,8 @@ def create(name: str, seed: int = 0, caller_info: dict = None) -> (ProblemSetupI
     f.set_observer(observer)
 
     return problem_information, f, x0, y0, observer_info
+
+
+def _generate_password() -> str:
+    # TODO: actually generate safe password
+    return 'secret password'
