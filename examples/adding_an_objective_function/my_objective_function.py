@@ -27,7 +27,7 @@ class MyProblemFactory(AbstractProblemFactory):
         AA_IDX = {AA[i]: i for i in range(len(AA))}
         return ProblemSetupInformation(name="MY_PROBLEM", max_sequence_length=3, aligned=True, alphabet=AA_IDX)
 
-    def create(self) -> (AbstractBlackBox, np.ndarray, np.ndarray):
+    def create(self, seed: int = 0) -> (AbstractBlackBox, np.ndarray, np.ndarray):
         L = self.get_setup_information().get_max_sequence_length()
         f = MyBlackBox(L)
         x0 = np.ones([1, L])
