@@ -30,7 +30,7 @@ class ExternalBlackBox(AbstractBlackBox):
         self.process_wrapper.close()  # clean up connection
 
 
-def create(name: str, seed: int = 0, caller_info: dict = None) -> (ProblemSetupInformation, AbstractBlackBox, np.ndarray, np.ndarray, object, Callable):
+def create(name: str, seed: int = 0, caller_info: dict = None) -> (ProblemSetupInformation, AbstractBlackBox, np.ndarray, np.ndarray, object):
     """
     Instantiantes a black-box function.
     :param name:
