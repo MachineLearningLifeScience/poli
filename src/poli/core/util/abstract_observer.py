@@ -11,3 +11,9 @@ class AbstractObserver:
 
     def finish(self) -> None:
         raise NotImplementedError("abstract method")
+
+    def __del__(self):
+        self.finish()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.finish()
