@@ -33,7 +33,7 @@ class ProcessWrapper:
         self.port = self.listener._listener._socket.getsockname()[1]
         # here is a VERY crucial step
         # we expect the shell script to take port and password as arguments
-        self.proc = subprocess.Popen([run_script, str(self.port), self.password], stdout=None, stderr=None, cwd=os.getcwd())
+        self.proc = subprocess.Popen([run_script, str(self.port), self.password], stdout=None, stderr=None)
         self.conn = self.listener.accept()  # wait for the process to connect
 
     def send(self, *args):
