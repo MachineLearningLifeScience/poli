@@ -1,5 +1,4 @@
 # TO DO
- * make install script that creates environments and run_scripts 
  * consider switching to Hydra (though this creates a dependency that might break in the future)
 # Protein Objective Library (POLi)
 An easy-to-use, plug-and-play library to benchmark protein-related Bayesian optimization algorithms.
@@ -37,6 +36,10 @@ NOTE: If your observer is NOT at the root of your project, you have to specify t
 Minimally, you should set `python_paths=[your_project_root]`.
 
 ### More elaborate example
+
+### Advanced options to add an observer
+Instead of providing a python observer class, you can also directly set a path to a run script.
+CRUCIALLY, this run script has to accept a port number and a password as an argument to build a connection.
 ## Adding your own benchmark
 ### Design principles
  * This library depends only on a generic version of `numpy`.
@@ -44,4 +47,15 @@ Minimally, you should set `python_paths=[your_project_root]`.
  * Having an associated shell script for each objective function allows to load different environments for conflicting objective function implementations.
 ### Minimal working example
 Since imports are dynamic it is vital that you stick to the naming convention.
+
 ## Software architecture
+At the heart of the library are the files `objective.py` and `objective_factory.py`.
+When a problem is registered in the `registry`, a shell script is created that takes three arguments:
+
+1. the package name of instance of `AbstractProblemFactory` 
+2. a port number
+3. a password
+
+When a problem is instantiated in `objective_factory.py`, a localhost connection is created listening at a free port.
+The shell script is called with the desired problem factory, the port and the password.
+Inside this script, the desired environment is started and then `objective.py` is called, which makes the connection to the server.

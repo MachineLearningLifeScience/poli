@@ -8,6 +8,9 @@ from multiprocessing.connection import Listener, Client
 
 
 def get_connection(port: int, password: str):
+    """
+    Function for clients to get a connection to a server.
+    """
     address = ('', port)
     conn = Client(address, authkey=password.encode())
     return conn
@@ -15,6 +18,14 @@ def get_connection(port: int, password: str):
 
 class ProcessWrapper:
     def __init__(self, run_script):
+        """
+        Server class for inter process communication.
+
+        :param run_script:
+            which run script to execute
+            IMPORTANT: The run script has to accept a port and a password as arguments and should call #get_connection
+            with these parameters.
+        """
         address = ('', 0)  #('localhost', 6000)
         self.password = _generate_password()
         self.listener = Listener(address, authkey=self.password.encode())
