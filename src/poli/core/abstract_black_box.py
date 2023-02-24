@@ -47,3 +47,6 @@ class AbstractBlackBox:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.terminate()
+
+    def __del__(self):
+        self.terminate()
