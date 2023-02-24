@@ -18,15 +18,17 @@ RUN_SCRIPTS_FOLDER = dirname(_RUN_SCRIPTS_FOLDER)
 
 def make_run_script(problem_factory: AbstractProblemFactory, conda_environment_location: str = None,
                     python_paths: List[str] = None) -> str:
-    return _make_run_script(problem_factory, conda_environment_location, python_paths)
+    command = inspect.getfile(objective)
+    return _make_run_script(command, problem_factory, conda_environment_location, python_paths)
 
 
 def make_observer_script(observer: AbstractObserver, conda_environment_location: str = None,
                          python_paths: List[str] = None):
-    return _make_run_script(observer, conda_environment_location, python_paths)
+    command = inspect.getfile(observer_wrapper)
+    return _make_run_script(command, observer, conda_environment_location, python_paths)
 
 
-def _make_run_script(instantiated_object, conda_environment_location, python_paths):
+def _make_run_script(command, instantiated_object, conda_environment_location, python_paths):
     class_object = instantiated_object.__class__
     problem_factory_name = class_object.__name__  # TODO: potential vulnerability?
     factory_location = inspect.getfile(class_object)
@@ -45,7 +47,7 @@ def _make_run_script(instantiated_object, conda_environment_location, python_pat
             desired factory
             """
             run_script = run_script_template_file.read() % (conda_environment_location, python_paths,
-                                                            factory_location + " " + full_problem_factory_name)
+                                                            command + " " + full_problem_factory_name)
         with open(run_script_location, "w+") as run_script_file:
             # write out run script and make it executable
             run_script_file.write(run_script)
