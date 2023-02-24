@@ -1,8 +1,11 @@
 #!/bin/bash
 CONDA_BASE=$(conda info --base)
 source $CONDA_BASE/etc/profile.d/conda.sh
+cd %s  # go to working directory
+conda deactivate # get rid of environment variables from the calling process
+PYTHONPATH=""  # clear python path
 conda activate %s  # environment location
-BASEDIR=$(dirname "$0")
 PYTHONPATH="${PYTHONPATH}:%s"  # additions to the python path
+#BASEDIR=$(dirname "$0")
 # it is CRUCIAL that the shell script is given port number and password
 python %s "$1" "$2" # factory name, port number and password
