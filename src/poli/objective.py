@@ -7,12 +7,14 @@ from poli.core.util.inter_process_communication.process_wrapper import get_conne
 
 
 def dynamically_instantiate(obj: str):
-    sys.path.append(os.getcwd())
+    # FIXME: this method opens up a serious security vulnerability
+    #sys.path.append(os.getcwd())
     last_dot = obj.rfind('.')
     try:
         exec("from " + obj[:last_dot] + " import " + obj[last_dot+1:] + " as DynamicObject")
         instantiated_object = eval("DynamicObject()")
-    except ModuleNotFoundError as e:
+    except ImportError as e:
+        logging.fatal(f"Path: {os.environ['PATH']}")
         logging.fatal(f"Python path: {sys.path}")
         raise e
     return instantiated_object
