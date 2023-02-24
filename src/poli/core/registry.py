@@ -20,7 +20,7 @@ ls = config.read(config_file)
 #     warnings.warn("Could not find configuration file: %s" % config_file)
 
 
-def set_observer(observer: AbstractObserver, conda_environment_location : str=None, python_paths: list[str] = None):
+def set_observer(observer: AbstractObserver, conda_environment_location : str=None, python_paths: List[str] = None):
     run_script_location = make_observer_script(observer, conda_environment_location, python_paths)
     set_observer_run_script(run_script_location)
 
@@ -45,7 +45,7 @@ def delete_observer_run_script() -> str:
 
 
 def register_problem(problem_factory: AbstractProblemFactory, conda_environment_location : str=None,
-                     python_paths: list[str] = None):
+                     python_paths: List[str] = None):
     problem_name = problem_factory.get_setup_information().get_problem_name()
     if problem_name not in config.sections():
         config.add_section(problem_name)
