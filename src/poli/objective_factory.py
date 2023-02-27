@@ -7,6 +7,7 @@ import numpy as np
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.core.registry import config, _RUN_SCRIPT_LOCATION, _DEFAULT, _OBSERVER
+from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.external_observer import ExternalObserver
 from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
 
@@ -23,14 +24,17 @@ class ExternalBlackBox(AbstractBlackBox):
 
     def terminate(self):
         # terminate objective process
-        self.process_wrapper.send(None)
+        if self.process_wrapper is not None:
+            self.process_wrapper.send(None)
+            self.process_wrapper.close()  # clean up connection
+            self.process_wrapper = None
         # terminate observer
         if self.observer is not None:
             self.observer.finish()
-        self.process_wrapper.close()  # clean up connection
+            self.observer = None
 
 
-def create(name: str, seed: int = 0, caller_info: dict = None) -> (ProblemSetupInformation, AbstractBlackBox, np.ndarray, np.ndarray, object):
+def create(name: str, seed: int = 0, caller_info: dict = None, observer: AbstractObserver = ExternalObserver()) -> (ProblemSetupInformation, AbstractBlackBox, np.ndarray, np.ndarray, object):
     """
     Instantiantes a black-box function.
     :param name:
@@ -39,6 +43,8 @@ def create(name: str, seed: int = 0, caller_info: dict = None) -> (ProblemSetupI
         Information for the objective in case randomization is involved.
     :param caller_info:
         Optional information about the caller that is forwarded to the logger to initialize the run.
+    :param observer:
+        Optional observer, external observer by default.
     :return:
         problem_information: a ProblemSetupInformation object holding basic properties about the problem
         f: an objective function that accepts a numpy array and returns a numpy array
@@ -58,11 +64,8 @@ def create(name: str, seed: int = 0, caller_info: dict = None) -> (ProblemSetupI
     x0, y0, problem_information = process_wrapper.recv()
 
     # instantiate observer (if desired)
-    observer = None
     observer_info = None
-    observer_script = config[_DEFAULT][_OBSERVER]
-    if observer_script != '':
-        observer = ExternalObserver(observer_script)
+    if observer is not None:
         observer_info = observer.initialize_observer(problem_information, caller_info, x0, y0)
 
     f = ExternalBlackBox(problem_information.get_max_sequence_length(), process_wrapper)

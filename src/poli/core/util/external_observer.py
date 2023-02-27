@@ -3,11 +3,12 @@ import numpy as np
 from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
+from poli.core.registry import config, _DEFAULT, _OBSERVER
 
 
 class ExternalObserver(AbstractObserver):
-    def __init__(self, observer_script):
-        self.observer_script = observer_script
+    def __init__(self):
+        self.observer_script = config[_DEFAULT][_OBSERVER]
         self.process_wrapper = None
 
     def observe(self, x: np.ndarray, y: np.ndarray, context=None) -> None:
@@ -25,5 +26,7 @@ class ExternalObserver(AbstractObserver):
         return observer_info
 
     def finish(self) -> None:
-        self.process_wrapper.send(None)
-        self.process_wrapper.close()
+        if self.process_wrapper is not None:
+            self.process_wrapper.send(None)
+            self.process_wrapper.close()
+            self.process_wrapper = None
