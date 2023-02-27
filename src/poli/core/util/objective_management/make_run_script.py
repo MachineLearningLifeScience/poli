@@ -34,7 +34,13 @@ def _make_run_script(command, instantiated_object, conda_environment_location, p
     class_object = instantiated_object.__class__
     problem_factory_name = class_object.__name__  # TODO: potential vulnerability?
     factory_location = inspect.getfile(class_object)
-    full_problem_factory_name = basename(factory_location)[:-2] + problem_factory_name
+    #full_problem_factory_name = basename(factory_location)[:-2] + problem_factory_name
+    package_name = inspect.getmodule(instantiated_object).__name__
+    if package_name == '__main__':
+        package_name = basename(factory_location)[:-3]
+    #else:
+    package_name += "."
+    full_problem_factory_name = package_name + problem_factory_name
     run_script_location = join(RUN_SCRIPTS_FOLDER, problem_factory_name + ".sh")
     if conda_environment_location is not None:
         # make path to conda environment absolute
