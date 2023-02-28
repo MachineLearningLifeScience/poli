@@ -7,5 +7,7 @@ PYTHONPATH=""  # clear python path
 conda activate %s  # environment location
 PYTHONPATH="${PYTHONPATH}:%s"  # additions to the python path
 #BASEDIR=$(dirname "$0")
+export PYTHONPATH=${PYTHONPATH}  # make python path available to python call
+export %s=${PYTHONPATH}  # some shell magic can prevent the export of PYTHONPATH -- no clue
 # it is CRUCIAL that the shell script is given port number and password
 python %s "$1" "$2" # factory name, port number and password

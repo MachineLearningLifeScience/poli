@@ -6,9 +6,15 @@ from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.util.inter_process_communication.process_wrapper import get_connection
 
 
+ADDITIONAL_IMPORT_SEARCH_PATHES_KEY = "ADDITIONAL_IMPORT_PATHS"
+
+
 def dynamically_instantiate(obj: str):
     # FIXME: this method opens up a serious security vulnerability
+    # TODO: possible alternative: importlib
     #sys.path.append(os.getcwd())
+    sys.path.extend(os.environ[ADDITIONAL_IMPORT_SEARCH_PATHES_KEY].split(':'))
+    #sys.path.extend(os.environ['PYTHONPATH'].split(':'))
     last_dot = obj.rfind('.')
     try:
         exec("from " + obj[:last_dot] + " import " + obj[last_dot+1:] + " as DynamicObject")
@@ -16,6 +22,11 @@ def dynamically_instantiate(obj: str):
     except ImportError as e:
         logging.fatal(f"Path: {os.environ['PATH']}")
         logging.fatal(f"Python path: {sys.path}")
+        logging.fatal(f"Path: {os.environ[ADDITIONAL_IMPORT_SEARCH_PATHES_KEY]}")
+        if 'PYTHONPATH' in os.environ.keys():
+            logging.fatal(f"Path: {os.environ['PYTHONPATH']}")
+        else:
+            logging.fatal("PYTHONPATH is not part of the environment variables.")
         raise e
     return instantiated_object
 

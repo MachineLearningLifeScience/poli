@@ -7,6 +7,7 @@ import stat
 from typing import List
 
 from poli import objective
+from poli.objective import ADDITIONAL_IMPORT_SEARCH_PATHES_KEY
 from poli.core.util import observer_wrapper
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.util.abstract_observer import AbstractObserver
@@ -55,6 +56,7 @@ def _make_run_script(command, instantiated_object, conda_environment_location, p
             desired factory
             """
             run_script = run_script_template_file.read() % (cwd, conda_environment_location, python_paths,
+                                                            ADDITIONAL_IMPORT_SEARCH_PATHES_KEY,
                                                             command + " " + full_problem_factory_name)
         with open(run_script_location, "w+") as run_script_file:
             # write out run script and make it executable
