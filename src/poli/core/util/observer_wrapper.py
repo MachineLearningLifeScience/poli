@@ -1,3 +1,8 @@
+"""
+This is the main module relevant for user-defined observers.
+When registering an observer, this module is called and instantiates the user's observer.
+"""
+
 import sys
 
 from poli.core.util.abstract_observer import AbstractObserver

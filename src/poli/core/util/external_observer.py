@@ -7,6 +7,10 @@ from poli.core.registry import config, _DEFAULT, _OBSERVER
 
 
 class ExternalObserver(AbstractObserver):
+    """
+    This is an observer class used by poli to wrap observer functionality.
+    User-defined observers typically do NOT inherit from here.
+    """
     def __init__(self):
         self.observer_script = config[_DEFAULT][_OBSERVER]
         self.process_wrapper = None
