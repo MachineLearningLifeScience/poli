@@ -2,8 +2,11 @@
 Module that wraps utility functions for interprocess communication.
 """
 __author__ = 'Simon Bartels'
+
+import logging
 import os
 import subprocess
+import time
 from multiprocessing.connection import Listener, Client
 
 
@@ -12,8 +15,21 @@ def get_connection(port: int, password: str):
     Function for clients to get a connection to a server.
     """
     address = ('', port)
-    conn = Client(address, authkey=password.encode())
-    return conn
+    retries = 3
+    while retries > 0:
+        time.sleep(1)  # wait a second and then try to make a connection
+        try:
+            # if we manage to establish a connection we exit the function
+            return Client(address, authkey=password.encode())
+        # maybe the host process isn't ready yet
+        except EOFError as e:
+            pass
+        except ConnectionRefusedError as e:
+            pass
+        retries -= 1
+    # when we get here, e must have been instantiated
+    logging.fatal("Could not connect to host process.")
+    raise e
 
 
 class ProcessWrapper:
