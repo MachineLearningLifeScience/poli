@@ -51,7 +51,6 @@ def create(name: str, seed: int = 0, caller_info: dict = None, observer: Abstrac
         x0: initial inputs
         y0: f(x0)
         observer_info: information from the observer_info about the instantiated run (allows the calling algorithm to connect)
-        terminate: a function to end the process behind f
     """
     # start objective process
     # VERY IMPORTANT: the script MUST accept port and password as arguments
