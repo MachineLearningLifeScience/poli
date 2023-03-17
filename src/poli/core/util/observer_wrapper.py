@@ -15,10 +15,10 @@ def start_observer_process(observer_name, port: int, password: str):
     conn = get_connection(port, password)
 
     # get setup info from external_observer
-    setup_info, caller_info, x0, y0 = conn.recv()
+    setup_info, caller_info, x0, y0, seed = conn.recv()
     # instantiate observer
     observer: AbstractObserver = dynamically_instantiate(observer_name)
-    observer_info = observer.initialize_observer(setup_info, caller_info, x0, y0)
+    observer_info = observer.initialize_observer(setup_info, caller_info, x0, y0, seed)
     # give mother process the signal that we're ready
     conn.send(observer_info)
 

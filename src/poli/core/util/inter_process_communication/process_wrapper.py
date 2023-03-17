@@ -15,7 +15,7 @@ def get_connection(port: int, password: str):
     Function for clients to get a connection to a server.
     """
     address = ('', port)
-    retries = 3
+    retries = 2
     while retries > 0:
         time.sleep(1)  # wait a second and then try to make a connection
         try:

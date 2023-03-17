@@ -65,7 +65,7 @@ def create(name: str, seed: int = 0, caller_info: dict = None, observer: Abstrac
     # instantiate observer (if desired)
     observer_info = None
     if observer is not None:
-        observer_info = observer.initialize_observer(problem_information, caller_info, x0, y0)
+        observer_info = observer.initialize_observer(problem_information, caller_info, x0, y0, seed)
 
     f = ExternalBlackBox(problem_information.get_max_sequence_length(), process_wrapper)
     f.set_observer(observer)

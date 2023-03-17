@@ -18,12 +18,12 @@ class ExternalObserver(AbstractObserver):
     def observe(self, x: np.ndarray, y: np.ndarray, context=None) -> None:
         self.process_wrapper.send([x, y, context])
 
-    def initialize_observer(self, setup_info: ProblemSetupInformation, caller_info, x0, y0) -> str:
+    def initialize_observer(self, setup_info: ProblemSetupInformation, caller_info, x0, y0, seed) -> str:
         # start observer process
         # VERY IMPORTANT: the observer script MUST accept port and password as arguments
         self.process_wrapper = ProcessWrapper(self.observer_script)
         # send setup information
-        self.process_wrapper.send([setup_info, caller_info, x0, y0])
+        self.process_wrapper.send([setup_info, caller_info, x0, y0, seed])
         # wait for logger handle
         observer_info = self.process_wrapper.recv()
         # forward to objective factory
