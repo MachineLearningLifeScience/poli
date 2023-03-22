@@ -1,5 +1,3 @@
-# TO DO
- * consider switching to Hydra (though this creates a dependency that might break in the future)
 # Protein Objective Library (POLi)
 An easy-to-use, plug-and-play library to benchmark protein-related Bayesian optimization algorithms.
 Primarily, this library provides objective functions encapsulating any dependencies.
