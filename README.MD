@@ -1,5 +1,3 @@
-# TO DO
- * consider switching to Hydra (though this creates a dependency that might break in the future)
 # Protein Objective Library (POLi)
 An easy-to-use, plug-and-play library to benchmark protein-related Bayesian optimization algorithms.
 Primarily, this library provides objective functions encapsulating any dependencies.
@@ -17,8 +15,6 @@ Run the following from the main directory (where this README file is also locate
 pip install -e .
 ```
 
-### Calling a benchmark
-The main file is `objective_function_factory.py`
 ### Minimal working example
 Optimizing an objective function that just returns a draw from a standard normal.
 ```
@@ -28,25 +24,18 @@ problem_info, f, x0, y0, run_info = objective_factory.create("WHITE_NOISE", call
 print(f(x0[:1, :]))
 f.terminate()
 ```
+### Calling a benchmark
+Calling a registered benchmark works as above, except that you have to exchange "WHITE_NOISE" for your objective name.
+You can see the registered benchmarks by calling `get_problems()` provided by `poli.core.registry`.
+For registering your own objectives, write a class inheriting from `AbstractProblemFactory`. 
+See `adding_an_objective_function` in the `examples` how to do this.
+
 ### Logging
 You can define an observer that gets notified everytime the objective function is called.
 For that you have to write a python class that inherits from `AbstractObserver`. 
 See `adding_an_observer.py` in the `examples` how to do this.
 NOTE: If your observer is NOT at the root of your project, you have to specify the argument `python_paths` accordingly.
 Minimally, you should set `python_paths=[your_project_root]`.
-
-### More elaborate example
-
-### Advanced options to add an observer
-Instead of providing a python observer class, you can also directly set a path to a run script.
-CRUCIALLY, this run script has to accept a port number and a password as an argument to build a connection.
-## Adding your own benchmark
-### Design principles
- * This library depends only on a generic version of `numpy`.
- * Therefore make sure that imports are called only when your objective is actually used.
- * Having an associated shell script for each objective function allows to load different environments for conflicting objective function implementations.
-### Minimal working example
-Since imports are dynamic it is vital that you stick to the naming convention.
 
 ## Software architecture
 At the heart of the library are the files `objective.py` and `objective_factory.py`.
