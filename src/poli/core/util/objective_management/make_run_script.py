@@ -45,7 +45,7 @@ def _make_run_script(command, instantiated_object, conda_environment_location, p
     full_problem_factory_name = package_name + problem_factory_name
     run_script_location = join(RUN_SCRIPTS_FOLDER, problem_factory_name + ".sh")
     if conda_environment_location is None:
-        conda_environment_location = os.path.join(*sys.executable.split(os.path.sep)[:-2])
+        conda_environment_location = sys.executable[:-len("/bin/python")]
     # make path to conda environment absolute
     conda_environment_location = str(os.path.abspath(conda_environment_location))
     if python_paths is None:
