@@ -23,18 +23,18 @@ class AbstractBlackBox:
         :param context:
         :return:
         """
-        assert(len(x.shape) == 2)
-        #assert(x.shape[0] == 1)
-        assert(x.shape[1] == self.L or not self.sequences_aligned)
+        assert len(x.shape) == 2
+        # assert(x.shape[0] == 1)
+        assert x.shape[1] == self.L or not self.sequences_aligned
         f = np.zeros([x.shape[0], 1])
         for i in range(x.shape[0]):
-            x_ = x[i:i+1, :]
+            x_ = x[i : i + 1, :]
             f_ = self._black_box(x_, context)
             f[i] = f_
-            assert(len(f_.shape) == 2)
-            assert(f_.shape[0] == 1)
-            assert(f_.shape[1] == 1)
-            assert(isinstance(f, np.ndarray))
+            assert len(f_.shape) == 2
+            assert f_.shape[0] == 1
+            assert f_.shape[1] == 1
+            assert isinstance(f, np.ndarray)
             if self.observer is not None:
                 self.observer.observe(x_, f_, context)
         return f

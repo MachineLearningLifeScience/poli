@@ -1,6 +1,12 @@
 class ProblemSetupInformation:
-    def __init__(self, name: str, max_sequence_length: int, aligned: bool, alphabet: dict,
-                 log_transform_recommended=False):
+    def __init__(
+        self,
+        name: str,
+        max_sequence_length: int,
+        aligned: bool,
+        alphabet: dict,
+        log_transform_recommended=False,
+    ):
         self.name = name
         self.max_sequence_length = max_sequence_length
         self.aligned = aligned

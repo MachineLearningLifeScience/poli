@@ -1,7 +1,7 @@
 """
 This is the main file relevant for users who want to run objective functions.
 """
-from typing import Callable
+from typing import Callable, Tuple
 import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
@@ -34,7 +34,12 @@ class ExternalBlackBox(AbstractBlackBox):
             self.observer = None
 
 
-def create(name: str, seed: int = 0, caller_info: dict = None, observer: AbstractObserver = ExternalObserver()) -> (ProblemSetupInformation, AbstractBlackBox, np.ndarray, np.ndarray, object):
+def create(
+    name: str,
+    seed: int = 0,
+    caller_info: dict = None,
+    observer: AbstractObserver = ExternalObserver(),
+) -> Tuple[ProblemSetupInformation, AbstractBlackBox, np.ndarray, np.ndarray, object]:
     """
     Instantiantes a black-box function.
     :param name:
@@ -65,7 +70,9 @@ def create(name: str, seed: int = 0, caller_info: dict = None, observer: Abstrac
     # instantiate observer (if desired)
     observer_info = None
     if observer is not None:
-        observer_info = observer.initialize_observer(problem_information, caller_info, x0, y0, seed)
+        observer_info = observer.initialize_observer(
+            problem_information, caller_info, x0, y0, seed
+        )
 
     f = ExternalBlackBox(problem_information.get_max_sequence_length(), process_wrapper)
     f.set_observer(observer)

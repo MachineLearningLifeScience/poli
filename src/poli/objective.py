@@ -12,18 +12,24 @@ ADDITIONAL_IMPORT_SEARCH_PATHES_KEY = "ADDITIONAL_IMPORT_PATHS"
 def dynamically_instantiate(obj: str):
     # FIXME: this method opens up a serious security vulnerability
     # TODO: possible alternative: importlib
-    #sys.path.append(os.getcwd())
-    sys.path.extend(os.environ[ADDITIONAL_IMPORT_SEARCH_PATHES_KEY].split(':'))
-    #sys.path.extend(os.environ['PYTHONPATH'].split(':'))
-    last_dot = obj.rfind('.')
+    # sys.path.append(os.getcwd())
+    sys.path.extend(os.environ[ADDITIONAL_IMPORT_SEARCH_PATHES_KEY].split(":"))
+    # sys.path.extend(os.environ['PYTHONPATH'].split(':'))
+    last_dot = obj.rfind(".")
     try:
-        exec("from " + obj[:last_dot] + " import " + obj[last_dot+1:] + " as DynamicObject")
+        exec(
+            "from "
+            + obj[:last_dot]
+            + " import "
+            + obj[last_dot + 1 :]
+            + " as DynamicObject"
+        )
         instantiated_object = eval("DynamicObject()")
     except ImportError as e:
         logging.fatal(f"Path: {os.environ['PATH']}")
         logging.fatal(f"Python path: {sys.path}")
         logging.fatal(f"Path: {os.environ[ADDITIONAL_IMPORT_SEARCH_PATHES_KEY]}")
-        if 'PYTHONPATH' in os.environ.keys():
+        if "PYTHONPATH" in os.environ.keys():
             logging.fatal(f"Path: {os.environ['PYTHONPATH']}")
         else:
             logging.fatal("PYTHONPATH is not part of the environment variables.")
@@ -56,9 +62,9 @@ def run(objective_name: str, port: int, password: str) -> None:
             break
         y = f(*msg)
         conn.send(y)
-    #conn.close()
-    #exit()  # kill other threads, and close file handles
+    # conn.close()
+    # exit()  # kill other threads, and close file handles
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run(sys.argv[1], int(sys.argv[2]), sys.argv[3])

@@ -29,9 +29,9 @@ def start_observer_process(observer_name, port: int, password: str):
             break
         observer.observe(*msg)
     observer.finish()
-    #conn.close()
-    #exit()  # kill other threads, and close file handles
+    # conn.close()
+    # exit()  # kill other threads, and close file handles
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     start_observer_process(sys.argv[1], int(sys.argv[2]), sys.argv[3])

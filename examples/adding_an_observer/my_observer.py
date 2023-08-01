@@ -1,4 +1,4 @@
-__author__ = 'Simon Bartels'
+__author__ = "Simon Bartels"
 import numpy as np
 import logging
 
@@ -14,21 +14,29 @@ class MyObserver(AbstractObserver):
         logging.fatal(f"observer has been called in step {self.step}: f({x})={y}")
         self.step += 1
 
-    def initialize_observer(self, problem_setup_info: ProblemSetupInformation, caller_info: object, x0: np.ndarray, y0: np.ndarray) -> object:
+    def initialize_observer(
+        self,
+        problem_setup_info: ProblemSetupInformation,
+        caller_info: object,
+        x0: np.ndarray,
+        y0: np.ndarray,
+    ) -> object:
         return None
 
     def finish(self) -> None:
         pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from poli import objective_factory
     from poli.core.registry import set_observer
 
     # (once) we have to register our observer
     set_observer(MyObserver(), conda_environment_location="")
 
-    problem_info, f, x0, y0, run_info = objective_factory.create("MY_PROBLEM", caller_info=None)
+    problem_info, f, x0, y0, run_info = objective_factory.create(
+        "MY_PROBLEM", caller_info=None
+    )
     # call objective function and observe that observer is called
     print(f"The observer will be called {x0.shape[0]} time(s).")
     f(x0)

@@ -11,6 +11,7 @@ class ExternalObserver(AbstractObserver):
     This is an observer class used by poli to wrap observer functionality.
     User-defined observers typically do NOT inherit from here.
     """
+
     def __init__(self):
         self.observer_script = config[_DEFAULT][_OBSERVER]
         self.process_wrapper = None
@@ -18,7 +19,9 @@ class ExternalObserver(AbstractObserver):
     def observe(self, x: np.ndarray, y: np.ndarray, context=None) -> None:
         self.process_wrapper.send([x, y, context])
 
-    def initialize_observer(self, setup_info: ProblemSetupInformation, caller_info, x0, y0, seed) -> str:
+    def initialize_observer(
+        self, setup_info: ProblemSetupInformation, caller_info, x0, y0, seed
+    ) -> str:
         # start observer process
         # VERY IMPORTANT: the observer script MUST accept port and password as arguments
         self.process_wrapper = ProcessWrapper(self.observer_script)
