@@ -34,7 +34,7 @@ def set_observer(
     set_observer_run_script(run_script_location)
 
 
-def set_observer_run_script(script_file_name: str) -> ():
+def set_observer_run_script(script_file_name: str) -> None:
     """
     Sets a run_script to be called on observer instantiation.
     VERY IMPORTANT: the observer script MUST accept port and password as arguments
