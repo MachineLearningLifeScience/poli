@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
@@ -8,7 +10,7 @@ class AbstractProblemFactory:
     def get_setup_information(self) -> ProblemSetupInformation:
         raise NotImplementedError("abstract method")
 
-    def create(self, seed: int = 0) -> (AbstractBlackBox, [np.ndarray], np.ndarray):
+    def create(self, seed: int = 0) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         """
         Returns a blackbox function and initial observations.
         :return:

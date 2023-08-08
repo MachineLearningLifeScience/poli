@@ -29,6 +29,9 @@ class AbstractBlackBox:
         # TODO: what happens with multi-objective?
         # In some cases, we might be interested in functions
         # that output more than one value.
+        # TODO: What happens with batched inputs?
+        # Why do we want to evaluate the objective
+        # function one at a time?
         f = np.zeros([x.shape[0], 1])
         for i in range(x.shape[0]):
             x_ = x[i : i + 1, :]

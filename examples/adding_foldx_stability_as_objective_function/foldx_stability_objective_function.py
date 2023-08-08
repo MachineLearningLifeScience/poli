@@ -9,19 +9,22 @@ FoldX. If not, we'll have to use a Docker
 container.
 """
 from pathlib import Path
-from typing import List, TypedDict, Tuple
+from re import M
+from typing import Dict, List, TypedDict, Tuple
 import subprocess
 import shutil
 from time import time
 from uuid import uuid4
 import logging
 
+from Levenshtein import editops
+
 import numpy as np
 
 from Bio import PDB
 from Bio.SeqUtils import seq1
 
-from foldx_utils import AMINO_ACIDS, MAX_SEQUENCE_LENGTH
+from foldx_utils import AMINO_ACIDS, ENCODING, INVERSE_ENCODING
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
@@ -35,104 +38,203 @@ PATH_TO_FOLDX_FILES = Path().home() / "foldx"
 # Feel free to change it if you want
 # to keep the files somewhere else.
 # An alternative is e.g. TMP_PATH = THIS_DIR
+# TODO: what happens if the user is on Windows?
+# TMP_PATH = THIS_DIR / "tmp"
 TMP_PATH = Path("/tmp").resolve()
+
+# Defining the maximum sequence length a priori
+# TODO: Ideally, this would be defined elsewhere,
+# maybe passed as an argument to the
+# FoldXStabilityProblemFactory, but POLi doesn't
+# support that yet.
+initial_pdb_file = THIS_DIR / "101m_Repair.pdb"
+
+parser = PDB.PDBParser(QUIET=True)
+wildtype_protein = parser.get_structure("pdb", initial_pdb_file)
+wildtype_amino_acids = [
+    seq1(residue.get_resname()) for residue in wildtype_protein.get_residues()
+]
+wildtype_residue_string = "".join(wildtype_amino_acids)
+
+MAX_SEQUENCE_LENGTH = len(wildtype_amino_acids)
 
 
 class FoldXContext(TypedDict):
     pdb_files: List[Path]
+    wildtype_pdb_file: List[Path]
     delete_working_dir: bool
+    path_to_mutation_list: Path
 
 
 class FoldXStabilityBlackBox(AbstractBlackBox):
-    def __init__(self, L: int):
+    def __init__(
+        self,
+        L: int,
+        wildtype_pdb_file: Path,
+        alphabet: Dict[str, int],
+        experiment_id: str = None,
+    ):
         super().__init__(L)
         self.parser = PDB.PDBParser(QUIET=True)
+        self.alphabet = alphabet
+        self.decoding = {v: k for k, v in self.alphabet.items()}
+        self.wildtype_pdb_file = wildtype_pdb_file
 
-    def create_working_directory(self, watermark: str = None) -> Path:
+        self.wildtype_structure = self.parser.get_structure(
+            "pdb", self.wildtype_pdb_file
+        )
+        self.wildtype_residues = list(self.wildtype_structure.get_residues())
+        self.wildtype_amino_acids = [
+            seq1(residue.get_resname()) for residue in self.wildtype_residues
+        ]
+        self.wildtype_residue_string = "".join(self.wildtype_amino_acids)
+
+        if experiment_id is None:
+            experiment_id = f"{int(time())}_{str(uuid4())[:8]}"
+        self.experiment_id = experiment_id
+
+    def mutations_from_wildtype(self, mutated_residue_string: str) -> List[str]:
+        """
+        Since foldx expects an individual_list.txt file of mutations,
+        this function computes the Levenshtein distance between
+        the wildtype residue string and the mutated residue string,
+        keeping track of the replacements.
+
+        This method returns a list of strings which are to be written
+        in a single line of individual_list.txt.
+        """
+        assert len(mutated_residue_string) == len(self.wildtype_residue_string)
+
+        # If the mutated string is the same as the wildtype string,
+        # there are no mutations. Still, FoldX expects us to pass
+        # a dummy mutation, so we "mutate" the first residue in the
+        # wildtype string.
+        if mutated_residue_string == self.wildtype_residue_string:
+            first_residue = self.wildtype_residues[0]
+            first_residue_name = seq1(first_residue.get_resname())
+            chain_id = first_residue.get_parent().id
+            index_in_sequence = first_residue.id[1]
+            return [
+                f"{first_residue_name}{chain_id}{index_in_sequence}{first_residue_name}"
+            ]
+
+        mutations = editops(self.wildtype_residue_string, mutated_residue_string)
+
+        mutations_in_line = []
+        for mutation_type, pos_in_wildtype, pos_in_mutant in mutations:
+            assert mutation_type == "replace"
+            original_wildtype_residue = self.wildtype_residue_string[pos_in_wildtype]
+            chain_id = self.wildtype_residues[pos_in_wildtype].get_parent().id
+            index_in_sequence = self.wildtype_residues[pos_in_wildtype].id[1]
+            mutated_residue = mutated_residue_string[pos_in_mutant]
+
+            mutation_string = f"{original_wildtype_residue}{chain_id}{index_in_sequence}{mutated_residue}"
+            mutations_in_line.append(mutation_string)
+
+        return mutations_in_line
+
+    def create_working_directory(self) -> Path:
         """
         TODO: document.
         """
-        if watermark is None:
-            watermark = f"{int(time())}_{str(uuid4())[:8]}"
 
-        working_dir = TMP_PATH / "foldx_tmp_files" / watermark
+        working_dir = TMP_PATH / "foldx_tmp_files" / self.experiment_id
         working_dir.mkdir(exist_ok=True, parents=True)
 
         return working_dir
 
-    def _black_box(self, x: np.ndarray, context: FoldXContext) -> np.ndarray:
+    def _black_box(self, x: np.ndarray, context: FoldXContext = None) -> np.ndarray:
         """
         Runs the given input x and pdb files provided
         in the context through FoldX and returns the
         total energy score.
+
+        Since the goal is MINIMIZING the energy,
+        we return the negative of the total energy.
+
+        After the initial call, let's assume that
+        the subsequent calls are about mutating
+        the wildtype sequence. From then onwards,
+        the context should contain
+        - wildtype_pdb_file
+        - path_to_mutation_list
+
+        To accomodate for the initial call, if the
+        path_to_mutation_list is not provided (or
+        if it's None), we assume that we're supposed
+        to evaluate the energy of the wildtype sequence.
+        TODO: implement this.
         """
         # Check if the context is valid
-        pdb_files = context["pdb_files"]
-        delete_working_dir = context["delete_working_dir"]
-
-        assert len(pdb_files) == len(
-            x
-        ), "The number of pdb files in the context must match the number of inputs."
+        # delete_working_dir = context["delete_working_dir"]
+        # wildtype_pdb_file = context["wildtype_pdb_file"]
+        wildtype_pdb_file = self.wildtype_pdb_file
 
         # Create a working directory for this function call
         working_dir = self.create_working_directory()
 
-        # Process each file in the context
-        results = []
-        for i, pdb_file in enumerate(pdb_files):
-            working_dir_at_i = working_dir / f"{pdb_file.stem}_{i}"
-            working_dir_at_i.mkdir(exist_ok=True, parents=True)
-            shutil.copyfile(
-                PATH_TO_FOLDX_FILES / "rotabase.txt", working_dir_at_i / "rotabase.txt"
-            )
+        # Given that x, we simply define the
+        # mutations to be made as a mutation_list.txt
+        # file.
+        mutations_as_strings = [
+            "".join([self.decoding[integer] for integer in x_i]) for x_i in x
+        ]
 
-            # Copy the pdb file to the working directory
-            pdb_name = f"{pdb_file.stem}_{i}"
-            shutil.copyfile(pdb_file, working_dir_at_i / f"{pdb_name}.pdb")
+        # Write the mutations in the format of individual_list.txt
+        lines = []
+        for mutation in mutations_as_strings:
+            # e.g. mutations_in_line = ["MA0A", "AA5G"]
+            # would represent two mutations of the same
+            # wildtype: one at residue 0, which is mutated
+            # from M to A, and one at residue 5, which is
+            # mutated from A to G.
+            # The A in between is the chain ID.
+            mutations_in_line = self.mutations_from_wildtype(mutation)
 
-            # Reading the pdb file and defining a mutation
-            # to itself on the first residue
-            residues = self.parser.get_structure("pdb", pdb_file).get_residues()
-            first_residue = next(residues)
-            residue_name = seq1(first_residue.get_resname())
-            chain_id = first_residue.get_parent().id
-            index_in_sequence = first_residue.id[1]
+            # These are represented as a single line, separated
+            # by commas, and terminated by a semicolon.
+            lines.append(",".join(mutations_in_line) + ";")
 
-            # Creating a dummy individual list of mutations
-            with open(working_dir_at_i / "individual_list.txt", "w") as f:
-                f.write(f"{residue_name}{chain_id}{index_in_sequence}{residue_name};\n")
+        with open(working_dir / "individual_list.txt", "w") as f:
+            f.writelines(lines)
 
-            # Run FoldX
-            logging.debug(f"Running FoldX for file {pdb_file}...")
-            subprocess.run(
-                [
-                    "foldx",
-                    "--command",
-                    "BuildModel",
-                    "--pdb",
-                    f"{pdb_name}.pdb",
-                    "--mutant-file",
-                    f"{str(working_dir_at_i / 'individual_list.txt')}",
-                    "--water",
-                    "-CRYSTAL",
-                    "--pH",
-                    "7.0",
-                ],
-                cwd=working_dir_at_i,
-            )
+        # Copy the rotabase.txt file to the working directory
+        shutil.copyfile(
+            PATH_TO_FOLDX_FILES / "rotabase.txt", working_dir / "rotabase.txt"
+        )
 
-            # Read the output files
-            with open(working_dir_at_i / f"Raw_{pdb_name}.fxout", "r") as f:
-                lines = f.readlines()
-                result = lines[-1].split()[1]
+        # Copy the wildtype pdb file to the working directory
+        shutil.copyfile(
+            wildtype_pdb_file, working_dir / f"{wildtype_pdb_file.stem}.pdb"
+        )
 
-            results.append(float(result))
+        # Run FoldX
+        foldx_command = [
+            "foldx",
+            "--command=BuildModel",
+            "--pdb",
+            f"{wildtype_pdb_file.stem}.pdb",
+            "--mutant-file",
+            "individual_list.txt",
+            "--water",
+            "-CRYSTAL",
+            "--pH",
+            "7.0",
+        ]
+        subprocess.run(foldx_command, cwd=working_dir)
 
-        # Delete the working directory
-        if delete_working_dir:
-            shutil.rmtree(working_dir)
+        # Read the output file
+        with open(working_dir / f"Raw_{wildtype_pdb_file.stem}.fxout", "r") as f:
+            lines = f.readlines()
 
-        return np.array(results).reshape(-1, 1)
+        # Assuming that we evaluated on just one input
+        # (since POLi doesn't accept batch inputs yet)
+        # TODO: if/when POLi accepts batch inputs, this
+        # should be changed.
+        assert len(x) == 1
+        results = [float(lines[-2].split()[1])]
+
+        return -np.array(results).reshape(-1, 1)
 
 
 class FoldXStabilityProblemFactory(AbstractProblemFactory):
@@ -141,7 +243,7 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
         TODO: document
         """
         alphabet_symbols = AMINO_ACIDS
-        alphabet = {symbol: i for i, symbol in enumerate(alphabet_symbols)}
+        alphabet = ENCODING
 
         return ProblemSetupInformation(
             name="FoldX_stability",
@@ -154,40 +256,34 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
         self, seed: int = 0, initial_pdb_file: Path = None
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         L = self.get_setup_information().get_max_sequence_length()
-        f = FoldXStabilityBlackBox(L)
+        wildtype_pdb_file = self.get_setup_information().wildtype_pdb_path
+        alphabet = self.get_setup_information().get_alphabet()
+        f = FoldXStabilityBlackBox(L, wildtype_pdb_file, alphabet)
 
-        # TODO: this should be the initial sequence
-        x0 = np.random.randint(0, len(AMINO_ACIDS), size=L).reshape(1, -1)
-        if initial_pdb_file is None:
-            initial_pdb_file = THIS_DIR / "101m_Repair.pdb"
+        parser = PDB.PDBParser(QUIET=True)
+        protein = parser.get_structure("pdb", wildtype_pdb_file)
+        amino_acids = [
+            seq1(residue.get_resname()) for residue in protein.get_residues()
+        ]
 
-        pdb_files = [initial_pdb_file]
+        x0 = np.array([ENCODING[amino_acid] for amino_acid in amino_acids]).reshape(
+            1, -1
+        )
 
-        f_0 = f(x0, {"pdb_files": pdb_files, "delete_working_dir": False})
+        f_0 = f(x0)
 
         return f, x0, f_0
 
 
 if __name__ == "__main__":
-    from poli import objective_factory
-    from poli.core.registry import register_problem
+    wildtype_pdb_file = THIS_DIR / "101m_Repair.pdb"
 
-    # (once) we have to register our factory
-    foldx_stability_problem_factory = FoldXStabilityProblemFactory()
-    register_problem(
-        foldx_stability_problem_factory,
-        conda_environment_location="/Users/migd/anaconda3/envs/poli-dev",
+    f = FoldXStabilityBlackBox(
+        MAX_SEQUENCE_LENGTH, wildtype_pdb_file=wildtype_pdb_file, alphabet=ENCODING
     )
 
-    # now we can instantiate our objective
-    problem_name = (
-        foldx_stability_problem_factory.get_setup_information().get_problem_name()
-    )
-    problem_info, f, x0, y0, run_info = objective_factory.create(
-        problem_name, caller_info=None, observer=None
-    )
-
-    initial_pdb_file = THIS_DIR / "101m_Repair.pdb"
-
-    print(f(x0, context={"pdb_files": [initial_pdb_file], "delete_working_dir": False}))
-    f.terminate()
+    x = np.array([[ENCODING[amino_acid] for amino_acid in wildtype_amino_acids]])
+    x_mod = x.copy()
+    x_mod[0, 0] = 0
+    x = np.array([x.flatten(), x_mod.flatten()])
+    print(f(x))
