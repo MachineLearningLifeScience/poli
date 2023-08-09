@@ -39,6 +39,7 @@ def create(
     seed: int = 0,
     caller_info: dict = None,
     observer: AbstractObserver = ExternalObserver(),
+    **kwargs_for_factory,
 ) -> Tuple[ProblemSetupInformation, AbstractBlackBox, np.ndarray, np.ndarray, object]:
     """
     Instantiantes a black-box function.
@@ -59,7 +60,9 @@ def create(
     """
     # start objective process
     # VERY IMPORTANT: the script MUST accept port and password as arguments
-    process_wrapper = ProcessWrapper(config[name][_RUN_SCRIPT_LOCATION])
+    process_wrapper = ProcessWrapper(
+        config[name][_RUN_SCRIPT_LOCATION], **kwargs_for_factory
+    )
     # TODO: add signal listener that intercepts when proc ends
     # wait for connection from objective process
     # TODO: potential (unlikely) race condition! (process might try to connect before listener is ready!)

@@ -10,7 +10,7 @@ from poli.core.util.inter_process_communication.process_wrapper import get_conne
 ADDITIONAL_IMPORT_SEARCH_PATHES_KEY = "ADDITIONAL_IMPORT_PATHS"
 
 
-def dynamically_instantiate(obj: str, **kwargs):
+def dynamically_instantiate(obj: str):
     # FIXME: this method opens up a serious security vulnerability
     # TODO: possible alternative: importlib
     # TODO: another possible alternative: hydra
@@ -26,7 +26,7 @@ def dynamically_instantiate(obj: str, **kwargs):
             + obj[last_dot + 1 :]
             + " as DynamicObject"
         )
-        instantiated_object = eval("DynamicObject")(**kwargs)
+        instantiated_object = eval("DynamicObject")()
     except ImportError as e:
         logging.fatal(f"Path: {os.environ['PATH']}")
         logging.fatal(f"Python path: {sys.path}")
@@ -55,16 +55,19 @@ def run(context, objective_name: str, port: int, password: str) -> None:
     :param objective_name:
         problem factory name including python packages, e.g. package.subpackage.MyFactoryName
     """
-    kwargs = dict([item.strip("--").split("=") for item in context.args])
+    if context.args == [""]:
+        # Then the user didn't pass any arguments
+        kwargs = {}
+    else:
+        kwargs = dict([item.strip("--").split("=") for item in context.args])
+
     # make connection with the mother process
     conn = get_connection(port, password)
     seed = conn.recv()
 
     # dynamically load objective function module
-    objective_factory: AbstractProblemFactory = dynamically_instantiate(
-        objective_name, **kwargs
-    )
-    f, x0, y0 = objective_factory.create(seed)
+    objective_factory: AbstractProblemFactory = dynamically_instantiate(objective_name)
+    f, x0, y0 = objective_factory.create(seed, **kwargs)
 
     # give mother process the signal that we're ready
     conn.send([x0, y0, objective_factory.get_setup_information()])

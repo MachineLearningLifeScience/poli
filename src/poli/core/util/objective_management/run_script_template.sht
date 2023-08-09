@@ -10,4 +10,4 @@ PYTHONPATH="${PYTHONPATH}:%s"  # additions to the python path
 export PYTHONPATH=${PYTHONPATH}  # make python path available to python call
 export %s=${PYTHONPATH}  # some shell magic can prevent the export of PYTHONPATH -- no clue
 # it is CRUCIAL that the shell script is given port number and password
-python %s --objective-name=%s --port="$1" --password="$2" %s # factory name, port number and password
+python %s --objective-name=%s --port="$1" --password="$2" "$3" # factory name, port number and password

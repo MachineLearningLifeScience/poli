@@ -76,13 +76,6 @@ def _make_run_script(
         # TODO: check that location exists and is valid environment
         python_paths = ":".join(python_paths)
 
-        # The user might be interested in passing additional arguments
-        # to the problem factory. These are passed as kwargs to this function. They are hard-baked into the run script with the
-        # following loop:
-        string_for_kwargs = ""
-        for key, value in kwargs.items():
-            string_for_kwargs += " --%s=%s" % (key, value)
-
         with open(
             join(dirname(__file__), "run_script_template.sht"), "r"
         ) as run_script_template_file:
@@ -97,7 +90,6 @@ def _make_run_script(
                 ADDITIONAL_IMPORT_SEARCH_PATHES_KEY,
                 command,
                 full_problem_factory_name,
-                string_for_kwargs,
             )
         with open(run_script_location, "w+") as run_script_file:
             # write out run script and make it executable

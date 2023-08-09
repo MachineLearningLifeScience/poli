@@ -9,14 +9,12 @@ class ProblemSetupInformation:
         aligned: bool,
         alphabet: dict,
         log_transform_recommended=False,
-        wildtype_pdb_path: Path = None,
     ):
         self.name = name
         self.max_sequence_length = max_sequence_length
         self.aligned = aligned
         self.alphabet = alphabet
         self.log_transform_recommended = log_transform_recommended
-        self.wildtype_pdb_path = wildtype_pdb_path
 
     def get_problem_name(self) -> str:
         return self.name

@@ -76,8 +76,9 @@ class FoldXStabilityBlackBox(AbstractBlackBox):
         self.parser = PDB.PDBParser(QUIET=True)
         self.alphabet = alphabet
         self.decoding = {v: k for k, v in self.alphabet.items()}
-        if not isinstance(wildtype_pdb_file, Path):
-            wildtype_pdb_file = Path(wildtype_pdb_file)
+
+        if isinstance(wildtype_pdb_file, str):
+            wildtype_pdb_file = Path(wildtype_pdb_file.strip())
 
         self.wildtype_pdb_file = wildtype_pdb_file
 
@@ -239,8 +240,8 @@ class FoldXStabilityBlackBox(AbstractBlackBox):
 
 
 class FoldXStabilityProblemFactory(AbstractProblemFactory):
-    def __init__(self, wildtype_pdb_path: Path) -> None:
-        self.wildtype_pdb_path = wildtype_pdb_path
+    def __init__(self) -> None:
+        self.required_arguments = ["wildtype_pdb_path"]
         super().__init__()
 
     def get_setup_information(self) -> ProblemSetupInformation:
@@ -256,14 +257,28 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
             aligned=True,
         )
 
-    def create(self, seed: int = 0) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+    def create(
+        self, seed: int = 0, wildtype_pdb_path: Path = None
+    ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         L = self.get_setup_information().get_max_sequence_length()
-        wildtype_pdb_file = self.wildtype_pdb_path
+        if wildtype_pdb_path is None:
+            raise ValueError(
+                "Missing required argument wildtype_pdb_path. "
+                "Did you forget to pass it to create()?"
+            )
+
+        if isinstance(wildtype_pdb_path, str):
+            wildtype_pdb_path = Path(wildtype_pdb_path.strip())
+        else:
+            raise ValueError(
+                f"wildtype_pdb_path must be a string or a Path. Received {type(wildtype_pdb_path)}"
+            )
+
         alphabet = self.get_setup_information().get_alphabet()
-        f = FoldXStabilityBlackBox(L, wildtype_pdb_file, alphabet)
+        f = FoldXStabilityBlackBox(L, wildtype_pdb_path, alphabet)
 
         parser = PDB.PDBParser(QUIET=True)
-        wildtype_structure = parser.get_structure("pdb", wildtype_pdb_file)
+        wildtype_structure = parser.get_structure("pdb", wildtype_pdb_path)
         wildtype_amino_acids = [
             seq1(residue.get_resname()) for residue in wildtype_structure.get_residues()
         ]
@@ -283,19 +298,19 @@ if __name__ == "__main__":
 
     wildtype_pdb_path = THIS_DIR / "101m_Repair.pdb"
 
-    foldx_problem_factory = FoldXStabilityProblemFactory(
-        wildtype_pdb_path=wildtype_pdb_path
-    )
+    foldx_problem_factory = FoldXStabilityProblemFactory()
 
     register_problem(
         foldx_problem_factory,
         conda_environment_location="/Users/migd/anaconda3/envs/poli-dev",
-        wildtype_pdb_path=wildtype_pdb_path,
     )
 
     problem_name = foldx_problem_factory.get_setup_information().get_problem_name()
     problem_info, f, x0, y0, run_info = objective_factory.create(
-        problem_name, seed=0, observer=None
+        problem_name,
+        seed=0,
+        observer=None,
+        # wildtype_pdb_path=wildtype_pdb_path,
     )
 
     print(f"Problem name: {problem_name}")

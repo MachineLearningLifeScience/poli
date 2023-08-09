@@ -33,7 +33,7 @@ def get_connection(port: int, password: str):
 
 
 class ProcessWrapper:
-    def __init__(self, run_script):
+    def __init__(self, run_script, **kwargs_for_factory):
         """
         Server class for inter process communication.
 
@@ -48,9 +48,15 @@ class ProcessWrapper:
         # TODO: very hacky way to read out the socket! (but the listener is not very cooperative)
         self.port = self.listener._listener._socket.getsockname()[1]
         # here is a VERY crucial step
-        # we expect the shell script to take port and password as arguments
+        # we expect the shell script to take port and password as arguments, as well as other arguments passed by the user
+        # when calling objective_factory.create
+        string_for_kwargs = ""
+        for key, value in kwargs_for_factory.items():
+            string_for_kwargs += f"--{key}={value} "
         self.proc = subprocess.Popen(
-            [run_script, str(self.port), self.password], stdout=None, stderr=None
+            [run_script, str(self.port), self.password, string_for_kwargs],
+            stdout=None,
+            stderr=None,
         )
         self.conn = self.listener.accept()  # wait for the process to connect
 
