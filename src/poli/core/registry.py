@@ -57,6 +57,7 @@ def register_problem(
     problem_factory: AbstractProblemFactory,
     conda_environment_location: str = None,
     python_paths: List[str] = None,
+    **kwargs,
 ):
     problem_name = problem_factory.get_setup_information().get_problem_name()
     if problem_name not in config.sections():
@@ -64,7 +65,7 @@ def register_problem(
     else:
         warnings.warn(f"Problem {problem_name} already exists. Overwriting.")
     run_script_location = make_run_script(
-        problem_factory, conda_environment_location, python_paths
+        problem_factory, conda_environment_location, python_paths, **kwargs
     )
     config[problem_name][_RUN_SCRIPT_LOCATION] = run_script_location
     _write_config()

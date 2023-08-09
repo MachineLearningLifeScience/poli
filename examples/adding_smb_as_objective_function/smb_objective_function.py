@@ -23,6 +23,7 @@ from simulator import test_level_from_z
 
 THIS_DIR = Path(__file__).parent.resolve()
 
+
 class SMBBlackBox(AbstractBlackBox):
     def __init__(self, L: int):
         super().__init__(L)
@@ -43,7 +44,7 @@ class SMBBlackBox(AbstractBlackBox):
             res = test_level_from_z(z, self.model, visualize=True)
 
         # Return the number of jumps
-        return np.array([res["jumps"]]).rehape(1, 1)
+        return np.array([res["jumpActionsPerformed"]], dtype=float).reshape(1, 1)
 
 
 class SMBProblemFactory(AbstractProblemFactory):

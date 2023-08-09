@@ -9,13 +9,11 @@ FoldX. If not, we'll have to use a Docker
 container.
 """
 from pathlib import Path
-from re import M
 from typing import Dict, List, TypedDict, Tuple
 import subprocess
 import shutil
 from time import time
 from uuid import uuid4
-import logging
 
 from Levenshtein import editops
 
@@ -24,7 +22,7 @@ import numpy as np
 from Bio import PDB
 from Bio.SeqUtils import seq1
 
-from foldx_utils import AMINO_ACIDS, ENCODING, INVERSE_ENCODING
+from foldx_utils import AMINO_ACIDS, ENCODING
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
@@ -78,6 +76,9 @@ class FoldXStabilityBlackBox(AbstractBlackBox):
         self.parser = PDB.PDBParser(QUIET=True)
         self.alphabet = alphabet
         self.decoding = {v: k for k, v in self.alphabet.items()}
+        if not isinstance(wildtype_pdb_file, Path):
+            wildtype_pdb_file = Path(wildtype_pdb_file)
+
         self.wildtype_pdb_file = wildtype_pdb_file
 
         self.wildtype_structure = self.parser.get_structure(
@@ -238,11 +239,14 @@ class FoldXStabilityBlackBox(AbstractBlackBox):
 
 
 class FoldXStabilityProblemFactory(AbstractProblemFactory):
+    def __init__(self, wildtype_pdb_path: Path) -> None:
+        self.wildtype_pdb_path = wildtype_pdb_path
+        super().__init__()
+
     def get_setup_information(self) -> ProblemSetupInformation:
         """
         TODO: document
         """
-        alphabet_symbols = AMINO_ACIDS
         alphabet = ENCODING
 
         return ProblemSetupInformation(
@@ -252,23 +256,21 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
             aligned=True,
         )
 
-    def create(
-        self, seed: int = 0, initial_pdb_file: Path = None
-    ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+    def create(self, seed: int = 0) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         L = self.get_setup_information().get_max_sequence_length()
-        wildtype_pdb_file = self.get_setup_information().wildtype_pdb_path
+        wildtype_pdb_file = self.wildtype_pdb_path
         alphabet = self.get_setup_information().get_alphabet()
         f = FoldXStabilityBlackBox(L, wildtype_pdb_file, alphabet)
 
         parser = PDB.PDBParser(QUIET=True)
-        protein = parser.get_structure("pdb", wildtype_pdb_file)
-        amino_acids = [
-            seq1(residue.get_resname()) for residue in protein.get_residues()
+        wildtype_structure = parser.get_structure("pdb", wildtype_pdb_file)
+        wildtype_amino_acids = [
+            seq1(residue.get_resname()) for residue in wildtype_structure.get_residues()
         ]
 
-        x0 = np.array([ENCODING[amino_acid] for amino_acid in amino_acids]).reshape(
-            1, -1
-        )
+        x0 = np.array(
+            [ENCODING[amino_acid] for amino_acid in wildtype_amino_acids]
+        ).reshape(1, -1)
 
         f_0 = f(x0)
 
@@ -276,14 +278,28 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
 
 
 if __name__ == "__main__":
-    wildtype_pdb_file = THIS_DIR / "101m_Repair.pdb"
+    from poli import objective_factory
+    from poli.core.registry import register_problem
 
-    f = FoldXStabilityBlackBox(
-        MAX_SEQUENCE_LENGTH, wildtype_pdb_file=wildtype_pdb_file, alphabet=ENCODING
+    wildtype_pdb_path = THIS_DIR / "101m_Repair.pdb"
+
+    foldx_problem_factory = FoldXStabilityProblemFactory(
+        wildtype_pdb_path=wildtype_pdb_path
     )
 
-    x = np.array([[ENCODING[amino_acid] for amino_acid in wildtype_amino_acids]])
-    x_mod = x.copy()
-    x_mod[0, 0] = 0
-    x = np.array([x.flatten(), x_mod.flatten()])
-    print(f(x))
+    register_problem(
+        foldx_problem_factory,
+        conda_environment_location="/Users/migd/anaconda3/envs/poli-dev",
+        wildtype_pdb_path=wildtype_pdb_path,
+    )
+
+    problem_name = foldx_problem_factory.get_setup_information().get_problem_name()
+    problem_info, f, x0, y0, run_info = objective_factory.create(
+        problem_name, seed=0, observer=None
+    )
+
+    print(f"Problem name: {problem_name}")
+    print(f"Problem info: {problem_info}")
+    print(f"Initial sequence: {x0}")
+    print(f"Initial score: {y0}")
+    print(f"Run info: {run_info}")

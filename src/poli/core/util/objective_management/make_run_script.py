@@ -22,10 +22,16 @@ def make_run_script(
     conda_environment_location: str = None,
     python_paths: List[str] = None,
     cwd=None,
+    **kwargs
 ) -> str:
     command = inspect.getfile(objective)
     return _make_run_script(
-        command, problem_factory, conda_environment_location, python_paths, cwd
+        command,
+        problem_factory,
+        conda_environment_location,
+        python_paths,
+        cwd,
+        **kwargs
     )
 
 
@@ -42,7 +48,12 @@ def make_observer_script(
 
 
 def _make_run_script(
-    command, instantiated_object, conda_environment_location, python_paths, cwd=None
+    command,
+    instantiated_object,
+    conda_environment_location,
+    python_paths,
+    cwd=None,
+    **kwargs
 ):
     if cwd is None:
         cwd = str(os.getcwd())
@@ -64,6 +75,14 @@ def _make_run_script(
             python_paths = [dirname(factory_location)]
         # TODO: check that location exists and is valid environment
         python_paths = ":".join(python_paths)
+
+        # The user might be interested in passing additional arguments
+        # to the problem factory. These are passed as kwargs to this function. They are hard-baked into the run script with the
+        # following loop:
+        string_for_kwargs = ""
+        for key, value in kwargs.items():
+            string_for_kwargs += " --%s=%s" % (key, value)
+
         with open(
             join(dirname(__file__), "run_script_template.sht"), "r"
         ) as run_script_template_file:
@@ -76,7 +95,9 @@ def _make_run_script(
                 conda_environment_location,
                 python_paths,
                 ADDITIONAL_IMPORT_SEARCH_PATHES_KEY,
-                command + " " + full_problem_factory_name,
+                command,
+                full_problem_factory_name,
+                string_for_kwargs,
             )
         with open(run_script_location, "w+") as run_script_file:
             # write out run script and make it executable

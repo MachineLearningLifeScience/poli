@@ -132,7 +132,7 @@ def load_example_model(path_to_state_dict: Path) -> VAEMario:
     """
     vae = VAEMario()
     vae.load_state_dict(
-        torch.load(path_to_state_dict), map_location=torch.device("cpu")
+        torch.load(path_to_state_dict, map_location=torch.device("cpu"))
     )
     return vae
 
