@@ -89,11 +89,3 @@ if __name__ == "__main__":
     # information to run. Said information can be interpreted
     # as being used for instantiating the problem factory.
     run()
-    # if len(sys.argv) == 4:
-    #     run(sys.argv[1], int(sys.argv[2]), sys.argv[3])
-    # elif len(sys.argv) > 4:
-    #     run(sys.argv[1], int(sys.argv[2]), sys.argv[3], *sys.argv[4:])
-    # else:
-    #     raise ValueError(
-    #         "Not enough arguments. Expected: objective_name, port, password"
-    #     )

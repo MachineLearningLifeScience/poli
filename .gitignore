@@ -9,3 +9,4 @@ temp
 src/poli/registered_objectives/*.sh
 
 .vscode/
+.DS_Store

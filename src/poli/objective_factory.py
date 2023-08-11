@@ -13,8 +13,11 @@ from poli.core.util.inter_process_communication.process_wrapper import ProcessWr
 
 
 class ExternalBlackBox(AbstractBlackBox):
-    def __init__(self, L: int, process_wrapper):
+    def __init__(self, L: int, process_wrapper, sequences_aligned: bool = False):
+        # TODO: the sequences_aligned assign to false is a hack for
+        # now
         super().__init__(L)
+        self.sequences_aligned = sequences_aligned
         self.process_wrapper = process_wrapper
 
     def _black_box(self, x, context=None):
