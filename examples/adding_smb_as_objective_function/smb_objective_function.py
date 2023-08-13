@@ -75,7 +75,7 @@ if __name__ == "__main__":
     smb_problem_factory = SMBProblemFactory()
     register_problem(
         smb_problem_factory,
-        conda_environment_location="/Users/migd/anaconda3/envs/poli-dev",
+        conda_environment_name="/Users/migd/anaconda3/envs/poli-dev",
     )
 
     # now we can instantiate our objective

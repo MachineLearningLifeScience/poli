@@ -302,7 +302,7 @@ if __name__ == "__main__":
 
     register_problem(
         foldx_problem_factory,
-        conda_environment_location="/Users/migd/anaconda3/envs/poli-dev",
+        conda_environment_name="/Users/migd/anaconda3/envs/poli-dev",
     )
 
     problem_name = foldx_problem_factory.get_setup_information().get_problem_name()

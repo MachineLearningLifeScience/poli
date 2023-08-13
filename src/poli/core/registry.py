@@ -1,9 +1,10 @@
+from typing import List, Union
 import os
 import configparser
+from pathlib import Path
 import warnings
 
 from poli.core.abstract_problem_factory import AbstractProblemFactory
-from typing import List
 
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.objective_management.make_run_script import (
@@ -55,17 +56,20 @@ def delete_observer_run_script() -> str:
 
 def register_problem(
     problem_factory: AbstractProblemFactory,
-    conda_environment_location: str = None,
+    conda_environment_name: Union[str, Path] = None,
     python_paths: List[str] = None,
     **kwargs,
 ):
+    if "conda_environment_location" in kwargs:
+        conda_environment_name = kwargs["conda_environment_location"]
+
     problem_name = problem_factory.get_setup_information().get_problem_name()
     if problem_name not in config.sections():
         config.add_section(problem_name)
     else:
         warnings.warn(f"Problem {problem_name} already exists. Overwriting.")
     run_script_location = make_run_script(
-        problem_factory, conda_environment_location, python_paths, **kwargs
+        problem_factory, conda_environment_name, python_paths, **kwargs
     )
     config[problem_name][_RUN_SCRIPT_LOCATION] = run_script_location
     _write_config()
