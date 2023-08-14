@@ -1,4 +1,4 @@
-name: poli_aloha_problem
+name: poli_foldx_stability
 channels:
   - defaults
 dependencies:
@@ -6,4 +6,6 @@ dependencies:
   - pip
   - pip:
     - numpy
+    - biopython
+    - python-levenshtein
     - "git+https://github.com/miguelgondu/poli.git"

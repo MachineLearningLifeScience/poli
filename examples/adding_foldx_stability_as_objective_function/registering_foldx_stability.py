@@ -305,25 +305,9 @@ if __name__ == "__main__":
     from poli import objective_factory
     from poli.core.registry import register_problem
 
-    wildtype_pdb_path = THIS_DIR / "101m_Repair.pdb"
-
     foldx_problem_factory = FoldXStabilityProblemFactory()
 
     register_problem(
         foldx_problem_factory,
-        conda_environment_name="poli-dev",
+        conda_environment_name="poli_foldx_stability",
     )
-
-    problem_name = foldx_problem_factory.get_setup_information().get_problem_name()
-    problem_info, f, x0, y0, run_info = objective_factory.create(
-        problem_name,
-        seed=0,
-        observer=None,
-        wildtype_pdb_path=wildtype_pdb_path,
-    )
-
-    print(f"Problem name: {problem_name}")
-    print(f"Problem info: {problem_info}")
-    print(f"Initial sequence: {x0}")
-    print(f"Initial score: {y0}")
-    print(f"Run info: {run_info}")
