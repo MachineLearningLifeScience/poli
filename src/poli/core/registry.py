@@ -16,8 +16,11 @@ _DEFAULT = "DEFAULT"
 _OBSERVER = "observer"
 _RUN_SCRIPT_LOCATION = "run_script_location"
 
+HOME_DIR = Path.home().resolve()
+(HOME_DIR / ".poli_objectives").mkdir(exist_ok=True)
 
-config_file = os.path.join(os.path.dirname(__file__), "..", "config.rc")
+# config_file = os.path.join(os.path.dirname(__file__), "..", "config.rc")
+config_file = str(HOME_DIR / ".poli_objectives" / "config.rc")
 config = configparser.ConfigParser(defaults={_OBSERVER: ""})
 ls = config.read(config_file)
 # if len(ls) == 0:

@@ -49,7 +49,7 @@ if __name__ == "__main__":
     my_problem_factory = MyProblemFactory()
     register_problem(
         my_problem_factory,
-        conda_environment_name="/Users/migd/anaconda3/envs/poli-dev",
+        conda_environment_name="poli-dev",
     )
 
     # now we can instantiate our objective

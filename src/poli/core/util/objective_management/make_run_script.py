@@ -12,10 +12,11 @@ from poli.objective import ADDITIONAL_IMPORT_SEARCH_PATHES_KEY
 from poli.core.util import observer_wrapper
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.util.abstract_observer import AbstractObserver
-from poli.registered_objectives import __file__ as _RUN_SCRIPTS_FOLDER
 
+# from poli.registered_objectives import __file__ as _RUN_SCRIPTS_FOLDER
 
-RUN_SCRIPTS_FOLDER = dirname(_RUN_SCRIPTS_FOLDER)
+HOME_DIR = Path.home().resolve()
+RUN_SCRIPTS_FOLDER = HOME_DIR / ".poli_objectives"
 
 
 def make_run_script(
