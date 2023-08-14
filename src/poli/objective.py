@@ -1,7 +1,8 @@
 import logging
 import os
 import sys
-import click
+import argparse
+from typing import List
 
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.util.inter_process_communication.process_wrapper import get_connection
@@ -39,27 +40,19 @@ def dynamically_instantiate(obj: str):
     return instantiated_object
 
 
-@click.command(
-    context_settings={
-        "ignore_unknown_options": True,
-        "allow_extra_args": True,
-    }
-)
-@click.option("--objective-name", required=True)
-@click.option("--port", required=True, type=int)
-@click.option("--password", required=True, type=str)
-@click.pass_context
-def run(context, objective_name: str, port: int, password: str) -> None:
+def run(
+    factory_kwargs: List[str], objective_name: str, port: int, password: str
+) -> None:
     """
     Starts an objective function listener loop to wait for requests.
     :param objective_name:
         problem factory name including python packages, e.g. package.subpackage.MyFactoryName
     """
-    if context.args == [""]:
+    if factory_kwargs == [""]:
         # Then the user didn't pass any arguments
         kwargs = {}
     else:
-        kwargs = dict([item.strip("--").split("=") for item in context.args])
+        kwargs = dict([item.strip("--").split("=") for item in factory_kwargs])
 
     # make connection with the mother process
     conn = get_connection(port, password)
@@ -88,4 +81,10 @@ if __name__ == "__main__":
     # TODO: modify this to allow for passing more
     # information to run. Said information can be interpreted
     # as being used for instantiating the problem factory.
-    run()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--objective-name", required=True)
+    parser.add_argument("--port", required=True, type=int)
+    parser.add_argument("--password", required=True, type=str)
+
+    args, factory_kwargs = parser.parse_known_args()
+    run(factory_kwargs, args.objective_name, args.port, args.password)

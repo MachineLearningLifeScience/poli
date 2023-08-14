@@ -61,6 +61,7 @@ def register_problem(
     problem_factory: AbstractProblemFactory,
     conda_environment_name: Union[str, Path] = None,
     python_paths: List[str] = None,
+    force: bool = False,
     **kwargs,
 ):
     if "conda_environment_location" in kwargs:
@@ -69,8 +70,20 @@ def register_problem(
     problem_name = problem_factory.get_setup_information().get_problem_name()
     if problem_name not in config.sections():
         config.add_section(problem_name)
-    else:
+    elif not force:
+        # If force is false, we warn the user and ask for confirmation
+        user_input = input(
+            f"Problem {problem_name} already exists. "
+            f"Do you want to overwrite it? (y/[n]) "
+        )
+        if user_input.lower() != "y":
+            raise ValueError(
+                f"Problem {problem_name} already exists. "
+                f"Use force=True to overwrite."
+            )
+
         warnings.warn(f"Problem {problem_name} already exists. Overwriting.")
+
     run_script_location = make_run_script(
         problem_factory, conda_environment_name, python_paths, **kwargs
     )
