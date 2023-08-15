@@ -1,0 +1,13 @@
+name: poli__mario
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.9
+  - conda-forge::openjdk
+  - pip
+  - pip:
+    - torch
+    - numpy
+    - click
+    - "git+https://github.com/miguelgondu/poli.git"

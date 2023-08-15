@@ -25,7 +25,10 @@ class AbstractBlackBox:
         """
         assert len(x.shape) == 2
         # assert(x.shape[0] == 1)
-        assert x.shape[1] == self.L or not self.sequences_aligned
+        # self.L == np.inf is a way to say that the
+        # length of the input is not fixed.
+        if self.L is not np.inf:
+            assert x.shape[1] == self.L or not self.sequences_aligned
         # TODO: what happens with multi-objective?
         # In some cases, we might be interested in functions
         # that output more than one value.

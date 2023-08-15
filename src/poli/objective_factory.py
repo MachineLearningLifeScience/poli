@@ -3,14 +3,30 @@ This is the main file relevant for users who want to run objective functions.
 """
 from typing import Callable, Tuple
 import numpy as np
+from pathlib import Path
+import configparser
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.problem_setup_information import ProblemSetupInformation
-from poli.core.registry import config, _RUN_SCRIPT_LOCATION, _DEFAULT, _OBSERVER
+from poli.core.registry import (
+    # config,
+    _RUN_SCRIPT_LOCATION,
+    _DEFAULT,
+    _OBSERVER,
+    register_problem_from_repository,
+)
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.external_observer import ExternalObserver
 from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
+from poli.objective_repository import AVAILABLE_OBJECTIVES
 
+def load_config():
+    HOME_DIR = Path.home().resolve()
+    config_file = str(HOME_DIR / ".poli_objectives" / "config.rc")
+    config = configparser.ConfigParser(defaults={_OBSERVER: ""})
+    ls = config.read(config_file)
+
+    return config
 
 class ExternalBlackBox(AbstractBlackBox):
     def __init__(self, L: int, process_wrapper, sequences_aligned: bool = False):
@@ -61,6 +77,33 @@ def create(
         y0: f(x0)
         observer_info: information from the observer_info about the instantiated run (allows the calling algorithm to connect)
     """
+    # TODO: change prints for logs and warnings.
+    # Check if the name is indeed registered, or
+    # available in the objective repository
+    config = load_config()
+    if name not in config:
+        if name not in AVAILABLE_OBJECTIVES:
+            raise ValueError(
+                f"Objective function '{name}' is not registered, "
+                "and it is not available in the repository."
+            )
+        
+        # At this point, we know that the function is available
+        # in the repository
+        answer = input(
+            f"Objective function '{name}' is not registered, "
+            "but it is available in the repository. Do you "
+            "want to install it? (y/[n])"
+        )
+        if answer == "y":
+            # Register problem
+            register_problem_from_repository(name)
+            # Refresh the config
+            print("Registered the objective from the repository.")
+            config = load_config()
+        else:
+            raise ValueError(f"Objective function '{name}' is not registered.")
+
     # start objective process
     # VERY IMPORTANT: the script MUST accept port and password as arguments
     process_wrapper = ProcessWrapper(

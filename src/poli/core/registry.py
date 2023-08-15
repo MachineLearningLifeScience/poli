@@ -3,6 +3,7 @@ import os
 import configparser
 from pathlib import Path
 import warnings
+import subprocess
 
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 
@@ -58,7 +59,7 @@ def delete_observer_run_script() -> str:
 
 
 def register_problem(
-    problem_factory: AbstractProblemFactory,
+    problem_factory: Union[AbstractProblemFactory, str],
     conda_environment_name: Union[str, Path] = None,
     python_paths: List[str] = None,
     force: bool = False,
@@ -89,6 +90,79 @@ def register_problem(
     )
     config[problem_name][_RUN_SCRIPT_LOCATION] = run_script_location
     _write_config()
+
+
+def register_problem_from_repository(name: str):
+    # the name is actually the folder inside
+    # poli/objective_repository, so we need
+    # to
+    # 1. create the environment from the yaml file
+    # 2. run the file from said enviroment (since
+    #    we can't import the factory: it may have
+    #    dependencies that are not installed)
+
+    # Moreover, we should only be doing this
+    # if the problem is not already registered.
+    PATH_TO_REPOSITORY = (
+        Path(__file__).parent.parent / "objective_repository"
+    ).resolve()
+
+    if name in config.sections():
+        warnings.warn(f"Problem {name} already registered. Skipping")
+        return
+
+    # 1. create the environment from the yaml file
+    try:
+        subprocess.run(
+            " ".join([
+                "conda",
+                "env",
+                "create",
+                "-f",
+                str(PATH_TO_REPOSITORY / name / "environment.yml"),
+            ]),
+            shell=True,
+            check=True,
+            capture_output=True
+        )
+    except subprocess.CalledProcessError as e:
+        if "already exists" in e.stderr.decode():
+            warnings.warn(f"Environment {name} already exists. Will not create it.")
+        else:
+            raise e
+
+    # 2. run the file from said enviroment (since
+    #    we can't import the factory: it may have
+    #    dependencies that are not installed)
+
+    # 2.1. Loading up the yml file to get the name
+    # of the environment
+    with open(PATH_TO_REPOSITORY / name / "environment.yml", "r") as f:
+        # This is a really crude way of doing this,
+        # but it works. We should probably use a
+        # yaml parser instead, but the idea is to keep
+        # the dependencies to a minimum.
+        yml = f.read()
+        lines = yml.split("\n")
+        conda_env_name_line = lines[0]
+        assert conda_env_name_line.startswith("name:"), (
+            "The first line of the environment.yml file "
+            "should be the name of the environment"
+        )
+        env_name = lines[0].split(":")[1].strip()
+
+    # 2.2. Running the file
+    file_to_run = PATH_TO_REPOSITORY / name / "register.py"
+    command = " ".join(["conda", "run", "-n", env_name, "python", str(file_to_run)])
+    warnings.warn(
+        "Running the following command: %s. " % command
+    )
+    subprocess.run(
+        command,
+        check=True,
+        shell=True,
+        capture_output=True
+    )
 
 
 def delete_problem(problem_name: str):

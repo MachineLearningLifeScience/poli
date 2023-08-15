@@ -1,18 +1,27 @@
 # Protein Objective Library (POLi)
-An easy-to-use, plug-and-play library to benchmark protein-related Bayesian optimization algorithms.
-Primarily, this library provides objective functions encapsulating any dependencies.
-Main benefit is that this allows to develop algorithms that use (say) tensorflow without having to worry that the objective was written in (say) torch.
+
+An easy-to-use, plug-and-play library to benchmark protein-related discrete optimization algorithms.
+Primarily, this library provides a way to encapsulate objective functions and their dependencies.
+The main benefit is that this allows to develop optimization algorithms that use (say) tensorflow without having to worry that the objective was written in (say) torch.
 
 For any code written by other authors (whether objective function or algorithm) this library allows to benchmark and analyse it without too much interaction.
 
 On purpose, logging is kept at the objective function side.
 This allows easier benchmarking of algorithms from other authors.
 Algorithmspecific logging can be done internally, on the site of the algorithm if necessary.
+
 ## Basic usage
+
 ### Installation
+
 Run the following from the main directory (where this README file is also located) to install the package in development mode (that is, modifications to the source code is directly visible to file importing it without the need for reinstallation).
 ```
 pip install -e .
+```
+
+If you are not interested in debugging locally, you could also install the bleeding-edge version by running
+```
+pip install git+https://github.com/MachineLearningLifeScience/poli.git
 ```
 
 ### Minimal working example
@@ -20,7 +29,7 @@ Optimizing an objective function that just returns a draw from a standard normal
 ```
 import poli.objective_factory
 
-problem_info, f, x0, y0, run_info = objective_factory.create("WHITE_NOISE", caller_info=None)
+problem_info, f, x0, y0, run_info = objective_factory.create("white_noise", caller_info=None, observer=None)
 print(f(x0[:1, :]))
 f.terminate()
 ```
