@@ -28,7 +28,11 @@ class AbstractBlackBox:
         # self.L == np.inf is a way to say that the
         # length of the input is not fixed.
         if self.L is not np.inf:
-            assert x.shape[1] == self.L or not self.sequences_aligned
+            assert x.shape[1] == self.L or not self.sequences_aligned, (
+                "The length of the input is not the same as the length of the input of the problem. "
+                f"(L={self.L}, x.shape[1]={x.shape[1]}). "
+                "If you want to allow for variable length inputs, set L=np.inf."
+            )
         # TODO: what happens with multi-objective?
         # In some cases, we might be interested in functions
         # that output more than one value.
@@ -40,10 +44,10 @@ class AbstractBlackBox:
             x_ = x[i : i + 1, :]
             f_ = self._black_box(x_, context)
             f[i] = f_
-            assert len(f_.shape) == 2
-            assert f_.shape[0] == 1
-            assert f_.shape[1] == 1
-            assert isinstance(f, np.ndarray)
+            assert len(f_.shape) == 2, f"len(f_.shape)={len(f_.shape)}, expected 2"
+            assert f_.shape[0] == 1, f"f_.shape[0]={f_.shape[0]}, expected 1"
+            assert f_.shape[1] == 1, f"f_.shape[1]={f_.shape[1]}, expected 1"
+            assert isinstance(f, np.ndarray), f"type(f)={type(f)}, not np.ndarray"
             if self.observer is not None:
                 self.observer.observe(x_, f_, context)
         return f

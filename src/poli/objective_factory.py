@@ -5,11 +5,11 @@ from typing import Callable, Tuple
 import numpy as np
 from pathlib import Path
 import configparser
+import traceback
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.core.registry import (
-    # config,
     _RUN_SCRIPT_LOCATION,
     _DEFAULT,
     _OBSERVER,
@@ -20,6 +20,7 @@ from poli.core.util.external_observer import ExternalObserver
 from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
 from poli.objective_repository import AVAILABLE_OBJECTIVES
 
+
 def load_config():
     HOME_DIR = Path.home().resolve()
     config_file = str(HOME_DIR / ".poli_objectives" / "config.rc")
@@ -27,6 +28,7 @@ def load_config():
     ls = config.read(config_file)
 
     return config
+
 
 class ExternalBlackBox(AbstractBlackBox):
     def __init__(self, L: int, process_wrapper, sequences_aligned: bool = False):
@@ -39,6 +41,11 @@ class ExternalBlackBox(AbstractBlackBox):
     def _black_box(self, x, context=None):
         self.process_wrapper.send([x, context])
         val = self.process_wrapper.recv()
+        if isinstance(val[0], Exception):
+            e, traceback_ = val
+            print(traceback_)
+            raise e
+
         return val
 
     def terminate(self):
@@ -87,18 +94,19 @@ def create(
                 f"Objective function '{name}' is not registered, "
                 "and it is not available in the repository."
             )
-        
+
         # At this point, we know that the function is available
         # in the repository
         answer = input(
             f"Objective function '{name}' is not registered, "
             "but it is available in the repository. Do you "
-            "want to install it? (y/[n])"
+            "want to install it? (y/[n]): "
         )
         if answer == "y":
             # Register problem
             register_problem_from_repository(name)
             # Refresh the config
+            # TODO: change to logging
             print("Registered the objective from the repository.")
             config = load_config()
         else:

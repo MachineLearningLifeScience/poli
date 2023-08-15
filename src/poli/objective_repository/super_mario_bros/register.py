@@ -23,6 +23,10 @@ from simulator import test_level_from_z
 
 THIS_DIR = Path(__file__).parent.resolve()
 
+# TODO: download the model from the internet
+# if it doesn't exist, as well as the simulator
+# FIXME: do this after we remove .pt and .jar
+# files from the python installation.
 
 class SMBBlackBox(AbstractBlackBox):
     def __init__(self, L: int):

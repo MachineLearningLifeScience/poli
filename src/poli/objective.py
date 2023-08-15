@@ -3,6 +3,7 @@ import os
 import sys
 import argparse
 from typing import List
+import traceback
 
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.util.inter_process_communication.process_wrapper import get_connection
@@ -71,8 +72,12 @@ def run(
         # x, context = msg
         if msg is None:
             break
-        y = f(*msg)
-        conn.send(y)
+        try:
+            y = f(*msg)
+            conn.send(y)
+        except Exception as e:
+            tb = traceback.format_exc()
+            conn.send((e, tb))
     # conn.close()
     # exit()  # kill other threads, and close file handles
 
