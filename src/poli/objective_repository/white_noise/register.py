@@ -28,7 +28,8 @@ class WhiteNoiseBlackBox(AbstractBlackBox):
 
 class WhiteNoiseProblemFactory(AbstractProblemFactory):
     def get_setup_information(self) -> ProblemSetupInformation:
-        alphabet_symbols = []
+        # A mock alphabet made of the 10 digits.
+        alphabet_symbols = [str(i) for i in range(10)]
         alphabet = {symbol: i for i, symbol in enumerate(alphabet_symbols)}
 
         return ProblemSetupInformation(
@@ -41,7 +42,7 @@ class WhiteNoiseProblemFactory(AbstractProblemFactory):
     def create(self, seed: int = 0) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         L = self.get_setup_information().get_max_sequence_length()
         f = WhiteNoiseBlackBox(L=L)
-        x0 = np.array([[1, 2, 3]])
+        x0 = np.array([["1", "2", "3"]])
 
         return f, x0, f(x0)
 
