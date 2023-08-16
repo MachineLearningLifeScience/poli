@@ -64,7 +64,8 @@ def create(
     name: str,
     seed: int = 0,
     caller_info: dict = None,
-    observer: AbstractObserver = ExternalObserver(),
+    observer: AbstractObserver = None,
+    force_register: bool = False,
     **kwargs_for_factory,
 ) -> Tuple[ProblemSetupInformation, AbstractBlackBox, np.ndarray, np.ndarray, object]:
     """
@@ -97,20 +98,26 @@ def create(
 
         # At this point, we know that the function is available
         # in the repository
-        answer = input(
-            f"Objective function '{name}' is not registered, "
-            "but it is available in the repository. Do you "
-            "want to install it? (y/[n]): "
-        )
+        if force_register:
+            # Then we install it.
+            answer = "y"
+        else:
+            # We ask the user for their confirmation
+            answer = input(
+                f"Objective function '{name}' is not registered, "
+                "but it is available in the repository. Do you "
+                "want to install it? (y/[n]): "
+            )
+
         if answer == "y":
             # Register problem
             register_problem_from_repository(name)
-            # Refresh the config
-            # TODO: change to logging
+            # TODO: change print to logging
             print("Registered the objective from the repository.")
+            # Refresh the config
             config = load_config()
         else:
-            raise ValueError(f"Objective function '{name}' is not registered.")
+            raise ValueError(f"Objective function '{name}' won't be registered. Aborting.")
 
     # start objective process
     # VERY IMPORTANT: the script MUST accept port and password as arguments
