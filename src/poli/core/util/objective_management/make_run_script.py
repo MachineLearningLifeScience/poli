@@ -81,7 +81,6 @@ def _make_run_script(
 
     full_problem_factory_name = package_name + problem_factory_name
     run_script_location = join(RUN_SCRIPTS_FOLDER, problem_factory_name + ".sh")
-<<<<<<< HEAD
 
     if isinstance(conda_environment_name, str):
         # TODO: check that conda environment exists
@@ -126,26 +125,4 @@ def _make_run_script(
             run_script_location, os.stat(run_script_location).st_mode | stat.S_IEXEC
         )  # make script file executable
 
-=======
-    if conda_environment_location is None:
-        conda_environment_location = sys.executable[:-len("/bin/python")]
-    # make path to conda environment absolute
-    conda_environment_location = str(os.path.abspath(conda_environment_location))
-    if python_paths is None:
-        python_paths = [dirname(factory_location)]
-    # TODO: check that location exists and is valid environment
-    python_paths = ":".join(python_paths)
-    with open(join(dirname(__file__), "run_script_template.sht"), "r") as run_script_template_file:
-        """
-        load template file and fill in gaps which load conda enviroment, append python paths and call run with the 
-        desired factory
-        """
-        run_script = run_script_template_file.read() % (cwd, conda_environment_location, python_paths,
-                                                        ADDITIONAL_IMPORT_SEARCH_PATHES_KEY,
-                                                        command + " " + full_problem_factory_name)
-    with open(run_script_location, "w+") as run_script_file:
-        # write out run script and make it executable
-        run_script_file.write(run_script)
-        os.chmod(run_script_location, os.stat(run_script_location).st_mode | stat.S_IEXEC)  # make script file executable
->>>>>>> upstream/master
     return run_script_location
