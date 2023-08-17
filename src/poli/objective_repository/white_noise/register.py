@@ -8,7 +8,6 @@ a conda environment called 'poli__base' (see the
 environment.yml file in this folder).
 """
 from typing import Tuple
-from string import ascii_uppercase
 
 import numpy as np
 
