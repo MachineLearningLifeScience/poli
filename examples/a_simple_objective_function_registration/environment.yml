@@ -1,0 +1,9 @@
+name: poli_aloha_problem
+channels:
+  - defaults
+dependencies:
+  - python=3.9
+  - pip
+  - pip:
+    - numpy
+    - "git+https://github.com/miguelgondu/poli.git"

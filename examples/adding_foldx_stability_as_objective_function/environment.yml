@@ -1,0 +1,11 @@
+name: poli_foldx_stability
+channels:
+  - defaults
+dependencies:
+  - python=3.9
+  - pip
+  - pip:
+    - numpy
+    - biopython
+    - python-levenshtein
+    - "git+https://github.com/miguelgondu/poli.git"

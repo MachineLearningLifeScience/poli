@@ -1,6 +1,9 @@
 import logging
 import os
 import sys
+import argparse
+from typing import List
+import traceback
 
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.util.inter_process_communication.process_wrapper import get_connection
@@ -12,18 +15,25 @@ ADDITIONAL_IMPORT_SEARCH_PATHES_KEY = "ADDITIONAL_IMPORT_PATHS"
 def dynamically_instantiate(obj: str):
     # FIXME: this method opens up a serious security vulnerability
     # TODO: possible alternative: importlib
-    #sys.path.append(os.getcwd())
-    sys.path.extend(os.environ[ADDITIONAL_IMPORT_SEARCH_PATHES_KEY].split(':'))
-    #sys.path.extend(os.environ['PYTHONPATH'].split(':'))
-    last_dot = obj.rfind('.')
+    # TODO: another possible alternative: hydra
+    # sys.path.append(os.getcwd())
+    sys.path.extend(os.environ[ADDITIONAL_IMPORT_SEARCH_PATHES_KEY].split(":"))
+    # sys.path.extend(os.environ['PYTHONPATH'].split(':'))
+    last_dot = obj.rfind(".")
     try:
-        exec("from " + obj[:last_dot] + " import " + obj[last_dot+1:] + " as DynamicObject")
-        instantiated_object = eval("DynamicObject()")
+        exec(
+            "from "
+            + obj[:last_dot]
+            + " import "
+            + obj[last_dot + 1 :]
+            + " as DynamicObject"
+        )
+        instantiated_object = eval("DynamicObject")()
     except ImportError as e:
         logging.fatal(f"Path: {os.environ['PATH']}")
         logging.fatal(f"Python path: {sys.path}")
         logging.fatal(f"Path: {os.environ[ADDITIONAL_IMPORT_SEARCH_PATHES_KEY]}")
-        if 'PYTHONPATH' in os.environ.keys():
+        if "PYTHONPATH" in os.environ.keys():
             logging.fatal(f"Path: {os.environ['PYTHONPATH']}")
         else:
             logging.fatal("PYTHONPATH is not part of the environment variables.")
@@ -31,19 +41,27 @@ def dynamically_instantiate(obj: str):
     return instantiated_object
 
 
-def run(objective_name: str, port: int, password: str) -> None:
+def run(
+    factory_kwargs: List[str], objective_name: str, port: int, password: str
+) -> None:
     """
     Starts an objective function listener loop to wait for requests.
     :param objective_name:
         problem factory name including python packages, e.g. package.subpackage.MyFactoryName
     """
+    if factory_kwargs == [""]:
+        # Then the user didn't pass any arguments
+        kwargs = {}
+    else:
+        kwargs = dict([item.strip("--").split("=") for item in factory_kwargs])
+
     # make connection with the mother process
     conn = get_connection(port, password)
     seed = conn.recv()
 
     # dynamically load objective function module
     objective_factory: AbstractProblemFactory = dynamically_instantiate(objective_name)
-    f, x0, y0 = objective_factory.create(seed)
+    f, x0, y0 = objective_factory.create(seed, **kwargs)
 
     # give mother process the signal that we're ready
     conn.send([x0, y0, objective_factory.get_setup_information()])
@@ -54,11 +72,24 @@ def run(objective_name: str, port: int, password: str) -> None:
         # x, context = msg
         if msg is None:
             break
-        y = f(*msg)
-        conn.send(y)
-    #conn.close()
-    #exit()  # kill other threads, and close file handles
+        try:
+            y = f(*msg)
+            conn.send(y)
+        except Exception as e:
+            tb = traceback.format_exc()
+            conn.send((e, tb))
+    # conn.close()
+    # exit()  # kill other threads, and close file handles
 
 
-if __name__ == '__main__':
-    run(sys.argv[1], int(sys.argv[2]), sys.argv[3])
+if __name__ == "__main__":
+    # TODO: modify this to allow for passing more
+    # information to run. Said information can be interpreted
+    # as being used for instantiating the problem factory.
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--objective-name", required=True)
+    parser.add_argument("--port", required=True, type=int)
+    parser.add_argument("--password", required=True, type=str)
+
+    args, factory_kwargs = parser.parse_known_args()
+    run(factory_kwargs, args.objective_name, args.port, args.password)

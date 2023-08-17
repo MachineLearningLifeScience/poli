@@ -1,50 +1,61 @@
 # Protein Objective Library (POLi)
-An easy-to-use, plug-and-play library to benchmark protein-related Bayesian optimization algorithms.
-Primarily, this library provides objective functions encapsulating any dependencies.
-Main benefit is that this allows to develop algorithms that use (say) tensorflow without having to worry that the objective was written in (say) torch.
+
+An easy-to-use, plug-and-play library to benchmark protein-related discrete optimization algorithms.
+Primarily, this library provides a way to encapsulate objective functions and their dependencies.
+The main benefit is that this allows to develop optimization algorithms that use (say) tensorflow without having to worry that the objective was written in (say) torch.
 
 For any code written by other authors (whether objective function or algorithm) this library allows to benchmark and analyse it without too much interaction.
 
 On purpose, logging is kept at the objective function side.
 This allows easier benchmarking of algorithms from other authors.
 Algorithmspecific logging can be done internally, on the site of the algorithm if necessary.
+
 ## Basic usage
+
 ### Installation
+
 Run the following from the main directory (where this README file is also located) to install the package in development mode (that is, modifications to the source code is directly visible to file importing it without the need for reinstallation).
 ```
 pip install -e .
 ```
 
+If you are not interested in debugging locally, you could also install the bleeding-edge version by running
+```
+pip install git+https://github.com/MachineLearningLifeScience/poli.git
+```
+
+To make sure everything went well, you can test your `poli` installation by running
+
+```bash
+$ python -c "from poli.core.registry import get_problems ; print(get_problems())"
+[]
+```
+
+If the installation isn't fresh/isn't the only one in your system, you might actually get some names inside that list.
+
 ### Minimal working example
-Optimizing an objective function that just returns a draw from a standard normal.
+Defining an objective function that just returns a draw from a standard normal.
+```python
+# Check examples/minimal_working_example.py
+import numpy as np
+from poli import objective_factory
+
+problem_info, f, x0, y0, run_info = objective_factory.create(name="white_noise")
+
+x = np.array([["1", "2", "3"]])  # must be of shape [b, L], in this case [1, 3].
+for _ in range(5):
+    print(f"f(x) = {f(x)}")
+
 ```
-import poli.objective_factory
 
-problem_info, f, x0, y0, run_info = objective_factory.create("WHITE_NOISE", caller_info=None)
-print(f(x0[:1, :]))
-f.terminate()
+### Calling objective functions from the repository
+
+As you might have noticed, you can get a list of the registered problems using the `get_problems` method inside `poli.core.registry`. You can also get a list of objective functions available for installing/registration using `from poli.objective_repository import AVAILABLE_OBJECTIVES`:
+
+```bash
+$ python -c "from poli.objective_repository import AVAILABLE_OBJECTIVES ; print(AVAILABLE_OBJECTIVES)"
+[..., 'white_noise']
 ```
-### Calling a benchmark
-Calling a registered benchmark works as above, except that you have to exchange "WHITE_NOISE" for your objective name.
-You can see the registered benchmarks by calling `get_problems()` provided by `poli.core.registry`.
-For registering your own objectives, write a class inheriting from `AbstractProblemFactory`. 
-See `adding_an_objective_function` in the `examples` how to do this.
 
-### Logging
-You can define an observer that gets notified everytime the objective function is called.
-For that you have to write a python class that inherits from `AbstractObserver`. 
-See `adding_an_observer.py` in the `examples` how to do this.
-NOTE: If your observer is NOT at the root of your project, you have to specify the argument `python_paths` accordingly.
-Minimally, you should set `python_paths=[your_project_root]`.
+If the function isn't there, **implement it yourself!** An example of how to do this can be found in `poli/examples/a_simple_objective_function_registration`.
 
-## Software architecture
-At the heart of the library are the files `objective.py` and `objective_factory.py`.
-When a problem is registered in the `registry`, a shell script is created that takes three arguments:
-
-1. the package name of instance of `AbstractProblemFactory` 
-2. a port number
-3. a password
-
-When a problem is instantiated in `objective_factory.py`, a localhost connection is created listening at a free port.
-The shell script is called with the desired problem factory, the port and the password.
-Inside this script, the desired environment is started and then `objective.py` is called, which makes the connection to the server.

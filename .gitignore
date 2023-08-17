@@ -4,3 +4,9 @@ __pycache__
 /src/poli/config.rc
 src/poli.egg-info/
 temp
+
+# Ignore the registered objectives
+src/poli/registered_objectives/*.sh
+
+.vscode/
+.DS_Store
