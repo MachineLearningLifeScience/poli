@@ -120,7 +120,7 @@ def test_level_from_z(
 if __name__ == "__main__":
     human_player = False
     vae = VAEMario()
-    vae.load_state_dict(torch.load("./models/example.pt"))
+    vae.load_state_dict(torch.load(filepath / "example.pt"))
 
     random_z = 3.0 * torch.randn((2,))
     res = test_level_from_z(random_z, vae, human_player=human_player)

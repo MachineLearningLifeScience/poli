@@ -8,4 +8,4 @@ dependencies:
     - numpy
     - biopython
     - python-levenshtein
-    - "git+https://github.com/miguelgondu/poli.git"
+    - "git+https://github.com/MachineLearningLifeScience/poli.git"
