@@ -12,7 +12,7 @@ from poli.core.util.inter_process_communication.process_wrapper import get_conne
 ADDITIONAL_IMPORT_SEARCH_PATHES_KEY = "ADDITIONAL_IMPORT_PATHS"
 
 
-def dynamically_instantiate(obj: str):
+def dynamically_instantiate(obj: str, **kwargs):
     # FIXME: this method opens up a serious security vulnerability
     # TODO: possible alternative: importlib
     # TODO: another possible alternative: hydra
@@ -28,7 +28,7 @@ def dynamically_instantiate(obj: str):
             + obj[last_dot + 1 :]
             + " as DynamicObject"
         )
-        instantiated_object = eval("DynamicObject")()
+        instantiated_object = eval("DynamicObject")(**kwargs)
     except ImportError as e:
         logging.fatal(f"Path: {os.environ['PATH']}")
         logging.fatal(f"Python path: {sys.path}")
@@ -42,17 +42,18 @@ def dynamically_instantiate(obj: str):
 
 
 def run(
-    factory_kwargs: List[str], objective_name: str, port: int, password: str
+    factory_kwargs: str, objective_name: str, port: int, password: str
 ) -> None:
     """
     Starts an objective function listener loop to wait for requests.
     :param objective_name:
         problem factory name including python packages, e.g. package.subpackage.MyFactoryName
     """
-    if factory_kwargs == [""]:
+    if factory_kwargs == "":
         # Then the user didn't pass any arguments
         kwargs = {}
     else:
+        factory_kwargs = factory_kwargs.split()
         kwargs = dict([item.strip("--").split("=") for item in factory_kwargs])
 
     # make connection with the mother process
@@ -60,6 +61,9 @@ def run(
     seed = conn.recv()
 
     # dynamically load objective function module
+    # At this point, the black box objective function
+    # is exactly the same as the one used in the
+    # registration (?).
     objective_factory: AbstractProblemFactory = dynamically_instantiate(objective_name)
     f, x0, y0 = objective_factory.create(seed, **kwargs)
 
@@ -68,16 +72,21 @@ def run(
 
     # now wait for objective function calls
     while True:
-        msg = conn.recv()
+        msg_type, *msg = conn.recv()
         # x, context = msg
         if msg is None:
             break
         try:
-            y = f(*msg)
-            conn.send(y)
+            if msg_type == "QUERY":
+                y = f(*msg)
+                conn.send(["QUERY", y])
+            elif msg_type == "ATTRIBUTE":
+                attribute = getattr(f, msg[0])
+                conn.send(["ATTRIBUTE", attribute])
         except Exception as e:
             tb = traceback.format_exc()
-            conn.send((e, tb))
+            conn.send(["EXCEPTION", (e, tb)])
+    
     # conn.close()
     # exit()  # kill other threads, and close file handles
 
@@ -92,4 +101,4 @@ if __name__ == "__main__":
     parser.add_argument("--password", required=True, type=str)
 
     args, factory_kwargs = parser.parse_known_args()
-    run(factory_kwargs, args.objective_name, args.port, args.password)
+    run(factory_kwargs[0], args.objective_name, args.port, args.password)

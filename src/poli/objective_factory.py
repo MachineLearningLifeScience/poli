@@ -1,7 +1,7 @@
 """
 This is the main file relevant for users who want to run objective functions.
 """
-from typing import Callable, Tuple
+from typing import Callable, Tuple, Any
 import numpy as np
 from pathlib import Path
 import configparser
@@ -39,9 +39,9 @@ class ExternalBlackBox(AbstractBlackBox):
         self.process_wrapper = process_wrapper
 
     def _black_box(self, x, context=None):
-        self.process_wrapper.send([x, context])
-        val = self.process_wrapper.recv()
-        if isinstance(val[0], Exception):
+        self.process_wrapper.send(["QUERY", x, context])
+        msg_type, val = self.process_wrapper.recv()
+        if msg_type == "EXCEPTION":
             e, traceback_ = val
             print(traceback_)
             raise e
@@ -51,13 +51,23 @@ class ExternalBlackBox(AbstractBlackBox):
     def terminate(self):
         # terminate objective process
         if self.process_wrapper is not None:
-            self.process_wrapper.send(None)
+            self.process_wrapper.send(["QUIT", None])
             self.process_wrapper.close()  # clean up connection
             self.process_wrapper = None
         # terminate observer
         if self.observer is not None:
             self.observer.finish()
             self.observer = None
+    
+    def __getattr__(self, __name: str) -> Any:
+        """
+        Asks for the attribute of the underlying
+        black-box function by sending a message
+        to the process w. the msg_type "ATTRIBUTE".
+        """
+        self.process_wrapper.send(["ATTRIBUTE", __name])
+        _, val = self.process_wrapper.recv()
+        return val
 
 
 def create(
