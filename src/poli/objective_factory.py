@@ -13,8 +13,8 @@ from poli.core.util.inter_process_communication.process_wrapper import ProcessWr
 
 
 class ExternalBlackBox(AbstractBlackBox):
-    def __init__(self, L: int, process_wrapper):
-        super().__init__(L)
+    def __init__(self, info: ProblemSetupInformation, process_wrapper):
+        super().__init__(info)
         self.process_wrapper = process_wrapper
 
     def _black_box(self, x, context=None):
@@ -67,7 +67,7 @@ def create(name: str, seed: int = 0, caller_info: dict = None, observer: Abstrac
     if observer is not None:
         observer_info = observer.initialize_observer(problem_information, caller_info, x0, y0, seed)
 
-    f = ExternalBlackBox(problem_information.get_max_sequence_length(), process_wrapper)
+    f = ExternalBlackBox(problem_information, process_wrapper)
     f.set_observer(observer)
 
     return problem_information, f, x0, y0, observer_info
