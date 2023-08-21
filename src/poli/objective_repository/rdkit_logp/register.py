@@ -1,14 +1,13 @@
 """
-This is a registration script for the rdkit_qed problem,
-whose black box objective function returns the quantitative
-estimate of druglikeness, which is a continuous version
-of Lipinsky's rule of 5 [1].
+This is a registration script for the rdkit_logp problem,
+whose black box objective function returns the log quotient
+of solubility (a.k.a. logP) [1].
 
 This black box is a simple wrapper around RDKit's
-Chem.QED.qed function, which returns a float between
-0 and 1. We allow for both SMILES and SELFIES strings.
+descriptors. We allow for both SMILES and SELFIES
+strings.
 
-The problem is registered as 'rdkit_qed', and it uses
+The problem is registered as 'rdkit_logp', and it uses
 a conda environment called 'poli__chem' (see the
 environment.yml file in this folder). If you want to
 run it locally without creating a new environemnt,
@@ -17,7 +16,8 @@ these are the extra requirements:
 - rdkit
 - selfies
 
-Run:
+If you are interested in running this directly,
+instead of inside an isolated process, run:
 
 ```
 pip install rdkit selfies
@@ -32,7 +32,7 @@ import json
 import numpy as np
 
 from rdkit import Chem
-from rdkit.Chem.QED import qed
+from rdkit.Chem import Descriptors
 
 import selfies as sf
 
@@ -43,7 +43,7 @@ from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.core.util.chemistry.string_to_molecule import string_to_molecule
 
 
-class QEDBlackBox(AbstractBlackBox):
+class LogPBlackBox(AbstractBlackBox):
     """
     A simple black box that returns the QED
     of a molecule. By default, we assume that the
@@ -89,19 +89,19 @@ class QEDBlackBox(AbstractBlackBox):
             # If the molecule cannot be parsed, return NaN
             return np.array([np.nan])
 
-        qed_value = qed(molecule)
+        logp_value = Descriptors.MolLogP(molecule)
 
         # If the qed value is not a float, return NaN
-        if not isinstance(qed_value, float):
+        if not isinstance(logp_value, float):
             return np.array([np.nan])
 
-        return np.array([[qed_value]])
+        return np.array([[logp_value]])
 
 
-class QEDProblemFactory(AbstractProblemFactory):
+class LogPProblemFactory(AbstractProblemFactory):
     def get_setup_information(self) -> ProblemSetupInformation:
         return ProblemSetupInformation(
-            name="rdkit_qed",
+            name="rdkit_logp",
             max_sequence_length=np.inf,
             aligned=False,
             alphabet=None,
@@ -145,7 +145,7 @@ class QEDProblemFactory(AbstractProblemFactory):
         self.alphabet = alphabet
 
         L = self.get_setup_information().get_max_sequence_length()
-        f = QEDBlackBox(
+        f = LogPBlackBox(
             L=L,
             alphabet=self.alphabet,
             from_selfies=string_representation.upper() == "SELFIES",
@@ -167,9 +167,9 @@ if __name__ == "__main__":
     # (see the environment.yml file in this folder),
     # we can register our problem s.t. it uses
     # said conda environment.
-    qed_problem_factory = QEDProblemFactory()
+    logp_problem_factory = LogPProblemFactory()
     register_problem(
-        qed_problem_factory,
+        logp_problem_factory,
         conda_environment_name="poli__chem",
         # force=True,
     )

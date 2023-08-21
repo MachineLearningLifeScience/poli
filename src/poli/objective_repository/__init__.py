@@ -1,8 +1,8 @@
 from pathlib import Path
 
 # These can be imported from the base environment.
-from .white_noise.register import WhiteNoiseBlackBox
-from .aloha.register import AlohaBlackBox
+from .white_noise.register import WhiteNoiseProblemFactory
+from .aloha.register import AlohaProblemFactory
 
 # These have more complex dependencies
 # from .super_mario_bros.register import SuperMarioBrosBlackBox
@@ -17,7 +17,30 @@ AVAILABLE_OBJECTIVES = sorted(
     [str(d.name) for d in THIS_DIR.glob("*") if d.is_dir() and d.name != "__pycache__"]
 )
 
-AVAILABLE_BLACK_BOXES = [
-    WhiteNoiseBlackBox,
-    AlohaBlackBox,
-]
+AVAILABLE_PROBLEM_FACTORIES = {
+    "white_noise": WhiteNoiseProblemFactory,
+    "aloha": AlohaProblemFactory,
+}
+
+try:
+    # TODO: the case of SMB is a little bit more delicate, since
+    # we actually have dependencies beyond Python.
+    from .super_mario_bros.register import SMBProblemFactory
+
+    AVAILABLE_PROBLEM_FACTORIES["super_mario_bros"] = SMBProblemFactory
+except ImportError:
+    pass
+
+try:
+    from .rdkit_qed.register import QEDProblemFactory
+
+    AVAILABLE_PROBLEM_FACTORIES["rdkit_qed"] = QEDProblemFactory
+except ImportError:
+    pass
+
+try:
+    from .rdkit_logp.register import LogPProblemFactory
+
+    AVAILABLE_PROBLEM_FACTORIES["rdkit_logp"] = LogPProblemFactory
+except ImportError:
+    pass

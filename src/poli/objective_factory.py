@@ -1,13 +1,14 @@
 """
 This is the main file relevant for users who want to run objective functions.
 """
-from typing import Callable, Tuple, Any
+from typing import Callable, Tuple, Any, Dict
 import numpy as np
 from pathlib import Path
 import configparser
 import traceback
 
 from poli.core.abstract_black_box import AbstractBlackBox
+from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.core.registry import (
     _RUN_SCRIPT_LOCATION,
@@ -18,7 +19,8 @@ from poli.core.registry import (
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.external_observer import ExternalObserver
 from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
-from poli.objective_repository import AVAILABLE_OBJECTIVES
+
+from poli.objective_repository import AVAILABLE_OBJECTIVES, AVAILABLE_PROBLEM_FACTORIES
 
 
 def load_config():
@@ -95,6 +97,14 @@ def create(
         y0: f(x0)
         observer_info: information from the observer_info about the instantiated run (allows the calling algorithm to connect)
     """
+    # If the user can run it with the envionment they currently
+    # have, then we do not need to install it.
+    if name in AVAILABLE_PROBLEM_FACTORIES:
+        problem_factory = AVAILABLE_PROBLEM_FACTORIES[name]()
+        problem_info = problem_factory.get_setup_information()
+        f, x0, y0 = problem_factory.create(seed=seed, **kwargs_for_factory)
+        return problem_info, f, x0, y0, None
+    
     # TODO: change prints for logs and warnings.
     # Check if the name is indeed registered, or
     # available in the objective repository

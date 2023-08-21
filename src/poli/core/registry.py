@@ -13,6 +13,8 @@ from poli.core.util.objective_management.make_run_script import (
     make_observer_script,
 )
 
+from poli.objective_repository import AVAILABLE_PROBLEM_FACTORIES
+
 _DEFAULT = "DEFAULT"
 _OBSERVER = "observer"
 _RUN_SCRIPT_LOCATION = "run_script_location"
@@ -114,16 +116,18 @@ def register_problem_from_repository(name: str):
     # 1. create the environment from the yaml file
     try:
         subprocess.run(
-            " ".join([
-                "conda",
-                "env",
-                "create",
-                "-f",
-                str(PATH_TO_REPOSITORY / name / "environment.yml"),
-            ]),
+            " ".join(
+                [
+                    "conda",
+                    "env",
+                    "create",
+                    "-f",
+                    str(PATH_TO_REPOSITORY / name / "environment.yml"),
+                ]
+            ),
             shell=True,
             check=True,
-            capture_output=True
+            capture_output=True,
         )
     except subprocess.CalledProcessError as e:
         if "already exists" in e.stderr.decode():
@@ -154,15 +158,8 @@ def register_problem_from_repository(name: str):
     # 2.2. Running the file
     file_to_run = PATH_TO_REPOSITORY / name / "register.py"
     command = " ".join(["conda", "run", "-n", env_name, "python", str(file_to_run)])
-    warnings.warn(
-        "Running the following command: %s. " % command
-    )
-    subprocess.run(
-        command,
-        check=True,
-        shell=True,
-        capture_output=True
-    )
+    warnings.warn("Running the following command: %s. " % command)
+    subprocess.run(command, check=True, shell=True, capture_output=True)
 
 
 def delete_problem(problem_name: str):
@@ -173,6 +170,14 @@ def delete_problem(problem_name: str):
 def get_problems() -> List[str]:
     problems = config.sections()
     # problems.remove(_DEFAULT)  # no need to remove default section
+
+    # We also pad the get_problems() with the problems
+    # the user can import already without any problem,
+    # i.e. the AVAILABLE_PROBLEM_FACTORIES in the
+    # objective_repository
+    available_problems = list(AVAILABLE_PROBLEM_FACTORIES.keys())
+    problems = sorted(list(set(problems + available_problems)))
+
     return problems
 
 

@@ -41,9 +41,7 @@ def dynamically_instantiate(obj: str, **kwargs):
     return instantiated_object
 
 
-def run(
-    factory_kwargs: str, objective_name: str, port: int, password: str
-) -> None:
+def run(factory_kwargs: str, objective_name: str, port: int, password: str) -> None:
     """
     Starts an objective function listener loop to wait for requests.
     :param objective_name:
@@ -74,7 +72,7 @@ def run(
     while True:
         msg_type, *msg = conn.recv()
         # x, context = msg
-        if msg is None:
+        if msg[0] is None:
             break
         try:
             if msg_type == "QUERY":
@@ -86,7 +84,7 @@ def run(
         except Exception as e:
             tb = traceback.format_exc()
             conn.send(["EXCEPTION", (e, tb)])
-    
+
     # conn.close()
     # exit()  # kill other threads, and close file handles
 
