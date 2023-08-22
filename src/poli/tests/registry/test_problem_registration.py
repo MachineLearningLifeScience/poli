@@ -77,6 +77,7 @@ def test_force_registering_logp():
 
 def test_force_registering_smb():
     # assert False
+    print("Testing SMB")
     _, f, x0, y0, _ = objective_factory.create(
         name="super_mario_bros",
         force_register=True,
@@ -86,6 +87,7 @@ def test_force_registering_smb():
 
 def test_registering_qed():
     # assert False
+    print("Testing QED")
     """
     Testing whether we can register the qed problem
     if rdkit and selfies are installed.
@@ -105,6 +107,7 @@ def test_registering_qed():
 
 def test_registering_logp():
     # assert False
+    print("Testing LogP")
     """
     Testing whether we can register the logp problem
     if rdkit and selfies are installed.
