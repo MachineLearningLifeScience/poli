@@ -20,8 +20,9 @@ jobs:
         echo $CONDA/bin >> $GITHUB_PATH
     - name: Install dependencies
       run: |
-        conda env update --file environment.yml --name base
-        python -m pip install tox
+        python -m pip install tox numpy
     - name: Test with tox
-      run: |
-        tox
+      uses: coactions/setup-xvfb@v1
+      with:
+        run: |
+          tox
