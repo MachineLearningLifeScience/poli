@@ -4,6 +4,8 @@ __pycache__
 /src/poli/config.rc
 src/poli.egg-info/
 temp
+build
+.tox
 
 # Ignore the registered objectives
 src/poli/registered_objectives/*.sh
