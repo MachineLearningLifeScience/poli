@@ -76,7 +76,7 @@ def test_force_registering_logp():
 
 
 def test_force_registering_smb():
-    assert False
+    # assert False
     _, f, x0, y0, _ = objective_factory.create(
         name="super_mario_bros",
         force_register=True,
