@@ -1,6 +1,6 @@
 # Protein Objective Library (POLi)
 
-[![Testing the package using tox (including conda)](https://github.com/MachineLearningLifeScience/poli/actions/workflows/python-tox-testing-including-conda.yml/badge.svg)](https://github.com/MachineLearningLifeScience/poli/actions/workflows/python-tox-testing-including-conda.yml)
+[![Testing (conda, python 3.9)](https://github.com/MachineLearningLifeScience/poli/actions/workflows/python-tox-testing-including-conda.yml/badge.svg)](https://github.com/MachineLearningLifeScience/poli/actions/workflows/python-tox-testing-including-conda.yml)
 
 An easy-to-use, plug-and-play library to benchmark protein-related discrete optimization algorithms.
 Primarily, this library provides a way to encapsulate objective functions and their dependencies.
@@ -10,7 +10,7 @@ For any code written by other authors (whether objective function or algorithm) 
 
 On purpose, logging is kept at the objective function side.
 This allows easier benchmarking of algorithms from other authors.
-Algorithmspecific logging can be done internally, on the site of the algorithm if necessary.
+Algorithm-specific logging can be done internally, on the site of the algorithm if necessary.
 
 ## Basic usage
 
@@ -56,7 +56,7 @@ As you might have noticed, you can get a list of the registered problems using t
 
 ```bash
 $ python -c "from poli.objective_repository import AVAILABLE_PROBLEM_FACTORIES ; print(AVAILABLE_PROBLEM_FACTORIES)"
-[..., 'white_noise']
+'{"white_noise": <WhiteNoiseProblemFactory(L=inf)>, ...}'
 ```
 
 If the function isn't there, you may:

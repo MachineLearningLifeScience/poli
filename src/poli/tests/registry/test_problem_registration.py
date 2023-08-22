@@ -32,7 +32,6 @@ def test_qed_is_available():
     _ = pytest.importorskip("selfies")
     from poli.objective_repository import AVAILABLE_PROBLEM_FACTORIES
 
-    print(AVAILABLE_PROBLEM_FACTORIES)
     assert "rdkit_qed" in AVAILABLE_PROBLEM_FACTORIES
 
 
@@ -45,7 +44,6 @@ def test_logp_is_available():
     _ = pytest.importorskip("selfies")
     from poli.objective_repository import AVAILABLE_PROBLEM_FACTORIES
 
-    print(AVAILABLE_PROBLEM_FACTORIES)
     assert "rdkit_logp" in AVAILABLE_PROBLEM_FACTORIES
 
 
@@ -94,8 +92,6 @@ def test_force_registering_logp():
 
 
 def test_registering_qed():
-    # assert False
-    print("Testing QED")
     """
     Testing whether we can register the qed problem
     if rdkit and selfies are installed.
@@ -114,8 +110,6 @@ def test_registering_qed():
 
 
 def test_registering_logp():
-    # assert False
-    print("Testing LogP")
     """
     Testing whether we can register the logp problem
     if rdkit and selfies are installed.
