@@ -8,7 +8,6 @@ THIS_DIR = Path(__file__).parent.resolve()
 
 def test_registering_white_noise():
     print("testing white noise")
-    assert False
     np = pytest.importorskip("numpy")
     _, f, _, _, _ = objective_factory.create(name="white_noise")
     x = np.array([["A", "B", "C", "D"]])
@@ -17,7 +16,6 @@ def test_registering_white_noise():
 
 
 def test_registering_aloha():
-    assert False
     np = pytest.importorskip("numpy")
     _, f, x0, y0, _ = objective_factory.create(name="aloha")
     x = np.array([list("ALOOF")])
@@ -26,7 +24,6 @@ def test_registering_aloha():
 
 
 def test_qed_is_available():
-    assert False
     """
     We test whether the qed problem is available
     when rdkit and selfies are installed.
@@ -40,7 +37,6 @@ def test_qed_is_available():
 
 
 def test_logp_is_available():
-    assert False
     """
     We test whether the logp problem is available
     when rdkit and selfies are installed.
