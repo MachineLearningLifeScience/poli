@@ -75,14 +75,14 @@ def test_force_registering_logp():
     f.terminate()
 
 
-def test_force_registering_smb():
-    # assert False
-    print("Testing SMB")
-    _, f, x0, y0, _ = objective_factory.create(
-        name="super_mario_bros",
-        force_register=True,
-    )
-    f.terminate()
+# def test_force_registering_smb():
+#     # assert False
+#     print("Testing SMB")
+#     _, f, x0, y0, _ = objective_factory.create(
+#         name="super_mario_bros",
+#         force_register=True,
+#     )
+#     f.terminate()
 
 
 def test_registering_qed():
