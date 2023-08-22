@@ -1,4 +1,4 @@
-name: Testing the package using tox (including conda)
+name: Test (conda, python 3.9)
 
 on: [push]
 
