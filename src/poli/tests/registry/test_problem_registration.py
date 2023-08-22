@@ -7,6 +7,8 @@ THIS_DIR = Path(__file__).parent.resolve()
 
 
 def test_registering_white_noise():
+    print("testing white noise")
+    assert False
     np = pytest.importorskip("numpy")
     _, f, _, _, _ = objective_factory.create(name="white_noise")
     x = np.array([["A", "B", "C", "D"]])
@@ -15,6 +17,7 @@ def test_registering_white_noise():
 
 
 def test_registering_aloha():
+    assert False
     np = pytest.importorskip("numpy")
     _, f, x0, y0, _ = objective_factory.create(name="aloha")
     x = np.array([list("ALOOF")])
@@ -23,6 +26,7 @@ def test_registering_aloha():
 
 
 def test_qed_is_available():
+    assert False
     """
     We test whether the qed problem is available
     when rdkit and selfies are installed.
@@ -36,6 +40,7 @@ def test_qed_is_available():
 
 
 def test_logp_is_available():
+    assert False
     """
     We test whether the logp problem is available
     when rdkit and selfies are installed.
@@ -49,6 +54,7 @@ def test_logp_is_available():
 
 
 def test_force_registering_qed():
+    assert False
     """
     We test whether we can force-register the qed problem
     if rdkit and selfies are not installed.
@@ -62,6 +68,7 @@ def test_force_registering_qed():
 
 
 def test_force_registering_logp():
+    assert False
     """
     We test whether we can force-register the logp problem
     if rdkit and selfies are not installed.
@@ -75,6 +82,7 @@ def test_force_registering_logp():
 
 
 def test_force_registering_smb():
+    assert False
     _, f, x0, y0, _ = objective_factory.create(
         name="super_mario_bros",
         force_register=True,
@@ -83,6 +91,7 @@ def test_force_registering_smb():
 
 
 def test_registering_qed():
+    assert False
     """
     Testing whether we can register the qed problem
     if rdkit and selfies are installed.
@@ -101,6 +110,7 @@ def test_registering_qed():
 
 
 def test_registering_logp():
+    assert False
     """
     Testing whether we can register the logp problem
     if rdkit and selfies are installed.
