@@ -23,5 +23,6 @@ jobs:
         python -m pip install tox numpy
     - name: Test with tox
       uses: coactions/setup-xvfb@v1
-      run: |
-        tox
+      with:
+        run: |
+          tox
