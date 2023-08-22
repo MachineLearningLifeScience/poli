@@ -1,5 +1,7 @@
 # Protein Objective Library (POLi)
 
+[![Testing the package using tox (including conda)](https://github.com/MachineLearningLifeScience/poli/actions/workflows/python-tox-testing-including-conda.yml/badge.svg)](https://github.com/MachineLearningLifeScience/poli/actions/workflows/python-tox-testing-including-conda.yml)
+
 An easy-to-use, plug-and-play library to benchmark protein-related discrete optimization algorithms.
 Primarily, this library provides a way to encapsulate objective functions and their dependencies.
 The main benefit is that this allows to develop optimization algorithms that use (say) tensorflow without having to worry that the objective was written in (say) torch.
@@ -50,12 +52,14 @@ for _ in range(5):
 
 ### Calling objective functions from the repository
 
-As you might have noticed, you can get a list of the registered problems using the `get_problems` method inside `poli.core.registry`. You can also get a list of objective functions available for installing/registration using `from poli.objective_repository import AVAILABLE_OBJECTIVES`:
+As you might have noticed, you can get a list of the registered problems using the `get_problems` method inside `poli.core.registry`. You can also get a list of objective functions available for installing/registration using `from poli.objective_repository import AVAILABLE_PROBLEM_FACTORIES`:
 
 ```bash
-$ python -c "from poli.objective_repository import AVAILABLE_OBJECTIVES ; print(AVAILABLE_OBJECTIVES)"
+$ python -c "from poli.objective_repository import AVAILABLE_PROBLEM_FACTORIES ; print(AVAILABLE_PROBLEM_FACTORIES)"
 [..., 'white_noise']
 ```
 
-If the function isn't there, **implement it yourself!** An example of how to do this can be found in `poli/examples/a_simple_objective_function_registration`.
+If the function isn't there, you may:
+- Install all the required dependencies for running the file. Check the relevant environment under `poli/objective_repository/problem_name/environment.yml`.
+- Implement the problem yourself! An example of how to do this can be found in `poli/examples/a_simple_objective_function_registration`.
 

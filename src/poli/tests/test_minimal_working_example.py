@@ -1,4 +1,7 @@
 def test_minimal_working_example():
+    """
+    Tests the minimal working example from the readme, verbatum.
+    """
     import numpy as np
     from poli import objective_factory
 
