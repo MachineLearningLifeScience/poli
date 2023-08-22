@@ -60,7 +60,7 @@ class ExternalBlackBox(AbstractBlackBox):
         if self.observer is not None:
             self.observer.finish()
             self.observer = None
-    
+
     def __getattr__(self, __name: str) -> Any:
         """
         Asks for the attribute of the underlying
@@ -104,7 +104,7 @@ def create(
         problem_info = problem_factory.get_setup_information()
         f, x0, y0 = problem_factory.create(seed=seed, **kwargs_for_factory)
         return problem_info, f, x0, y0, None
-    
+
     # TODO: change prints for logs and warnings.
     # Check if the name is indeed registered, or
     # available in the objective repository
@@ -137,7 +137,9 @@ def create(
             # Refresh the config
             config = load_config()
         else:
-            raise ValueError(f"Objective function '{name}' won't be registered. Aborting.")
+            raise ValueError(
+                f"Objective function '{name}' won't be registered. Aborting."
+            )
 
     # start objective process
     # VERY IMPORTANT: the script MUST accept port and password as arguments

@@ -76,7 +76,8 @@ def run(factory_kwargs: str, objective_name: str, port: int, password: str) -> N
             break
         try:
             if msg_type == "QUERY":
-                y = f(*msg)
+                x, context = msg
+                y = f(x, context=context)
                 conn.send(["QUERY", y])
             elif msg_type == "ATTRIBUTE":
                 attribute = getattr(f, msg[0])

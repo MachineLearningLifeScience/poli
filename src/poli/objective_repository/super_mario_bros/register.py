@@ -28,6 +28,7 @@ THIS_DIR = Path(__file__).parent.resolve()
 # FIXME: do this after we remove .pt and .jar
 # files from the python installation.
 
+
 class SMBBlackBox(AbstractBlackBox):
     def __init__(self, L: int):
         super().__init__(L)
@@ -47,8 +48,13 @@ class SMBBlackBox(AbstractBlackBox):
         with torch.no_grad():
             res = test_level_from_z(z, self.model, visualize=True)
 
-        # Return the number of jumps
-        return np.array([res["jumpActionsPerformed"]], dtype=float).reshape(1, 1)
+        # Return the number of jumps if the level was
+        # solved successfully, else return np.NaN
+        if res["marioStatus"] == 1:
+            jumps = res["jumpActionsPerformed"]
+        else:
+            jumps = -10.0
+        return np.array([jumps], dtype=float).reshape(1, 1)
 
 
 class SMBProblemFactory(AbstractProblemFactory):
@@ -80,4 +86,3 @@ if __name__ == "__main__":
         smb_problem_factory,
         conda_environment_name="poli__mario",
     )
-

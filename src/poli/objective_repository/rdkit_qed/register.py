@@ -87,13 +87,13 @@ class QEDBlackBox(AbstractBlackBox):
             )
         except ValueError:
             # If the molecule cannot be parsed, return NaN
-            return np.array([np.nan])
+            return np.array([[np.nan]])
 
         qed_value = qed(molecule)
 
         # If the qed value is not a float, return NaN
         if not isinstance(qed_value, float):
-            return np.array([np.nan])
+            return np.array([[np.nan]])
 
         return np.array([[qed_value]])
 
