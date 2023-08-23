@@ -30,3 +30,6 @@ jobs:
     - name: Test poli-chem with tox
       run: |
         tox -e poli-chem-py39
+    - name: Test poli-protein with tox
+      run: |
+        tox -e poli-protein-py39
