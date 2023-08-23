@@ -1,6 +1,8 @@
 import pytest
 from pathlib import Path
 
+import numpy as np
+
 from poli import objective_factory
 
 THIS_DIR = Path(__file__).parent.resolve()
@@ -17,7 +19,7 @@ def test_registering_white_noise():
 
 def test_registering_aloha():
     np = pytest.importorskip("numpy")
-    _, f, x0, y0, _ = objective_factory.create(name="aloha")
+    _, f, _, y0, _ = objective_factory.create(name="aloha")
     x = np.array([list("ALOOF")])
     assert f(x) == 3
     f.terminate()
@@ -78,11 +80,15 @@ def test_force_registering_qed():
     We test whether we can force-register the qed problem
     if rdkit and selfies are not installed.
     """
-    _, f, x0, y0, _ = objective_factory.create(
+    _, f, _, y0, _ = objective_factory.create(
         name="rdkit_qed",
         path_to_alphabet=THIS_DIR / "alphabet_qed.json",
         force_register=True,
     )
+
+    # Asserting that the QED of a single carbon
+    # is close to 0.35978494 (according to RDKit).
+    assert np.isclose(y0, 0.35978494).all()
     f.terminate()
 
 
@@ -91,11 +97,15 @@ def test_force_registering_logp():
     We test whether we can force-register the logp problem
     if rdkit and selfies are not installed.
     """
-    _, f, x0, y0, _ = objective_factory.create(
+    _, f, _, y0, _ = objective_factory.create(
         name="rdkit_logp",
         path_to_alphabet=THIS_DIR / "alphabet_qed.json",
         force_register=True,
     )
+
+    # Asserting that a single carbon atom has logp close
+    # to 0.6361. (according to RDKit)
+    assert np.isclose(y0, 0.6361).all()
     f.terminate()
 
 
@@ -115,11 +125,39 @@ def test_force_registering_foldx_stability():
     if not (PATH_TO_FOLDX_FILES / "rotabase.txt").exists():
         pytest.skip("rotabase.txt is not in the foldx directory. ")
 
-    _, f, x0, y0, _ = objective_factory.create(
+    _, f, _, y0, _ = objective_factory.create(
         name="foldx_stability",
         wildtype_pdb_path=THIS_DIR / "101m_Repair.pdb",
         force_register=True,
     )
+
+    assert np.isclose(y0, 32.4896).all()
+    f.terminate()
+
+
+def test_force_registering_foldx_sasa():
+    """
+    We test whether we can force-register the foldx_sasa
+    problem if foldx is installed.
+    """
+    HOME_DIR = Path().home().resolve()
+    PATH_TO_FOLDX_FILES = HOME_DIR / "foldx"
+    if not PATH_TO_FOLDX_FILES.exists():
+        pytest.skip("FoldX is not installed. ")
+
+    if not (PATH_TO_FOLDX_FILES / "foldx").exists():
+        pytest.skip("FoldX is not compiled. ")
+
+    if not (PATH_TO_FOLDX_FILES / "rotabase.txt").exists():
+        pytest.skip("rotabase.txt is not in the foldx directory. ")
+
+    _, f, _, y0, _ = objective_factory.create(
+        name="foldx_sasa",
+        wildtype_pdb_path=THIS_DIR / "101m_Repair.pdb",
+        force_register=True,
+    )
+
+    assert np.isclose(y0, 8411.45578009).all()
     f.terminate()
 
 
@@ -134,7 +172,7 @@ def test_force_registering_foldx_stability():
 # def test_force_registering_smb():
 #     # assert False
 #     print("Testing SMB")
-#     _, f, x0, y0, _ = objective_factory.create(
+#     _, f, _, y0, _ = objective_factory.create(
 #         name="super_mario_bros",
 #         force_register=True,
 #     )
@@ -146,16 +184,21 @@ def test_registering_qed():
     Testing whether we can register the qed problem
     if rdkit and selfies are installed.
     """
-    rdkit = pytest.importorskip("rdkit")
-    selfies = pytest.importorskip("selfies")
+    _ = pytest.importorskip("rdkit")
+    _ = pytest.importorskip("selfies")
     np = pytest.importorskip("numpy")
 
-    _, f, x0, y0, _ = objective_factory.create(
+    _, f, _, y0, _ = objective_factory.create(
         name="rdkit_qed",
         path_to_alphabet=THIS_DIR / "alphabet_qed.json",
     )
     x = np.array([[1]])
     f(x)
+
+    # Asserting that the QED of a single carbon
+    # is close to 0.35978494 (according to RDKit).
+    assert np.isclose(y0, 0.35978494).all()
+
     f.terminate()
 
 
@@ -168,12 +211,17 @@ def test_registering_logp():
     selfies = pytest.importorskip("selfies")
     np = pytest.importorskip("numpy")
 
-    _, f, x0, y0, _ = objective_factory.create(
+    _, f, _, y0, _ = objective_factory.create(
         name="rdkit_logp",
         path_to_alphabet=THIS_DIR / "alphabet_qed.json",
     )
     x = np.array([[1]])
     f(x)
+
+    # Asserting that a single carbon atom has logp close
+    # to 0.6361. (according to RDKit)
+    assert np.isclose(y0, 0.6361).all()
+
     f.terminate()
 
 
@@ -196,7 +244,36 @@ def test_registering_foldx_stability():
     _ = pytest.importorskip("Bio")
     _ = pytest.importorskip("Levenshtein")
 
-    _, f, x0, y0, _ = objective_factory.create(
+    _, f, _, y0, _ = objective_factory.create(
         name="foldx_stability",
         wildtype_pdb_path=THIS_DIR / "101m_Repair.pdb",
     )
+
+    assert np.isclose(y0, 32.4896).all()
+
+
+def test_registering_foldx_sasa():
+    """
+    Testing whether we can register the logp problem
+    if biopython and python-levenshtein are installed.
+    """
+    HOME_DIR = Path().home().resolve()
+    PATH_TO_FOLDX_FILES = HOME_DIR / "foldx"
+    if not PATH_TO_FOLDX_FILES.exists():
+        pytest.skip("FoldX is not installed. ")
+
+    if not (PATH_TO_FOLDX_FILES / "foldx").exists():
+        pytest.skip("FoldX is not compiled. ")
+
+    if not (PATH_TO_FOLDX_FILES / "rotabase.txt").exists():
+        pytest.skip("rotabase.txt is not in the foldx directory. ")
+
+    _ = pytest.importorskip("Bio")
+    _ = pytest.importorskip("Levenshtein")
+
+    _, f, _, y0, _ = objective_factory.create(
+        name="foldx_sasa",
+        wildtype_pdb_path=THIS_DIR / "101m_Repair.pdb",
+    )
+
+    assert np.isclose(y0, 8411.45578009).all()

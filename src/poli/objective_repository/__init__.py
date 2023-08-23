@@ -52,3 +52,10 @@ try:
     AVAILABLE_PROBLEM_FACTORIES["foldx_stability"] = FoldXStabilityProblemFactory
 except (ImportError, FileNotFoundError):
     pass
+
+try:
+    from .foldx_sasa.register import FoldXSASAProblemFactory
+
+    AVAILABLE_PROBLEM_FACTORIES["foldx_sasa"] = FoldXSASAProblemFactory
+except (ImportError, FileNotFoundError):
+    pass
