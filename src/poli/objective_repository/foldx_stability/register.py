@@ -1,15 +1,8 @@
 """
-In this script, we test whether POLi can
-optimize the stability of a protein using
-FoldX as an objective function.
-
-By this, I mean: I'm not exactly sure whether
-the conda environment will be enough to run
-FoldX. If not, we'll have to use a Docker
-container.
+This script registers FoldX stability as an objective function.
 """
 from pathlib import Path
-from typing import Dict, List, TypedDict, Tuple
+from typing import Dict, List, Tuple
 import subprocess
 import shutil
 from time import time
@@ -22,11 +15,17 @@ import numpy as np
 from Bio import PDB
 from Bio.SeqUtils import seq1
 
-from foldx_utils import AMINO_ACIDS, ENCODING
-
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem_setup_information import ProblemSetupInformation
+
+# TODO: We need to include both relative import
+# and path extention to make testing work.
+try:
+    from foldx_utils import ENCODING
+except ModuleNotFoundError:
+    from .foldx_utils import ENCODING
+
 
 THIS_DIR = Path(__file__).parent.resolve()
 PATH_TO_FOLDX_FILES = Path().home() / "foldx"
@@ -48,29 +47,6 @@ assert (
 # TODO: what happens if the user is on Windows?
 # TMP_PATH = THIS_DIR / "tmp"
 TMP_PATH = Path("/tmp").resolve()
-
-# Defining the maximum sequence length a priori
-# TODO: Ideally, this would be defined elsewhere,
-# maybe passed as an argument to the
-# FoldXStabilityProblemFactory, but POLi doesn't
-# support that yet.
-initial_pdb_file = THIS_DIR / "101m_Repair.pdb"
-
-parser = PDB.PDBParser(QUIET=True)
-wildtype_protein = parser.get_structure("pdb", initial_pdb_file)
-wildtype_amino_acids = [
-    seq1(residue.get_resname()) for residue in wildtype_protein.get_residues()
-]
-wildtype_residue_string = "".join(wildtype_amino_acids)
-
-MAX_SEQUENCE_LENGTH = len(wildtype_amino_acids)
-
-
-class FoldXContext(TypedDict):
-    pdb_files: List[Path]
-    wildtype_pdb_file: List[Path]
-    delete_working_dir: bool
-    path_to_mutation_list: Path
 
 
 class FoldXStabilityBlackBox(AbstractBlackBox):
@@ -154,7 +130,7 @@ class FoldXStabilityBlackBox(AbstractBlackBox):
 
         return working_dir
 
-    def _black_box(self, x: np.ndarray, context: FoldXContext = None) -> np.ndarray:
+    def _black_box(self, x: np.ndarray, context: None) -> np.ndarray:
         """
         Runs the given input x and pdb files provided
         in the context through FoldX and returns the
@@ -255,10 +231,10 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
         alphabet = ENCODING
 
         return ProblemSetupInformation(
-            name="FoldX_stability",
-            max_sequence_length=MAX_SEQUENCE_LENGTH,
+            name="foldx_stability",
+            max_sequence_length=np.inf,
             alphabet=alphabet,
-            aligned=True,
+            aligned=False,
         )
 
     def create(
@@ -276,6 +252,8 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
 
         if isinstance(wildtype_pdb_path, str):
             wildtype_pdb_path = Path(wildtype_pdb_path.strip())
+        elif isinstance(wildtype_pdb_path, Path):
+            pass
         else:
             raise ValueError(
                 f"wildtype_pdb_path must be a string or a Path. Received {type(wildtype_pdb_path)}"
@@ -307,8 +285,7 @@ if __name__ == "__main__":
     from poli.core.registry import register_problem
 
     foldx_problem_factory = FoldXStabilityProblemFactory()
-
     register_problem(
         foldx_problem_factory,
-        conda_environment_name="poli_foldx_stability",
+        conda_environment_name="poli__protein",
     )
