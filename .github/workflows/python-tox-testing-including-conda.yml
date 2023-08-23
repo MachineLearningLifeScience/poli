@@ -1,6 +1,6 @@
 name: Test (conda, python 3.9)
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build-linux:
