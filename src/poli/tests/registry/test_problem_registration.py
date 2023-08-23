@@ -102,8 +102,19 @@ def test_force_registering_logp():
 def test_force_registering_foldx_stability():
     """
     We test whether we can force-register the foldx_stability
-    problem if foldx is not installed.
+    problem if foldx is installed.
     """
+    HOME_DIR = Path().home().resolve()
+    PATH_TO_FOLDX_FILES = HOME_DIR / "foldx"
+    if not PATH_TO_FOLDX_FILES.exists():
+        pytest.skip("FoldX is not installed. ")
+
+    if not (PATH_TO_FOLDX_FILES / "foldx").exists():
+        pytest.skip("FoldX is not compiled. ")
+
+    if not (PATH_TO_FOLDX_FILES / "rotabase.txt").exists():
+        pytest.skip("rotabase.txt is not in the foldx directory. ")
+
     _, f, x0, y0, _ = objective_factory.create(
         name="foldx_stability",
         wildtype_pdb_path=THIS_DIR / "101m_Repair.pdb",
