@@ -25,8 +25,8 @@ jobs:
       run: |
         tox -e lint
     - name: Test poli-base with tox
-        run: |
+      run: |
         tox -e poli-base-py39
     - name: Test poli-chem with tox
-        run: |
+      run: |
         tox -e poli-chem-py39
