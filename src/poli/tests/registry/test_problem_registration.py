@@ -47,6 +47,32 @@ def test_logp_is_available():
     assert "rdkit_logp" in AVAILABLE_PROBLEM_FACTORIES
 
 
+def test_foldx_stability_is_available():
+    """
+    We test whether foldx_stability is available when
+    1. foldx is installed.
+    2. foldx files are in the right position
+    2. biopython and python-levenshtein are installed
+    """
+    HOME_DIR = Path().home().resolve()
+    PATH_TO_FOLDX_FILES = HOME_DIR / "foldx"
+    if not PATH_TO_FOLDX_FILES.exists():
+        pytest.skip("FoldX is not installed. ")
+
+    if not (PATH_TO_FOLDX_FILES / "foldx").exists():
+        pytest.skip("FoldX is not compiled. ")
+
+    if not (PATH_TO_FOLDX_FILES / "rotabase.txt").exists():
+        pytest.skip("rotabase.txt is not in the foldx directory. ")
+
+    _ = pytest.importorskip("Bio")
+    _ = pytest.importorskip("Levenshtein")
+
+    from poli.objective_repository import AVAILABLE_PROBLEM_FACTORIES
+
+    assert "foldx_stability" in AVAILABLE_PROBLEM_FACTORIES
+
+
 def test_force_registering_qed():
     """
     We test whether we can force-register the qed problem
@@ -68,6 +94,30 @@ def test_force_registering_logp():
     _, f, x0, y0, _ = objective_factory.create(
         name="rdkit_logp",
         path_to_alphabet=THIS_DIR / "alphabet_qed.json",
+        force_register=True,
+    )
+    f.terminate()
+
+
+def test_force_registering_foldx_stability():
+    """
+    We test whether we can force-register the foldx_stability
+    problem if foldx is installed.
+    """
+    HOME_DIR = Path().home().resolve()
+    PATH_TO_FOLDX_FILES = HOME_DIR / "foldx"
+    if not PATH_TO_FOLDX_FILES.exists():
+        pytest.skip("FoldX is not installed. ")
+
+    if not (PATH_TO_FOLDX_FILES / "foldx").exists():
+        pytest.skip("FoldX is not compiled. ")
+
+    if not (PATH_TO_FOLDX_FILES / "rotabase.txt").exists():
+        pytest.skip("rotabase.txt is not in the foldx directory. ")
+
+    _, f, x0, y0, _ = objective_factory.create(
+        name="foldx_stability",
+        wildtype_pdb_path=THIS_DIR / "101m_Repair.pdb",
         force_register=True,
     )
     f.terminate()
@@ -114,7 +164,6 @@ def test_registering_logp():
     Testing whether we can register the logp problem
     if rdkit and selfies are installed.
     """
-    THIS_DIR = Path(__file__).parent.resolve()
     rdkit = pytest.importorskip("rdkit")
     selfies = pytest.importorskip("selfies")
     np = pytest.importorskip("numpy")
@@ -126,3 +175,28 @@ def test_registering_logp():
     x = np.array([[1]])
     f(x)
     f.terminate()
+
+
+def test_registering_foldx_stability():
+    """
+    Testing whether we can register the logp problem
+    if biopython and python-levenshtein are installed.
+    """
+    HOME_DIR = Path().home().resolve()
+    PATH_TO_FOLDX_FILES = HOME_DIR / "foldx"
+    if not PATH_TO_FOLDX_FILES.exists():
+        pytest.skip("FoldX is not installed. ")
+
+    if not (PATH_TO_FOLDX_FILES / "foldx").exists():
+        pytest.skip("FoldX is not compiled. ")
+
+    if not (PATH_TO_FOLDX_FILES / "rotabase.txt").exists():
+        pytest.skip("rotabase.txt is not in the foldx directory. ")
+
+    _ = pytest.importorskip("Bio")
+    _ = pytest.importorskip("Levenshtein")
+
+    _, f, x0, y0, _ = objective_factory.create(
+        name="foldx_stability",
+        wildtype_pdb_path=THIS_DIR / "101m_Repair.pdb",
+    )

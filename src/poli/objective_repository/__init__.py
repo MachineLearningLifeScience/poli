@@ -22,6 +22,7 @@ AVAILABLE_PROBLEM_FACTORIES = {
     "aloha": AlohaProblemFactory,
 }
 
+
 try:
     # TODO: the case of SMB is a little bit more delicate, since
     # we actually have dependencies beyond Python.
@@ -43,4 +44,11 @@ try:
 
     AVAILABLE_PROBLEM_FACTORIES["rdkit_logp"] = LogPProblemFactory
 except ImportError:
+    pass
+
+try:
+    from .foldx_stability.register import FoldXStabilityProblemFactory
+
+    AVAILABLE_PROBLEM_FACTORIES["foldx_stability"] = FoldXStabilityProblemFactory
+except (ImportError, FileNotFoundError):
     pass
