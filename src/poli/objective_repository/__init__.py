@@ -50,5 +50,5 @@ try:
     from .foldx_stability.register import FoldXStabilityProblemFactory
 
     AVAILABLE_PROBLEM_FACTORIES["foldx_stability"] = FoldXStabilityProblemFactory
-except ImportError:
+except (ImportError, FileNotFoundError):
     pass
