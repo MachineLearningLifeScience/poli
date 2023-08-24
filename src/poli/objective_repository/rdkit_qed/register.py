@@ -80,7 +80,13 @@ class QEDBlackBox(AbstractBlackBox):
         we use the alphabet to construct a SMILES string,
         and query QED from RDKit.
         """
-        molecule_string = "".join([self.inverse_alphabet[i] for i in x.flatten()])
+        molecule_string = "".join(
+            [
+                self.inverse_alphabet[i]
+                for i in x.flatten()
+                if self.inverse_alphabet[i] not in ["[unk]", "[unk2]"]
+            ]
+        )
         try:
             molecule = string_to_molecule(
                 molecule_string, from_selfies=self.from_selfies
@@ -110,15 +116,16 @@ class QEDProblemFactory(AbstractProblemFactory):
     def create(
         self,
         seed: int = 0,
+        alphabet: Dict[str, int] = None,
         path_to_alphabet: Path = None,
         string_representation: str = "SMILES",
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
-        if path_to_alphabet is None:
+        if path_to_alphabet is None and alphabet is None:
             # TODO: add support for more file types
             raise ValueError(
-                "Missing required keyword argument: path_to_alphabet: Path. "
-                "Path to alphabet (a json file {str: int}) must be provided "
-                " to the QEDProblemFactory."
+                "Missing required keyword argument: either path_to_alphabet or alphabet must be provided. \n"
+                "- alphabet could be a Dict[str, int], or \n "
+                "- path_to_alphabet could be the Path to a json file {str: int} \n "
             )
 
         if string_representation.upper() not in ["SMILES", "SELFIES"]:
@@ -127,20 +134,21 @@ class QEDProblemFactory(AbstractProblemFactory):
                 "String representation must be either 'SMILES' or 'SELFIES'."
             )
 
-        if isinstance(path_to_alphabet, str):
-            path_to_alphabet = Path(path_to_alphabet.strip()).resolve()
+        if alphabet is None:
+            if isinstance(path_to_alphabet, str):
+                path_to_alphabet = Path(path_to_alphabet.strip()).resolve()
 
-        if not path_to_alphabet.exists():
-            raise ValueError(f"Path to alphabet {path_to_alphabet} does not exist.")
+            if not path_to_alphabet.exists():
+                raise ValueError(f"Path to alphabet {path_to_alphabet} does not exist.")
 
-        if not path_to_alphabet.suffix == ".json":
-            # TODO: add support for more file types
-            raise ValueError(
-                f"Path to alphabet {path_to_alphabet} must be a json file."
-            )
+            if not path_to_alphabet.suffix == ".json":
+                # TODO: add support for more file types
+                raise ValueError(
+                    f"Path to alphabet {path_to_alphabet} must be a json file."
+                )
 
-        with open(path_to_alphabet, "r") as f:
-            alphabet = json.load(f)
+            with open(path_to_alphabet, "r") as f:
+                alphabet = json.load(f)
 
         self.alphabet = alphabet
 
