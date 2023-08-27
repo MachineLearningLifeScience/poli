@@ -167,6 +167,10 @@ def create(
         e, tb = msg
         print(tb)
         raise e
+    else:
+        raise ValueError(
+            f"Internal error: received {msg_type} when expecting SETUP or EXCEPTION"
+        )
 
     # instantiate observer (if desired)
     observer_info = None
