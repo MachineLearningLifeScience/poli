@@ -22,17 +22,26 @@ from poli.core.util.proteins.pdb_parsing import (
 PATH_TO_FOLDX_FILES = Path().home() / "foldx"
 if not PATH_TO_FOLDX_FILES.exists():
     raise FileNotFoundError(
-        "Please download FoldX and place it in your home directory. "
+        "Please download FoldX and place it in your home directory. \n"
+        "We expect it to find the following files: \n"
+        "   - the binary at: ~/foldx/foldx  \n"
+        "   - the rotabase file at: ~/foldx/rotabase.txt \n"
     )
 
 if not (PATH_TO_FOLDX_FILES / "foldx").exists():
     raise FileNotFoundError(
-        "Please compile FoldX and place it in your home directory as 'foldx'. "
+        "Please compile FoldX and place it in your home directory as 'foldx'. \n"
+        "We expect it to find the following files: \n"
+        "   - the binary at: ~/foldx/foldx  \n"
+        "   - the rotabase file at: ~/foldx/rotabase.txt \n"
     )
 
 if not (PATH_TO_FOLDX_FILES / "rotabase.txt").exists():
     raise FileNotFoundError(
         "Please place the rotabase.txt file in your foldx directory. "
+        "We expect it to find the following paths: \n"
+        "   - the binary at: ~/foldx/foldx  \n"
+        "   - the rotabase file at: ~/foldx/rotabase.txt \n"
     )
 
 

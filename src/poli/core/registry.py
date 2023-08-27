@@ -159,7 +159,13 @@ def register_problem_from_repository(name: str):
     file_to_run = PATH_TO_REPOSITORY / name / "register.py"
     command = " ".join(["conda", "run", "-n", env_name, "python", str(file_to_run)])
     warnings.warn("Running the following command: %s. " % command)
-    subprocess.run(command, check=True, shell=True, capture_output=True)
+    try:
+        subprocess.run(command, check=True, shell=True, capture_output=True)
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(
+            f"Found error when running {file_to_run} from environment {env_name}: \n"
+            f"{e.stderr.decode()}"
+        )
 
 
 def delete_problem(problem_name: str):

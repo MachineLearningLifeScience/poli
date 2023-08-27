@@ -56,17 +56,24 @@ def run(factory_kwargs: str, objective_name: str, port: int, password: str) -> N
 
     # make connection with the mother process
     conn = get_connection(port, password)
-    seed = conn.recv()
+    msg_type, seed = conn.recv()
 
     # dynamically load objective function module
     # At this point, the black box objective function
     # is exactly the same as the one used in the
     # registration (?).
-    objective_factory: AbstractProblemFactory = dynamically_instantiate(objective_name)
-    f, x0, y0 = objective_factory.create(seed, **kwargs)
+    try:
+        objective_factory: AbstractProblemFactory = dynamically_instantiate(
+            objective_name
+        )
+        f, x0, y0 = objective_factory.create(seed, **kwargs)
 
-    # give mother process the signal that we're ready
-    conn.send([x0, y0, objective_factory.get_setup_information()])
+        # give mother process the signal that we're ready
+        conn.send(["SETUP", x0, y0, objective_factory.get_setup_information()])
+    except Exception as e:
+        tb = traceback.format_exc()
+        conn.send("EXCEPTION", e, tb)
+        raise e
 
     # now wait for objective function calls
     while True:
@@ -84,7 +91,7 @@ def run(factory_kwargs: str, objective_name: str, port: int, password: str) -> N
                 conn.send(["ATTRIBUTE", attribute])
         except Exception as e:
             tb = traceback.format_exc()
-            conn.send(["EXCEPTION", (e, tb)])
+            conn.send(["EXCEPTION", e, tb])
 
     # conn.close()
     # exit()  # kill other threads, and close file handles
