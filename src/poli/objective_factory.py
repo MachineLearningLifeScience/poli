@@ -42,13 +42,19 @@ class ExternalBlackBox(AbstractBlackBox):
 
     def _black_box(self, x, context=None):
         self.process_wrapper.send(["QUERY", x, context])
-        msg_type, val = self.process_wrapper.recv()
+        msg_type, *val = self.process_wrapper.recv()
         if msg_type == "EXCEPTION":
             e, traceback_ = val
             print(traceback_)
             raise e
+        elif msg_type == "QUERY":
+            y = val[0]
 
-        return val
+            return y
+        else:
+            raise ValueError(
+                f"Internal error: received {msg_type} when expecting QUERY or EXCEPTION"
+            )
 
     def terminate(self):
         # terminate objective process
@@ -149,9 +155,18 @@ def create(
     # TODO: add signal listener that intercepts when proc ends
     # wait for connection from objective process
     # TODO: potential (unlikely) race condition! (process might try to connect before listener is ready!)
-    process_wrapper.send(seed)
+    process_wrapper.send(("SETUP", seed))
     # wait for objective process to finish setting up
-    x0, y0, problem_information = process_wrapper.recv()
+
+    msg_type, *msg = process_wrapper.recv()
+    if msg_type == "SETUP":
+        # Then the instance of the abstract factory
+        # was correctly set-up, and
+        x0, y0, problem_information = msg
+    elif msg_type == "EXCEPTION":
+        e, tb = msg
+        print(tb)
+        raise e
 
     # instantiate observer (if desired)
     observer_info = None
