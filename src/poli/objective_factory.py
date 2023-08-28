@@ -6,6 +6,7 @@ import numpy as np
 from pathlib import Path
 import configparser
 import traceback
+import logging
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
@@ -84,6 +85,7 @@ def create(
     caller_info: dict = None,
     observer: AbstractObserver = None,
     force_register: bool = False,
+    force_isolation: bool = False,
     **kwargs_for_factory,
 ) -> Tuple[ProblemSetupInformation, AbstractBlackBox, np.ndarray, np.ndarray, object]:
     """
@@ -96,6 +98,12 @@ def create(
         Optional information about the caller that is forwarded to the logger to initialize the run.
     :param observer:
         Optional observer, external observer by default.
+    :param force_register:
+        If True, then the objective function is registered without asking
+        for confirmation, overwriting any previous registration.
+    :param force_isolation:
+        If True, then the objective function is instantiated as an isolated
+        process.
     :return:
         problem_information: a ProblemSetupInformation object holding basic properties about the problem
         f: an objective function that accepts a numpy array and returns a numpy array
@@ -105,7 +113,8 @@ def create(
     """
     # If the user can run it with the envionment they currently
     # have, then we do not need to install it.
-    if name in AVAILABLE_PROBLEM_FACTORIES:
+    create_from_repository = not force_isolation
+    if name in AVAILABLE_PROBLEM_FACTORIES and create_from_repository:
         problem_factory = AVAILABLE_PROBLEM_FACTORIES[name]()
         problem_info = problem_factory.get_setup_information()
         f, x0, y0 = problem_factory.create(seed=seed, **kwargs_for_factory)
@@ -139,7 +148,7 @@ def create(
             # Register problem
             register_problem_from_repository(name)
             # TODO: change print to logging
-            print("Registered the objective from the repository.")
+            logging.debug(f"Registered the objective from the repository.")
             # Refresh the config
             config = load_config()
         else:
@@ -156,7 +165,6 @@ def create(
     # wait for connection from objective process
     # TODO: potential (unlikely) race condition! (process might try to connect before listener is ready!)
     process_wrapper.send(("SETUP", seed))
-    # wait for objective process to finish setting up
 
     msg_type, *msg = process_wrapper.recv()
     if msg_type == "SETUP":
