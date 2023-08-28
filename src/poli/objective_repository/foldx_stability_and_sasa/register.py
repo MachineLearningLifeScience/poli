@@ -33,7 +33,7 @@ from poli.core.util.proteins.foldx import FoldxInterface
 TMP_PATH = Path("/tmp").resolve()
 
 
-class FoldXSASABlackBox(AbstractBlackBox):
+class FoldXStabilityAndSASABlackBox(AbstractBlackBox):
     def __init__(
         self,
         L: int,
@@ -119,15 +119,41 @@ class FoldXSASABlackBox(AbstractBlackBox):
         ]
 
         foldx_interface = FoldxInterface(working_dir)
-        sasa_score = foldx_interface.compute_sasa(
+        stability, sasa_score = foldx_interface.compute_stability_and_sasa(
             pdb_file=wildtype_pdb_file,
             mutations=mutations_as_strings,
         )
 
-        return np.array([sasa_score]).reshape(-1, 1)
+        return np.array([stability, sasa_score]).reshape(-1, 2)
+
+    def __call__(self, x, context=None):
+        """
+        We overwrite the call method to bypass checking the outputs'
+        size. This is because we return two outputs, and the
+        AbstractBlackBox class expects a single output.
+        """
+        assert len(x.shape) == 2
+
+        # TODO: what happens with batch evaluations that
+        # could be processed in parallel?
+        f = np.zeros([x.shape[0], 2])
+        for i, x_i in enumerate(x):
+            f_i = self._black_box(x_i.reshape(1, -1), context)  # an [1, 2] array
+            f[i, :] = f_i
+            assert len(f_i.shape) == 2, f"len(f_i.shape)={len(f_i.shape)}, expected 2"
+            assert f_i.shape[0] == 1, f"f_i.shape[0]={f_i.shape[0]}, expected 1"
+            assert (
+                f_i.shape[1] == 2
+            ), f"f_i.shape[1]={f_i.shape[1]}, expected {2} (the number of objectives)"
+            assert isinstance(f, np.ndarray), f"type(f)={type(f)}, not np.ndarray"
+
+        if self.observer is not None:
+            self.observer.observe(x, f, context)
+
+        return f
 
 
-class FoldXSASAProblemFactory(AbstractProblemFactory):
+class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
     def get_setup_information(self) -> ProblemSetupInformation:
         """
         TODO: document
@@ -135,7 +161,7 @@ class FoldXSASAProblemFactory(AbstractProblemFactory):
         alphabet = ENCODING
 
         return ProblemSetupInformation(
-            name="foldx_sasa",
+            name="foldx_stability_and_sasa",
             max_sequence_length=np.inf,
             alphabet=alphabet,
             aligned=False,
@@ -168,7 +194,7 @@ class FoldXSASAProblemFactory(AbstractProblemFactory):
             # See ENCODING in foldx_utils.py
             alphabet = self.get_setup_information().get_alphabet()
 
-        f = FoldXSASABlackBox(L, wildtype_pdb_path, alphabet)
+        f = FoldXStabilityAndSASABlackBox(L, wildtype_pdb_path, alphabet)
 
         wildtype_residues = parse_pdb_as_residues(wildtype_pdb_path)
         wildtype_amino_acids = [
@@ -189,7 +215,7 @@ class FoldXSASAProblemFactory(AbstractProblemFactory):
 if __name__ == "__main__":
     from poli.core.registry import register_problem
 
-    foldx_problem_factory = FoldXSASAProblemFactory()
+    foldx_problem_factory = FoldXStabilityAndSASAProblemFactory()
     register_problem(
         foldx_problem_factory,
         conda_environment_name="poli__protein",

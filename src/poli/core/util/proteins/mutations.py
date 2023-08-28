@@ -8,12 +8,20 @@ foldx expects mutations in a certain format:
     - the third letter is the chain ID,
     - the fourth letter is the mutant residue.
 """
-from typing import List
+from typing import List, Tuple
 
 from Bio.PDB.Residue import Residue
 from Bio.SeqUtils import seq1
 
-from Levenshtein import editops
+
+def edits_between_strings(string_1: str, string_2: str) -> List[Tuple[str, int, int]]:
+    """
+    Overwriting editops to only consider replacements between strings.
+    This returns ("replace", pos_in_string_1, pos_in_string_2).
+    """
+    for i, (a, b) in enumerate(zip(string_1, string_2)):
+        if a != b:
+            yield ("replace", i, i)
 
 
 def mutations_from_wildtype_and_mutant(
@@ -53,7 +61,7 @@ def mutations_from_wildtype_and_mutant(
             f"{first_residue_name}{chain_id}{index_in_sequence}{first_residue_name}"
         ]
 
-    mutations = editops(wildtype_residue_string, mutated_residue_string)
+    mutations = edits_between_strings(wildtype_residue_string, mutated_residue_string)
 
     mutations_in_line = []
     for mutation_type, pos_in_wildtype, pos_in_mutant in mutations:
