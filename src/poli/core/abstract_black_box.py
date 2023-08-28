@@ -63,3 +63,23 @@ class AbstractBlackBox:
 
     def __del__(self):
         self.terminate()
+
+    def __neg__(self):
+        """
+        Creates a new black box, where the objective function
+        is the negative of the original one.
+        """
+        negative_black_box = NegativeBlackBox(self)
+        return negative_black_box
+
+
+class NegativeBlackBox(AbstractBlackBox):
+    def __init__(self, f: AbstractBlackBox):
+        self.f = f
+        super().__init__(f.L)
+
+    def __call__(self, x, context=None):
+        return -self.f.__call__(x, context)
+
+    def _black_box(self, x, context=None):
+        return self.f._black_box(x, context)
