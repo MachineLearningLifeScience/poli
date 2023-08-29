@@ -194,7 +194,9 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
         parser = PDB.PDBParser(QUIET=True)
         wildtype_structure = parser.get_structure("pdb", wildtype_pdb_path)
         wildtype_amino_acids = [
-            seq1(residue.get_resname()) for residue in wildtype_structure.get_residues()
+            seq1(residue.get_resname())
+            for residue in wildtype_structure.get_residues()
+            if residue.get_resname() != "NA"
         ]
 
         x0 = np.array(

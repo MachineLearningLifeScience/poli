@@ -67,3 +67,13 @@ try:
     AVAILABLE_PROBLEM_FACTORIES["foldx_rfp"] = RFPWrapperFactory
 except (ImportError, FileNotFoundError):
     pass
+
+
+try:
+    from .foldx_stability_and_sasa.register import FoldXStabilityAndSASAProblemFactory
+
+    AVAILABLE_PROBLEM_FACTORIES[
+        "foldx_stability_and_sasa"
+    ] = FoldXStabilityAndSASAProblemFactory
+except (ImportError, FileNotFoundError):
+    pass

@@ -8,7 +8,7 @@ The problem is registered as 'aloha', and it uses
 a conda environment called 'poli__base' (see the
 environment.yml file in this folder).
 """
-from typing import Tuple
+from typing import Tuple, Dict
 from string import ascii_uppercase
 
 import numpy as np
@@ -19,11 +19,25 @@ from poli.core.problem_setup_information import ProblemSetupInformation
 
 
 class AlohaBlackBox(AbstractBlackBox):
-    def __init__(self, L: int = 5):
+    def __init__(self, L: int = 5, alphabet: Dict[str, int] = None):
+        self.alphabet = alphabet
         super().__init__(L=L)
 
     # The only method you have to define
     def _black_box(self, x: np.ndarray, context: dict = None) -> np.ndarray:
+        # x is a [b, L] array of strings or ints, if they are
+        # ints, then we should convert them to strings
+        # using the alphabet.
+        # TODO: this assumes that the input is a batch of size 1.
+        # Address this when we change __call__.
+        if x.dtype.kind == "i":
+            if self.alphabet is None:
+                raise ValueError(
+                    "The alphabet must be defined if the input is an array of ints."
+                )
+            inverse_alphabet = {v: k for k, v in self.alphabet.items()}
+            x = np.array([[inverse_alphabet[i] for i in x[0]]])
+
         matches = x == np.array(["A", "L", "O", "H", "A"])
         return np.sum(matches, axis=1, keepdims=True)
 
@@ -43,7 +57,7 @@ class AlohaProblemFactory(AbstractProblemFactory):
 
     def create(self, seed: int = 0) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         L = self.get_setup_information().get_max_sequence_length()
-        f = AlohaBlackBox(L=L)
+        f = AlohaBlackBox(L=L, alphabet=self.get_setup_information().alphabet)
         x0 = np.array([["A", "L", "O", "O", "F"]])
 
         return f, x0, f(x0)

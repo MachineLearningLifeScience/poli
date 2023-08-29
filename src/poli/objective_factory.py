@@ -6,6 +6,7 @@ import numpy as np
 from pathlib import Path
 import configparser
 import traceback
+import logging
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
@@ -42,13 +43,19 @@ class ExternalBlackBox(AbstractBlackBox):
 
     def _black_box(self, x, context=None):
         self.process_wrapper.send(["QUERY", x, context])
-        msg_type, val = self.process_wrapper.recv()
+        msg_type, *val = self.process_wrapper.recv()
         if msg_type == "EXCEPTION":
             e, traceback_ = val
             print(traceback_)
             raise e
+        elif msg_type == "QUERY":
+            y = val[0]
 
-        return val
+            return y
+        else:
+            raise ValueError(
+                f"Internal error: received {msg_type} when expecting QUERY or EXCEPTION"
+            )
 
     def terminate(self):
         # terminate objective process
@@ -78,6 +85,7 @@ def create(
     caller_info: dict = None,
     observer: AbstractObserver = None,
     force_register: bool = False,
+    force_isolation: bool = False,
     **kwargs_for_factory,
 ) -> Tuple[ProblemSetupInformation, AbstractBlackBox, np.ndarray, np.ndarray, object]:
     """
@@ -90,6 +98,12 @@ def create(
         Optional information about the caller that is forwarded to the logger to initialize the run.
     :param observer:
         Optional observer, external observer by default.
+    :param force_register:
+        If True, then the objective function is registered without asking
+        for confirmation, overwriting any previous registration.
+    :param force_isolation:
+        If True, then the objective function is instantiated as an isolated
+        process.
     :return:
         problem_information: a ProblemSetupInformation object holding basic properties about the problem
         f: an objective function that accepts a numpy array and returns a numpy array
@@ -99,7 +113,8 @@ def create(
     """
     # If the user can run it with the envionment they currently
     # have, then we do not need to install it.
-    if name in AVAILABLE_PROBLEM_FACTORIES:
+    create_from_repository = not force_isolation
+    if name in AVAILABLE_PROBLEM_FACTORIES and create_from_repository:
         problem_factory = AVAILABLE_PROBLEM_FACTORIES[name]()
         problem_info = problem_factory.get_setup_information()
         f, x0, y0 = problem_factory.create(seed=seed, **kwargs_for_factory)
@@ -133,7 +148,7 @@ def create(
             # Register problem
             register_problem_from_repository(name)
             # TODO: change print to logging
-            print("Registered the objective from the repository.")
+            logging.debug(f"Registered the objective from the repository.")
             # Refresh the config
             config = load_config()
         else:
@@ -149,9 +164,21 @@ def create(
     # TODO: add signal listener that intercepts when proc ends
     # wait for connection from objective process
     # TODO: potential (unlikely) race condition! (process might try to connect before listener is ready!)
-    process_wrapper.send(seed)
-    # wait for objective process to finish setting up
-    x0, y0, problem_information = process_wrapper.recv()
+    process_wrapper.send(("SETUP", seed))
+
+    msg_type, *msg = process_wrapper.recv()
+    if msg_type == "SETUP":
+        # Then the instance of the abstract factory
+        # was correctly set-up, and
+        x0, y0, problem_information = msg
+    elif msg_type == "EXCEPTION":
+        e, tb = msg
+        print(tb)
+        raise e
+    else:
+        raise ValueError(
+            f"Internal error: received {msg_type} when expecting SETUP or EXCEPTION"
+        )
 
     # instantiate observer (if desired)
     observer_info = None

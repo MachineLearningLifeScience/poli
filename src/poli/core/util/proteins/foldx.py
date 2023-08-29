@@ -22,17 +22,26 @@ from poli.core.util.proteins.pdb_parsing import (
 PATH_TO_FOLDX_FILES = Path().home() / "foldx"
 if not PATH_TO_FOLDX_FILES.exists():
     raise FileNotFoundError(
-        "Please download FoldX and place it in your home directory. "
+        "Please download FoldX and place it in your home directory. \n"
+        "We expect it to find the following files: \n"
+        "   - the binary at: ~/foldx/foldx  \n"
+        "   - the rotabase file at: ~/foldx/rotabase.txt \n"
     )
 
 if not (PATH_TO_FOLDX_FILES / "foldx").exists():
     raise FileNotFoundError(
-        "Please compile FoldX and place it in your home directory as 'foldx'. "
+        "Please compile FoldX and place it in your home directory as 'foldx'. \n"
+        "We expect it to find the following files: \n"
+        "   - the binary at: ~/foldx/foldx  \n"
+        "   - the rotabase file at: ~/foldx/rotabase.txt \n"
     )
 
 if not (PATH_TO_FOLDX_FILES / "rotabase.txt").exists():
     raise FileNotFoundError(
         "Please place the rotabase.txt file in your foldx directory. "
+        "We expect it to find the following paths: \n"
+        "   - the binary at: ~/foldx/foldx  \n"
+        "   - the rotabase file at: ~/foldx/rotabase.txt \n"
     )
 
 
@@ -102,26 +111,23 @@ class FoldxInterface:
             f"Please check the working directory: {self.working_dir}. "
         )
 
-    def compute_stability(self, pdb_file: Path, mutations: List[str]) -> float:
-        if not (self.working_dir / f"Raw_{pdb_file.stem}.fxout").exists():
-            self._simulate_mutations(pdb_file, mutations)
-
+    def _read_energy(self, pdb_file: Path) -> float:
+        """
+        This method reads the energy from a FoldX results file,
+        assuming that there was a single mutation.
+        TODO: add support for multiple mutations.
+        """
         with open(self.working_dir / f"Raw_{pdb_file.stem}.fxout") as f:
             lines = f.readlines()
 
-        # TODO: add support for multiple mutations
-        assert len(mutations) == 1, "We only support single mutations for now. "
-
-        # The energy is at the second to last line
-        # and in the second column.
         energy = float(lines[-2].split()[1])
-        return -energy
+        return energy
 
-    def compute_sasa(self, pdb_file: Path, mutations: List[str]) -> float:
-        if not (self.working_dir / f"Raw_{pdb_file.stem}.fxout").exists():
-            self._simulate_mutations(pdb_file, mutations)
-
-        # Loading up the mutation's pdb file
+    def _compute_sasa(self, pdb_file: Path) -> float:
+        """
+        This method computes the SASA from a FoldX results file,
+        assuming that there was a single mutation.
+        """
         mutated_structure = parse_pdb_as_structure(
             self.working_dir / f"{pdb_file.stem}_1.pdb", structure_name="pdb_mutated"
         )
@@ -132,6 +138,32 @@ class FoldxInterface:
         sasa_computer.compute(mutated_structure, level="S")
 
         return mutated_structure.sasa
+
+    def compute_stability(self, pdb_file: Path, mutations: List[str]) -> float:
+        # if not (self.working_dir / f"Raw_{pdb_file.stem}.fxout").exists():
+        assert len(mutations) == 1, "We only support single mutations for now. "
+        self._simulate_mutations(pdb_file, mutations)
+
+        stability = -self._read_energy(pdb_file)
+        return stability
+
+    def compute_sasa(self, pdb_file: Path, mutations: List[str]) -> float:
+        # if not (self.working_dir / f"Raw_{pdb_file.stem}.fxout").exists():
+        self._simulate_mutations(pdb_file, mutations)
+
+        sasa_score = self._compute_sasa(pdb_file)
+        return sasa_score
+
+    def compute_stability_and_sasa(self, pdb_file: Path, mutations: List[str]):
+        """
+        This function computes stability and sasa with a single foldx run,
+        instead of two separate runs.
+        """
+        assert len(mutations) == 1, "We only support single mutations for now."
+        self._simulate_mutations(pdb_file, mutations)
+        stability = -self._read_energy(pdb_file)
+        sasa_score = self._compute_sasa(pdb_file)
+        return stability, sasa_score
 
     def copy_foldx_files(self, pdb_file: Path):
         """
