@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Dict
 import os
 import configparser
 from pathlib import Path
@@ -13,7 +13,7 @@ from poli.core.util.objective_management.make_run_script import (
     make_observer_script,
 )
 
-from poli.objective_repository import AVAILABLE_PROBLEM_FACTORIES
+from poli.objective_repository import AVAILABLE_PROBLEM_FACTORIES, AVAILABLE_OBJECTIVES
 
 _DEFAULT = "DEFAULT"
 _OBSERVER = "observer"
@@ -173,7 +173,7 @@ def delete_problem(problem_name: str):
     _write_config()
 
 
-def get_problems() -> List[str]:
+def get_problems(include_repository: bool = False) -> List[str]:
     problems = config.sections()
     # problems.remove(_DEFAULT)  # no need to remove default section
 
@@ -182,9 +182,23 @@ def get_problems() -> List[str]:
     # i.e. the AVAILABLE_PROBLEM_FACTORIES in the
     # objective_repository
     available_problems = list(AVAILABLE_PROBLEM_FACTORIES.keys())
+
+    if include_repository:
+        # We include the problems that the user _could_
+        # install from the repo. These are available in the
+        # AVAILABLE_OBJECTIVES list.
+        available_problems += AVAILABLE_OBJECTIVES
+
     problems = sorted(list(set(problems + available_problems)))
 
     return problems
+
+
+def get_problem_factories() -> Dict[str, AbstractProblemFactory]:
+    """
+    Returns a dictionary with the problem factories
+    """
+    return AVAILABLE_PROBLEM_FACTORIES
 
 
 def _write_config():

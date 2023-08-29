@@ -10,4 +10,4 @@ dependencies:
     - torch
     - numpy
     - click
-    - "git+https://github.com/MachineLearningLifeScience/poli.git"
+    - "git+https://github.com/MachineLearningLifeScience/poli.git@master"
