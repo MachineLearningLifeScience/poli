@@ -9,7 +9,7 @@ if __name__ == "__main__":
     wildtype_pdb_path = THIS_DIR / "101m_Repair.pdb"
 
     problem_info, f, x0, y0, run_info = objective_factory.create(
-        "FoldX_stability",
+        "foldx_stability",
         seed=0,
         observer=None,
         wildtype_pdb_path=wildtype_pdb_path,

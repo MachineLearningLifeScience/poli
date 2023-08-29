@@ -241,6 +241,9 @@ def test_registering_foldx_stability():
     if not (PATH_TO_FOLDX_FILES / "rotabase.txt").exists():
         pytest.skip("rotabase.txt is not in the foldx directory. ")
 
+    if not (THIS_DIR / "101m_Repair.pdb").exists():
+        pytest.skip("Could not find wildtype 101m_Repair.pdb in test folder.")
+
     _ = pytest.importorskip("Bio")
     _ = pytest.importorskip("Levenshtein")
 
