@@ -21,19 +21,21 @@ Run the following from the main directory (where this README file is also locate
 pip install -e .
 ```
 
-If you are not interested in debugging locally, you could also install the bleeding-edge version by running
+If you are not interested in debugging locally, you could also install a stable version by running
 ```
-pip install git+https://github.com/MachineLearningLifeScience/poli.git
+pip install git+https://github.com/MachineLearningLifeScience/poli.git@master
 ```
+
+The bleeding-edge is contained in the `dev` branch, so if you want to install that, change `@master` for `@dev`.
 
 To make sure everything went well, you can test your `poli` installation by running
 
 ```bash
 $ python -c "from poli.core.registry import get_problems ; print(get_problems())"
-[]
+['aloha', 'white_noise']
 ```
 
-If the installation isn't fresh/isn't the only one in your system, you might actually get some names inside that list.
+If the installation isn't fresh/isn't the only one in your system, you might actually get some more names inside that list.
 
 ### Minimal working example
 Defining an objective function that just returns a draw from a standard normal.
