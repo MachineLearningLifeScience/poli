@@ -94,7 +94,13 @@ def _make_run_script(
 
         conda_environment_name = str(conda_environment_name)
     else:
-        raise ValueError("conda_environment_location must be a string or a Path.")
+        if conda_environment_name is None:
+            conda_environment_name = sys.executable[: -len("/bin/python")]
+            conda_environment_name = str(os.path.abspath(conda_environment_name))
+        else:
+            raise ValueError(
+                "If specified, conda_environment_location must be a string or a Path."
+            )
 
     # make path to conda environment absolute
     if python_paths is None:
