@@ -280,3 +280,35 @@ def test_registering_foldx_sasa():
     )
 
     assert np.isclose(y0, 8411.45578009).all()
+
+
+def test_registering_foldx_stability_and_sasa():
+    """
+    Testing whether we can register the logp problem
+    if biopython and python-levenshtein are installed.
+    """
+    HOME_DIR = Path().home().resolve()
+    PATH_TO_FOLDX_FILES = HOME_DIR / "foldx"
+    if not PATH_TO_FOLDX_FILES.exists():
+        pytest.skip("FoldX is not installed. ")
+
+    if not (PATH_TO_FOLDX_FILES / "foldx").exists():
+        pytest.skip("FoldX is not compiled. ")
+
+    if not (PATH_TO_FOLDX_FILES / "rotabase.txt").exists():
+        pytest.skip("rotabase.txt is not in the foldx directory. ")
+
+    _ = pytest.importorskip("Bio")
+    _ = pytest.importorskip("Levenshtein")
+
+    _, f, _, y0, _ = objective_factory.create(
+        name="foldx_stability_and_sasa",
+        wildtype_pdb_path=THIS_DIR / "101m_Repair.pdb",
+    )
+
+    assert np.isclose(y0[:, 0], 32.4896).all()
+    assert np.isclose(y0[:, 1], 8411.45578009).all()
+
+
+if __name__ == "__main__":
+    test_registering_foldx_sasa()

@@ -26,21 +26,18 @@ pip install rdkit selfies
 [1] TODO: add reference
 """
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Tuple, List
 import json
 
 import numpy as np
 
-from rdkit import Chem
 from rdkit.Chem.QED import qed
-
-import selfies as sf
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem_setup_information import ProblemSetupInformation
 
-from poli.core.util.chemistry.string_to_molecule import string_to_molecule
+from poli.core.util.chemistry.string_to_molecule import strings_to_molecules
 
 
 class QEDBlackBox(AbstractBlackBox):
@@ -60,18 +57,27 @@ class QEDBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        L: int = np.inf,
-        alphabet: Dict[str, int] = None,
+        info: ProblemSetupInformation,
+        batch_size: int = None,
+        alphabet: List[str] = None,
         from_selfies: bool = False,
     ):
         if alphabet is None:
-            raise ValueError("Alphabet must be provided to the QEDBlackBox.")
-        self.alphabet = alphabet
-        self.inverse_alphabet = {v: k for k, v in alphabet.items()}
+            # TODO: remove this as soon as we have a default alphabet
+            assert info.alphabet is not None, (
+                "We only support for the user to provide an alphabet (List[str]). "
+                "Provide an alphabet in objective_function.create(...)"
+            )
+            alphabet = info.alphabet
+
+        string_to_idx = {symbol: i for i, symbol in enumerate(alphabet)}
+
+        self.string_to_idx = string_to_idx
+        self.idx_to_string = {v: k for k, v in string_to_idx.items()}
         self.from_selfies = from_selfies
         self.from_smiles = not from_selfies
 
-        super().__init__(L=L)
+        super().__init__(info, batch_size)
 
     # The only method you have to define
     def _black_box(self, x: np.ndarray, context: dict = None) -> np.ndarray:
@@ -80,32 +86,49 @@ class QEDBlackBox(AbstractBlackBox):
         we use the alphabet to construct a SMILES string,
         and query QED from RDKit.
         """
-        molecule_string = "".join(
-            [
-                self.inverse_alphabet[i]
-                for i in x.flatten()
-                if self.inverse_alphabet[i] not in ["[unk]", "[unk2]"]
+        # We check if the user provided an array of strings
+        if x.dtype.kind in ["U", "S"]:
+            molecule_strings = ["".join([x_ij for x_ij in x_i.flatten()]) for x_i in x]
+        elif x.dtype.kind in ["i", "f"]:
+            molecule_strings = [
+                "".join([self.idx_to_string[x_ij] for x_ij in x_i.flatten()])
+                for x_i in x
             ]
-        )
-        try:
-            molecule = string_to_molecule(
-                molecule_string, from_selfies=self.from_selfies
+        else:
+            raise ValueError(
+                f"Unsupported dtype: {x.dtype}. "
+                "The input must be an array of strings or integers."
             )
-        except ValueError:
-            # If the molecule cannot be parsed, return NaN
-            return np.array([[np.nan]])
 
-        qed_value = qed(molecule)
+        # Transforms strings into RDKit molecules.
+        # Those that cannot be parsed are set to None.
+        molecules = strings_to_molecules(
+            molecule_strings, from_selfies=self.from_selfies
+        )
 
-        # If the qed value is not a float, return NaN
-        if not isinstance(qed_value, float):
-            return np.array([[np.nan]])
+        # Computes the QED values for each molecule.
+        qed_values = []
+        for molecule in molecules:
+            if molecule is not None:
+                qed_value = qed(molecule)
 
-        return np.array([[qed_value]])
+                # If the qed value is not a float, return NaN
+                if not isinstance(qed_value, float):
+                    qed_value = np.nan
+
+            # If the molecule is None, then RDKit failed
+            # to parse it, and we return NaN.
+            else:
+                qed_value = np.nan
+
+            qed_values.append(qed_value)
+
+        return np.array(qed_values).reshape(-1, 1)
 
 
 class QEDProblemFactory(AbstractProblemFactory):
     def get_setup_information(self) -> ProblemSetupInformation:
+        # TODO: Add a default alphabet here.
         return ProblemSetupInformation(
             name="rdkit_qed",
             max_sequence_length=np.inf,
@@ -116,16 +139,17 @@ class QEDProblemFactory(AbstractProblemFactory):
     def create(
         self,
         seed: int = 0,
-        alphabet: Dict[str, int] = None,
+        alphabet: List[str] = None,
         path_to_alphabet: Path = None,
         string_representation: str = "SMILES",
+        batch_size: int = None,
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         if path_to_alphabet is None and alphabet is None:
             # TODO: add support for more file types
             raise ValueError(
                 "Missing required keyword argument: either path_to_alphabet or alphabet must be provided. \n"
-                "- alphabet could be a Dict[str, int], or \n "
-                "- path_to_alphabet could be the Path to a json file {str: int} \n "
+                "- alphabet could be a List[str], or \n "
+                "- path_to_alphabet could be the Path to a json file [token_1, token_2, ...] \n "
             )
 
         if string_representation.upper() not in ["SMILES", "SELFIES"]:
@@ -152,18 +176,19 @@ class QEDProblemFactory(AbstractProblemFactory):
 
         self.alphabet = alphabet
 
-        L = self.get_setup_information().get_max_sequence_length()
+        problem_info = self.get_setup_information()
         f = QEDBlackBox(
-            L=L,
+            info=problem_info,
             alphabet=self.alphabet,
             from_selfies=string_representation.upper() == "SELFIES",
+            batch_size=batch_size,
         )
 
         # The sequence "C"
         if string_representation.upper() == "SMILES":
-            x0 = np.array([[self.alphabet["C"]]])
+            x0 = np.array([["C"]])
         else:
-            x0 = np.array([[self.alphabet["[C]"]]])
+            x0 = np.array([["[C]"]])
 
         return f, x0, f(x0)
 

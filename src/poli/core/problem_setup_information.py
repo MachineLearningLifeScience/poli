@@ -1,3 +1,5 @@
+from typing import List, Dict, Union
+
 from pathlib import Path
 
 
@@ -7,9 +9,23 @@ class ProblemSetupInformation:
         name: str,
         max_sequence_length: int,
         aligned: bool,
-        alphabet: dict,
+        alphabet: List[str],
         log_transform_recommended=False,
     ):
+        """
+        Default constructor.
+
+        :param name:
+            the problem's name
+        :param max_sequence_length:
+            length of the longest sequence
+        :param aligned:
+            whether the sequences have been aligned
+        :param alphabet:
+            list of characters that may appear
+        :param log_transform_recommended:
+            a recommendation for optimization algorithm whether to log transform the targets
+        """
         self.name = name
         self.max_sequence_length = max_sequence_length
         self.aligned = aligned

@@ -17,8 +17,8 @@ from poli.core.problem_setup_information import ProblemSetupInformation
 
 
 class WhiteNoiseBlackBox(AbstractBlackBox):
-    def __init__(self, L: int = np.inf):
-        super().__init__(L=L)
+    def __init__(self, info: ProblemSetupInformation, batch_size: int = None):
+        super().__init__(info, batch_size)
 
     # The only method you have to define
     def _black_box(self, x: np.ndarray, context: dict = None) -> np.ndarray:
@@ -28,8 +28,7 @@ class WhiteNoiseBlackBox(AbstractBlackBox):
 class WhiteNoiseProblemFactory(AbstractProblemFactory):
     def get_setup_information(self) -> ProblemSetupInformation:
         # A mock alphabet made of the 10 digits.
-        alphabet_symbols = [str(i) for i in range(10)]
-        alphabet = {symbol: i for i, symbol in enumerate(alphabet_symbols)}
+        alphabet = [str(i) for i in range(10)]
 
         return ProblemSetupInformation(
             name="white_noise",
@@ -39,8 +38,8 @@ class WhiteNoiseProblemFactory(AbstractProblemFactory):
         )
 
     def create(self, seed: int = 0) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
-        L = self.get_setup_information().get_max_sequence_length()
-        f = WhiteNoiseBlackBox(L=L)
+        problem_info = self.get_setup_information()
+        f = WhiteNoiseBlackBox(info=problem_info)
         x0 = np.array([["1", "2", "3"]])
 
         return f, x0, f(x0)

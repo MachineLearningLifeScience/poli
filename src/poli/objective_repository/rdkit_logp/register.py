@@ -31,16 +31,13 @@ import json
 
 import numpy as np
 
-from rdkit import Chem
 from rdkit.Chem import Descriptors
-
-import selfies as sf
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem_setup_information import ProblemSetupInformation
 
-from poli.core.util.chemistry.string_to_molecule import string_to_molecule
+from poli.core.util.chemistry.string_to_molecule import strings_to_molecules
 
 
 class LogPBlackBox(AbstractBlackBox):
@@ -60,18 +57,27 @@ class LogPBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        L: int = np.inf,
+        info: int = np.inf,
+        batch_size: int = None,
         alphabet: Dict[str, int] = None,
         from_selfies: bool = False,
     ):
         if alphabet is None:
-            raise ValueError("Alphabet must be provided to the QEDBlackBox.")
-        self.alphabet = alphabet
-        self.inverse_alphabet = {v: k for k, v in alphabet.items()}
+            # TODO: remove this as soon as we have a default alphabet
+            assert info.alphabet is not None, (
+                "We only support for the user to provide an alphabet (List[str]). "
+                "Provide an alphabet in objective_function.create(...)"
+            )
+            alphabet = info.alphabet
+
+        string_to_idx = {symbol: i for i, symbol in enumerate(alphabet)}
+
+        self.string_to_idx = string_to_idx
+        self.idx_to_string = {v: k for k, v in string_to_idx.items()}
         self.from_selfies = from_selfies
         self.from_smiles = not from_selfies
 
-        super().__init__(L=L)
+        super().__init__(info, batch_size)
 
     # The only method you have to define
     def _black_box(self, x: np.ndarray, context: dict = None) -> np.ndarray:
@@ -80,22 +86,44 @@ class LogPBlackBox(AbstractBlackBox):
         we use the alphabet to construct a SMILES string,
         and query QED from RDKit.
         """
-        molecule_string = "".join([self.inverse_alphabet[i] for i in x.flatten()])
-        try:
-            molecule = string_to_molecule(
-                molecule_string, from_selfies=self.from_selfies
+        if x.dtype.kind in ["U", "S"]:
+            molecule_strings = ["".join([x_ij for x_ij in x_i.flatten()]) for x_i in x]
+        elif x.dtype.kind in ["i", "f"]:
+            molecule_strings = [
+                "".join([self.idx_to_string[x_ij] for x_ij in x_i.flatten()])
+                for x_i in x
+            ]
+        else:
+            raise ValueError(
+                f"Unsupported dtype: {x.dtype}. "
+                "The input must be an array of strings or integers."
             )
-        except ValueError:
-            # If the molecule cannot be parsed, return NaN
-            return np.array([np.nan])
 
-        logp_value = Descriptors.MolLogP(molecule)
+        # Transforms strings into RDKit molecules.
+        # Those that cannot be parsed are set to None.
+        molecules = strings_to_molecules(
+            molecule_strings, from_selfies=self.from_selfies
+        )
 
-        # If the qed value is not a float, return NaN
-        if not isinstance(logp_value, float):
-            return np.array([np.nan])
+        # Computes the LogP values for each molecule.
+        logp_values = []
 
-        return np.array([[logp_value]])
+        for molecule in molecules:
+            if molecule is not None:
+                logp_value = Descriptors.MolLogP(molecule)
+
+                # If the qed value is not a float, return NaN
+                if not isinstance(logp_value, float):
+                    logp_value = np.nan
+
+            # If the molecule is None, then RDKit failed
+            # to parse it, and we return NaN.
+            else:
+                logp_value = np.nan
+
+            logp_values.append(logp_value)
+
+        return np.array(logp_values).reshape(-1, 1)
 
 
 class LogPProblemFactory(AbstractProblemFactory):
@@ -112,6 +140,7 @@ class LogPProblemFactory(AbstractProblemFactory):
         seed: int = 0,
         path_to_alphabet: Path = None,
         string_representation: str = "SMILES",
+        batch_size: int = None,
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         if path_to_alphabet is None:
             # TODO: add support for more file types
@@ -144,18 +173,19 @@ class LogPProblemFactory(AbstractProblemFactory):
 
         self.alphabet = alphabet
 
-        L = self.get_setup_information().get_max_sequence_length()
+        problem_info = self.get_setup_information()
         f = LogPBlackBox(
-            L=L,
+            info=problem_info,
+            batch_size=batch_size,
             alphabet=self.alphabet,
             from_selfies=string_representation.upper() == "SELFIES",
         )
 
         # The sequence "C"
         if string_representation.upper() == "SMILES":
-            x0 = np.array([[self.alphabet["C"]]])
+            x0 = np.array([["C"]])
         else:
-            x0 = np.array([[self.alphabet["[C]"]]])
+            x0 = np.array([["[C]"]])
 
         return f, x0, f(x0)
 
