@@ -1,24 +1,21 @@
 import numpy as np
+from poli.core.problem_setup_information import ProblemSetupInformation
 
 from poli.core.util.abstract_observer import AbstractObserver
 
 
 class AbstractBlackBox:
-    def __init__(self, L: int):
-        """
-        :param L: length of the inputs (NOT 1hot encoded)
-        """
-        self.L = L
-        self.sequences_aligned = True  # TODO: make this an option
+    def __init__(self, info: ProblemSetupInformation):
+        self.info = info
         self.observer = None
 
     def set_observer(self, observer: AbstractObserver):
         self.observer = observer
 
-    def __call__(self, x, context=None):
+    def __call__(self, x: np.array, context=None):
         """
         The purpose of this function is to enforce that inputs are equal across problems.
-        To avoid errors inputs must be of shape 1xL. (That is, NOT 1hot encoded but explicitly using the alphabet.)
+        To avoid errors, the inputs are strings.
         :param x:
         :param context:
         :return:
