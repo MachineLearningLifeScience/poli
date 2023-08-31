@@ -19,7 +19,7 @@ from poli.core.util.proteins.pdb_parsing import (
     parse_pdb_as_residue_strings,
     parse_pdb_as_residues,
 )
-from poli.core.util.proteins.defaults import ENCODING
+from poli.core.util.proteins.defaults import AMINO_ACIDS
 from poli.core.util.proteins.mutations import mutations_from_wildtype_and_mutant
 from poli.core.util.proteins.foldx import FoldxInterface
 
@@ -36,14 +36,29 @@ TMP_PATH = Path("/tmp").resolve()
 class FoldXStabilityAndSASABlackBox(AbstractBlackBox):
     def __init__(
         self,
-        L: int,
-        wildtype_pdb_file: Path,
-        alphabet: Dict[str, int],
+        info: ProblemSetupInformation = None,
+        batch_size: int = 1,
+        wildtype_pdb_file: Path = None,
+        alphabet: List[str] = None,
         experiment_id: str = None,
     ):
-        super().__init__(L)
-        self.alphabet = alphabet
-        self.decoding = {v: k for k, v in self.alphabet.items()}
+        """
+        TODO: Document
+        """
+        # WARNING: notice how the batch-size is set to 1.
+        # This is because we only support simulating one
+        # mutation at a time.
+        # TODO: fix this using parallelization.
+
+        # TODO: assert that wildtype_pdb_file is provided
+        assert wildtype_pdb_file is not None, (
+            "Missing required argument wildtype_pdb_file. "
+            "Did you forget to pass it to create and into the black box?"
+        )
+        super().__init__(info=info, batch_size=batch_size)
+
+        if alphabet is None:
+            alphabet = info.alphabet
 
         if isinstance(wildtype_pdb_file, str):
             wildtype_pdb_file = Path(wildtype_pdb_file.strip())
@@ -111,11 +126,11 @@ class FoldXStabilityAndSASABlackBox(AbstractBlackBox):
         # Create a working directory for this function call
         working_dir = self.create_working_directory()
 
-        # Given that x, we simply define the
+        # Given x (np.array[str]), we simply define the
         # mutations to be made as a mutation_list.txt
         # file.
         mutations_as_strings = [
-            "".join([self.decoding[integer] for integer in x_i]) for x_i in x
+            "".join([amino_acid for amino_acid in x_i]) for x_i in x
         ]
 
         foldx_interface = FoldxInterface(working_dir)
@@ -126,39 +141,13 @@ class FoldXStabilityAndSASABlackBox(AbstractBlackBox):
 
         return np.array([stability, sasa_score]).reshape(-1, 2)
 
-    def __call__(self, x, context=None):
-        """
-        We overwrite the call method to bypass checking the outputs'
-        size. This is because we return two outputs, and the
-        AbstractBlackBox class expects a single output.
-        """
-        assert len(x.shape) == 2
-
-        # TODO: what happens with batch evaluations that
-        # could be processed in parallel?
-        f = np.zeros([x.shape[0], 2])
-        for i, x_i in enumerate(x):
-            f_i = self._black_box(x_i.reshape(1, -1), context)  # an [1, 2] array
-            f[i, :] = f_i
-            assert len(f_i.shape) == 2, f"len(f_i.shape)={len(f_i.shape)}, expected 2"
-            assert f_i.shape[0] == 1, f"f_i.shape[0]={f_i.shape[0]}, expected 1"
-            assert (
-                f_i.shape[1] == 2
-            ), f"f_i.shape[1]={f_i.shape[1]}, expected {2} (the number of objectives)"
-            assert isinstance(f, np.ndarray), f"type(f)={type(f)}, not np.ndarray"
-
-        if self.observer is not None:
-            self.observer.observe(x, f, context)
-
-        return f
-
 
 class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
     def get_setup_information(self) -> ProblemSetupInformation:
         """
         TODO: document
         """
-        alphabet = ENCODING
+        alphabet = AMINO_ACIDS
 
         return ProblemSetupInformation(
             name="foldx_stability_and_sasa",
@@ -171,9 +160,8 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
         self,
         seed: int = 0,
         wildtype_pdb_path: Path = None,
-        alphabet: Dict[str, int] = None,
+        alphabet: List[str] = None,
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
-        L = self.get_setup_information().get_max_sequence_length()
         if wildtype_pdb_path is None:
             raise ValueError(
                 "Missing required argument wildtype_pdb_path. "
@@ -194,7 +182,13 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
             # See ENCODING in foldx_utils.py
             alphabet = self.get_setup_information().get_alphabet()
 
-        f = FoldXStabilityAndSASABlackBox(L, wildtype_pdb_path, alphabet)
+        problem_info = self.get_setup_information()
+        f = FoldXStabilityAndSASABlackBox(
+            info=problem_info,
+            batch_size=1,
+            wildtype_pdb_file=wildtype_pdb_path,
+            alphabet=alphabet,
+        )
 
         wildtype_residues = parse_pdb_as_residues(wildtype_pdb_path)
         wildtype_amino_acids = [
@@ -203,9 +197,7 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
             if residue.get_resname() != "NA"
         ]
 
-        x0 = np.array(
-            [ENCODING[amino_acid] for amino_acid in wildtype_amino_acids]
-        ).reshape(1, -1)
+        x0 = np.array(wildtype_amino_acids).reshape(1, -1)
 
         f_0 = f(x0)
 
