@@ -34,16 +34,8 @@ def load_config():
 
 
 class ExternalBlackBox(AbstractBlackBox):
-<<<<<<< HEAD
-    def __init__(self, L: int, process_wrapper, sequences_aligned: bool = False):
-        # TODO: the sequences_aligned assign to false is a hack for
-        # now
-        super().__init__(L)
-        self.sequences_aligned = sequences_aligned
-=======
     def __init__(self, info: ProblemSetupInformation, process_wrapper):
         super().__init__(info)
->>>>>>> upstream/experiment_code_running
         self.process_wrapper = process_wrapper
 
     def _black_box(self, x, context=None):

@@ -19,9 +19,9 @@ from poli.core.problem_setup_information import ProblemSetupInformation
 
 
 class AlohaBlackBox(AbstractBlackBox):
-    def __init__(self, L: int = 5, alphabet: Dict[str, int] = None):
-        self.alphabet = alphabet
-        super().__init__(L=L)
+    def __init__(self, info: ProblemSetupInformation, batch_size: int = None):
+        self.alphabet = {symbol: idx for idx, symbol in enumerate(info.alphabet)}
+        super().__init__(info, batch_size)
 
     # The only method you have to define
     def _black_box(self, x: np.ndarray, context: dict = None) -> np.ndarray:
@@ -39,14 +39,13 @@ class AlohaBlackBox(AbstractBlackBox):
             x = np.array([[inverse_alphabet[i] for i in x[0]]])
 
         matches = x == np.array(["A", "L", "O", "H", "A"])
-        return np.sum(matches, axis=1, keepdims=True)
+        return np.sum(matches.reshape(-1, 1), axis=0, keepdims=True)
 
 
 class AlohaProblemFactory(AbstractProblemFactory):
     def get_setup_information(self) -> ProblemSetupInformation:
         # The alphabet: ["A", "B", "C", ...]
-        alphabet_symbols = list(ascii_uppercase)
-        alphabet = {symbol: i for i, symbol in enumerate(alphabet_symbols)}
+        alphabet = list(ascii_uppercase)
 
         return ProblemSetupInformation(
             name="aloha",
@@ -56,8 +55,8 @@ class AlohaProblemFactory(AbstractProblemFactory):
         )
 
     def create(self, seed: int = 0) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
-        L = self.get_setup_information().get_max_sequence_length()
-        f = AlohaBlackBox(L=L, alphabet=self.get_setup_information().alphabet)
+        problem_info = self.get_setup_information()
+        f = AlohaBlackBox(info=problem_info)
         x0 = np.array([["A", "L", "O", "O", "F"]])
 
         return f, x0, f(x0)

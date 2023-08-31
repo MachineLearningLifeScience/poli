@@ -1,13 +1,16 @@
 import numpy as np
+
 from poli.core.problem_setup_information import ProblemSetupInformation
 
 from poli.core.util.abstract_observer import AbstractObserver
+from poli.core.util.batch import batched
 
 
 class AbstractBlackBox:
-    def __init__(self, info: ProblemSetupInformation):
+    def __init__(self, info: ProblemSetupInformation, batch_size: int = None):
         self.info = info
         self.observer = None
+        self.batch_size = batch_size
 
     def set_observer(self, observer: AbstractObserver):
         self.observer = observer
@@ -15,38 +18,53 @@ class AbstractBlackBox:
     def __call__(self, x: np.array, context=None):
         """
         The purpose of this function is to enforce that inputs are equal across problems.
-        To avoid errors, the inputs are strings.
+        The inputs are usually assumed to be strings, and all objective functions in our
+        repository will assume that the inputs are strings. Some also allow for integers
+        (i.e. token ids) to be passed as inputs.
         :param x:
         :param context:
         :return:
         """
+        # We will always assume that the inputs is a 2D array.
+        # The first dimension is the batch size, and the second
+        # dimension should match the maximum sequence length of
+        # the problem. One can opt out of this by setting L=np.inf
+        # or L=None.
         assert len(x.shape) == 2
-        # assert(x.shape[0] == 1)
-        # self.L == np.inf is a way to say that the
-        # length of the input is not fixed.
-        if self.L is not np.inf:
-            assert x.shape[1] == self.L or not self.sequences_aligned, (
+        maximum_sequence_length = self.info.get_max_sequence_length()
+
+        # We assert that the length matches L if the maximum sequence length
+        # specified in the problem is different from np.inf or None.
+        if maximum_sequence_length not in [np.inf, None]:
+            assert x.shape[1] == maximum_sequence_length, (
                 "The length of the input is not the same as the length of the input of the problem. "
-                f"(L={self.L}, x.shape[1]={x.shape[1]}). "
-                "If you want to allow for variable length inputs, set L=np.inf."
+                f"(L={maximum_sequence_length}, x.shape[1]={x.shape[1]}). "
+                "If you want to allow for variable-length inputs, set L=np.inf or L=None."
             )
-        # TODO: what happens with multi-objective?
-        # In some cases, we might be interested in functions
-        # that output more than one value.
-        # TODO: What happens with batched inputs?
-        # Why do we want to evaluate the objective
-        # function one at a time?
-        f = np.zeros([x.shape[0], 1])
-        for i in range(x.shape[0]):
-            x_ = x[i : i + 1, :]
-            f_ = self._black_box(x_, context)
-            f[i] = f_
-            assert len(f_.shape) == 2, f"len(f_.shape)={len(f_.shape)}, expected 2"
-            assert f_.shape[0] == 1, f"f_.shape[0]={f_.shape[0]}, expected 1"
-            assert f_.shape[1] == 1, f"f_.shape[1]={f_.shape[1]}, expected 1"
-            assert isinstance(f, np.ndarray), f"type(f)={type(f)}, not np.ndarray"
+
+        # Evaluate f by batches. If batch_size is None, then we evaluate
+        # the whole input at once.
+        batch_size = self.batch_size if self.batch_size is not None else x.shape[0]
+        f_evals = []
+        for x_batch_ in batched(x, batch_size):
+            x_batch = np.concatenate(x_batch_, axis=0).reshape(batch_size, -1)
+            f_batch = self._black_box(x_batch, context)
+            assert (
+                len(f_batch.shape) == 2
+            ), f"len(f(x).shape)={len(f_batch.shape)}, expected 2"
+
+            assert isinstance(
+                f_batch, np.ndarray
+            ), f"type(f)={type(f_batch)}, not np.ndarray"
+
+            # We pass the information to the observer, if any.
             if self.observer is not None:
-                self.observer.observe(x_, f_, context)
+                self.observer.observe(x_batch, f_batch, context)
+
+            f_evals.append(f_batch)
+
+        # Finally, we append the results of the batches.
+        f = np.concatenate(f_evals, axis=0)
         return f
 
     def _black_box(self, x, context=None):

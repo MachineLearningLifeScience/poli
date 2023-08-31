@@ -1,3 +1,5 @@
+from typing import List, Dict, Union
+
 from pathlib import Path
 
 
@@ -7,7 +9,7 @@ class ProblemSetupInformation:
         name: str,
         max_sequence_length: int,
         aligned: bool,
-        alphabet: dict,
+        alphabet: List[str],
         log_transform_recommended=False,
     ):
         """

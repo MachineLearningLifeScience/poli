@@ -280,3 +280,7 @@ def test_registering_foldx_sasa():
     )
 
     assert np.isclose(y0, 8411.45578009).all()
+
+
+if __name__ == "__main__":
+    test_registering_foldx_sasa()
