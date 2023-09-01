@@ -25,8 +25,8 @@ THIS_DIR = Path(__file__).parent.resolve()
 
 
 class SMBBlackBox(AbstractBlackBox):
-    def __init__(self, L: int):
-        super().__init__(L)
+    def __init__(self, info: ProblemSetupInformation, batch_size: int = None):
+        super().__init__(info=info, batch_size=batch_size)
 
         self.model = load_example_model(THIS_DIR / "example.pt")
 
@@ -49,8 +49,7 @@ class SMBBlackBox(AbstractBlackBox):
 
 class SMBProblemFactory(AbstractProblemFactory):
     def get_setup_information(self) -> ProblemSetupInformation:
-        alphabet_symbols = ["z1", "z2"]
-        alphabet = {symbol: i for i, symbol in enumerate(alphabet_symbols)}
+        alphabet = ["z1", "z2"]
 
         return ProblemSetupInformation(
             name="SMB",
@@ -60,9 +59,10 @@ class SMBProblemFactory(AbstractProblemFactory):
         )
 
     def create(self, seed: int = 0) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
-        L = self.get_setup_information().get_max_sequence_length()
-        f = SMBBlackBox(L)
-        x0 = np.ones([1, L])
+        problem_info = self.get_setup_information()
+        f = SMBBlackBox(info=problem_info)
+        sequence_length = problem_info.get_max_sequence_length()
+        x0 = np.ones([1, sequence_length])
 
         return f, x0, f(x0)
 
@@ -75,7 +75,7 @@ if __name__ == "__main__":
     smb_problem_factory = SMBProblemFactory()
     register_problem(
         smb_problem_factory,
-        conda_environment_name="/Users/migd/anaconda3/envs/poli-dev",
+        conda_environment_name="poli__mario",
     )
 
     # now we can instantiate our objective

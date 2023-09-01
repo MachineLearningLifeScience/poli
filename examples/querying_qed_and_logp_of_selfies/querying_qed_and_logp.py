@@ -52,7 +52,7 @@ if __name__ == "__main__":
     selfies_aspirin = sf.split_selfies(selfies_aspirin)
 
     # Using the alphabet to transform it to a sequence of integers
-    x_aspirin = np.array([[f_qed.alphabet[c] for c in selfies_aspirin]])
+    x_aspirin = np.array([list(selfies_aspirin)])
 
     print(f"QED of aspirin: {f_qed(x_aspirin)}")
     print(f"logP of aspirin: {f_logp(x_aspirin)}")

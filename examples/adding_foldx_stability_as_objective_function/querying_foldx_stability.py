@@ -1,7 +1,6 @@
 from pathlib import Path
 
 from poli import objective_factory
-from poli.core.registry import register_problem
 
 THIS_DIR = Path(__file__).parent.resolve()
 

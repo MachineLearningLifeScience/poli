@@ -20,3 +20,4 @@ if __name__ == "__main__":
     x1 = np.array(["F", "L", "E", "A", "S"]).reshape(1, -1)
     y1 = f(x1)
     print(x1, y1)
+    f.terminate()
