@@ -72,7 +72,7 @@ def run(factory_kwargs: str, objective_name: str, port: int, password: str) -> N
         conn.send(["SETUP", x0, y0, objective_factory.get_setup_information()])
     except Exception as e:
         tb = traceback.format_exc()
-        conn.send("EXCEPTION", e, tb)
+        conn.send(["EXCEPTION", e, tb])
         raise e
 
     # now wait for objective function calls
