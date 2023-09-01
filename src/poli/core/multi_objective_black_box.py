@@ -8,6 +8,7 @@ from typing import List
 import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
+from poli.core.problem_setup_information import ProblemSetupInformation
 
 
 class MultiObjectiveBlackBox(AbstractBlackBox):
@@ -17,10 +18,23 @@ class MultiObjectiveBlackBox(AbstractBlackBox):
     objective functions.
 
     TODO: Should we evaluate in parallel?
+    TODO: At some point, we should consider unions of ProblemSetupInformations.
+          That way, we could simply specify the list of black box functions, and
+          then "join" their problem setups.
     """
 
-    def __init__(self, L: int, objective_functions: List[AbstractBlackBox]):
-        super().__init__(L)
+    def __init__(
+        self,
+        info: ProblemSetupInformation,
+        batch_size: int = None,
+        objective_functions: List[AbstractBlackBox] = None,
+    ) -> None:
+        if objective_functions is None:
+            raise ValueError(
+                "objective_functions must be provided as a list of AbstractBlackBox instances or inherited classes."
+            )
+
+        super().__init__(info=info, batch_size=batch_size)
 
         self.objective_functions = objective_functions
 
@@ -31,31 +45,3 @@ class MultiObjectiveBlackBox(AbstractBlackBox):
             res.append(obj_function(x, context))
 
         return np.concatenate(res, axis=1)
-
-    def __call__(self, x, context=None):
-        """
-        This implementation overwrites the call method
-        of the parent class to avoid the assertion that
-        the output of the black box function is of shape
-        [1, 1]. Instead, we allow the output to be [1, n]
-        where n is the number of objectives.
-        """
-        assert len(x.shape) == 2
-
-        # TODO: what happens with batch evaluations that
-        # could be processed in parallel?
-        f = np.zeros([x.shape[0], len(self.objective_functions)])
-        for i, x_i in enumerate(x):
-            f_i = self._black_box(x_i.reshape(1, -1), context)  # an [1, n] array
-            f[i, :] = f_i
-            assert len(f_i.shape) == 2, f"len(f_i.shape)={len(f_i.shape)}, expected 2"
-            assert f_i.shape[0] == 1, f"f_i.shape[0]={f_i.shape[0]}, expected 1"
-            assert f_i.shape[1] == len(
-                self.objective_functions
-            ), f"f_i.shape[1]={f_i.shape[1]}, expected {len(self.objective_functions)} (the number of objectives)"
-            assert isinstance(f, np.ndarray), f"type(f)={type(f)}, not np.ndarray"
-
-        if self.observer is not None:
-            self.observer.observe(x, f, context)
-
-        return f

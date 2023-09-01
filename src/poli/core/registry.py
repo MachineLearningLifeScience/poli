@@ -80,10 +80,8 @@ def register_problem(
             f"Do you want to overwrite it? (y/[n]) "
         )
         if user_input.lower() != "y":
-            raise ValueError(
-                f"Problem {problem_name} already exists. "
-                f"Use force=True to overwrite."
-            )
+            warnings.warn(f"Problem {problem_name} already exists. Not overwriting.")
+            return
 
         warnings.warn(f"Problem {problem_name} already exists. Overwriting.")
 

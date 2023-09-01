@@ -14,9 +14,9 @@ from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem_setup_information import ProblemSetupInformation
 
 
-class AlohaBlackBox(AbstractBlackBox):
-    def __init__(self, L: int = 5):
-        super().__init__(L=L)
+class OurAlohaBlackBox(AbstractBlackBox):
+    def __init__(self, info: ProblemSetupInformation, batch_size: int = None):
+        super().__init__(info, batch_size)
 
     # The only method you have to define
     def _black_box(self, x: np.ndarray, context: dict = None) -> np.ndarray:
@@ -24,22 +24,21 @@ class AlohaBlackBox(AbstractBlackBox):
         return np.sum(matches, axis=1, keepdims=True)
 
 
-class AlohaProblemFactory(AbstractProblemFactory):
+class OurAlohaProblemFactory(AbstractProblemFactory):
     def get_setup_information(self) -> ProblemSetupInformation:
         # The alphabet: ["A", "B", "C", ...]
-        alphabet_symbols = list(ascii_uppercase)
-        alphabet = {symbol: i for i, symbol in enumerate(alphabet_symbols)}
+        alphabet = list(ascii_uppercase)
 
         return ProblemSetupInformation(
-            name="aloha",
+            name="our_aloha",
             max_sequence_length=5,
             aligned=True,
             alphabet=alphabet,
         )
 
     def create(self, seed: int = 0) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
-        L = self.get_setup_information().get_max_sequence_length()
-        f = AlohaBlackBox(L=L)
+        problem_info = self.get_setup_information()
+        f = OurAlohaBlackBox(info=problem_info)
         x0 = np.array([["A", "L", "O", "O", "F"]])
 
         return f, x0, f(x0)
@@ -52,7 +51,7 @@ if __name__ == "__main__":
     # (see the environment.yml file in this folder),
     # we can register our problem s.t. it uses
     # said conda environment.
-    aloha_problem_factory = AlohaProblemFactory()
+    aloha_problem_factory = OurAlohaProblemFactory()
     register_problem(
         aloha_problem_factory,
         conda_environment_name="poli_aloha_problem",

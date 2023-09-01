@@ -79,7 +79,7 @@ def run(factory_kwargs: str, objective_name: str, port: int, password: str) -> N
     while True:
         msg_type, *msg = conn.recv()
         # x, context = msg
-        if msg[0] is None:
+        if msg_type == "QUIT":
             break
         try:
             if msg_type == "QUERY":

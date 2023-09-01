@@ -91,7 +91,7 @@ class AbstractBlackBox:
 class NegativeBlackBox(AbstractBlackBox):
     def __init__(self, f: AbstractBlackBox):
         self.f = f
-        super().__init__(f.L)
+        super().__init__(info=f.info, batch_size=f.batch_size)
 
     def __call__(self, x, context=None):
         return -self.f.__call__(x, context)
