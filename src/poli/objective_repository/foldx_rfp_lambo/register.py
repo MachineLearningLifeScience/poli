@@ -63,7 +63,7 @@ class RFPWrapperFactory(AbstractProblemFactory):
         self.alphabet = AMINO_ACIDS
 
     def get_setup_information(self) -> ProblemSetupInformation:
-        return ProblemSetupInformation("FOLDX_RFP", 244, False, self.alphabet)
+        return ProblemSetupInformation("foldx_rfp", 244, False, self.alphabet)
 
     def create(self, seed: int = 0) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         config = get_config()
