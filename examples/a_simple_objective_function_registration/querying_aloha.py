@@ -21,3 +21,9 @@ if __name__ == "__main__":
     y1 = f(x1)
     print(x1, y1)
     f.terminate()
+
+    # Another example (using the start function)
+    with objective_factory.start(name="our_aloha") as f:
+        x = np.array(["F", "L", "E", "A", "S"]).reshape(1, -1)
+        y = f(x)
+        print(x, y)

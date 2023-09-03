@@ -92,6 +92,21 @@ def test_force_registering_qed():
     f.terminate()
 
 
+def test_force_registering_qed_with_context_manager():
+    """
+    Tests the objective_factory.start method on QED.
+    """
+    with objective_factory.start(
+        name="rdkit_qed",
+        force_register=True,
+        force_isolation=True,
+        path_to_alphabet=THIS_DIR / "alphabet_qed.json",
+    ) as f:
+        x = np.array([["C"]])
+        y = f(x)
+        assert np.isclose(y, 0.35978494).all()
+
+
 def test_force_registering_logp():
     """
     We test whether we can force-register the logp problem
@@ -308,7 +323,3 @@ def test_registering_foldx_stability_and_sasa():
 
     assert np.isclose(y0[:, 0], 32.4896).all()
     assert np.isclose(y0[:, 1], 8411.45578009).all()
-
-
-if __name__ == "__main__":
-    test_registering_foldx_sasa()
