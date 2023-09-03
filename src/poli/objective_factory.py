@@ -75,6 +75,108 @@ class ExternalBlackBox(AbstractBlackBox):
         _, val = self.process_wrapper.recv()
         return val
 
+    def __del__(self):
+        self.terminate()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        return self.terminate()
+
+
+def __create_from_repository(
+    name: str, seed: int = 0, **kwargs_for_factory
+) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+    """
+    If the problem is available in AVAILABLE_PROBLEM_FACTORIES
+    (i.e. if the user could import all the dependencies directly),
+    we create the problem directly. Otherwise, we raise an error.
+    """
+    if name not in AVAILABLE_PROBLEM_FACTORIES:
+        raise ValueError(
+            f"Objective function '{name}' is not available in the repository."
+        )
+
+    problem_factory = AVAILABLE_PROBLEM_FACTORIES[name]()
+    f, x0, y0 = problem_factory.create(seed=seed, **kwargs_for_factory)
+
+    return f, x0, y0
+
+
+def __create_as_isolated_process(
+    name: str,
+    seed: int = 0,
+    **kwargs_for_factory,
+) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+    """
+    If the problem is registered, we create it as an isolated
+    process. Otherwise, we raise an error.
+    """
+    config = load_config()
+    if name not in config:
+        raise ValueError(f"Objective function '{name}' is not registered. ")
+
+    # start objective process
+    # VERY IMPORTANT: the script MUST accept port and password as arguments
+    process_wrapper = ProcessWrapper(
+        config[name][_RUN_SCRIPT_LOCATION], **kwargs_for_factory
+    )
+    # TODO: add signal listener that intercepts when proc ends
+    # wait for connection from objective process
+    # TODO: potential (unlikely) race condition! (process might try to connect before listener is ready!)
+    process_wrapper.send(("SETUP", seed))
+
+    msg_type, *msg = process_wrapper.recv()
+    if msg_type == "SETUP":
+        # Then the instance of the abstract factory
+        # was correctly set-up, and
+        x0, y0, problem_information = msg
+    elif msg_type == "EXCEPTION":
+        e, tb = msg
+        print(tb)
+        raise e
+    else:
+        raise ValueError(
+            f"Internal error: received {msg_type} when expecting SETUP or EXCEPTION"
+        )
+
+    f = ExternalBlackBox(problem_information, process_wrapper)
+
+    return f, x0, y0
+
+
+def __register_objective_if_available(name: str, force_register: bool = False):
+    config = load_config()
+    if name not in config:
+        if name not in AVAILABLE_OBJECTIVES:
+            raise ValueError(
+                f"Objective function '{name}' is not registered, "
+                "and it is not available in the repository."
+            )
+
+        # At this point, we know that the function is available
+        # in the repository
+        if force_register:
+            # Then we install it.
+            answer = "y"
+        else:
+            # We ask the user for their confirmation
+            answer = input(
+                f"Objective function '{name}' is not registered, "
+                "but it is available in the repository. Do you "
+                "want to install it? (y/[n]): "
+            )
+
+        if answer == "y":
+            # Register problem
+            register_problem_from_repository(name)
+            # TODO: change print to logging
+            logging.debug(f"Registered the objective from the repository.")
+            # Refresh the config
+            config = load_config()
+        else:
+            raise ValueError(
+                f"Objective function '{name}' won't be registered. Aborting."
+            )
+
 
 def create(
     name: str,
@@ -110,72 +212,24 @@ def create(
     """
     # If the user can run it with the envionment they currently
     # have, then we do not need to install it.
-    create_from_repository = not force_isolation
-    if name in AVAILABLE_PROBLEM_FACTORIES and create_from_repository:
-        problem_factory = AVAILABLE_PROBLEM_FACTORIES[name]()
-        problem_info = problem_factory.get_setup_information()
-        f, x0, y0 = problem_factory.create(seed=seed, **kwargs_for_factory)
+    if name in AVAILABLE_PROBLEM_FACTORIES and not force_isolation:
+        f, x0, y0 = __create_from_repository(name, seed=seed, **kwargs_for_factory)
+        problem_info = f.info
         return problem_info, f, x0, y0, None
 
     # TODO: change prints for logs and warnings.
     # Check if the name is indeed registered, or
     # available in the objective repository
-    config = load_config()
-    if name not in config:
-        if name not in AVAILABLE_OBJECTIVES:
-            raise ValueError(
-                f"Objective function '{name}' is not registered, "
-                "and it is not available in the repository."
-            )
+    __register_objective_if_available(name, force_register=force_register)
 
-        # At this point, we know that the function is available
-        # in the repository
-        if force_register:
-            # Then we install it.
-            answer = "y"
-        else:
-            # We ask the user for their confirmation
-            answer = input(
-                f"Objective function '{name}' is not registered, "
-                "but it is available in the repository. Do you "
-                "want to install it? (y/[n]): "
-            )
-
-        if answer == "y":
-            # Register problem
-            register_problem_from_repository(name)
-            # TODO: change print to logging
-            logging.debug(f"Registered the objective from the repository.")
-            # Refresh the config
-            config = load_config()
-        else:
-            raise ValueError(
-                f"Objective function '{name}' won't be registered. Aborting."
-            )
-
-    # start objective process
-    # VERY IMPORTANT: the script MUST accept port and password as arguments
-    process_wrapper = ProcessWrapper(
-        config[name][_RUN_SCRIPT_LOCATION], **kwargs_for_factory
+    # At this point, we know the name is registered.
+    # Thus, we should be able to start it as an isolated process
+    f, x0, y0 = __create_as_isolated_process(
+        name,
+        seed=seed,
+        **kwargs_for_factory,
     )
-    # TODO: add signal listener that intercepts when proc ends
-    # wait for connection from objective process
-    # TODO: potential (unlikely) race condition! (process might try to connect before listener is ready!)
-    process_wrapper.send(("SETUP", seed))
-
-    msg_type, *msg = process_wrapper.recv()
-    if msg_type == "SETUP":
-        # Then the instance of the abstract factory
-        # was correctly set-up, and
-        x0, y0, problem_information = msg
-    elif msg_type == "EXCEPTION":
-        e, tb = msg
-        print(tb)
-        raise e
-    else:
-        raise ValueError(
-            f"Internal error: received {msg_type} when expecting SETUP or EXCEPTION"
-        )
+    problem_information = f.info
 
     # instantiate observer (if desired)
     observer_info = None
@@ -184,7 +238,54 @@ def create(
             problem_information, caller_info, x0, y0, seed
         )
 
-    f = ExternalBlackBox(problem_information, process_wrapper)
     f.set_observer(observer)
 
     return problem_information, f, x0, y0, observer_info
+
+
+def start(
+    name: str,
+    seed: int = 0,
+    caller_info: dict = None,
+    observer: AbstractObserver = None,
+    force_register: bool = False,
+    force_isolation: bool = False,
+    **kwargs_for_factory,
+) -> AbstractBlackBox:
+    """
+    Works just like create, but it does not run the function on anything, and returns
+    only the black-box function.
+
+    One example of running this function:
+
+    ```python
+    from poli import objective_factory
+
+    with objective_factory.start(name="aloha") as f:
+        x = np.array(["F", "L", "E", "A", "S"]).reshape(1, -1)
+        y = f(x)
+        print(x, y)
+    ```
+
+    If the black-box function is created as an isolated process, then
+    it will automatically close when the context manager is closed.
+    """
+    # Check if we can import the function immediately
+    if name in AVAILABLE_PROBLEM_FACTORIES and not force_isolation:
+        f, _, _ = __create_from_repository(name, seed=seed, **kwargs_for_factory)
+        return f
+
+    # Check if the name is indeed registered, or
+    # available in the objective repository
+    __register_objective_if_available(name, force_register=force_register)
+
+    # If not, then we create it as an isolated process
+    f, _, _ = __create_as_isolated_process(name, seed=seed, **kwargs_for_factory)
+
+    # instantiate observer (if desired)
+    if observer is not None:
+        observer.initialize_observer(f.info, caller_info, None, None, seed)
+
+    f.set_observer(observer)
+
+    return f

@@ -5,6 +5,8 @@ def test_optimizing_aloha():
     """
     If poli_baselines is available, this test checks
     whether we can optimize the aloha problem.
+    TODO: This depends on poli baselines. We should mock that behavior,
+    or move this test to the poli_baselines package.
     """
     from poli import objective_factory
     from poli.core.registry import get_problems
@@ -25,7 +27,6 @@ def test_optimizing_aloha():
         black_box=f,
         x0=x0,
         y0=y0,
-        alphabet=problem_info.get_alphabet(),
     )
 
     # Running the optimization for 1000 steps,
