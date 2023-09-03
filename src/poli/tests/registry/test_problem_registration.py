@@ -98,6 +98,7 @@ def test_force_registering_qed_with_context_manager():
     """
     with objective_factory.start(
         name="rdkit_qed",
+        force_register=True,
         force_isolation=True,
         path_to_alphabet=THIS_DIR / "alphabet_qed.json",
     ) as f:
