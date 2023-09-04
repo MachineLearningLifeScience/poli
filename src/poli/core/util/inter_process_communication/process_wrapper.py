@@ -1,7 +1,9 @@
 """
 Module that wraps utility functions for interprocess communication.
 """
-__author__ = "Simon Bartels"
+__author__ = "Simon Bartels and Miguel González Duque"
+
+from pathlib import Path
 
 import logging
 import os
@@ -52,12 +54,19 @@ class ProcessWrapper:
         # when calling objective_factory.create
         string_for_kwargs = ""
         for key, value in kwargs_for_factory.items():
-            string_for_kwargs += f"--{key}={value} "
+            if isinstance(value, str):
+                string_for_kwargs += f"--{key}={value} "
+            elif isinstance(value, Path):
+                string_for_kwargs += f"--{key}={str(value)} "
+            elif isinstance(value, list):
+                string_for_kwargs += f"--{key}=list:{','.join(value)} "
+
         self.proc = subprocess.Popen(
             [run_script, str(self.port), self.password, string_for_kwargs],
             stdout=None,
             stderr=None,
         )
+
         self.conn = self.listener.accept()  # wait for the process to connect
 
     def send(self, *args):

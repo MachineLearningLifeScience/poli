@@ -63,6 +63,54 @@ def test_qed_example():
     assert np.isclose(y, 0.35978494).all()
 
 
+def test_qed_example_using_strings():
+    import numpy as np
+    from poli import objective_factory
+
+    # Your alphabet
+    alphabet = ["", "[C]", "..."]
+
+    # How to create
+    problem_info, f, x0, y0, run_info = objective_factory.create(
+        name="rdkit_qed",
+        alphabet=alphabet,
+        string_representation="SELFIES",  # it is "SMILES" by default.
+        force_register=True,
+    )
+
+    # Example input: a single carbon
+    x = np.array(["[C]"]).reshape(1, -1)
+
+    # Querying:
+    y = f(x)
+    print(y)  # Should be close to 0.35978494
+    assert np.isclose(y, 0.35978494).all()
+
+
+def test_logp_example_using_strings():
+    import numpy as np
+    from poli import objective_factory
+
+    # Your alphabet
+    alphabet = ["", "[C]", "..."]
+
+    # How to create
+    problem_info, f, x0, y0, run_info = objective_factory.create(
+        name="rdkit_logp",
+        alphabet=alphabet,
+        string_representation="SELFIES",  # it is "SMILES" by default.
+        force_register=True,
+    )
+
+    # Example input: a single carbon
+    x = np.array(["[C]"]).reshape(1, -1)
+
+    # Querying:
+    y = f(x)
+    print(y)  # Should be close to 0.6361
+    assert np.isclose(y, 0.6361).all()
+
+
 def test_logp_example():
     from pathlib import Path
     import numpy as np
@@ -87,3 +135,7 @@ def test_logp_example():
     y = f(x)
     print(y)  # Should be close to 0.6361
     assert np.isclose(y, 0.6361).all()
+
+
+if __name__ == "__main__":
+    test_qed_example_using_strings()
