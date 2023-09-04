@@ -62,9 +62,9 @@ except (ImportError, FileNotFoundError):
 
 
 try:
-    from .foldx_rfp.register import RFPWrapperFactory
+    from .foldx_rfp_lambo.register import RFPWrapperFactory
 
-    AVAILABLE_PROBLEM_FACTORIES["foldx_rfp"] = RFPWrapperFactory
+    AVAILABLE_PROBLEM_FACTORIES["foldx_rfp_lambo"] = RFPWrapperFactory
 except (ImportError, FileNotFoundError):
     pass
 
