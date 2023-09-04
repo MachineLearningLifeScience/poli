@@ -52,7 +52,16 @@ def run(factory_kwargs: str, objective_name: str, port: int, password: str) -> N
         kwargs = {}
     else:
         factory_kwargs = factory_kwargs.split()
-        kwargs = dict([item.strip("--").split("=") for item in factory_kwargs])
+        kwargs = {}
+        for item in factory_kwargs:
+            item = item.strip("--")
+            key, value = item.split("=")
+            if value.startswith("list:"):
+                # Then we assume that the value was a list
+                value = value.strip("list:")
+                value = value.split(",")
+
+            kwargs[key] = value
 
     # make connection with the mother process
     conn = get_connection(port, password)

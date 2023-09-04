@@ -72,6 +72,7 @@ class QEDBlackBox(AbstractBlackBox):
 
         string_to_idx = {symbol: i for i, symbol in enumerate(alphabet)}
 
+        self.alphabet = alphabet
         self.string_to_idx = string_to_idx
         self.idx_to_string = {v: k for k, v in string_to_idx.items()}
         self.from_selfies = from_selfies

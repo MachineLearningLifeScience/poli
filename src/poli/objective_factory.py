@@ -72,8 +72,15 @@ class ExternalBlackBox(AbstractBlackBox):
         to the process w. the msg_type "ATTRIBUTE".
         """
         self.process_wrapper.send(["ATTRIBUTE", __name])
-        _, val = self.process_wrapper.recv()
-        return val
+        msg_type, *msg = self.process_wrapper.recv()
+        if msg_type == "EXCEPTION":
+            e, traceback_ = msg
+            print(traceback_)
+            raise e
+        else:
+            assert msg_type == "ATTRIBUTE"
+            attribute = msg[0]
+            return attribute
 
     def __del__(self):
         self.terminate()
