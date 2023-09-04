@@ -10,6 +10,11 @@ class AbstractBlackBox:
     def __init__(self, info: ProblemSetupInformation, batch_size: int = None):
         self.info = info
         self.observer = None
+        if not self.info.sequences_are_aligned():
+            assert (
+                batch_size is None or batch_size == 1
+            ), "For unaligned problems only batch size 1 is supported!"
+            batch_size = 1
         self.batch_size = batch_size
 
     def set_observer(self, observer: AbstractObserver):
@@ -30,12 +35,16 @@ class AbstractBlackBox:
         # dimension should match the maximum sequence length of
         # the problem. One can opt out of this by setting L=np.inf
         # or L=None.
-        assert len(x.shape) == 2
+        if self.info.sequences_are_aligned():
+            assert len(x.shape) == 2
         maximum_sequence_length = self.info.get_max_sequence_length()
 
         # We assert that the length matches L if the maximum sequence length
         # specified in the problem is different from np.inf or None.
-        if maximum_sequence_length not in [np.inf, None]:
+        if (
+            maximum_sequence_length not in [np.inf, None]
+            and self.info.sequences_are_aligned()
+        ):
             assert x.shape[1] == maximum_sequence_length, (
                 "The length of the input is not the same as the length of the input of the problem. "
                 f"(L={maximum_sequence_length}, x.shape[1]={x.shape[1]}). "
@@ -47,7 +56,14 @@ class AbstractBlackBox:
         batch_size = self.batch_size if self.batch_size is not None else x.shape[0]
         f_evals = []
         for x_batch_ in batched(x, batch_size):
-            x_batch = np.concatenate(x_batch_, axis=0).reshape(batch_size, -1)
+            x_batch = (
+                np.concatenate(x_batch_, axis=0).reshape(batch_size, -1)
+                if batch_size > 1
+                else np.array(x_batch_)
+            )
+            assert (
+                x_batch.shape[0] == batch_size
+            ), f"x_batch.shape[0]={x_batch.shape[0]}, expected {batch_size}"
             f_batch = self._black_box(x_batch, context)
             assert (
                 len(f_batch.shape) == 2
