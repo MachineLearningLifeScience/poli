@@ -101,11 +101,27 @@ def register_problem_from_repository(name: str):
     #    we can't import the factory: it may have
     #    dependencies that are not installed)
 
-    # Moreover, we should only be doing this
-    # if the problem is not already registered.
+    # Load up the environment name
     PATH_TO_REPOSITORY = (
         Path(__file__).parent.parent / "objective_repository"
     ).resolve()
+
+    with open(PATH_TO_REPOSITORY / name / "environment.yml", "r") as f:
+        # This is a really crude way of doing this,
+        # but it works. We should probably use a
+        # yaml parser instead, but the idea is to keep
+        # the dependencies to a minimum.
+        yml = f.read()
+        lines = yml.split("\n")
+        conda_env_name_line = lines[0]
+        assert conda_env_name_line.startswith("name:"), (
+            "The first line of the environment.yml file "
+            "should be the name of the environment"
+        )
+        env_name = lines[0].split(":")[1].strip()
+
+    # Moreover, we should only be doing this
+    # if the problem is not already registered.
 
     if name in config.sections():
         warnings.warn(f"Problem {name} already registered. Skipping")
@@ -129,7 +145,7 @@ def register_problem_from_repository(name: str):
         )
     except subprocess.CalledProcessError as e:
         if "already exists" in e.stderr.decode():
-            warnings.warn(f"Environment {name} already exists. Will not create it.")
+            warnings.warn(f"Environment {env_name} already exists. Will not create it.")
         else:
             raise e
 
@@ -137,23 +153,7 @@ def register_problem_from_repository(name: str):
     #    we can't import the factory: it may have
     #    dependencies that are not installed)
 
-    # 2.1. Loading up the yml file to get the name
-    # of the environment
-    with open(PATH_TO_REPOSITORY / name / "environment.yml", "r") as f:
-        # This is a really crude way of doing this,
-        # but it works. We should probably use a
-        # yaml parser instead, but the idea is to keep
-        # the dependencies to a minimum.
-        yml = f.read()
-        lines = yml.split("\n")
-        conda_env_name_line = lines[0]
-        assert conda_env_name_line.startswith("name:"), (
-            "The first line of the environment.yml file "
-            "should be the name of the environment"
-        )
-        env_name = lines[0].split(":")[1].strip()
-
-    # 2.2. Running the file
+    # Running the file
     file_to_run = PATH_TO_REPOSITORY / name / "register.py"
     command = " ".join(["conda", "run", "-n", env_name, "python", str(file_to_run)])
     warnings.warn("Running the following command: %s. " % command)
