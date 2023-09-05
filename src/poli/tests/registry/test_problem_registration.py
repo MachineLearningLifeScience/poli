@@ -344,7 +344,3 @@ def test_penalized_logp_lambo():
     print(x0)
     print(y0)
     f.terminate()
-
-
-if __name__ == "__main__":
-    test_penalized_logp_lambo()
