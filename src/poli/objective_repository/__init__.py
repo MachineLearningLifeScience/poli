@@ -77,3 +77,20 @@ try:
     ] = FoldXStabilityAndSASAProblemFactory
 except (ImportError, FileNotFoundError):
     pass
+
+
+try:
+    from .penalized_logp_lambo.register import PenalizedLogPLamboProblemFactory
+
+    AVAILABLE_PROBLEM_FACTORIES[
+        "penalized_logp_lambo"
+    ] = PenalizedLogPLamboProblemFactory
+except (ImportError, FileNotFoundError):
+    pass
+
+try:
+    from .ddr3_docking.register import DDR3ProblemFactory
+
+    AVAILABLE_PROBLEM_FACTORIES["ddr3_docking"] = DDR3ProblemFactory
+except (ImportError, FileNotFoundError):
+    pass
