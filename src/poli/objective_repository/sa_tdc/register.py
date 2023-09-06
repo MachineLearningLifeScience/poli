@@ -18,9 +18,15 @@ from poli.core.util.chemistry.string_to_molecule import translate_selfies_to_smi
 
 
 class SABlackBox(TDCBlackBox):
-    def __init__(self, info: ProblemSetupInformation, batch_size: int = None, from_smiles: bool = True):
+    def __init__(
+        self,
+        info: ProblemSetupInformation,
+        batch_size: int = None,
+        from_smiles: bool = True,
+    ):
         oracle_name = "SA"
         super().__init__(oracle_name, info, batch_size, from_smiles)
+
 
 class SAProblemFactory(AbstractProblemFactory):
     def get_setup_information(self) -> ProblemSetupInformation:

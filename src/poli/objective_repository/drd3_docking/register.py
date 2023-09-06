@@ -25,7 +25,13 @@ class DRD3BlackBox(TDCBlackBox):
         from_smiles: bool = True,
     ):
         oracle_name = "3pbl_docking"
-        super().__init__(oracle_name=oracle_name, info=info, batch_size=batch_size, from_smiles=from_smiles)
+        super().__init__(
+            oracle_name=oracle_name,
+            info=info,
+            batch_size=batch_size,
+            from_smiles=from_smiles,
+        )
+
 
 class DRD3ProblemFactory(AbstractProblemFactory):
     def get_setup_information(self) -> ProblemSetupInformation:
