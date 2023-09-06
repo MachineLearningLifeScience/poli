@@ -96,7 +96,7 @@ def selfies_to_molecules(selfies_strings: List[str]) -> Chem.Mol:
     Chem.Mol
         An RDKit molecule.
     """
-    smiles_strings = translate_smiles_to_selfies(selfies_strings, strict=True)
+    smiles_strings = translate_selfies_to_smiles(selfies_strings, strict=True)
     molecule = smiles_to_molecules(smiles_strings)
     return molecule
 
