@@ -4,6 +4,7 @@ When registering an observer, this module is called and instantiates the user's 
 """
 
 import sys
+import argparse
 
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.inter_process_communication.process_wrapper import get_connection
@@ -34,4 +35,10 @@ def start_observer_process(observer_name, port: int, password: str):
 
 
 if __name__ == "__main__":
-    start_observer_process(sys.argv[1], int(sys.argv[2]), sys.argv[3])
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--objective-name", required=True)
+    parser.add_argument("--port", required=True, type=int)
+    parser.add_argument("--password", required=True, type=str)
+
+    args, factory_kwargs = parser.parse_known_args()
+    start_observer_process(args.objective_name, args.port, args.password)
