@@ -19,7 +19,7 @@ from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.core.util.chemistry.string_to_molecule import translate_selfies_to_smiles
 
 
-class DDR3BlackBox(AbstractBlackBox):
+class DRD3BlackBox(AbstractBlackBox):
     def __init__(
         self,
         info: ProblemSetupInformation,
@@ -53,10 +53,10 @@ class DDR3BlackBox(AbstractBlackBox):
         return np.array(docking_scores).reshape(-1, 1)
 
 
-class DDR3ProblemFactory(AbstractProblemFactory):
+class DRD3ProblemFactory(AbstractProblemFactory):
     def get_setup_information(self) -> ProblemSetupInformation:
         return ProblemSetupInformation(
-            name="ddr3_docking",
+            name="drd3_docking",
             max_sequence_length=np.inf,
             aligned=False,
             alphabet=None,
@@ -75,7 +75,7 @@ class DDR3ProblemFactory(AbstractProblemFactory):
             )
 
         problem_info = self.get_setup_information()
-        f = DDR3BlackBox(
+        f = DRD3BlackBox(
             info=problem_info,
             batch_size=batch_size,
             from_smiles=string_representation.upper() == "SMILES",
@@ -97,7 +97,7 @@ if __name__ == "__main__":
     from poli.core.registry import register_problem
 
     register_problem(
-        DDR3ProblemFactory(),
+        DRD3ProblemFactory(),
         conda_environment_name="poli__lambo",
         force=True,
     )

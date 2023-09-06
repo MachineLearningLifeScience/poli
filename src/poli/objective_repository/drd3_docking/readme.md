@@ -1,4 +1,4 @@
-# Using the DDR3 objective function
+# Using the DRD3 objective function
 
 There are several requirements for running this objective function. We expect you to
 

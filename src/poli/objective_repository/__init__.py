@@ -89,8 +89,8 @@ except (ImportError, FileNotFoundError):
     pass
 
 try:
-    from .ddr3_docking.register import DDR3ProblemFactory
+    from .drd3_docking.register import DDR3ProblemFactory
 
-    AVAILABLE_PROBLEM_FACTORIES["ddr3_docking"] = DDR3ProblemFactory
+    AVAILABLE_PROBLEM_FACTORIES["drd3_docking"] = DDR3ProblemFactory
 except (ImportError, FileNotFoundError):
     pass
