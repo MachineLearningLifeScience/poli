@@ -2,11 +2,26 @@
 
 There are several requirements for running this objective function. We expect you to
 
-- have the `prepare_receptor` binary from the ADFR suite installed and in the path,
 - have AutoDock Vina installed in the path,
-- have the `poli__lambo` created.
+- have the `prepare_receptor` binary from the ADFR suite installed and in the path,
+- have the `poli__lambo` environment created.
 
 The rest of this readme shows you how to do all this:
+
+## Installing AutoDock Vina
+
+### Download the files
+
+[Download AutoDock Vina from the Center for Computational Structural Biology's website](https://vina.scripps.edu/downloads/). Uncompress them.
+
+### Add the binary folder to the path.
+
+Add this to the path by including `export PATH=path/to/AutoDock_vina/bin:$PATH` in your `~/.bashrc` or `~/.zshrc`.
+
+```bash
+# In your ~/.bashrc or ~/.zshrc
+export PATH=path/to/AutoDock_vina/bin:$PATH
+```
 
 ## Installing the ADFR suite
 
@@ -20,17 +35,14 @@ After running `./install.sh`, you should be able to find `.../bin/prepare_recept
 
 ### Add `prepare_receptor` to the path
 
-Add this to the path by including `export PATH=path/to/ADFR/bin/prepare_receptor:$PATH` in your `~/.bashrc` or `~/.zshrc`.
+For the docking to run, `pyscreener` needs access to the `prepare_receptor` binary. However, adding all of the ADFR `bin` folder is sometimes problematic, since it has a version of Python inside.
 
-## Installing AutoDock Vina
+Thus, we recommend creating a symlink. Write this in your `~/.bashrc` or `~/.zshrc`:
 
-### Download the files
-
-[Download AutoDock Vina from the Center for Computational Structural Biology's website](https://vina.scripps.edu/downloads/). Uncompress them.
-
-### Add the binary folder to the path.
-
-Add this to the path by including `export PATH=path/to/AutoDock_vina/bin:$PATH` in your `~/.bashrc` or `~/.zshrc`.
+```bash
+# In your ~/.bashrc or ~/.zshrc
+ln -sf /path/to/ADFR/bin/prepare_receptor /path/to/AutoDock_vina/bin
+```
 
 ## Create the `poli__lambo` environment
 

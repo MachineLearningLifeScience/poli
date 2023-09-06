@@ -3,7 +3,7 @@ import numpy as np
 from poli import objective_factory
 
 # Using create
-_, f, x0, y0, _ = objective_factory.create(name="ddr3_docking")
+_, f, x0, y0, _ = objective_factory.create(name="ddr3_docking", force_register=True)
 print(x0)
 print(y0)
 f.terminate()
