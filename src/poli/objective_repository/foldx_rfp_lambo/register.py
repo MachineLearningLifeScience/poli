@@ -15,6 +15,7 @@ from poli.core.problem_setup_information import ProblemSetupInformation
 
 from lambo.tasks.proxy_rfp.proxy_rfp import ProxyRFPTask
 from lambo.utils import AMINO_ACIDS
+from lambo.utils import RESIDUE_ALPHABET
 from lambo import __file__ as project_root_file
 
 
@@ -61,6 +62,7 @@ class RFPWrapperFactory(AbstractProblemFactory):
         # self.alphabet["-"] = 0
         # self.alphabet["X"] = 0  # TODO: is that the way I want to handle this stupid single sequence?
         self.alphabet = AMINO_ACIDS
+        self.residue_alphabet = RESIDUE_ALPHABET
 
     def get_setup_information(self) -> ProblemSetupInformation:
         return ProblemSetupInformation("foldx_rfp_lambo", 244, False, self.alphabet)
@@ -80,6 +82,15 @@ class RFPWrapperFactory(AbstractProblemFactory):
         base_candidates, base_targets, all_seqs, all_targets = bb_task.task_setup(
             config, project_root=project_root
         )
+        problem_seq = "GEELIKENMHMKLYMEGTVNNHHFKCTTEGEGKPYEGTQTQRIKVVEGGPLPFAFDILATCFSKTFINHTQGIPDFFKQSFPEGFTWERVTTYEDGGVLTVTQDTSLQDGCLIYNVKLRGVNFPSNGPVMQKKTLGWEATTETLYPADGGLEGRCDMALXLVGGGHLHCNLKTTYRSXKPAKNLKMPGVYFVDRRLERIKEADNETYVEQHEVAVARYCDLPSKL"
+        if problem_seq in all_seqs:
+            # above seq is problematic due to an X in position 159
+            # according to PDB this sequence has the most (98%) similarity: SKGEELIKENMHMKLYMEGTVNNHHFKCTTEGEGKPYEGTQTQRIKVVEGGPLPFAFDILATCFMYGSKTFINHTQGIPDFFKQSFPEGFTWERVTTYEDGGVLTVTQDTSLQDGCLIYNVKLRGVNFPSNGPVMQKKTLGWEATTETLYPADGGLEGRCDMALKLVGGGHLHCNLKTTYRSKKPAKNLKMPGVYFVDRRLERIKEADNETYVEQHEVAVARYCDLPSKL
+            # I've removed the initial SK and some MYG in the middle
+            # Then it's really just a K in position 159 which is different.
+            #seq[159] = 'K'  # strings are immutable
+            seq = "GEELIKENMHMKLYMEGTVNNHHFKCTTEGEGKPYEGTQTQRIKVVEGGPLPFAFDILATCFSKTFINHTQGIPDFFKQSFPEGFTWERVTTYEDGGVLTVTQDTSLQDGCLIYNVKLRGVNFPSNGPVMQKKTLGWEATTETLYPADGGLEGRCDMALKLVGGGHLHCNLKTTYRSKKPAKNLKMPGVYFVDRRLERIKEADNETYVEQHEVAVARYCDLPSKL"
+            all_seqs[np.where(all_seqs == problem_seq)] = seq
         return RFPWrapper(bb_task, base_candidates), all_seqs, all_targets
 
 
