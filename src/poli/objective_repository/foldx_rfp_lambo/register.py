@@ -88,7 +88,7 @@ class RFPWrapperFactory(AbstractProblemFactory):
             # according to PDB this sequence has the most (98%) similarity: SKGEELIKENMHMKLYMEGTVNNHHFKCTTEGEGKPYEGTQTQRIKVVEGGPLPFAFDILATCFMYGSKTFINHTQGIPDFFKQSFPEGFTWERVTTYEDGGVLTVTQDTSLQDGCLIYNVKLRGVNFPSNGPVMQKKTLGWEATTETLYPADGGLEGRCDMALKLVGGGHLHCNLKTTYRSKKPAKNLKMPGVYFVDRRLERIKEADNETYVEQHEVAVARYCDLPSKL
             # I've removed the initial SK and some MYG in the middle
             # Then it's really just a K in position 159 which is different.
-            #seq[159] = 'K'  # strings are immutable
+            # seq[159] = 'K'  # strings are immutable
             seq = "GEELIKENMHMKLYMEGTVNNHHFKCTTEGEGKPYEGTQTQRIKVVEGGPLPFAFDILATCFSKTFINHTQGIPDFFKQSFPEGFTWERVTTYEDGGVLTVTQDTSLQDGCLIYNVKLRGVNFPSNGPVMQKKTLGWEATTETLYPADGGLEGRCDMALKLVGGGHLHCNLKTTYRSKKPAKNLKMPGVYFVDRRLERIKEADNETYVEQHEVAVARYCDLPSKL"
             all_seqs[np.where(all_seqs == problem_seq)] = seq
         return RFPWrapper(bb_task, base_candidates), all_seqs, all_targets
