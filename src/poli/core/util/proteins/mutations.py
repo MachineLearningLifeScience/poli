@@ -8,7 +8,7 @@ foldx expects mutations in a certain format:
     - the third letter is the chain ID,
     - the fourth letter is the mutant residue.
 """
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 from Bio.PDB.Residue import Residue
 from Bio.SeqUtils import seq1
@@ -46,7 +46,11 @@ def mutations_from_wildtype_and_mutant(
         [seq1(res.get_resname()) for res in wildtype_residues]
     )
 
-    assert len(mutated_residue_string) == len(wildtype_residue_string)
+    assert len(mutated_residue_string) == len(wildtype_residue_string), (
+        f"wildtype residue string and mutated residue string "
+        f"have different lengths: {len(wildtype_residue_string)} "
+        f"and {len(mutated_residue_string)}."
+    )
 
     # If the mutated string is the same as the wildtype string,
     # there are no mutations. Still, FoldX expects us to pass
