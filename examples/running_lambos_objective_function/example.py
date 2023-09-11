@@ -14,7 +14,7 @@ You will unfortunately need to
 from poli import objective_factory
 
 
-_, f, x0, y0, _ = objective_factory.create(name="foldx_rfp_lambo", force_register=True)
+_, f, x0, y0, _ = objective_factory.create(name="foldx_rfp_lambo")
 
 print(x0)
 print(y0)
