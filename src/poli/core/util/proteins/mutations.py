@@ -85,6 +85,9 @@ def mutations_from_wildtype_and_mutant(
         )
         mutations_in_line.append(mutation_string)
 
+    if len(mutations_in_line) > 30:
+        raise ValueError(f"More than 20 errors were found.")
+
     return mutations_in_line
 
 
