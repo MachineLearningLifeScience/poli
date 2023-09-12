@@ -2,7 +2,7 @@
 This script registers FoldX stability as an objective function.
 """
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import List, Tuple, Union, Dict
 from time import time
 from uuid import uuid4
 
@@ -20,7 +20,10 @@ from poli.core.util.proteins.pdb_parsing import (
     parse_pdb_as_residues,
 )
 from poli.core.util.proteins.defaults import AMINO_ACIDS
-from poli.core.util.proteins.mutations import mutations_from_wildtype_and_mutant
+from poli.core.util.proteins.mutations import (
+    mutations_from_wildtype_and_mutant,
+    find_closest_wildtype_pdb_file_to_mutant,
+)
 from poli.core.util.proteins.foldx import FoldxInterface
 
 # This is the folder where all the files
@@ -38,7 +41,7 @@ class FoldXStabilityAndSASABlackBox(AbstractBlackBox):
         self,
         info: ProblemSetupInformation = None,
         batch_size: int = 1,
-        wildtype_pdb_file: Path = None,
+        wildtype_pdb_path: Union[Path, List[Path]] = None,
         alphabet: List[str] = None,
         experiment_id: str = None,
     ):
@@ -51,7 +54,7 @@ class FoldXStabilityAndSASABlackBox(AbstractBlackBox):
         # TODO: fix this using parallelization.
 
         # TODO: assert that wildtype_pdb_file is provided
-        assert wildtype_pdb_file is not None, (
+        assert wildtype_pdb_path is not None, (
             "Missing required argument wildtype_pdb_file. "
             "Did you forget to pass it to create and into the black box?"
         )
@@ -60,14 +63,25 @@ class FoldXStabilityAndSASABlackBox(AbstractBlackBox):
         if alphabet is None:
             alphabet = info.alphabet
 
-        if isinstance(wildtype_pdb_file, str):
-            wildtype_pdb_file = Path(wildtype_pdb_file.strip())
+        if isinstance(wildtype_pdb_path, str):
+            wildtype_pdb_path = Path(wildtype_pdb_path.strip())
 
-        self.wildtype_pdb_file = wildtype_pdb_file
+        if isinstance(wildtype_pdb_path, Path):
+            wildtype_pdb_path = [wildtype_pdb_path]
 
-        self.wildtype_residues = parse_pdb_as_residues(wildtype_pdb_file)
-        self.wildtype_amino_acids = parse_pdb_as_residue_strings(wildtype_pdb_file)
-        self.wildtype_residue_string = "".join(self.wildtype_amino_acids)
+        self.wildtype_pdb_paths = wildtype_pdb_path
+
+        self.wildtype_resiudes = [
+            parse_pdb_as_residues(pdb_file) for pdb_file in wildtype_pdb_path
+        ]
+
+        self.wildtype_amino_acids = [
+            parse_pdb_as_residue_strings(pdb_file) for pdb_file in wildtype_pdb_path
+        ]
+
+        self.wildtype_residue_strings = [
+            "".join(amino_acids) for amino_acids in self.wildtype_amino_acids
+        ]
 
         if experiment_id is None:
             experiment_id = f"{int(time())}_{str(uuid4())[:8]}"
@@ -83,8 +97,23 @@ class FoldXStabilityAndSASABlackBox(AbstractBlackBox):
         This method returns a list of strings which are to be written
         in a single line of individual_list.txt.
         """
+        # First, we identify the PDB we should compare against
+        # by minimizing the Hamming distance between the
+        # mutated residue string and the wildtype residue strings
+        # of all the PDBs we have.
+
+        # Since foldx only allows for substitutions, we only
+        # consider the PDBs whose length is the same as the
+        # mutated residue string.
+        best_candidate_pdb_file = find_closest_wildtype_pdb_file_to_mutant(
+            self.wildtype_pdb_paths, mutated_residue_string
+        )
+        best_candidate_index = self.wildtype_pdb_paths.index(best_candidate_pdb_file)
+
+        # After we have identified the best candidate PDB,
+        # we can compute the mutations to be made.
         return mutations_from_wildtype_and_mutant(
-            self.wildtype_residues, mutated_residue_string
+            self.wildtype_residues[best_candidate_index], mutated_residue_string
         )
 
     def create_working_directory(self) -> Path:
@@ -118,20 +147,30 @@ class FoldXStabilityAndSASABlackBox(AbstractBlackBox):
         if it's None), we assume that we're supposed
         to evaluate the energy of the wildtype sequence.
         """
-        # Check if the context is valid
-        # delete_working_dir = context["delete_working_dir"]
-        # wildtype_pdb_file = context["wildtype_pdb_file"]
-        wildtype_pdb_file = self.wildtype_pdb_file
+        # TODO: add support for multiple mutations.
+        # For now, we assume that the batch size is
+        # always 1.
+        assert x.shape[0] == 1, "We only support single mutations for now. "
 
         # Create a working directory for this function call
         working_dir = self.create_working_directory()
 
-        # Given x (np.array[str]), we simply define the
-        # mutations to be made as a mutation_list.txt
-        # file.
+        # We only need to provide the mutations as
+        # amino acid sequences. The FoldxInterface
+        # will take care of the rest.
         mutations_as_strings = [
             "".join([amino_acid for amino_acid in x_i]) for x_i in x
         ]
+
+        # We find the associated wildtype to this given
+        # mutation. This is done by minimizing the
+        # Hamming distance between the mutated residue
+        # string and the wildtype residue strings of
+        # all the PDBs we have.
+        # TODO: this assumes a batch size of 1.
+        wildtype_pdb_file = find_closest_wildtype_pdb_file_to_mutant(
+            self.wildtype_pdb_paths, mutations_as_strings[0]
+        )
 
         foldx_interface = FoldxInterface(working_dir)
         stability, sasa_score = foldx_interface.compute_stability_and_sasa(
@@ -159,7 +198,7 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
     def create(
         self,
         seed: int = 0,
-        wildtype_pdb_path: Path = None,
+        wildtype_pdb_path: Union[Path, List[Path]] = None,
         alphabet: List[str] = None,
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         if wildtype_pdb_path is None:
@@ -169,35 +208,58 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
             )
 
         if isinstance(wildtype_pdb_path, str):
-            wildtype_pdb_path = Path(wildtype_pdb_path.strip())
+            wildtype_pdb_path = [Path(wildtype_pdb_path.strip())]
         elif isinstance(wildtype_pdb_path, Path):
-            pass
+            wildtype_pdb_path = [wildtype_pdb_path]
+        elif isinstance(wildtype_pdb_path, list):
+            if isinstance(wildtype_pdb_path[0], str):
+                wildtype_pdb_path = [Path(x.strip()) for x in wildtype_pdb_path]
+            elif isinstance(wildtype_pdb_path[0], Path):
+                pass
         else:
             raise ValueError(
                 f"wildtype_pdb_path must be a string or a Path. Received {type(wildtype_pdb_path)}"
             )
+        # By this point, we know that wildtype_pdb_path is a
+        # list of Path objects.
 
+        # We use the default alphabet if None was provided.
+        # See ENCODING in foldx_utils.py
         if alphabet is None:
-            # We use the default alphabet.
-            # See ENCODING in foldx_utils.py
             alphabet = self.get_setup_information().get_alphabet()
 
         problem_info = self.get_setup_information()
         f = FoldXStabilityAndSASABlackBox(
             info=problem_info,
             batch_size=1,
-            wildtype_pdb_file=wildtype_pdb_path,
+            wildtype_pdb_path=wildtype_pdb_path,
             alphabet=alphabet,
         )
 
-        wildtype_residues = parse_pdb_as_residues(wildtype_pdb_path)
+        # We need to compute the initial values of all wildtypes
+        # in wildtype_pdb_path. For this, we need to specify x0,
+        # a vector of wildtype sequences. These are padded to
+        # match the maximum length with empty strings.
+        wildtype_amino_acids_ = []
+        for pdb_file in wildtype_pdb_path:
+            wildtype_residues = parse_pdb_as_residues(pdb_file)
+            wildtype_amino_acids_.append(
+                [
+                    seq1(residue.get_resname())
+                    for residue in wildtype_residues
+                    if residue.get_resname() != "NA"
+                ]
+            )
+        longest_wildtype_length = max([len(x) for x in wildtype_amino_acids_])
+
         wildtype_amino_acids = [
-            seq1(residue.get_resname())
-            for residue in wildtype_residues
-            if residue.get_resname() != "NA"
+            amino_acids + [""] * (longest_wildtype_length - len(amino_acids))
+            for amino_acids in wildtype_amino_acids_
         ]
 
-        x0 = np.array(wildtype_amino_acids).reshape(1, -1)
+        x0 = np.array(wildtype_amino_acids).reshape(
+            len(wildtype_pdb_path), longest_wildtype_length
+        )
 
         f_0 = f(x0)
 
