@@ -52,12 +52,21 @@ class ProcessWrapper:
         # here is a VERY crucial step
         # we expect the shell script to take port and password as arguments, as well as other arguments passed by the user
         # when calling objective_factory.create
+        # TODO: This is a very silly way to handle communication between processes,
+        # and it is also very dangerous, because the user can pass arbitrary arguments
+        # to the shell script. We should instead use a proper IPC library.
         string_for_kwargs = ""
         for key, value in kwargs_for_factory.items():
             if isinstance(value, str):
-                string_for_kwargs += f"--{key}={value} "
+                string_for_kwargs += f"--{key}={str(value)} "
             elif isinstance(value, Path):
                 string_for_kwargs += f"--{key}={str(value)} "
+            elif isinstance(value, bool):
+                string_for_kwargs += f"--{key}=bool:{str(value)} "
+            elif isinstance(value, int):
+                string_for_kwargs += f"--{key}=int:{str(value)} "
+            elif isinstance(value, float):
+                string_for_kwargs += f"--{key}=float:{str(value)} "
             elif isinstance(value, list):
                 string_for_kwargs += (
                     f"--{key}=list:{','.join([str(v) for v in value])} "

@@ -67,7 +67,13 @@ class RFPWrapperFactory(AbstractProblemFactory):
     def get_setup_information(self) -> ProblemSetupInformation:
         return ProblemSetupInformation("foldx_rfp_lambo", 244, False, self.alphabet)
 
-    def create(self, seed: int = 0) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+    def create(
+        self,
+        seed: int = 0,
+        batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
+    ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         config = get_config()
         config = conf
         # make problem reproducible

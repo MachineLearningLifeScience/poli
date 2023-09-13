@@ -57,8 +57,10 @@ class LogPBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        info: int = np.inf,
+        info: ProblemSetupInformation,
         batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
         alphabet: List[str] = None,
         from_selfies: bool = False,
     ):
@@ -77,7 +79,12 @@ class LogPBlackBox(AbstractBlackBox):
         self.from_selfies = from_selfies
         self.from_smiles = not from_selfies
 
-        super().__init__(info, batch_size)
+        super().__init__(
+            info=info,
+            batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
+        )
 
     # The only method you have to define
     def _black_box(self, x: np.ndarray, context: dict = None) -> np.ndarray:
@@ -138,10 +145,12 @@ class LogPProblemFactory(AbstractProblemFactory):
     def create(
         self,
         seed: int = 0,
+        batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
         path_to_alphabet: Path = None,
         alphabet: List[str] = None,
         string_representation: str = "SMILES",
-        batch_size: int = None,
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         if path_to_alphabet is None and alphabet is None:
             # TODO: add support for more file types
@@ -179,6 +188,8 @@ class LogPProblemFactory(AbstractProblemFactory):
         f = LogPBlackBox(
             info=problem_info,
             batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
             alphabet=self.alphabet,
             from_selfies=string_representation.upper() == "SELFIES",
         )

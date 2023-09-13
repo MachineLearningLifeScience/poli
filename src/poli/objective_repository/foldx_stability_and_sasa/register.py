@@ -26,14 +26,23 @@ class FoldXStabilityAndSASABlackBox(FoldxBlackBox):
     def __init__(
         self,
         info: ProblemSetupInformation = None,
-        batch_size: int = 1,
+        batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
         wildtype_pdb_path: Union[Path, List[Path]] = None,
         alphabet: List[str] = None,
         experiment_id: str = None,
         tmp_folder: Path = None,
     ):
         super().__init__(
-            info, batch_size, wildtype_pdb_path, alphabet, experiment_id, tmp_folder
+            info=info,
+            batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
+            wildtype_pdb_path=wildtype_pdb_path,
+            alphabet=alphabet,
+            experiment_id=experiment_id,
+            tmp_folder=tmp_folder,
         )
 
     def _black_box(self, x: np.ndarray, context: None) -> np.ndarray:
@@ -53,9 +62,14 @@ class FoldXStabilityAndSASABlackBox(FoldxBlackBox):
         # TODO: add support for multiple mutations.
         # For now, we assume that the batch size is
         # always 1.
+        print(x)
         assert x.shape[0] == 1, "We only support single mutations for now. "
 
-        # Create a working directory for this function call
+        # We create a different folder for each
+        # mutation. This is because FoldX will
+        # create a bunch of files in the working
+        # directory, and we don't want to overwrite
+        # them.
         working_dir = self.create_working_directory()
 
         # We only need to provide the mutations as
@@ -80,6 +94,7 @@ class FoldXStabilityAndSASABlackBox(FoldxBlackBox):
             pdb_file=wildtype_pdb_file,
             mutations=mutations_as_strings,
         )
+        print("Done with computations in FoldX. ")
 
         return np.array([stability, sasa_score]).reshape(-1, 2)
 
@@ -95,12 +110,15 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
             name="foldx_stability_and_sasa",
             max_sequence_length=np.inf,
             alphabet=alphabet,
-            aligned=False,
+            aligned=True,
         )
 
     def create(
         self,
         seed: int = 0,
+        batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
         wildtype_pdb_path: Union[Path, List[Path]] = None,
         alphabet: List[str] = None,
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
@@ -134,7 +152,9 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
         problem_info = self.get_setup_information()
         f = FoldXStabilityAndSASABlackBox(
             info=problem_info,
-            batch_size=1,
+            batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
             wildtype_pdb_path=wildtype_pdb_path,
             alphabet=alphabet,
         )

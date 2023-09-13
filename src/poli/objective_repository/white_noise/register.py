@@ -17,8 +17,19 @@ from poli.core.problem_setup_information import ProblemSetupInformation
 
 
 class WhiteNoiseBlackBox(AbstractBlackBox):
-    def __init__(self, info: ProblemSetupInformation, batch_size: int = None):
-        super().__init__(info, batch_size)
+    def __init__(
+        self,
+        info: ProblemSetupInformation,
+        batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
+    ):
+        super().__init__(
+            info=info,
+            batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
+        )
 
     # The only method you have to define
     def _black_box(self, x: np.ndarray, context: dict = None) -> np.ndarray:
@@ -37,9 +48,20 @@ class WhiteNoiseProblemFactory(AbstractProblemFactory):
             alphabet=alphabet,
         )
 
-    def create(self, seed: int = 0) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+    def create(
+        self,
+        seed: int = 0,
+        batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
+    ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         problem_info = self.get_setup_information()
-        f = WhiteNoiseBlackBox(info=problem_info)
+        f = WhiteNoiseBlackBox(
+            info=problem_info,
+            batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
+        )
         x0 = np.array([["1", "2", "3"]])
 
         return f, x0, f(x0)

@@ -7,6 +7,7 @@ from typing import List
 from pathlib import Path
 import shutil
 import subprocess
+import os
 
 from Bio.PDB.Residue import Residue
 from Bio.PDB import SASA
@@ -157,6 +158,9 @@ class FoldxInterface:
         assuming that there was a single mutation.
         TODO: add support for multiple mutations.
         """
+        assert (
+            self.working_dir / f"Raw_{pdb_file.stem}.fxout"
+        ).exists(), f"FoldX did not generate the expected results file {self.working_dir / f'Raw_{pdb_file.stem}.fxout'}. "
         with open(self.working_dir / f"Raw_{pdb_file.stem}.fxout") as f:
             lines = f.readlines()
 
@@ -168,13 +172,16 @@ class FoldxInterface:
         This method computes the SASA from a FoldX results file,
         assuming that there was a single mutation.
         """
+        print("Parsing mutated structure")
         mutated_structure = parse_pdb_as_structure(
             self.working_dir / f"{pdb_file.stem}_1.pdb", structure_name="pdb_mutated"
         )
+
         sasa_computer = SASA.ShrakeRupley()
 
         # This computes the sasa score, and attaches
         # it to the structure.
+        print("Computing the internal SASA")
         sasa_computer.compute(mutated_structure, level="S")
 
         return mutated_structure.sasa
@@ -215,8 +222,13 @@ class FoldxInterface:
                 1,
             ], "We only support single mutations for now. Pass no mutations if you want to compute the energy and SASA of the wildtype."
         self._simulate_mutations(pdb_file, mutations)
+
+        print("Reading stability")
         stability = -self._read_energy(pdb_file)
+        print("Computing sasa")
         sasa_score = self._compute_sasa(pdb_file)
+
+        print("Done!")
         return stability, sasa_score
 
     def copy_foldx_files(self, pdb_file: Path):
@@ -224,8 +236,9 @@ class FoldxInterface:
         We copy the rotabase and pdb file to the working directory.
         """
         if not (self.working_dir / "rotabase.txt").exists():
-            shutil.copy(
-                PATH_TO_FOLDX_FILES / "rotabase.txt", self.working_dir / "rotabase.txt"
+            os.symlink(
+                str(PATH_TO_FOLDX_FILES / "rotabase.txt"),
+                str(self.working_dir / "rotabase.txt"),
             )
         destination_path_for_pdb = self.working_dir / f"{pdb_file.stem}.pdb"
         if not destination_path_for_pdb.exists():
