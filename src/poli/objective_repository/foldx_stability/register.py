@@ -37,14 +37,23 @@ class FoldXStabilityBlackBox(FoldxBlackBox):
     def __init__(
         self,
         info: ProblemSetupInformation = None,
-        batch_size: int = 1,
+        batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
         wildtype_pdb_path: Union[Path, List[Path]] = None,
         alphabet: List[str] = None,
         experiment_id: str = None,
         tmp_folder: Path = None,
     ):
         super().__init__(
-            info, batch_size, wildtype_pdb_path, alphabet, experiment_id, tmp_folder
+            info,
+            batch_size,
+            parallelize,
+            num_workers,
+            wildtype_pdb_path,
+            alphabet,
+            experiment_id,
+            tmp_folder,
         )
 
     def _black_box(self, x: np.ndarray, context: None) -> np.ndarray:
@@ -113,8 +122,11 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
     def create(
         self,
         seed: int = 0,
+        batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
         wildtype_pdb_path: Union[Path, List[Path]] = None,
-        alphabet: Dict[str, int] = None,
+        alphabet: List[str] = None,
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         if wildtype_pdb_path is None:
             raise ValueError(
@@ -147,7 +159,9 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
         # TODO: add support for a larger batch-size.
         f = FoldXStabilityBlackBox(
             info=problem_info,
-            batch_size=1,
+            batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
             wildtype_pdb_path=wildtype_pdb_path,
             alphabet=alphabet,
         )

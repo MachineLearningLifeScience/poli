@@ -26,7 +26,9 @@ class FoldxBlackBox(AbstractBlackBox):
     def __init__(
         self,
         info: ProblemSetupInformation = None,
-        batch_size: int = 1,
+        batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
         wildtype_pdb_path: Union[Path, List[Path]] = None,
         alphabet: List[str] = None,
         experiment_id: str = None,
@@ -45,7 +47,12 @@ class FoldxBlackBox(AbstractBlackBox):
             "Missing required argument wildtype_pdb_file. "
             "Did you forget to pass it to create and into the black box?"
         )
-        super().__init__(info=info, batch_size=batch_size)
+        super().__init__(
+            info=info,
+            batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
+        )
 
         if alphabet is None:
             alphabet = info.alphabet
@@ -80,8 +87,11 @@ class FoldxBlackBox(AbstractBlackBox):
         """
         TODO: document.
         """
+        sub_experiment_id = str(uuid4())[:8]
 
-        working_dir = self.tmp_folder / "foldx_tmp_files" / self.experiment_id
+        working_dir = (
+            self.tmp_folder / "foldx_tmp_files" / self.experiment_id / sub_experiment_id
+        )
         working_dir.mkdir(exist_ok=True, parents=True)
 
         return working_dir

@@ -90,7 +90,12 @@ class ExternalBlackBox(AbstractBlackBox):
 
 
 def __create_from_repository(
-    name: str, seed: int = 0, **kwargs_for_factory
+    name: str,
+    seed: int = 0,
+    batch_size: int = None,
+    parallelize: bool = False,
+    num_workers: int = None,
+    **kwargs_for_factory,
 ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
     """
     If the problem is available in AVAILABLE_PROBLEM_FACTORIES
@@ -102,8 +107,14 @@ def __create_from_repository(
             f"Objective function '{name}' is not available in the repository."
         )
 
-    problem_factory = AVAILABLE_PROBLEM_FACTORIES[name]()
-    f, x0, y0 = problem_factory.create(seed=seed, **kwargs_for_factory)
+    problem_factory: AbstractProblemFactory = AVAILABLE_PROBLEM_FACTORIES[name]()
+    f, x0, y0 = problem_factory.create(
+        seed=seed,
+        batch_size=batch_size,
+        parallelize=parallelize,
+        num_workers=num_workers,
+        **kwargs_for_factory,
+    )
 
     return f, x0, y0
 
@@ -187,11 +198,15 @@ def __register_objective_if_available(name: str, force_register: bool = False):
 
 def create(
     name: str,
+    *,
     seed: int = 0,
     caller_info: dict = None,
     observer: AbstractObserver = None,
     force_register: bool = False,
     force_isolation: bool = False,
+    batch_size: int = None,
+    parallelize: bool = False,
+    num_workers: int = None,
     **kwargs_for_factory,
 ) -> Tuple[ProblemSetupInformation, AbstractBlackBox, np.ndarray, np.ndarray, object]:
     """
@@ -210,6 +225,13 @@ def create(
     :param force_isolation:
         If True, then the objective function is instantiated as an isolated
         process.
+    :param batch_size:
+        The batch size, passed to the black box to run evaluations on batches.
+        If None, it will evaluate all inputs at once.
+    :param parallelize:
+        If True, then the objective function runs in parallel.
+    :param num_workers:
+        When parallelize is True, this specifies the number of processes to use.
     :return:
         problem_information: a ProblemSetupInformation object holding basic properties about the problem
         f: an objective function that accepts a numpy array and returns a numpy array
@@ -220,7 +242,14 @@ def create(
     # If the user can run it with the envionment they currently
     # have, then we do not need to install it.
     if name in AVAILABLE_PROBLEM_FACTORIES and not force_isolation:
-        f, x0, y0 = __create_from_repository(name, seed=seed, **kwargs_for_factory)
+        f, x0, y0 = __create_from_repository(
+            name,
+            seed=seed,
+            batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
+            **kwargs_for_factory,
+        )
         problem_info = f.info
         return problem_info, f, x0, y0, None
 
