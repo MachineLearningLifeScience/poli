@@ -136,4 +136,4 @@ def test_logp_example():
 
 
 if __name__ == "__main__":
-    test_qed_example_using_strings()
+    test_qed_example()

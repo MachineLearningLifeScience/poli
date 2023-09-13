@@ -59,7 +59,9 @@ class ProcessWrapper:
             elif isinstance(value, Path):
                 string_for_kwargs += f"--{key}={str(value)} "
             elif isinstance(value, list):
-                string_for_kwargs += f"--{key}=list:{','.join(value)} "
+                string_for_kwargs += (
+                    f"--{key}=list:{','.join([str(v) for v in value])} "
+                )
 
         self.proc = subprocess.Popen(
             [run_script, str(self.port), self.password, string_for_kwargs],
