@@ -3,8 +3,6 @@ This script registers FoldX stability as an objective function.
 """
 from pathlib import Path
 from typing import List, Tuple, Union
-from time import time
-from uuid import uuid4
 
 import numpy as np
 
@@ -15,7 +13,6 @@ from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem_setup_information import ProblemSetupInformation
 
 from poli.core.util.proteins.pdb_parsing import (
-    parse_pdb_as_residue_strings,
     parse_pdb_as_residues,
 )
 from poli.core.util.proteins.defaults import AMINO_ACIDS
