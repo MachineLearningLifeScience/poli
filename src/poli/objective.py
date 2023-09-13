@@ -72,9 +72,7 @@ def run(factory_kwargs: str, objective_name: str, port: int, password: str) -> N
     :param objective_name:
         problem factory name including python packages, e.g. package.subpackage.MyFactoryName
     """
-    print(factory_kwargs)
     kwargs = parse_factory_kwargs(factory_kwargs)
-    print(kwargs)
 
     # make connection with the mother process
     conn = get_connection(port, password)
