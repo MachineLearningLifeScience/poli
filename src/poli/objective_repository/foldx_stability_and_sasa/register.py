@@ -62,7 +62,6 @@ class FoldXStabilityAndSASABlackBox(FoldxBlackBox):
         # TODO: add support for multiple mutations.
         # For now, we assume that the batch size is
         # always 1.
-        print(x)
         assert x.shape[0] == 1, "We only support single mutations for now. "
 
         # We create a different folder for each
@@ -94,7 +93,6 @@ class FoldXStabilityAndSASABlackBox(FoldxBlackBox):
             pdb_file=wildtype_pdb_file,
             mutations=mutations_as_strings,
         )
-        print("Done with computations in FoldX. ")
 
         return np.array([stability, sasa_score]).reshape(-1, 2)
 

@@ -172,7 +172,6 @@ class FoldxInterface:
         This method computes the SASA from a FoldX results file,
         assuming that there was a single mutation.
         """
-        print("Parsing mutated structure")
         mutated_structure = parse_pdb_as_structure(
             self.working_dir / f"{pdb_file.stem}_1.pdb", structure_name="pdb_mutated"
         )
@@ -181,7 +180,6 @@ class FoldxInterface:
 
         # This computes the sasa score, and attaches
         # it to the structure.
-        print("Computing the internal SASA")
         sasa_computer.compute(mutated_structure, level="S")
 
         return mutated_structure.sasa
@@ -223,12 +221,9 @@ class FoldxInterface:
             ], "We only support single mutations for now. Pass no mutations if you want to compute the energy and SASA of the wildtype."
         self._simulate_mutations(pdb_file, mutations)
 
-        print("Reading stability")
         stability = -self._read_energy(pdb_file)
-        print("Computing sasa")
         sasa_score = self._compute_sasa(pdb_file)
 
-        print("Done!")
         return stability, sasa_score
 
     def copy_foldx_files(self, pdb_file: Path):
