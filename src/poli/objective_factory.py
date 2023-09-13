@@ -122,6 +122,9 @@ def __create_from_repository(
 def __create_as_isolated_process(
     name: str,
     seed: int = 0,
+    batch_size: int = None,
+    parallelize: bool = False,
+    num_workers: int = None,
     **kwargs_for_factory,
 ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
     """
@@ -134,6 +137,9 @@ def __create_as_isolated_process(
 
     # start objective process
     # VERY IMPORTANT: the script MUST accept port and password as arguments
+    kwargs_for_factory["batch_size"] = batch_size
+    kwargs_for_factory["parallelize"] = parallelize
+    kwargs_for_factory["num_workers"] = num_workers
     process_wrapper = ProcessWrapper(
         config[name][_RUN_SCRIPT_LOCATION], **kwargs_for_factory
     )
@@ -263,6 +269,9 @@ def create(
     f, x0, y0 = __create_as_isolated_process(
         name,
         seed=seed,
+        batch_size=batch_size,
+        parallelize=parallelize,
+        num_workers=num_workers,
         **kwargs_for_factory,
     )
     problem_information = f.info
