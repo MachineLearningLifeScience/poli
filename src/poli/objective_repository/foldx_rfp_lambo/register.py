@@ -87,9 +87,9 @@ class RFPWrapperFactory(AbstractProblemFactory):
         base_candidates, base_targets, all_seqs, all_targets = bb_task.task_setup(
             config, project_root=project_root
         )
-        if self.problem_seq in all_seqs:
+        if self.problem_sequence in all_seqs:
             # substitute erroneous sequence "X in position 159" with correct PDB fasta sequence
-            all_seqs[np.where(all_seqs == self.problem_seq)] = self.correct_sequence
+            all_seqs[np.where(all_seqs == self.problem_sequence)] = self.correct_sequence
         return RFPWrapper(bb_task, base_candidates), all_seqs, all_targets
 
 
