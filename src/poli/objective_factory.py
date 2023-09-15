@@ -57,8 +57,12 @@ class ExternalBlackBox(AbstractBlackBox):
     def terminate(self):
         # terminate objective process
         if self.process_wrapper is not None:
-            self.process_wrapper.send(["QUIT", None])
-            self.process_wrapper.close()  # clean up connection
+            try:
+                self.process_wrapper.send(["QUIT", None])
+                self.process_wrapper.close()  # clean up connection
+            except AttributeError:
+                # This means that the process has already been terminated
+                pass
             self.process_wrapper = None
         # terminate observer
         if self.observer is not None:
