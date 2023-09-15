@@ -83,7 +83,6 @@ class AbstractBlackBox:
             # We evaluate the batch in parallel if the user wants to.
             if self.parallelize:
                 with Pool(self.num_workers) as pool:
-                    print(f"evaluating shape: {x_batch.shape}")
                     f_batch_ = pool.starmap(
                         self._black_box, [(x.reshape(1, -1), context) for x in x_batch]
                     )
