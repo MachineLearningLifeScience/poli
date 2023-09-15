@@ -1,6 +1,8 @@
 __author__ = "Simon Bartels"
 
 import logging
+import yaml
+from pathlib import Path
 import os
 from collections import namedtuple
 import random
@@ -12,6 +14,7 @@ import torch
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem_setup_information import ProblemSetupInformation
+from poli.objective_repository.foldx_rfp_lambo import PROBLEM_SEQ, CORRECT_SEQ
 
 from lambo.tasks.proxy_rfp.proxy_rfp import ProxyRFPTask
 from lambo.utils import AMINO_ACIDS
@@ -35,7 +38,6 @@ class RFPWrapper(AbstractBlackBox):
     def _black_box(self, x, context=None):
         best_b_cand = None
         min_hd = np.infty  # Hamming distance of best_b_cand to x
-        # seq = "".join([self.inverse_alphabet[x[0, i]] for i in range(x.shape[1])])
         seq = x[0]  # take out the string from the np array
         for b_cand in self.base_candidates:
             b_seq = b_cand.mutant_residue_seq
@@ -57,12 +59,9 @@ class RFPWrapper(AbstractBlackBox):
 
 class RFPWrapperFactory(AbstractProblemFactory):
     def __init__(self):
-        # raise NotImplementedError("TODO: adapt to new alphabet definition in Poli")
-        # self.alphabet = {AMINO_ACIDS[i]: i+1 for i in range(len(AMINO_ACIDS))}
-        # self.alphabet["-"] = 0
-        # self.alphabet["X"] = 0  # TODO: is that the way I want to handle this stupid single sequence?
         self.alphabet = AMINO_ACIDS
-        self.residue_alphabet = RESIDUE_ALPHABET
+        self.problem_sequence = PROBLEM_SEQ
+        self.correct_sequence = CORRECT_SEQ
 
     def get_setup_information(self) -> ProblemSetupInformation:
         return ProblemSetupInformation("foldx_rfp_lambo", 244, False, self.alphabet)
@@ -88,40 +87,28 @@ class RFPWrapperFactory(AbstractProblemFactory):
         base_candidates, base_targets, all_seqs, all_targets = bb_task.task_setup(
             config, project_root=project_root
         )
-        problem_seq = "GEELIKENMHMKLYMEGTVNNHHFKCTTEGEGKPYEGTQTQRIKVVEGGPLPFAFDILATCFSKTFINHTQGIPDFFKQSFPEGFTWERVTTYEDGGVLTVTQDTSLQDGCLIYNVKLRGVNFPSNGPVMQKKTLGWEATTETLYPADGGLEGRCDMALXLVGGGHLHCNLKTTYRSXKPAKNLKMPGVYFVDRRLERIKEADNETYVEQHEVAVARYCDLPSKL"
-        if problem_seq in all_seqs:
-            # above seq is problematic due to an X in position 159
-            # according to PDB this sequence has the most (98%) similarity: SKGEELIKENMHMKLYMEGTVNNHHFKCTTEGEGKPYEGTQTQRIKVVEGGPLPFAFDILATCFMYGSKTFINHTQGIPDFFKQSFPEGFTWERVTTYEDGGVLTVTQDTSLQDGCLIYNVKLRGVNFPSNGPVMQKKTLGWEATTETLYPADGGLEGRCDMALKLVGGGHLHCNLKTTYRSKKPAKNLKMPGVYFVDRRLERIKEADNETYVEQHEVAVARYCDLPSKL
-            # I've removed the initial SK and some MYG in the middle
-            # Then it's really just a K in position 159 which is different.
-            # seq[159] = 'K'  # strings are immutable
-            seq = "GEELIKENMHMKLYMEGTVNNHHFKCTTEGEGKPYEGTQTQRIKVVEGGPLPFAFDILATCFSKTFINHTQGIPDFFKQSFPEGFTWERVTTYEDGGVLTVTQDTSLQDGCLIYNVKLRGVNFPSNGPVMQKKTLGWEATTETLYPADGGLEGRCDMALKLVGGGHLHCNLKTTYRSKKPAKNLKMPGVYFVDRRLERIKEADNETYVEQHEVAVARYCDLPSKL"
-            all_seqs[np.where(all_seqs == problem_seq)] = seq
+        if self.problem_sequence in all_seqs:
+            # substitute erroneous sequence "X in position 159" with correct PDB fasta sequence
+            all_seqs[
+                np.where(all_seqs == self.problem_sequence)
+            ] = self.correct_sequence
         return RFPWrapper(bb_task, base_candidates), all_seqs, all_targets
 
 
-task = {
-    "_target_": "lambo.tasks.proxy_rfp.proxy_rfp.ProxyRFPTask",
-    "obj_dim": 2,
-    "log_prefix": "proxy_rfp",
-    "batch_size": 16,
-    "max_len": 244,
-    "max_num_edits:": None,
-    "max_ngram_size": 1,
-    "allow_len_change": False,
-    "num_start_examples": 512,
-}
 tokenizer = {"_target_": "lambo.utils.ResidueTokenizer"}
 Config = namedtuple("config", ["task", "tokenizer", "log_dir", "job_name", "timestamp"])
 
 name_is_main = __name__ == "__main__"
 
 
-# this is to trick Hydra...
-# __name__ = '__main__'
-# config_path = os.path.join(project_root, 'hydra_config')
+# satisfy Hydra
 def get_config():
     global conf
+    task = yaml.safe_load(
+        Path(
+            os.path.dirname(__file__) + os.path.sep + "lambo_task_config.yaml"
+        ).read_text()
+    )
     config = Config(
         task,
         tokenizer,
@@ -134,7 +121,6 @@ def get_config():
 
 
 if name_is_main:
-    # os.chdir(os.path.join(project_root, "scripts"))
     from poli.core.registry import register_problem
 
     rfp_problem_factory = RFPWrapperFactory()
