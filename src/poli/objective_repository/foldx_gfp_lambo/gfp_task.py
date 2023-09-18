@@ -35,7 +35,9 @@ class ProxyGFPTask(BaseTask):
         )
         self.op_types = ["sub"]
         self.num_start_examples = num_start_examples
-    
+
     def task_setup(self, config, project_root=None, *args, **kwargs):
-        project_root = hydra.utils.get_original_cwd() if project_root is None else project_root
+        project_root = (
+            hydra.utils.get_original_cwd() if project_root is None else project_root
+        )
         candidate_data = pd.read_csv()
