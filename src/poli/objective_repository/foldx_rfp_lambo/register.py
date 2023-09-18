@@ -83,7 +83,7 @@ class RFPWrapperFactory(AbstractProblemFactory):
 
         tokenizer = hydra.utils.instantiate(config.tokenizer)
         bb_task = hydra.utils.instantiate(
-            config.task, tokenizer=tokenizer, candidate_pool=[]
+            config.task, tokenizer=tokenizer, candidate_pool=[], seed=seed
         )
         base_candidates, base_targets, all_seqs, all_targets = bb_task.task_setup(
             config, project_root=project_root
