@@ -107,7 +107,11 @@ def get_config():
     global conf
     task = yaml.safe_load(
         Path(
-            os.path.dirname(__file__) + os.path.sep + "lambo_task_config.yaml"
+            os.path.dirname(__file__)
+            + os.path.sep
+            + "task"
+            + os.path.sep
+            + "rfp_internal.yaml"
         ).read_text()
     )
     config = Config(
