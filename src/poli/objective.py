@@ -31,6 +31,8 @@ def parse_factory_kwargs(factory_kwargs: str) -> dict:
                 value = float(value.strip("float:"))
             elif value.startswith("bool:"):
                 value = value.strip("bool:") == "True"
+            elif value.startswith("none:"):
+                value = None
 
             kwargs[key] = value
 

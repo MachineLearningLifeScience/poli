@@ -68,7 +68,7 @@ class RFPWrapperFactory(AbstractProblemFactory):
 
     def create(
         self,
-        seed: int = 0,
+        seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,

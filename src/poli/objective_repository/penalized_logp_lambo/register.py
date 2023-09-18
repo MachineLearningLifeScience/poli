@@ -16,6 +16,8 @@ from poli.core.problem_setup_information import ProblemSetupInformation
 
 from poli.core.util.chemistry.string_to_molecule import translate_selfies_to_smiles
 
+from poli.core.util.seeding import seed_numpy, seed_python
+
 
 class PenalizedLogPLamboBlackBox(AbstractBlackBox):
     """
@@ -84,10 +86,13 @@ class PenalizedLogPLamboProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
-        seed: int = 0,
+        seed: int = None,
         penalized: bool = True,
         string_representation: str = "SMILES",
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+        seed_numpy(seed)
+        seed_python(seed)
+
         if string_representation.upper() not in ["SMILES", "SELFIES"]:
             raise ValueError(
                 "Missing required keyword argument: string_representation: str. "

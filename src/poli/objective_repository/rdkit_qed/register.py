@@ -39,6 +39,8 @@ from poli.core.problem_setup_information import ProblemSetupInformation
 
 from poli.core.util.chemistry.string_to_molecule import strings_to_molecules
 
+from poli.core.util.seeding import seed_numpy, seed_python
+
 
 class QEDBlackBox(AbstractBlackBox):
     """
@@ -147,7 +149,7 @@ class QEDProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
-        seed: int = 0,
+        seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
@@ -155,6 +157,9 @@ class QEDProblemFactory(AbstractProblemFactory):
         path_to_alphabet: Path = None,
         string_representation: str = "SMILES",
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+        seed_numpy(seed)
+        seed_python(seed)
+
         if path_to_alphabet is None and alphabet is None:
             # TODO: add support for more file types
             raise ValueError(
