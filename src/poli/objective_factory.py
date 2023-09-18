@@ -125,7 +125,7 @@ def __create_from_repository(
 
 def __create_as_isolated_process(
     name: str,
-    seed: int = 0,
+    seed: int = None,
     batch_size: int = None,
     parallelize: bool = False,
     num_workers: int = None,
