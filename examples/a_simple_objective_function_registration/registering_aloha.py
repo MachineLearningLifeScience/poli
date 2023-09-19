@@ -37,7 +37,7 @@ class OurAlohaProblemFactory(AbstractProblemFactory):
         )
 
     def create(
-        self, seed: int = 0, **kwargs
+        self, seed: int = None, **kwargs
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         problem_info = self.get_setup_information()
         f = OurAlohaBlackBox(info=problem_info)

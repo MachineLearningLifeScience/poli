@@ -15,6 +15,8 @@ from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem_setup_information import ProblemSetupInformation
 
+from poli.core.util.seeding import seed_numpy, seed_python
+
 
 class WhiteNoiseBlackBox(AbstractBlackBox):
     def __init__(
@@ -50,11 +52,14 @@ class WhiteNoiseProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
-        seed: int = 0,
+        seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+        seed_numpy(seed)
+        seed_python(seed)
+
         problem_info = self.get_setup_information()
         f = WhiteNoiseBlackBox(
             info=problem_info,

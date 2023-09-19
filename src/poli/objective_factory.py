@@ -1,11 +1,10 @@
 """
 This is the main file relevant for users who want to run objective functions.
 """
-from typing import Callable, Tuple, Any, Dict
+from typing import Tuple, Any
 import numpy as np
 from pathlib import Path
 import configparser
-import traceback
 import logging
 
 from poli.core.abstract_black_box import AbstractBlackBox
@@ -13,12 +12,10 @@ from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.core.registry import (
     _RUN_SCRIPT_LOCATION,
-    _DEFAULT,
     _OBSERVER,
     register_problem_from_repository,
 )
 from poli.core.util.abstract_observer import AbstractObserver
-from poli.core.util.external_observer import ExternalObserver
 from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
 
 from poli.objective_repository import AVAILABLE_OBJECTIVES, AVAILABLE_PROBLEM_FACTORIES
@@ -95,7 +92,7 @@ class ExternalBlackBox(AbstractBlackBox):
 
 def __create_from_repository(
     name: str,
-    seed: int = 0,
+    seed: int = None,
     batch_size: int = None,
     parallelize: bool = False,
     num_workers: int = None,
@@ -209,7 +206,7 @@ def __register_objective_if_available(name: str, force_register: bool = False):
 def create(
     name: str,
     *,
-    seed: int = 0,
+    seed: int = None,
     caller_info: dict = None,
     observer: AbstractObserver = None,
     force_register: bool = False,
@@ -294,7 +291,7 @@ def create(
 
 def start(
     name: str,
-    seed: int = 0,
+    seed: int = None,
     caller_info: dict = None,
     observer: AbstractObserver = None,
     force_register: bool = False,

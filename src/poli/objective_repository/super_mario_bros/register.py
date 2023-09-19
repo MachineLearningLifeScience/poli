@@ -16,6 +16,8 @@ from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem_setup_information import ProblemSetupInformation
 
+from poli.core.util.seeding import seed_numpy, seed_python
+
 from model import load_example_model
 
 from simulator import test_level_from_z
@@ -69,7 +71,12 @@ class SMBProblemFactory(AbstractProblemFactory):
             alphabet=alphabet,
         )
 
-    def create(self, seed: int = 0) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+    def create(
+        self, seed: int = None
+    ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+        seed_numpy(seed)
+        seed_python(seed)
+
         L = self.get_setup_information().get_max_sequence_length()
         f = SMBBlackBox(L)
         x0 = np.ones([1, L])

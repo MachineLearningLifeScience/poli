@@ -71,6 +71,8 @@ class ProcessWrapper:
                 string_for_kwargs += (
                     f"--{key}=list:{','.join([str(v) for v in value])} "
                 )
+            elif value is None:
+                string_for_kwargs += f"--{key}=none:None "
 
         self.proc = subprocess.Popen(
             [run_script, str(self.port), self.password, string_for_kwargs],

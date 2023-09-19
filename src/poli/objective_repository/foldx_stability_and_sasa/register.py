@@ -21,6 +21,8 @@ from poli.core.util.proteins.foldx import FoldxInterface
 
 from poli.core.proteins.foldx_black_box import FoldxBlackBox
 
+from poli.core.util.seeding import seed_numpy, seed_python
+
 
 class FoldXStabilityAndSASABlackBox(FoldxBlackBox):
     def __init__(
@@ -113,13 +115,16 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
-        seed: int = 0,
+        seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
         wildtype_pdb_path: Union[Path, List[Path]] = None,
         alphabet: List[str] = None,
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+        seed_numpy(seed)
+        seed_python(seed)
+
         if wildtype_pdb_path is None:
             raise ValueError(
                 "Missing required argument wildtype_pdb_path. "
