@@ -75,6 +75,7 @@ class RFPWrapperFactory(AbstractProblemFactory):
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         config = get_config()
         config = conf
+
         # make problem reproducible
         random.seed(seed)
         torch.manual_seed(seed)
@@ -82,7 +83,7 @@ class RFPWrapperFactory(AbstractProblemFactory):
 
         tokenizer = hydra.utils.instantiate(config.tokenizer)
         bb_task = hydra.utils.instantiate(
-            config.task, tokenizer=tokenizer, candidate_pool=[]
+            config.task, tokenizer=tokenizer, candidate_pool=[], seed=seed
         )
         base_candidates, base_targets, all_seqs, all_targets = bb_task.task_setup(
             config, project_root=project_root
@@ -106,7 +107,11 @@ def get_config():
     global conf
     task = yaml.safe_load(
         Path(
-            os.path.dirname(__file__) + os.path.sep + "lambo_task_config.yaml"
+            os.path.dirname(__file__)
+            + os.path.sep
+            + "task"
+            + os.path.sep
+            + "rfp_internal.yaml"
         ).read_text()
     )
     config = Config(

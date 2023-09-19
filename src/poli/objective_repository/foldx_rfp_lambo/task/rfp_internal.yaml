@@ -1,4 +1,4 @@
-_target_: lambo.tasks.proxy_rfp.proxy_rfp.ProxyRFPTask
+_target_: poli.objective_repository.foldx_rfp_lambo.rfp_internal.PoliRFPInternal
 obj_dim: 2
 log_prefix: proxy_rfp_lambo
 batch_size: 16
