@@ -263,7 +263,7 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
-        seed: int = 0,
+        seed: int = None,
         wildtype_pdb_path: Path = None,
         alphabet: Dict[str, int] = None,
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
