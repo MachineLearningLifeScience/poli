@@ -27,8 +27,20 @@ conf = None
 
 
 class RFPWrapper(AbstractBlackBox):
-    def __init__(self, task: ProxyRFPTask, base_candidates):
-        super().__init__(RFPWrapperFactory().get_setup_information())
+    def __init__(
+        self,
+        task: ProxyRFPTask,
+        base_candidates,
+        parallelize: bool = False,
+        num_workers: int = None,
+        batch_size: int = None,
+    ):
+        super().__init__(
+            RFPWrapperFactory().get_setup_information(),
+            parallelize=parallelize,
+            num_workers=num_workers,
+            batch_size=batch_size,
+        )
         self.task = task
         self.base_candidates = base_candidates
         self.sequences_aligned = False
@@ -93,7 +105,17 @@ class RFPWrapperFactory(AbstractProblemFactory):
             all_seqs[
                 np.where(all_seqs == self.problem_sequence)
             ] = self.correct_sequence
-        return RFPWrapper(bb_task, base_candidates), all_seqs, all_targets
+        return (
+            RFPWrapper(
+                bb_task,
+                base_candidates,
+                parallelize=parallelize,
+                num_workers=num_workers,
+                batch_size=batch_size,
+            ),
+            all_seqs,
+            all_targets,
+        )
 
 
 tokenizer = {"_target_": "lambo.utils.ResidueTokenizer"}
