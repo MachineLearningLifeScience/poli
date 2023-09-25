@@ -16,6 +16,7 @@ from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.objective_repository.foldx_rfp_lambo import PROBLEM_SEQ, CORRECT_SEQ
 
+import lambo
 from lambo.tasks.proxy_rfp.proxy_rfp import ProxyRFPTask
 from lambo.utils import AMINO_ACIDS
 from lambo.utils import RESIDUE_ALPHABET
@@ -85,15 +86,17 @@ class RFPWrapperFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
-        config = get_config()
-        config = conf
 
+        config = get_config()
+        config = conf # TODO: cleanup
+        # TODO
         # make problem reproducible
         random.seed(seed)
         torch.manual_seed(seed)
         np.random.seed(seed)
 
         tokenizer = hydra.utils.instantiate(config.tokenizer)
+        # NOTE: the task at this point is the original proxy rfp task
         bb_task = hydra.utils.instantiate(
             config.task, tokenizer=tokenizer, candidate_pool=[], seed=seed
         )
@@ -124,16 +127,20 @@ Config = namedtuple("config", ["task", "tokenizer", "log_dir", "job_name", "time
 name_is_main = __name__ == "__main__"
 
 
-# satisfy Hydra
 def get_config():
+    """
+    Utility function with lambo specifc config to RFP task.
+    """
     global conf
     task = yaml.safe_load(
         Path(
-            os.path.dirname(__file__)
+            str(Path(lambo.__file__).parent.resolve().parent.resolve())
+            + os.path.sep
+            + "hydra_config"
             + os.path.sep
             + "task"
             + os.path.sep
-            + "rfp_internal.yaml"
+            + "proxy_rfp.yaml"
         ).read_text()
     )
     config = Config(
