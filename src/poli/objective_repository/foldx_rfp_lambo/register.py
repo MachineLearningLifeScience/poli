@@ -86,10 +86,8 @@ class RFPWrapperFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
-
         config = get_config()
-        config = conf # TODO: cleanup
-        # TODO
+        config = conf  # TODO: cleanup
         # make problem reproducible
         random.seed(seed)
         torch.manual_seed(seed)
