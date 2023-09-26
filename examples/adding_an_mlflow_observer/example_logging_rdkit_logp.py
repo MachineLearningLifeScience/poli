@@ -24,5 +24,5 @@ if __name__ == "__main__":
     f(np.array([["[C]", "[C]"]]))
     f(np.array([["[C]", "[C]", "[C]"]]))
     f(np.array([["[C]", "[C]", "[C]", "[C]"]]))
-    
+
     observer.finish()
