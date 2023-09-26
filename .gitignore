@@ -14,5 +14,6 @@ src/poli/registered_objectives/*.sh
 .DS_Store
 oracle/
 
-# Ignores MLFlow runs
+# Ignores MLFlow and WandB runs
 mlruns/
+wandb/

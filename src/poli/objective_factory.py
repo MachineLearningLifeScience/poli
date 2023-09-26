@@ -63,8 +63,11 @@ class ExternalBlackBox(AbstractBlackBox):
             self.process_wrapper = None
         # terminate observer
         if self.observer is not None:
-            self.observer.finish()
-            self.observer = None
+            try:
+                self.observer.finish()
+                self.observer = None
+            except:
+                pass
 
     def __getattr__(self, __name: str) -> Any:
         """
@@ -197,8 +200,7 @@ def __register_objective_if_available(name: str, force_register: bool = False):
         if answer == "y":
             # Register problem
             register_problem_from_repository(name)
-            # TODO: change print to logging
-            logging.debug(f"Registered the objective from the repository.")
+            logging.debug(f"POLI: Registered the objective from the repository.")
             # Refresh the config
             config = load_config()
         else:
@@ -272,7 +274,6 @@ def create(
 
         return problem_info, f, x0, y0, observer_info
 
-    # TODO: change prints for logs and warnings.
     # Check if the name is indeed registered, or
     # available in the objective repository
     __register_objective_if_available(name, force_register=force_register)
