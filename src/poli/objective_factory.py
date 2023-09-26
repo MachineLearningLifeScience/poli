@@ -96,6 +96,7 @@ def __create_from_repository(
     batch_size: int = None,
     parallelize: bool = False,
     num_workers: int = None,
+    observer: AbstractObserver = None,
     **kwargs_for_factory,
 ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
     """
@@ -116,6 +117,9 @@ def __create_from_repository(
         num_workers=num_workers,
         **kwargs_for_factory,
     )
+
+    if observer is not None:
+        f.set_observer(observer)
 
     return f, x0, y0
 
@@ -258,7 +262,15 @@ def create(
             **kwargs_for_factory,
         )
         problem_info = f.info
-        return problem_info, f, x0, y0, None
+
+        observer_info = None
+        if observer is not None:
+            observer_info = observer.initialize_observer(
+                problem_info, caller_info, x0, y0, seed
+            )
+            f.set_observer(observer)
+
+        return problem_info, f, x0, y0, observer_info
 
     # TODO: change prints for logs and warnings.
     # Check if the name is indeed registered, or

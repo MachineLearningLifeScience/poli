@@ -17,7 +17,7 @@ class AbstractObserver:
         raise NotImplementedError("abstract method")
 
     def finish(self) -> None:
-        raise NotImplementedError("abstract method")
+        pass
 
     def __del__(self):
         self.finish()
