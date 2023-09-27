@@ -12,8 +12,11 @@ class ExternalObserver(AbstractObserver):
     User-defined observers typically do NOT inherit from here.
     """
 
-    def __init__(self):
-        self.observer_script = config[_DEFAULT][_OBSERVER]
+    def __init__(self, observer_name: str = None):
+        if observer_name is None:
+            observer_name = _DEFAULT
+
+        self.observer_script = config[observer_name][_OBSERVER]
         self.process_wrapper = None
 
     def observe(self, x: np.ndarray, y: np.ndarray, context=None) -> None:

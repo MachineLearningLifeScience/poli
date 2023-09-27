@@ -61,9 +61,7 @@ def _make_run_script(
     cwd=None,
     **kwargs,
 ):
-    """
-    An internal function for creating run scripts.
-    """
+    """An internal function for creating run scripts; returns the location of the run script."""
     if cwd is None:
         cwd = str(os.getcwd())
 
