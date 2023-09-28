@@ -1,5 +1,4 @@
 import numpy as np
-
 from multiprocessing import Pool, cpu_count
 
 from poli.core.problem_setup_information import ProblemSetupInformation

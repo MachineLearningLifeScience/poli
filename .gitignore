@@ -13,3 +13,7 @@ src/poli/registered_objectives/*.sh
 .vscode/
 .DS_Store
 oracle/
+
+# Ignores MLFlow and WandB runs
+mlruns/
+wandb/

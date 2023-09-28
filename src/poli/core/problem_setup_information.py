@@ -41,8 +41,18 @@ class ProblemSetupInformation:
     def sequences_are_aligned(self) -> bool:
         return self.aligned
 
-    def get_alphabet(self) -> dict:
+    def get_alphabet(self) -> list:
         return self.alphabet
 
     def log_transform_recommended(self) -> bool:
         return self.log_transform_recommended
+
+    def as_dict(self) -> dict:
+        """Returns all attributes as a dictionary."""
+        return {
+            "name": self.name,
+            "max_sequence_length": self.max_sequence_length,
+            "aligned": self.aligned,
+            "alphabet": self.alphabet,
+            "log_transform_recommended": self.log_transform_recommended,
+        }

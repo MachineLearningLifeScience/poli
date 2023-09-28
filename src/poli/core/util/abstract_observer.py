@@ -17,10 +17,17 @@ class AbstractObserver:
         raise NotImplementedError("abstract method")
 
     def finish(self) -> None:
-        raise NotImplementedError("abstract method")
+        pass
 
     def __del__(self):
-        self.finish()
+        # TODO: this is not pretty. We should find a better
+        # way to detect when the observer process has been
+        # terminated.
+        try:
+            self.finish()
+        except Exception:
+            # This means that the observer process has already been terminated.
+            pass
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.finish()

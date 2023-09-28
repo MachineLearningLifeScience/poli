@@ -63,8 +63,11 @@ class ExternalBlackBox(AbstractBlackBox):
             self.process_wrapper = None
         # terminate observer
         if self.observer is not None:
-            self.observer.finish()
-            self.observer = None
+            try:
+                self.observer.finish()
+                self.observer = None
+            except:
+                pass
 
     def __getattr__(self, __name: str) -> Any:
         """
@@ -96,6 +99,7 @@ def __create_from_repository(
     batch_size: int = None,
     parallelize: bool = False,
     num_workers: int = None,
+    observer: AbstractObserver = None,
     **kwargs_for_factory,
 ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
     """
@@ -116,6 +120,9 @@ def __create_from_repository(
         num_workers=num_workers,
         **kwargs_for_factory,
     )
+
+    if observer is not None:
+        f.set_observer(observer)
 
     return f, x0, y0
 
@@ -193,8 +200,7 @@ def __register_objective_if_available(name: str, force_register: bool = False):
         if answer == "y":
             # Register problem
             register_problem_from_repository(name)
-            # TODO: change print to logging
-            logging.debug(f"Registered the objective from the repository.")
+            logging.debug(f"POLI: Registered the objective from the repository.")
             # Refresh the config
             config = load_config()
         else:
@@ -258,9 +264,16 @@ def create(
             **kwargs_for_factory,
         )
         problem_info = f.info
-        return problem_info, f, x0, y0, None
 
-    # TODO: change prints for logs and warnings.
+        observer_info = None
+        if observer is not None:
+            observer_info = observer.initialize_observer(
+                problem_info, caller_info, x0, y0, seed
+            )
+            f.set_observer(observer)
+
+        return problem_info, f, x0, y0, observer_info
+
     # Check if the name is indeed registered, or
     # available in the objective repository
     __register_objective_if_available(name, force_register=force_register)
