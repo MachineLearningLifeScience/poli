@@ -131,7 +131,3 @@ def test_observer_registration_and_external_instancing():
 
     # Cleaning up the observer run script
     delete_observer_run_script(observer_name="simple__")
-
-
-if __name__ == "__main__":
-    test_observer_registration_and_external_instancing()

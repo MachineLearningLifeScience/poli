@@ -27,12 +27,11 @@ def start_observer_process(observer_name, port: int, password: str):
         observer_info = observer.initialize_observer(
             setup_info, caller_info, x0, y0, seed
         )
+        # give mother process the signal that we're ready
         conn.send(["SETUP", observer_info])
     except Exception as e:
         conn.send(["EXCEPTION", e])
         sys.exit(1)
-
-    # give mother process the signal that we're ready
 
     # now wait for observe calls
     while True:
@@ -65,6 +64,4 @@ if __name__ == "__main__":
     parser.add_argument("--password", required=True, type=str)
 
     args, _ = parser.parse_known_args()
-    start_observer_process(
-        args.objective_name, args.port, args.password
-    )
+    start_observer_process(args.objective_name, args.port, args.password)

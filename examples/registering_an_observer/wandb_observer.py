@@ -16,7 +16,7 @@ class WandbObserver(AbstractObserver):
     def __init__(self, initial_step: int = None) -> None:
         if initial_step is None:
             raise ValueError("initial_step must be provided")
-        
+
         # Log into wandb
         wandb.login()
 
