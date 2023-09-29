@@ -8,7 +8,7 @@ import argparse
 
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.inter_process_communication.process_wrapper import get_connection
-from poli.objective import dynamically_instantiate
+from poli.objective import dynamically_instantiate, parse_factory_kwargs
 
 
 def start_observer_process(observer_name, port: int, password: str):
@@ -16,19 +16,43 @@ def start_observer_process(observer_name, port: int, password: str):
     conn = get_connection(port, password)
 
     # get setup info from external_observer
-    setup_info, caller_info, x0, y0, seed = conn.recv()
+    setup_info, caller_info, x0, y0, seed, observer_kwargs = conn.recv()
+
     # instantiate observer
-    observer: AbstractObserver = dynamically_instantiate(observer_name)
-    observer_info = observer.initialize_observer(setup_info, caller_info, x0, y0, seed)
+    try:
+        observer: AbstractObserver = dynamically_instantiate(
+            observer_name, **observer_kwargs
+        )
+
+        observer_info = observer.initialize_observer(
+            setup_info, caller_info, x0, y0, seed
+        )
+        conn.send(["SETUP", observer_info])
+    except Exception as e:
+        conn.send(["EXCEPTION", e])
+        sys.exit(1)
+
     # give mother process the signal that we're ready
-    conn.send(observer_info)
 
     # now wait for observe calls
     while True:
-        msg = conn.recv()
-        if msg is None:
+        msg_type, *msg = conn.recv()
+        if msg_type == "OBSERVATION":
+            # How should we inform the external observer
+            # if something fails during observation?
+            # (TODO).
+            try:
+                observer.observe(*msg)
+                conn.send(["OBSERVATION", None])
+            except Exception as e:
+                conn.send(["EXCEPTION", e])
+        elif msg_type == "ATTRIBUTE":
+            try:
+                conn.send(["ATTRIBUTE", getattr(observer, msg[0])])
+            except Exception as e:
+                conn.send(["EXCEPTION", e])
+        elif msg_type == "QUIT":
             break
-        observer.observe(*msg)
     observer.finish()
     # conn.close()
     # exit()  # kill other threads, and close file handles
@@ -40,5 +64,7 @@ if __name__ == "__main__":
     parser.add_argument("--port", required=True, type=int)
     parser.add_argument("--password", required=True, type=str)
 
-    args, factory_kwargs = parser.parse_known_args()
-    start_observer_process(args.objective_name, args.port, args.password)
+    args, _ = parser.parse_known_args()
+    start_observer_process(
+        args.objective_name, args.port, args.password
+    )
