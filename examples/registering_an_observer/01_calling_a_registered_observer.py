@@ -14,7 +14,7 @@ if __name__ == "__main__":
     # This observer now runs on an isolated process
     # on the poli__wandb environment, as was registered
     # in ./00_registering_an_observer.py.
-    observer = ExternalObserver(observer_name="wandb")
+    observer = ExternalObserver(observer_name="wandb", initial_step=0)
 
     # Instantiate the objective
     problem_info, f, x0, y0, run_info = objective_factory.create(

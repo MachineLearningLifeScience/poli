@@ -21,7 +21,7 @@ from wandb_observer import WandbObserver
 
 if __name__ == "__main__":
     set_observer(
-        observer=WandbObserver(),
+        observer=WandbObserver(initial_step=0),
         conda_environment_location="poli__wandb",
         observer_name="wandb",
     )

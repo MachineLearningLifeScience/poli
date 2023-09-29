@@ -13,12 +13,15 @@ from poli.core.util.abstract_observer import AbstractObserver
 
 
 class WandbObserver(AbstractObserver):
-    def __init__(self) -> None:
+    def __init__(self, initial_step: int = None) -> None:
+        if initial_step is None:
+            raise ValueError("initial_step must be provided")
+
         # Log into wandb
         wandb.login()
 
         # Some variables to keep track of the run
-        self.step = 0
+        self.step = initial_step
         self.x_table = wandb.Table(columns=["step", "x", "y"])
         super().__init__()
 
