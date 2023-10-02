@@ -102,7 +102,11 @@ class AbstractBlackBox:
 
             # We pass the information to the observer, if any.
             if self.observer is not None:
-                self.observer.observe(x_batch, f_batch, context)
+                # observer logic s.t. observations are individual - later aggregate w.r.t batch_size
+                for i in range(x_batch.shape[0]): 
+                    _x = np.atleast_2d(x_batch[i])
+                    _y = np.atleast_2d(f_batch[i])
+                    self.observer.observe(_x, _y, context)
 
             f_evals.append(f_batch)
 
