@@ -24,11 +24,11 @@ class AbstractBlackBox:
 
         self.num_workers = num_workers
 
-        if not self.info.sequences_are_aligned():
-            assert (
-                batch_size is None or batch_size == 1
-            ), "For unaligned problems only batch size 1 is supported!"
-            batch_size = 1
+        # if not self.info.sequences_are_aligned():
+        #     # assert (
+        #     #     batch_size is None or batch_size == 1
+        #     # ), "For unaligned problems only batch size 1 is supported!"
+        #     batch_size = 1
         self.batch_size = batch_size
 
     def set_observer(self, observer: AbstractObserver):
@@ -73,11 +73,14 @@ class AbstractBlackBox:
         # We evaluate x in batches.
         for x_batch_ in batched(x, batch_size):
             # We reshape the batch to be 2D, even if the batch size is 1.
-            x_batch = (
-                np.concatenate(x_batch_, axis=0).reshape(len(x_batch_), -1)
-                if batch_size > 1
-                else np.array(x_batch_)
-            )
+            try:
+                x_batch = (
+                    np.concatenate(x_batch_, axis=0).reshape(len(x_batch_), -1)
+                    if batch_size > 1
+                    else np.array(x_batch_)
+                )
+            except ValueError:  # in case unaligned sequences or zero dimensional
+                x_batch = np.array(x_batch_)
 
             # We evaluate the batch in parallel if the user wants to.
             if self.parallelize:
@@ -99,7 +102,11 @@ class AbstractBlackBox:
 
             # We pass the information to the observer, if any.
             if self.observer is not None:
-                self.observer.observe(x_batch, f_batch, context)
+                # observer logic s.t. observations are individual - later aggregate w.r.t batch_size
+                for i in range(x_batch.shape[0]):
+                    _x = np.atleast_2d(x_batch[i])
+                    _y = np.atleast_2d(f_batch[i])
+                    self.observer.observe(_x, _y, context)
 
             f_evals.append(f_batch)
 

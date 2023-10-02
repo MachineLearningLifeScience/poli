@@ -110,7 +110,7 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
             name="foldx_stability_and_sasa",
             max_sequence_length=np.inf,
             alphabet=alphabet,
-            aligned=True,
+            aligned=False,
         )
 
     def create(
