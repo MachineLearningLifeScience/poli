@@ -47,14 +47,16 @@ def dynamically_instantiate(obj: str, **kwargs):
     sys.path.extend(os.environ[ADDITIONAL_IMPORT_SEARCH_PATHES_KEY].split(":"))
     # sys.path.extend(os.environ['PYTHONPATH'].split(':'))
     last_dot = obj.rfind(".")
+
+    command = (
+        "from "
+        + obj[:last_dot]
+        + " import "
+        + obj[last_dot + 1 :]
+        + " as DynamicObject"
+    )
     try:
-        exec(
-            "from "
-            + obj[:last_dot]
-            + " import "
-            + obj[last_dot + 1 :]
-            + " as DynamicObject"
-        )
+        exec(command)
         instantiated_object = eval("DynamicObject")(**kwargs)
     except ImportError as e:
         logging.fatal(f"Path: {os.environ['PATH']}")

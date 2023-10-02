@@ -28,7 +28,9 @@ class ExternalObserver(AbstractObserver):
         # And we make sure the process received and logged it correctly
         msg_type, *msg = self.process_wrapper.recv()
         if msg_type == "EXCEPTION":
-            raise msg[0]
+            e, tb = msg
+            print(tb)
+            raise e
 
         # else, it was a successful observation
 
@@ -49,7 +51,9 @@ class ExternalObserver(AbstractObserver):
         if msg_type == "SETUP":
             observer_info = msg[0]
         elif msg_type == "EXCEPTION":
-            raise msg[0]
+            e, tb = msg
+            print(tb)
+            raise e
         else:
             raise ValueError("Unknown message type from observer process: " + msg_type)
 
@@ -71,7 +75,8 @@ class ExternalObserver(AbstractObserver):
         self.process_wrapper.send(["ATTRIBUTE", __name])
         msg_type, *msg = self.process_wrapper.recv()
         if msg_type == "EXCEPTION":
-            e = msg[0]
+            e, tb = msg
+            print(tb)
             raise e
         else:
             assert msg_type == "ATTRIBUTE"

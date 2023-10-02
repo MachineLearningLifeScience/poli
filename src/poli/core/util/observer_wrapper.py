@@ -5,6 +5,7 @@ When registering an observer, this module is called and instantiates the user's 
 
 import sys
 import argparse
+import traceback
 
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.inter_process_communication.process_wrapper import get_connection
@@ -19,18 +20,19 @@ def start_observer_process(observer_name, port: int, password: str):
     setup_info, caller_info, x0, y0, seed, observer_kwargs = conn.recv()
 
     # instantiate observer
-    try:
-        observer: AbstractObserver = dynamically_instantiate(
-            observer_name, **observer_kwargs
-        )
+    observer: AbstractObserver = dynamically_instantiate(
+        observer_name, **observer_kwargs
+    )
 
+    try:
         observer_info = observer.initialize_observer(
             setup_info, caller_info, x0, y0, seed
         )
         # give mother process the signal that we're ready
         conn.send(["SETUP", observer_info])
     except Exception as e:
-        conn.send(["EXCEPTION", e])
+        tb = traceback.format_exc()
+        conn.send(["EXCEPTION", e, tb])
         sys.exit(1)
 
     # now wait for observe calls
@@ -44,12 +46,14 @@ def start_observer_process(observer_name, port: int, password: str):
                 observer.observe(*msg)
                 conn.send(["OBSERVATION", None])
             except Exception as e:
-                conn.send(["EXCEPTION", e])
+                tb = traceback.format_exc()
+                conn.send(["EXCEPTION", e, tb])
         elif msg_type == "ATTRIBUTE":
             try:
                 conn.send(["ATTRIBUTE", getattr(observer, msg[0])])
             except Exception as e:
-                conn.send(["EXCEPTION", e])
+                tb = traceback.format_exc()
+                conn.send(["EXCEPTION", e, tb])
         elif msg_type == "QUIT":
             break
     observer.finish()
