@@ -117,8 +117,11 @@ class AbstractBlackBox:
     def _black_box(self, x, context=None):
         raise NotImplementedError("abstract method")
 
-    def terminate(self):
-        pass
+    def terminate(self) -> None:
+        if self.observer is not None:
+            # NOTE: terminating a problem should gracefully end the observer process -> write the last state.
+            self.observer.finish()
+        return
 
     def __enter__(self):
         return self
