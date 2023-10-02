@@ -79,7 +79,7 @@ class AbstractBlackBox:
                     if batch_size > 1
                     else np.array(x_batch_)
                 )
-            except ValueError: # in case unaligned sequences or zero dimensional
+            except ValueError:  # in case unaligned sequences or zero dimensional
                 x_batch = np.array(x_batch_)
 
             # We evaluate the batch in parallel if the user wants to.
@@ -103,7 +103,7 @@ class AbstractBlackBox:
             # We pass the information to the observer, if any.
             if self.observer is not None:
                 # observer logic s.t. observations are individual - later aggregate w.r.t batch_size
-                for i in range(x_batch.shape[0]): 
+                for i in range(x_batch.shape[0]):
                     _x = np.atleast_2d(x_batch[i])
                     _y = np.atleast_2d(f_batch[i])
                     self.observer.observe(_x, _y, context)
