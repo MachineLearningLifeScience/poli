@@ -87,13 +87,7 @@ class AbstractBlackBox:
                     )
                     f_batch = np.array(f_batch_).reshape(len(x_batch_), -1)
             else:  # iterative treatment
-                if x_batch.shape[0] > 1:
-                    _f_batch = np.array(
-                        [self._black_box(_x, context) for _x in x_batch]
-                    )
-                    f_batch = np.array(_f_batch).reshape(len(x_batch_), -1)
-                else:
-                    f_batch = self._black_box(x_batch, context)
+                f_batch = self._black_box(x_batch, context)
 
             assert (
                 len(f_batch.shape) == 2
