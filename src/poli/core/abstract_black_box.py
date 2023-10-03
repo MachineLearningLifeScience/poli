@@ -73,14 +73,11 @@ class AbstractBlackBox:
         # We evaluate x in batches.
         for x_batch_ in batched(x, batch_size):
             # We reshape the batch to be 2D, even if the batch size is 1.
-            try:
-                x_batch = (
-                    np.concatenate(x_batch_, axis=0).reshape(len(x_batch_), -1)
-                    if batch_size > 1
-                    else np.array(x_batch_)
-                )
-            except ValueError:  # in case unaligned sequences or zero dimensional
-                x_batch = np.array(x_batch_)
+            x_batch = (
+                np.concatenate(x_batch_, axis=0).reshape(len(x_batch_), -1)
+                if batch_size > 1
+                else np.array(x_batch_)
+            )
 
             # We evaluate the batch in parallel if the user wants to.
             if self.parallelize:
