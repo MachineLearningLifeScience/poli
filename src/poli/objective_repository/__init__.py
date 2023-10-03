@@ -94,3 +94,11 @@ try:
     AVAILABLE_PROBLEM_FACTORIES["drd3_docking"] = DDR3ProblemFactory
 except (ImportError, FileNotFoundError):
     pass
+
+
+try:
+    from .gfp_select.register import GFPSelectionProblemFactory
+
+    AVAILABLE_PROBLEM_FACTORIES["gfp_select"] = GFPSelectionProblemFactory
+except (ImportError, FileNotFoundError):
+    pass
