@@ -97,7 +97,9 @@ class AbstractBlackBox:
                 f_batch, np.ndarray
             ), f"type(f)={type(f_batch)}, not np.ndarray"
 
-            assert x_batch.shape[0] == f_batch.shape[0], f"Inconsistent evaluation axis=0 x={x_batch.shape} != black_box y={f_batch.shape}"
+            assert (
+                x_batch.shape[0] == f_batch.shape[0]
+            ), f"Inconsistent evaluation axis=0 x={x_batch.shape} != black_box y={f_batch.shape}"
 
             # We pass the information to the observer, if any.
             if self.observer is not None:
