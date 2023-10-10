@@ -1,16 +1,12 @@
-# Protein Objective Library (POLi)
+# `poli`, a library for discrete sequence optimization
 
 [![Testing (conda, python 3.9)](https://github.com/MachineLearningLifeScience/poli/actions/workflows/python-tox-testing-including-conda.yml/badge.svg)](https://github.com/MachineLearningLifeScience/poli/actions/workflows/python-tox-testing-including-conda.yml)
 
-An easy-to-use, plug-and-play library to benchmark protein-related discrete optimization algorithms.
-Primarily, this library provides a way to encapsulate objective functions and their dependencies.
-The main benefit is that this allows to develop optimization algorithms that use (say) tensorflow without having to worry that the objective was written in (say) torch.
+`poli` is an easy-to-use, plug-and-play library to query black-box functions in biology and cheminformatics. Examples include:
+- Computing the **stability** of mutations from a wildtype protein (using `foldx`).
+- Computing the **docking scores** of ligands to proteins (using [`pyscreener`]() and [`pytdc`]()).
 
-For any code written by other authors (whether objective function or algorithm) this library allows to benchmark and analyse it without too much interaction.
-
-On purpose, logging is kept at the objective function side.
-This allows easier benchmarking of algorithms from other authors.
-Algorithm-specific logging can be done internally, on the site of the algorithm if necessary.
+When dependencies get tough, this library provides a way to encapsulate objective functions into isolated `conda` environments. The main benefit is that this allows to develop optimization algorithms that use (say) tensorflow without having to worry about the specific dependencies of the objective function. Moreover, `poli` provides a way to inject logging into the objective function evaluations using observers.
 
 ## Basic usage
 
@@ -52,16 +48,40 @@ for _ in range(5):
 
 ```
 
-### Calling objective functions from the repository
+### When you have the right dependencies...
 
-As you might have noticed, you can get a list of the registered problems using the `get_problems` method inside `poli.core.registry`. You can also get a list of objective functions available for installing/registration using `from poli.objective_repository import AVAILABLE_PROBLEM_FACTORIES`:
+If you have enough dependencies to run an objective function, it will become available. For example, try running `pip install rdkit selfies` followed by the `get_problems()` statement from above:
 
 ```bash
-$ python -c "from poli.objective_repository import AVAILABLE_PROBLEM_FACTORIES ; print(AVAILABLE_PROBLEM_FACTORIES)"
-'{"white_noise": <WhiteNoiseProblemFactory(L=inf)>, ...}'
+$ pip install rdkit selfies
+$ python -c "from poli.core.registry import get_problems ; print(get_problems())"
+['aloha', 'rdkit_logp', 'rdkit_qed', 'white_noise']
 ```
 
-If the function isn't there, you may:
-- Install all the required dependencies for running the file. Check the relevant environment under `poli/objective_repository/problem_name/environment.yml`.
-- Implement the problem yourself! An example of how to do this can be found in `poli/examples/a_simple_objective_function_registration`.
+Now that both `rdkit` and `selfies` are in the current environment, problems like computing `logp` and `qed` of SELFIES or SMILES strings become available.
 
+### Calling objective functions in isolated enviroments
+
+To get a list of all avilable objective functions, you can pass the `include_repository=True` flag to `get_problems`:
+
+```bash
+$ python -c "from poli.core.registry import get_problems ; print(get_problems(include_repository=True))"
+['aloha', 'drd3_docking', 'foldx_sasa', 'foldx_stability', ..., 'white_noise']
+```
+
+**Most of these objective functions can be run out-of-the-box** in isolated enviroments. For example, consider computing the synthetic accessibility of a molecule using `pytdc`. This problem is called `sa_tdc` in `poli`, and can easily be run without having the right dependencies installed:
+
+```python
+from poli import objective_factory
+import numpy as np
+
+problem_info, f, x0, y0, run_info = objective_factory.create(
+    name="sa_tdc",
+    force_register=True,
+    string_representation="SELFIES",
+)
+
+x = np.array([["[C]", "[C]", "[C]"]])
+print(f"f({x}) = {f(x)}")
+
+```

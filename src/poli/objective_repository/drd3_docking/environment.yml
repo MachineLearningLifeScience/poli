@@ -1,4 +1,4 @@
-name: poli__lambo
+name: poli__tdc
 channels:
   - conda-forge
   - defaults
@@ -13,12 +13,7 @@ dependencies:
   - pip:
     - "git+https://github.com/MachineLearningLifeScience/poli.git@dev"
     - biopython==1.81
-    - botorch==0.8.5
-    - gpytorch==1.10
-    - hydra-core==1.1.0.dev6
     - python-levenshtein==0.12.2
-    - pymoo==0.6.0.1
-    - torch==2.0.1
     - pandas==2.0.3
     - cachetools==5.3.1
     - rdkit
@@ -30,3 +25,4 @@ dependencies:
     - h5py
     - tqdm
     - scikit-learn
+    - networkx
