@@ -4,7 +4,7 @@
 
 `poli` is an easy-to-use, plug-and-play library to query black-box functions in biology and cheminformatics. Examples include:
 - Computing the **stability** of mutations from a wildtype protein (using `foldx`).
-- Computing the **docking scores** of ligands to proteins (using [`pyscreener`]() and [`pytdc`]()).
+- Computing the **docking scores** of ligands to proteins (using [`pyscreener`](https://github.com/coleygroup/pyscreener) and [`pytdc`](https://tdcommons.ai/functions/oracles/)).
 
 When dependencies get tough, this library provides a way to encapsulate objective functions into isolated `conda` environments. The main benefit is that this allows to develop optimization algorithms that use (say) tensorflow without having to worry about the specific dependencies of the objective function. Moreover, `poli` provides a way to inject logging into the objective function evaluations using observers.
 
