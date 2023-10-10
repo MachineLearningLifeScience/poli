@@ -21,9 +21,11 @@ class TDCBlackBox(AbstractBlackBox):
         oracle_name: str,
         info: ProblemSetupInformation,
         batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
         from_smiles: bool = True,
     ):
-        super().__init__(info, batch_size)
+        super().__init__(info, batch_size, parallelize, num_workers)
         self.oracle = Oracle(name=oracle_name)
         self.from_smiles = from_smiles
 
