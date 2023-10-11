@@ -17,7 +17,7 @@ PDB_PARSER = Bio.PDB.PDBParser(PERMISSIVE=0)
 
 
 class NonHetSelector(Bio.PDB.Select):
-    """ Remove HET atoms and choose first conformation of disordered atoms"""
+    """Remove HET atoms and choose first conformation of disordered atoms"""
 
     def accept_residue(self, residue):
         norm_res_bool = residue.get_resname() in [
@@ -102,7 +102,7 @@ def _step_4_fix_numbering(fixer, temp3, temp4):
         residues_before.append(chain.get_list())
         for res in chain:
             for atom in res:
-                atoms_before.append(atom)    
+                atoms_before.append(atom)
     residues_after = []
     atoms_after = []
     for chain in structure_after[0]:
@@ -213,7 +213,6 @@ def clean_pdb(pdb_input_filename: str, out_dir: str, reduce_executable: str):
 
 
 if __name__ == "__main__":
-
     t0 = time.time()
 
     # Argument Parser
