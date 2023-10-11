@@ -1,0 +1,21 @@
+name: poli__tdc
+channels:
+  - omnia
+  - conda-forge
+  - anaconda
+  - defaults
+dependencies:
+  - python=3.9
+  - pdbfixer
+  - openbabel
+  - openmm
+  - mpl-scatter-density
+  - pip:
+    - "git+https://github.com/MachineLearningLifeScience/poli.git@dev"
+    - biopython
+    - torch
+    - pandas
+    - matplotlib
+    - pdb-tools
+    - ptitprince
+    - scikit-learn
