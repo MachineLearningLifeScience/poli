@@ -12,10 +12,11 @@ dependencies:
   - mpl-scatter-density
   - pip:
     - "git+https://github.com/MachineLearningLifeScience/poli.git@dev"
-    - biopython
+    - biopython==1.75
     - torch
     - pandas
     - matplotlib
     - pdb-tools
     - ptitprince
     - scikit-learn
+    - pyyaml

@@ -5,7 +5,8 @@ import time
 
 import Bio
 import Bio.PDB
-import Bio.PDB.Vector
+
+# import Bio.PDB.Vector
 import numpy as np
 import simtk
 import simtk.openmm
@@ -13,9 +14,9 @@ import simtk.openmm.app
 import simtk.unit
 from Bio.PDB.DSSP import DSSP
 
-basepath = os.path.dirname(os.path.realpath(__file__))
-sys.path.insert(1, basepath)
-import grid
+# basepath = os.path.dirname(os.path.realpath(__file__))
+# sys.path.insert(1, basepath)
+from . import grid
 
 
 def extract_atomic_features(pdb_filename):

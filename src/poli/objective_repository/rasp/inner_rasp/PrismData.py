@@ -14,7 +14,7 @@ See README.md for general file format definitions.
 
 __version__ = 1.001
 
-from Bio import Seq, SeqRecord, SeqIO, pairwise2, SubsMat
+from Bio import Seq, SeqRecord, SeqIO, pairwise2
 from Bio.SubsMat import MatrixInfo
 import numpy as np
 import pandas as pd

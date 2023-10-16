@@ -211,6 +211,14 @@ def clean_pdb(pdb_input_filename: str, out_dir: str, reduce_executable: str):
                         PDBIO.set_structure(structure_after[0])
                         PDBIO.save(outpdb)
 
+    # Add a header to the output file
+    with open(os.path.join(out_dir, pdbid + "_clean.pdb"), "r") as f:
+        lines = f.readlines()
+    with open(os.path.join(out_dir, pdbid + "_clean.pdb"), "w") as f:
+        f.write(f"HEADER   CLEANED FROM {pdb_input_filename}\n")
+        for line in lines:
+            f.write(line)
+
 
 if __name__ == "__main__":
     t0 = time.time()

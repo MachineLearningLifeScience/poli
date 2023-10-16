@@ -1,5 +1,8 @@
+from pathlib import Path
+import os, stat
+import subprocess
+
 import glob
-import os
 import pandas as pd
 import torch
 
@@ -16,6 +19,12 @@ from poli.objective_repository.rasp.inner_rasp.helpers import (
     ds_pred,
     rasp_to_prism,
     get_seq_from_variant,
+)
+from poli.objective_repository.rasp.inner_rasp.pdb_parser_scripts.clean_pdb import (
+    clean_pdb,
+)
+from poli.objective_repository.rasp.inner_rasp.pdb_parser_scripts.extract_environments import (
+    extract_environments,
 )
 
 NUM_ENSEMBLE = 10
@@ -162,20 +171,156 @@ def predict(
     ...
 
 
-if __name__ == "__main__":
-    wildtype_pdb_path = ...
-    chain_to_keep = ...
+class RaspInterface:
+    def __init__(self, working_dir: Path) -> None:
+        self.working_dir = working_dir
 
-    # Command to run to clean up the chains:
-    # This one will need pdb_selchain, pdb_delhetatm, pdb_delres, pdb_fixinsert, and pdb_tidy.
-    # These are all available in the pdb-tools package, which
-    # is already installed in the conda environment.
-    # !pdb_selchain -"$chain" /content/query_protein.pdb | pdb_delhetatm | pdb_delres --999:0:1 | pdb_fixinsert | pdb_tidy  > /content/data/test/predictions/raw/query_protein_uniquechain.pdb
+        # Making the appropriate folders:
+        (self.working_dir / "raw").mkdir(parents=True, exist_ok=True)
+        (self.working_dir / "cleaned").mkdir(parents=True, exist_ok=True)
+        (self.working_dir / "parsed").mkdir(parents=True, exist_ok=True)
+        (self.working_dir / "output").mkdir(parents=True, exist_ok=True)
+
+        # Downloading reduce and compile it.
+        self.reduce_executable_path = None
+        self.get_and_compile_reduce()
+
+    def get_and_compile_reduce(self):
+        """
+        This function downloads reduce and compiles it
+        if we can't find it inside ~/.poli_objectives/rasp.
+        """
+        HOME_DIR = self.working_dir.home()
+        RASP_DIR = HOME_DIR / ".poli_objectives" / "rasp"
+        RASP_DIR.mkdir(parents=True, exist_ok=True)
+
+        REDUCE_DIR = RASP_DIR / "reduce"
+        EXECUTABLE_PATH = REDUCE_DIR / "reduce_src" / "reduce"
+        if not (EXECUTABLE_PATH).exists():
+            # Clone it using git.
+            # TODO: Is there a way of downloading the contents
+            # of the repo without cloning it?
+            subprocess.run(
+                "git clone https://github.com/rlabduke/reduce.git",
+                cwd=RASP_DIR,
+                shell=True,
+                stdout=subprocess.DEVNULL,
+            )
+
+            # compile it.
+
+            subprocess.run(
+                "make",
+                cwd=REDUCE_DIR,
+                stdout=subprocess.DEVNULL,
+            )
+
+            # Change its permissions.
+            os.chmod(EXECUTABLE_PATH, stat.S_IEXEC)
+
+        self.reduce_executable_path = EXECUTABLE_PATH
+
+    def raw_pdb_to_unique_chain(self, wildtype_pdb_path: Path, chain: str = "A"):
+        """
+        This function takes a raw pdb file, extracts a chain, and tidies up
+        using pdbtools. Following their interactive implementation, this
+        function will:
+            1. Select a chain.
+            2. Delete heteroatoms.
+            3. Delete residues between -999 and 0.
+            4. Fix insertions.
+            5. Tidy the PDB.
+
+        The output of this function is a PDB file with a single chain,
+        stored at the working directory of this RaspInterface instance.
+        More precisely, it will be stored at
+        working_dir / raw / {wildtype_pdb_path.stem}_query_protein_uniquechain.pdb
+        """
+        # First command to run (which uses pdbtools to select a chain,
+        # delete heteroatoms, remove some residues, fix insertions,
+        # and tidy the PDB).
+        raw_output_path = (
+            self.working_dir
+            / "raw"
+            / f"{wildtype_pdb_path.stem}_query_protein_uniquechain.pdb"
+        )
+        pdb_tools_command_for_cleanup = [
+            "pdb_selchain",
+            f"-{chain}",
+            str(wildtype_pdb_path.resolve()),
+            "|",
+            "pdb_delhetatm",
+            "|",
+            "pdb_delres",
+            "--999:0:1",
+            "|",
+            "pdb_fixinsert",
+            "|",
+            "pdb_tidy",
+            ">",
+            str(raw_output_path.resolve()),
+        ]
+
+        subprocess.run(
+            " ".join(pdb_tools_command_for_cleanup),
+            check=True,
+            cwd=self.working_dir,
+            shell=True,
+        )
+
+    def unique_chain_to_clean_pdb(self, wildtype_pdb_path: Path):
+        clean_pdb(
+            pdb_input_filename=str(
+                self.working_dir
+                / "raw"
+                / f"{wildtype_pdb_path.stem}_query_protein_uniquechain.pdb"
+            ),
+            out_dir=str(self.working_dir / "cleaned"),
+            reduce_executable=str(self.reduce_executable_path),
+        )
+
+    def cleaned_to_parsed_pdb(
+        self,
+        wildtype_pdb_path: Path,
+        max_radius: float = 9.0,
+        include_center: bool = False,
+    ):
+        """
+        This function takes a cleaned pdb file, and extracts the
+        residue environments using extract_environments.py.
+        The output of this function is a .npz file in the
+        parsed directory given by:
+        working_dir / parsed / {wildtype_pdb_path.stem}_query_protein_uniquechain_clean_coordinate_features.npz
+        """
+        # !python3 /content/src/pdb_parser_scripts/extract_environments.py --pdb_in /content/data/test/predictions/cleaned/query_protein_uniquechain_clean.pdb  --out_dir /content/data/test/predictions/parsed/  #&> /dev/null
+        pdb_id = wildtype_pdb_path.stem
+        extract_environments(
+            pdb_filename=str(
+                self.working_dir
+                / "cleaned"
+                / f"{wildtype_pdb_path.stem}_query_protein_uniquechain_clean.pdb"
+            ),
+            pdb_id=pdb_id,
+            max_radius=max_radius,
+            out_dir=str(self.working_dir / "parsed"),
+            include_center=include_center,
+        )
+
+
+if __name__ == "__main__":
+    THIS_DIR = Path(__file__).parent.resolve()
+    wildtype_pdb_path = THIS_DIR / "101m.pdb"
+    chain_to_keep = "A"
+
+    rasp_interface = RaspInterface(THIS_DIR / "tmp")
+
+    rasp_interface.raw_pdb_to_unique_chain(wildtype_pdb_path, chain_to_keep)
+    rasp_interface.unique_chain_to_clean_pdb(wildtype_pdb_path)
+    rasp_interface.cleaned_to_parsed_pdb(wildtype_pdb_path)
 
     # Commands required to pre-process the PDBs:
     # These ones will need clean_pdb.py, reduce, and extract_environments.py
     # !python3 /content/src/pdb_parser_scripts/clean_pdb.py --pdb_file_in /content/data/test/predictions/raw/query_protein_uniquechain.pdb --out_dir /content/data/test/predictions/cleaned/ --reduce_exe /content/src/pdb_parser_scripts/reduce/reduce #&> /dev/null
-    # !python3 /content/src/pdb_parser_scripts/extract_environments.py --pdb_in /content/data/test/predictions/cleaned/query_protein_uniquechain_clean.pdb  --out_dir /content/data/test/predictions/parsed/  #&> /dev/null
 
     # The output of these is a .npz file in the parsed directory.
     # More precisely, it generates:
