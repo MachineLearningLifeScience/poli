@@ -6,6 +6,7 @@ import pickle
 import random
 import sys
 from typing import Dict, List, Union
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -576,11 +577,14 @@ def ds_pred(
             )
 
             # Load ds models in a load
+            HOME_DIR = Path(__file__).resolve().home()
+            RASP_DIR = HOME_DIR / ".poli_objectives" / "rasp"
             for i in range(NUM_ENSEMBLE):
                 model_idx = i
                 ds_model_net.load_state_dict(
                     torch.load(
-                        f"/content/output/ds_models/ds_model_{model_idx}/model.pt"
+                        RASP_DIR / "ds_models" / f"ds_model_{model_idx}" / "model.pt",
+                        map_location=DEVICE,
                     )
                 )
                 ds_model_net.eval()

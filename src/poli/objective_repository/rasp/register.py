@@ -2,8 +2,8 @@ from pathlib import Path
 import os, stat
 import subprocess
 
-import glob
 import pandas as pd
+import numpy as np
 import torch
 
 from Bio.PDB.Polypeptide import index_to_one, one_to_index
@@ -28,24 +28,30 @@ from poli.objective_repository.rasp.inner_rasp.pdb_parser_scripts.extract_enviro
 )
 
 NUM_ENSEMBLE = 10
+DEVICE = "cpu"
 TASK_ID = int(1)
 PER_TASK = int(1)
 
 AF_ID = ""
 PDB_ID = ""
 
+THIS_DIR = Path(__file__).parent.resolve()
+HOME_DIR = THIS_DIR.home()
+RASP_DIR = HOME_DIR / ".poli_objectives" / "rasp"
+RASP_DIR.mkdir(parents=True, exist_ok=True)
+
 
 def load_cavity_and_downstream_models():
-    DEVICE = "cpu"
+    # DEVICE = "cpu"
 
     # TODO: Ask why this was implemented this way.
     # A transparent alternative would be to simply
     # load the model from the path itself.
-    best_cavity_model_path = open(
-        f"/content/output/cavity_models/best_model_path.txt", "r"
-    ).read()
+    best_cavity_model_path = RASP_DIR / "cavity_model_15.pt"
     cavity_model_net = CavityModel(get_latent=True).to(DEVICE)
-    cavity_model_net.load_state_dict(torch.load(f"{best_cavity_model_path}"))
+    cavity_model_net.load_state_dict(
+        torch.load(f"{best_cavity_model_path}", map_location=DEVICE)
+    )
     cavity_model_net.eval()
     ds_model_net = DownstreamModel().to(DEVICE)
     ds_model_net.apply(init_lin_weights)
@@ -53,55 +59,6 @@ def load_cavity_and_downstream_models():
 
     return cavity_model_net, ds_model_net
 
-
-def predict(
-    cavity_model_net, ds_model_net, df_structure, dataset_key, NUM_ENSEMBLE, DEVICE
-):
-    df_ml = ds_pred(
-        cavity_model_net,
-        ds_model_net,
-        df_structure,
-        dataset_key,
-        NUM_ENSEMBLE,
-        DEVICE,
-    )
-
-    df_total = df_structure.merge(
-        df_ml, on=["pdbid", "chainid", "variant"], how="outer"
-    )
-    # df_total["b_factors"] = df_total.apply(lambda row: row["resenv"].b_factors, axis=1)
-    df_total = df_total.drop("resenv", 1)
-    print(
-        f"{len(df_structure)-len(df_ml)} data points dropped when matching total data with ml predictions in: {dataset_key}."
-    )
-
-    # Parse output into separate files by pdb, print to PRISM format
-    for pdbid in df_total["pdbid"].unique():
-        df_pdb = df_total[df_total["pdbid"] == pdbid]
-        for chainid in df_pdb["chainid"].unique():
-            pred_outfile = (
-                f"{os.getcwd()}/output/{dataset_key}/cavity_pred_{pdbid}_{chainid}.csv"
-            )
-            print(f"Parsing predictions from pdb: {pdbid}{chainid} into {pred_outfile}")
-            df_chain = df_pdb[df_pdb["chainid"] == chainid]
-            df_chain = df_chain.assign(pos=df_chain["variant"].str[1:-1])
-            df_chain["pos"] = pd.to_numeric(df_chain["pos"])
-            first_res_no = min(df_chain["pos"])
-            df_chain = df_chain.assign(wt_AA=df_chain["variant"].str[0])
-            df_chain = df_chain.assign(mt_AA=df_chain["variant"].str[-1])
-            seq = get_seq_from_variant(df_chain)
-            df_chain.to_csv(pred_outfile, index=False)
-            prism_outfile = (
-                f"/content/output/{dataset_key}/prism_cavity_{pdbid}_{chainid}.txt"
-            )
-
-            # if (AF_ID !=''):
-            #   prism_outfile = f"/content/output/{dataset_key}/prism_cavity_{AF_ID}_{chainid}.txt"
-            # elif (PDB_ID !=''):
-            #   prism_outfile = f"/content/output/{dataset_key}/prism_cavity_{PDB_ID}_{chainid}.txt"
-            # elif PDB_custom:
-            #   prism_outfile = f"/content/output/{dataset_key}/prism_cavity_XXXX_{chainid}.txt"
-            cavity_to_prism(df_chain, pdbid, chainid, seq, prism_outfile)
     ...
 
 
@@ -118,6 +75,8 @@ class RaspInterface:
         # Downloading reduce and compile it.
         self.reduce_executable_path = None
         self.get_and_compile_reduce()
+
+        # Downloading the cavity and downstream models.
 
     def get_and_compile_reduce(self):
         """
@@ -153,6 +112,71 @@ class RaspInterface:
             os.chmod(EXECUTABLE_PATH, stat.S_IEXEC)
 
         self.reduce_executable_path = EXECUTABLE_PATH
+
+    def predict(
+        self,
+        cavity_model_net,
+        ds_model_net,
+        df_structure,
+        dataset_key,
+        NUM_ENSEMBLE,
+        DEVICE,
+    ):
+        df_ml = ds_pred(
+            cavity_model_net,
+            ds_model_net,
+            df_structure,
+            dataset_key,
+            NUM_ENSEMBLE,
+            DEVICE,
+        )
+
+        df_total = df_structure.merge(
+            df_ml, on=["pdbid", "chainid", "variant"], how="outer"
+        )
+        # df_total["b_factors"] = df_total.apply(lambda row: row["resenv"].b_factors, axis=1)
+        df_total = df_total.drop("resenv", axis=1)
+        print(
+            f"{len(df_structure)-len(df_ml)} data points dropped when matching total data with ml predictions in: {dataset_key}."
+        )
+
+        # Parse output into separate files by pdb, print to PRISM format
+        for pdbid in df_total["pdbid"].unique():
+            df_pdb = df_total[df_total["pdbid"] == pdbid]
+            for chainid in df_pdb["chainid"].unique():
+                pred_outdir = self.working_dir / "output" / f"{dataset_key}"
+                pred_outdir.mkdir(parents=True, exist_ok=True)
+                pred_outfile = pred_outdir / f"cavity_pred_{pdbid}_{chainid}.csv"
+                print(
+                    f"Parsing predictions from pdb: {pdbid}{chainid} into {pred_outfile}"
+                )
+                df_chain = df_pdb[df_pdb["chainid"] == chainid]
+                df_chain = df_chain.assign(pos=df_chain["variant"].str[1:-1])
+                df_chain["pos"] = pd.to_numeric(df_chain["pos"])
+                first_res_no = min(df_chain["pos"])
+                df_chain = df_chain.assign(wt_AA=df_chain["variant"].str[0])
+                df_chain = df_chain.assign(mt_AA=df_chain["variant"].str[-1])
+                seq = get_seq_from_variant(df_chain)
+                df_chain.to_csv(pred_outfile, index=False)
+                prism_outfile = pred_outdir / f"prism_cavity_{pdbid}_{chainid}.txt"
+
+                # if (AF_ID !=''):
+                #   prism_outfile = f"/content/output/{dataset_key}/prism_cavity_{AF_ID}_{chainid}.txt"
+                # elif (PDB_ID !=''):
+                #   prism_outfile = f"/content/output/{dataset_key}/prism_cavity_{PDB_ID}_{chainid}.txt"
+                # elif PDB_custom:
+                #   prism_outfile = f"/content/output/{dataset_key}/prism_cavity_XXXX_{chainid}.txt"
+                cavity_to_prism(df_chain, pdbid, chainid, seq, prism_outfile)
+
+    def download_cavity_and_downstream_models(self):
+        """
+        This function downloads the cavity and downstream models
+        at the ~/.poli_objectives/rasp directory.
+
+        TODO: Find a way to download the models without
+        having to clone the entire repo.
+        """
+        raise NotImplementedError
 
     def raw_pdb_to_unique_chain(self, wildtype_pdb_path: Path, chain: str = "A"):
         """
@@ -321,6 +345,27 @@ class RaspInterface:
 
         df_structure.drop(columns="index", inplace=True)
 
+        # Load PDB amino acid frequencies used to approximate unfolded states
+        THIS_DIR = Path(__file__).parent.resolve()
+        pdb_nlfs = -np.log(
+            np.load(THIS_DIR / "inner_rasp" / "pdb_frequencies.npz")["frequencies"]
+        )
+
+        # # Add wt and mt idxs and freqs to df
+
+        df_structure["wt_idx"] = df_structure.apply(
+            lambda row: one_to_index(row["variant"][0]), axis=1
+        )
+        df_structure["mt_idx"] = df_structure.apply(
+            lambda row: one_to_index(row["variant"][-1]), axis=1
+        )
+        df_structure["wt_nlf"] = df_structure.apply(
+            lambda row: pdb_nlfs[row["wt_idx"]], axis=1
+        )
+        df_structure["mt_nlf"] = df_structure.apply(
+            lambda row: pdb_nlfs[row["mt_idx"]], axis=1
+        )
+
         return df_structure
 
 
@@ -335,5 +380,14 @@ if __name__ == "__main__":
     rasp_interface.unique_chain_to_clean_pdb(wildtype_pdb_path)
     rasp_interface.cleaned_to_parsed_pdb(wildtype_pdb_path)
 
-    df = rasp_interface.create_df_structure(wildtype_pdb_path)
-    print(df.head())
+    df_structure = rasp_interface.create_df_structure(wildtype_pdb_path)
+    print(df_structure.head())
+
+    # Loading the models
+    cavity_model_net, ds_model_net = load_cavity_and_downstream_models()
+
+    # Predicting
+    dataset_key = "predictions"
+    df_ml = rasp_interface.predict(
+        cavity_model_net, ds_model_net, df_structure, dataset_key, NUM_ENSEMBLE, DEVICE
+    )
