@@ -1,8 +1,11 @@
 import argparse
 import os
 import subprocess
+import sys
 import tempfile
+from io import BytesIO, StringIO
 import time
+from pathlib import Path
 
 import Bio.PDB
 import Bio.PDB.Polypeptide
@@ -11,6 +14,7 @@ import pdbfixer
 import simtk
 import simtk.openmm
 import simtk.openmm.app
+
 
 PDBIO = Bio.PDB.PDBIO()
 PDB_PARSER = Bio.PDB.PDBParser(PERMISSIVE=0)
@@ -50,14 +54,15 @@ def _step_1_reduce(
     temp1,
 ):
     # Add hydrogens using reduce program
+    reduce_executable_path = Path(reduce_executable)
+    path_to_wwPDB_het_dict = (
+        reduce_executable_path.parent.parent / "reduce_wwPDB_het_dict.txt"
+    )
     command = [
         reduce_executable,
         "-BUILD",
         "-DB",
-        os.path.join(
-            os.path.dirname(os.path.dirname(reduce_executable)),
-            "reduce_wwPDB_het_dict.txt",
-        ),
+        str(path_to_wwPDB_het_dict),
         "-Quiet",
         pdb_input_filename,
     ]
@@ -97,19 +102,11 @@ def _step_4_fix_numbering(fixer, temp3, temp4):
     structure_before = PDB_PARSER.get_structure(temp3.name, temp3.name)
     structure_after = PDB_PARSER.get_structure(temp4.name, temp4.name)
     residues_before = []
-    atoms_before = []
     for chain in structure_before[0]:
         residues_before.append(chain.get_list())
-        for res in chain:
-            for atom in res:
-                atoms_before.append(atom)
     residues_after = []
-    atoms_after = []
     for chain in structure_after[0]:
         residues_after.append(chain.get_list())
-        for res in chain:
-            for atom in res:
-                atoms_after.append(atom)
     chain_counter = ""
     for i, chain in enumerate(structure_before[0]):
         try:
@@ -162,8 +159,6 @@ def _step_4_fix_numbering(fixer, temp3, temp4):
                     pass
                 res2.id = res1.id
                 counter += 1
-        for atom1, atom2 in zip(atoms_before, atoms_after):
-            atom2.bfactor = atom1.bfactor
 
     return structure_after
 
@@ -210,14 +205,6 @@ def clean_pdb(pdb_input_filename: str, out_dir: str, reduce_executable: str):
                     ) as outpdb:
                         PDBIO.set_structure(structure_after[0])
                         PDBIO.save(outpdb)
-
-    # Add a header to the output file
-    with open(os.path.join(out_dir, pdbid + "_clean.pdb"), "r") as f:
-        lines = f.readlines()
-    with open(os.path.join(out_dir, pdbid + "_clean.pdb"), "w") as f:
-        f.write(f"HEADER   CLEANED FROM {pdb_input_filename}\n")
-        for line in lines:
-            f.write(line)
 
 
 if __name__ == "__main__":

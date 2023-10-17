@@ -1,22 +1,21 @@
 import argparse
+import enum
 import os
 import sys
 import time
 
 import Bio
 import Bio.PDB
-
-# import Bio.PDB.Vector
+import Bio.PDB.Vector
 import numpy as np
 import simtk
 import simtk.openmm
 import simtk.openmm.app
 import simtk.unit
-from Bio.PDB.DSSP import DSSP
 
-# basepath = os.path.dirname(os.path.realpath(__file__))
-# sys.path.insert(1, basepath)
-from . import grid
+basepath = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(1, basepath)
+import grid
 
 
 def extract_atomic_features(pdb_filename):
@@ -33,7 +32,6 @@ def extract_atomic_features(pdb_filename):
     sequence_onehot = []
     resids_pdb = []
     chain_ids = []
-    b_factors_res = []
     for i, chain in enumerate(first_model):
         # Append chainid
         chain_ids.append(chain.id)
@@ -43,14 +41,6 @@ def extract_atomic_features(pdb_filename):
         for res in chain.get_residues():
             resids_pdb.append(res.id[1])
             sequence_chain.append(res.resname.strip())
-
-            # Get B factors
-            b_factors_atom = []
-            for atom in res:
-                b_factors_atom.append(atom.get_bfactor())
-            b_factors_res.append(
-                sum(b_factors_atom) / len(b_factors_atom)
-            )  # Take mean of atomic B factors
 
         # Add to global container for this protein
         sequence.append(sequence_chain)
@@ -68,12 +58,6 @@ def extract_atomic_features(pdb_filename):
         aa_onehot_chain = np.zeros((len(aa_indices), 21))
         aa_onehot_chain[np.arange(len(aa_indices)), aa_indices] = 1
         sequence_onehot.append(aa_onehot_chain)
-
-    # Get SASA
-    sasa = []
-    dssp = DSSP(first_model, pdb_filename)
-    for res in list(dssp.keys()):
-        sasa.append(dssp[res][3])
 
     # Keep track of boundaries of individual chains
     chain_boundary_indices = np.cumsum([0] + [len(entry) for entry in sequence_onehot])
@@ -105,6 +89,7 @@ def extract_atomic_features(pdb_filename):
         chain_start_index = chain_boundary_indices[i]
         for j, residue in enumerate(chain.residues()):
             for atom in residue.atoms():
+
                 # Extract atom features
                 index = atom.index
                 position = list(positions[index].value_in_unit(simtk.unit.angstrom))
@@ -121,20 +106,12 @@ def extract_atomic_features(pdb_filename):
     # Convert valid lists to numpy arrays
     # (even convert atom_names since its simpler to mask with despite being str)
     features["atom_names"] = np.array(features["atom_names"], dtype="a5")
-    features["res_indices"] = np.array(features["res_indices"], dtype=np.int)
+    features["res_indices"] = np.array(features["res_indices"], dtype=np.int32)
     features["x"] = np.array(features["x"], dtype=np.float32)
     features["y"] = np.array(features["y"], dtype=np.float32)
     features["z"] = np.array(features["z"], dtype=np.float32)
 
-    return (
-        features,
-        sasa,
-        b_factors_res,
-        sequence_onehot,
-        chain_ids,
-        chain_boundary_indices,
-        resids_pdb,
-    )
+    return features, sequence_onehot, chain_ids, chain_boundary_indices, resids_pdb
 
 
 def extract_coordinates(features, max_radius, include_center):
@@ -169,6 +146,7 @@ def extract_coordinates(features, max_radius, include_center):
                 res_indices_glob == residue_index, features["atom_names"] == b"C"
             ).any()
         ):
+
             N_mask = np.logical_and(
                 res_indices_glob == residue_index, features["atom_names"] == b"N"
             )
@@ -278,8 +256,6 @@ def extract_environments(
     # Extract atomic features and other relevant info
     (
         features,
-        sasa,
-        b_factors,
         sequence_onehot,
         chain_ids,
         chain_boundary_indices,
@@ -297,8 +273,6 @@ def extract_environments(
         out_dir + f"/{pdb_id}_coordinate_features",
         atom_types_numeric=atom_types_numeric,
         positions=xyz_ref_origo_arr,
-        sasa=sasa,
-        b_factors=b_factors,
         selector=selector_array,
         aa_onehot=sequence_onehot,
         chain_boundary_indices=chain_boundary_indices,
@@ -319,6 +293,7 @@ def str2bool(v):
 
 
 if __name__ == "__main__":
+
     t0 = time.time()
 
     # Argument parser

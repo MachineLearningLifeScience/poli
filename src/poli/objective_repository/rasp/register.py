@@ -8,7 +8,7 @@ import torch
 
 from Bio.PDB.Polypeptide import index_to_one, one_to_index
 
-from poli.objective_repository.rasp.inner_rasp.rasp_model import (
+from poli.objective_repository.rasp.inner_rasp.cavity_model import (
     CavityModel,
     DownstreamModel,
     ResidueEnvironmentsDataset,
@@ -17,7 +17,7 @@ from poli.objective_repository.rasp.inner_rasp.rasp_model import (
 from poli.objective_repository.rasp.inner_rasp.helpers import (
     init_lin_weights,
     ds_pred,
-    rasp_to_prism,
+    cavity_to_prism,
     get_seq_from_variant,
 )
 from poli.objective_repository.rasp.inner_rasp.pdb_parser_scripts.clean_pdb import (
@@ -33,72 +33,6 @@ PER_TASK = int(1)
 
 AF_ID = ""
 PDB_ID = ""
-
-
-def create_df_structure():
-    pdb_filenames_ds = sorted(
-        glob.glob(f"/content/data/test/predictions/parsed/*coord*")
-    )
-
-    dataset_structure = ResidueEnvironmentsDataset(pdb_filenames_ds, transformer=None)
-
-    resenv_dataset = {}
-    for resenv in dataset_structure:
-        if AF_ID != "":
-            key = f"--{AF_ID}--{resenv.chain_id}--{resenv.pdb_residue_number}--{index_to_one(resenv.restype_index)}--"
-        elif PDB_ID != "":
-            key = f"--{PDB_ID}--{resenv.chain_id}--{resenv.pdb_residue_number}--{index_to_one(resenv.restype_index)}--"
-        else:
-            key = f"--{'CUSTOM'}--{resenv.chain_id}--{resenv.pdb_residue_number}--{index_to_one(resenv.restype_index)}--"
-        resenv_dataset[key] = resenv
-
-    df_structure_no_mt = pd.DataFrame.from_dict(
-        resenv_dataset, orient="index", columns=["resenv"]
-    )
-    df_structure_no_mt.reset_index(inplace=True)
-    df_structure_no_mt["index"] = df_structure_no_mt["index"].astype(str)
-    res_info = pd.DataFrame(
-        df_structure_no_mt["index"].str.split("--").tolist(),
-        columns=["blank", "pdb_id", "chain_id", "pos", "wt_AA", "blank2"],
-    )
-
-    df_structure_no_mt["pdbid"] = res_info["pdb_id"]
-    df_structure_no_mt["chainid"] = res_info["chain_id"]
-    df_structure_no_mt["variant"] = res_info["wt_AA"] + res_info["pos"] + "X"
-    aa_list = [
-        "A",
-        "C",
-        "D",
-        "E",
-        "F",
-        "G",
-        "H",
-        "I",
-        "K",
-        "L",
-        "M",
-        "N",
-        "P",
-        "Q",
-        "R",
-        "S",
-        "T",
-        "V",
-        "W",
-        "Y",
-    ]
-    df_structure = pd.DataFrame(
-        df_structure_no_mt.values.repeat(20, axis=0), columns=df_structure_no_mt.columns
-    )
-    for i in range(0, len(df_structure), 20):
-        for j in range(20):
-            df_structure.iloc[i + j, :]["variant"] = (
-                df_structure.iloc[i + j, :]["variant"][:-1] + aa_list[j]
-            )
-
-    df_structure.drop(columns="index", inplace=True)
-
-    return df_structure
 
 
 def load_cavity_and_downstream_models():
@@ -167,7 +101,7 @@ def predict(
             #   prism_outfile = f"/content/output/{dataset_key}/prism_cavity_{PDB_ID}_{chainid}.txt"
             # elif PDB_custom:
             #   prism_outfile = f"/content/output/{dataset_key}/prism_cavity_XXXX_{chainid}.txt"
-            rasp_to_prism(df_chain, pdbid, chainid, seq, prism_outfile)
+            cavity_to_prism(df_chain, pdbid, chainid, seq, prism_outfile)
     ...
 
 
@@ -269,6 +203,10 @@ class RaspInterface:
         )
 
     def unique_chain_to_clean_pdb(self, wildtype_pdb_path: Path):
+        """
+        This function takes a pdb with a single chain, and
+        cleans it using RaSP's clean_pdb.py script.
+        """
         clean_pdb(
             pdb_input_filename=str(
                 self.working_dir
@@ -306,6 +244,85 @@ class RaspInterface:
             include_center=include_center,
         )
 
+    def create_df_structure(self, wildtype_pdb_path: Path):
+        """
+        This function creates a pandas dataframe with the
+        residue environments of a given pdb file, and
+        prepares it for mutation.
+        """
+        pdb_filename_for_df = (
+            self.working_dir
+            / "parsed"
+            / f"{wildtype_pdb_path.stem}_coordinate_features.npz"
+        )
+        assert pdb_filename_for_df.exists(), (
+            f"{pdb_filename_for_df} does not exist."
+            " Remember to run the preprocessing step."
+        )
+
+        dataset_structure = ResidueEnvironmentsDataset(
+            [str(pdb_filename_for_df)], transformer=None
+        )
+
+        resenv_dataset = {}
+        for resenv in dataset_structure:
+            if AF_ID != "":
+                key = f"--{AF_ID}--{resenv.chain_id}--{resenv.pdb_residue_number}--{index_to_one(resenv.restype_index)}--"
+            elif PDB_ID != "":
+                key = f"--{PDB_ID}--{resenv.chain_id}--{resenv.pdb_residue_number}--{index_to_one(resenv.restype_index)}--"
+            else:
+                key = f"--{'CUSTOM'}--{resenv.chain_id}--{resenv.pdb_residue_number}--{index_to_one(resenv.restype_index)}--"
+            resenv_dataset[key] = resenv
+
+        df_structure_no_mt = pd.DataFrame.from_dict(
+            resenv_dataset, orient="index", columns=["resenv"]
+        )
+        df_structure_no_mt.reset_index(inplace=True)
+        df_structure_no_mt["index"] = df_structure_no_mt["index"].astype(str)
+        res_info = pd.DataFrame(
+            df_structure_no_mt["index"].str.split("--").tolist(),
+            columns=["blank", "pdb_id", "chain_id", "pos", "wt_AA", "blank2"],
+        )
+
+        df_structure_no_mt["pdbid"] = res_info["pdb_id"]
+        df_structure_no_mt["chainid"] = res_info["chain_id"]
+        df_structure_no_mt["variant"] = res_info["wt_AA"] + res_info["pos"] + "X"
+        aa_list = [
+            "A",
+            "C",
+            "D",
+            "E",
+            "F",
+            "G",
+            "H",
+            "I",
+            "K",
+            "L",
+            "M",
+            "N",
+            "P",
+            "Q",
+            "R",
+            "S",
+            "T",
+            "V",
+            "W",
+            "Y",
+        ]
+        df_structure = pd.DataFrame(
+            df_structure_no_mt.values.repeat(20, axis=0),
+            columns=df_structure_no_mt.columns,
+        )
+        for i in range(0, len(df_structure), 20):
+            for j in range(20):
+                df_structure.iloc[i + j, :]["variant"] = (
+                    df_structure.iloc[i + j, :]["variant"][:-1] + aa_list[j]
+                )
+
+        df_structure.drop(columns="index", inplace=True)
+
+        return df_structure
+
 
 if __name__ == "__main__":
     THIS_DIR = Path(__file__).parent.resolve()
@@ -318,12 +335,5 @@ if __name__ == "__main__":
     rasp_interface.unique_chain_to_clean_pdb(wildtype_pdb_path)
     rasp_interface.cleaned_to_parsed_pdb(wildtype_pdb_path)
 
-    # Commands required to pre-process the PDBs:
-    # These ones will need clean_pdb.py, reduce, and extract_environments.py
-    # !python3 /content/src/pdb_parser_scripts/clean_pdb.py --pdb_file_in /content/data/test/predictions/raw/query_protein_uniquechain.pdb --out_dir /content/data/test/predictions/cleaned/ --reduce_exe /content/src/pdb_parser_scripts/reduce/reduce #&> /dev/null
-
-    # The output of these is a .npz file in the parsed directory.
-    # More precisely, it generates:
-    # "/content/data/test/predictions/parsed/query_protein_uniquechain_clean_coordinate_features.npz"
-
-    ...
+    df = rasp_interface.create_df_structure(wildtype_pdb_path)
+    print(df.head())

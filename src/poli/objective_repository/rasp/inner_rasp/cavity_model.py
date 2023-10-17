@@ -1,4 +1,7 @@
+import glob
 import os
+import random
+from typing import Callable, List, Union
 
 import numpy as np
 import pandas as pd
@@ -43,16 +46,12 @@ class ResidueEnvironment:
         self,
         xyz_coords,
         atom_types,
-        sasa,
-        b_factors,
         restype_onehot,
         chain_id,
         pdb_residue_number,
         pdb_id,
     ):
         self.xyz_coords = xyz_coords
-        self.sasa = sasa
-        self.b_factors = b_factors
         self.atom_types = atom_types
         self.restype_onehot = restype_onehot
         self.restype_index = np.argmax(self.restype_onehot)
@@ -63,8 +62,6 @@ class ResidueEnvironment:
     def __repr__(self):
         return (
             f"<ResidueEnvironment with {self.xyz_coords.shape[0]} atoms. "
-            f"sasa: {self.sasa}, "
-            f"b_factors: {self.b_factors}, "
             f"pdb_id: {self.pdb_id}, "
             f"chain_id: {self.chain_id}, "
             f"pdb_residue_number: {self.pdb_residue_number}, "
@@ -88,11 +85,8 @@ class ResidueEnvironmentsDataset(Dataset):
     def __init__(
         self,
         input_data,
-        dataset_key=None,
-        transformer=None,
+        transformer,
     ):
-        self.dataset_key = dataset_key
-        self.transformer = transformer
 
         if all(isinstance(x, ResidueEnvironment) for x in input_data):
             self.res_env_objects = input_data
@@ -102,6 +96,8 @@ class ResidueEnvironmentsDataset(Dataset):
             raise ValueError(
                 "Input data is not of type" "Union[List[str], List[ResidueEnvironment]]"
             )
+
+        self.transformer = transformer
 
     def __len__(self):
         return len(self.res_env_objects)
@@ -117,8 +113,6 @@ class ResidueEnvironmentsDataset(Dataset):
         for i in range(len(npz_filenames)):
             coordinate_features = np.load(npz_filenames[i])
             atom_coords_prot_seq = coordinate_features["positions"]
-            sasa_arr = coordinate_features["sasa"]
-            b_factors_arr = coordinate_features["b_factors"]
             restypes_onehots_prot_seq = coordinate_features["aa_onehot"]
             selector_prot_seq = coordinate_features["selector"]
             atom_types_flattened = coordinate_features["atom_types_numeric"]
@@ -127,10 +121,10 @@ class ResidueEnvironmentsDataset(Dataset):
             pdb_residue_numbers = coordinate_features["residue_numbers"]
             chain_boundary_indices = coordinate_features["chain_boundary_indices"]
             N_residues = selector_prot_seq.shape[0]
-            if self.dataset_key == "Homology":
+            if "bin" in npz_filenames[i]:  # Check if file belongs to Homology data set
                 pdb_id = os.path.basename(npz_filenames[i])[:19]
             else:
-                pdb_id = os.path.basename(npz_filenames[i]).split("/")[-1][:-30]
+                pdb_id = os.path.basename(npz_filenames[i])[:4]
 
             for resi_i in range(N_residues):
                 selector = selector_prot_seq[resi_i]
@@ -141,8 +135,6 @@ class ResidueEnvironmentsDataset(Dataset):
                 coords = atom_coords_prot_seq[resi_i][coords_mask]
                 atom_types = atom_types_flattened[selector_masked]
                 restype_onehot = restypes_onehots_prot_seq[resi_i]
-                sasa = sasa_arr[resi_i]
-                b_factors = b_factors_arr[resi_i]
 
                 pdb_residue_number = int(pdb_residue_numbers[resi_i])
                 # Locate chain id
@@ -157,8 +149,6 @@ class ResidueEnvironmentsDataset(Dataset):
                     ResidueEnvironment(
                         coords,
                         atom_types,
-                        sasa,
-                        b_factors,
                         restype_onehot,
                         chain_id,
                         pdb_residue_number,
@@ -365,7 +355,7 @@ class CavityModel(torch.nn.Module):
                         + (torch.reshape(self.zz.to(x.device), [-1, 1]) - pos[:, 2])
                         ** 2
                     )
-                    / (2 * self.sigma_p**2)
+                    / (2 * self.sigma_p ** 2)
                 )
 
                 # Normalize each atom to 1
@@ -446,6 +436,7 @@ class DDGDataset(Dataset):
         df,
         transformer=None,
     ):
+
         self.df = df
         self.transformer = transformer
 
