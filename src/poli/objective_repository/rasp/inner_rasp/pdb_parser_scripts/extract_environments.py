@@ -89,7 +89,6 @@ def extract_atomic_features(pdb_filename):
         chain_start_index = chain_boundary_indices[i]
         for j, residue in enumerate(chain.residues()):
             for atom in residue.atoms():
-
                 # Extract atom features
                 index = atom.index
                 position = list(positions[index].value_in_unit(simtk.unit.angstrom))
@@ -146,7 +145,6 @@ def extract_coordinates(features, max_radius, include_center):
                 res_indices_glob == residue_index, features["atom_names"] == b"C"
             ).any()
         ):
-
             N_mask = np.logical_and(
                 res_indices_glob == residue_index, features["atom_names"] == b"N"
             )
@@ -293,7 +291,6 @@ def str2bool(v):
 
 
 if __name__ == "__main__":
-
     t0 = time.time()
 
     # Argument parser

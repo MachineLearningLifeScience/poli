@@ -459,7 +459,6 @@ def ds_train_val(
     pearson_r_list = []
 
     for epoch in range(EPOCHS):
-
         print(f"Epoch: {epoch+1}/{EPOCHS}")
 
         # Initialize
@@ -473,7 +472,6 @@ def ds_train_val(
         ds_model_net.train()
 
         for _, _, _, x_cavity_batch, x_ds_batch, ddg_fermi_batch, _ in dataloader_train:
-
             # Initialize optimizer
             optimizer.zero_grad()
 
@@ -494,7 +492,6 @@ def ds_train_val(
         # Val loop
         ds_model_net.eval()
         with torch.no_grad():
-
             for (
                 _,
                 _,
@@ -504,7 +501,6 @@ def ds_train_val(
                 val_ddg_fermi_batch,
                 val_ddg_batch,
             ) in dataloader_val:
-
                 # Compute predictions
                 val_cavity_pred_batch = cavity_model_net(val_x_cavity_batch)
                 val_ddg_fermi_pred_batch = ds_model_net(
@@ -574,7 +570,6 @@ def ds_pred(
             x_cavity_batch,
             x_ds_batch,
         ) in dataloader:
-
             # Initialize
             ddg_fermi_pred_batch_ensemble = torch.empty(len(variant_batch), 0).to(
                 DEVICE

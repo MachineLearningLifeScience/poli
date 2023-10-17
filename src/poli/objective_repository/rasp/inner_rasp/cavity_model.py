@@ -87,7 +87,6 @@ class ResidueEnvironmentsDataset(Dataset):
         input_data,
         transformer,
     ):
-
         if all(isinstance(x, ResidueEnvironment) for x in input_data):
             self.res_env_objects = input_data
         elif all(isinstance(x, str) for x in input_data):
@@ -355,7 +354,7 @@ class CavityModel(torch.nn.Module):
                         + (torch.reshape(self.zz.to(x.device), [-1, 1]) - pos[:, 2])
                         ** 2
                     )
-                    / (2 * self.sigma_p ** 2)
+                    / (2 * self.sigma_p**2)
                 )
 
                 # Normalize each atom to 1
@@ -436,7 +435,6 @@ class DDGDataset(Dataset):
         df,
         transformer=None,
     ):
-
         self.df = df
         self.transformer = transformer
 
