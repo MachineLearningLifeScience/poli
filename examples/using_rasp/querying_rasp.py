@@ -19,7 +19,14 @@ if __name__ == "__main__":
     wildtype_pdb_file = THIS_DIR / "101m.pdb"
 
     info = ProblemSetupInformation(
+<<<<<<< HEAD
         name="rasp", max_sequence_length=np.inf, alphabet=AMINO_ACIDS, aligned=False
+=======
+        name="rasp",
+        max_sequence_length=np.inf,
+        alphabet=AMINO_ACIDS,
+        aligned=False
+>>>>>>> 437f6cda794042b922ad8513e1902cee879c8419
     )
 
     f = RaspBlackBox(info=info, wildtype_pdb_path=wildtype_pdb_file)
