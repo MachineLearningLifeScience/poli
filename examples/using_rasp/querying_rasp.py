@@ -4,13 +4,7 @@ and objective factory.
 """
 from pathlib import Path
 
-import numpy as np
-
-from poli.objective_repository.rasp.register import RaspBlackBox, RaspProblemFactory
-from poli.core.problem_setup_information import ProblemSetupInformation
-
-from poli.core.util.proteins.defaults import AMINO_ACIDS
-from poli.core.util.proteins.pdb_parsing import parse_pdb_as_residue_strings
+from poli.objective_repository.rasp.register import RaspProblemFactory
 
 
 THIS_DIR = Path(__file__).parent.resolve()

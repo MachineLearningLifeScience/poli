@@ -396,8 +396,14 @@ class RaspInterface:
             for mutant_residue_string in mutant_residue_strings:
                 if mutant_residue_string == wildtype_residue_string:
                     # Then we append a mock mutation.
+                    original_residue_as_single_character = wildtype_residue_string[0]
+                    position_in_chain = res_info.iloc[0]["pos"]
+                    mutant_residue_as_single_character = wildtype_residue_string[0]
+
                     mutations_in_rasp_format.append(
-                        wildtype_residue_string[0] + f"{1}" + wildtype_residue_string[0]
+                        original_residue_as_single_character
+                        + f"{position_in_chain}"
+                        + mutant_residue_as_single_character
                     )
                     continue
 
@@ -406,8 +412,14 @@ class RaspInterface:
                 )
                 for edit_ in edits_:
                     _, i, _ = edit_
+                    original_residue_as_single_character = wildtype_residue_string[i]
+                    position_in_chain = res_info.iloc[i]["pos"]
+                    mutant_residue_as_single_character = mutant_residue_string[i]
+
                     mutations_in_rasp_format.append(
-                        wildtype_residue_string[i] + f"{i+1}" + mutant_residue_string[i]
+                        original_residue_as_single_character
+                        + f"{position_in_chain}"
+                        + mutant_residue_as_single_character
                     )
 
             # Filter df_structure to only contain the mutations in
