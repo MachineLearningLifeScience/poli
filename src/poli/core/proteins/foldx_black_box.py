@@ -3,8 +3,6 @@ from pathlib import Path
 from time import time
 from uuid import uuid4
 
-import numpy as np
-
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.problem_setup_information import ProblemSetupInformation
 
