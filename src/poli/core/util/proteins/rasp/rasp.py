@@ -1,3 +1,4 @@
+from typing import List
 from pathlib import Path
 import subprocess
 import os, stat
@@ -9,6 +10,7 @@ import numpy as np
 import torch
 
 from Bio.PDB.Polypeptide import index_to_one, one_to_index
+from Bio.SeqUtils import seq1
 
 from .inner_rasp.cavity_model import (
     CavityModel,
@@ -28,6 +30,8 @@ from .inner_rasp.pdb_parser_scripts.clean_pdb import (
 from .inner_rasp.pdb_parser_scripts.extract_environments import (
     extract_environments,
 )
+
+from poli.core.util.proteins.mutations import edits_between_strings
 
 THIS_DIR = Path(__file__).parent.resolve()
 HOME_DIR = THIS_DIR.home()
@@ -191,7 +195,7 @@ class RaspInterface:
         The output of this function is a PDB file with a single chain,
         stored at the working directory of this RaspInterface instance.
         More precisely, it will be stored at
-        working_dir / raw / {wildtype_pdb_path.stem}_query_protein_uniquechain.pdb
+        working_dir / raw / {wildtype_pdb_path.stem}_{chain}.pdb
         """
         # First command to run (which uses pdbtools to select a chain,
         # delete heteroatoms, remove some residues, fix insertions,
@@ -229,6 +233,12 @@ class RaspInterface:
         """
         This function takes a pdb with a single chain, and
         cleans it using RaSP's clean_pdb.py script.
+
+        The output of this function is a cleaned pdb file
+        stored at the working directory of this RaspInterface
+        instance. More precisely, it will be stored at
+        working_dir / cleaned / {wildtype_pdb_path.stem}_clean.pdb
+        This stem is usually just {pdb_id}_{chain}.
         """
         clean_pdb(
             pdb_input_filename=str(
@@ -251,9 +261,14 @@ class RaspInterface:
         residue environments using extract_environments.py.
         The output of this function is a .npz file in the
         parsed directory given by:
-        working_dir / parsed / {wildtype_pdb_path.stem}_query_protein_uniquechain_clean_coordinate_features.npz
+        working_dir / parsed / {wildtype_pdb_path.stem}.npz
+        At this stage, this stem is usually {pdb_id}_{chain}_clean
         """
+        # The command used by the original RaSP implementation:
         # !python3 /content/src/pdb_parser_scripts/extract_environments.py --pdb_in /content/data/test/predictions/cleaned/query_protein_uniquechain_clean.pdb  --out_dir /content/data/test/predictions/parsed/  #&> /dev/null
+
+        # We modify the naming convention to make it easier. Now
+        # the output file will be named:
         pdb_id = wildtype_pdb_path.stem
         extract_environments(
             pdb_filename=str(
@@ -267,16 +282,36 @@ class RaspInterface:
             include_center=include_center,
         )
 
-    def create_df_structure(self, wildtype_pdb_path: Path):
+    def create_df_structure(
+        self, wildtype_pdb_path: Path, mutant_residue_strings: List[str] = None
+    ):
         """
         This function creates a pandas dataframe with the
         residue environments of a given pdb file, and
-        prepares it for mutation.
+        prepares it for ALL single-site mutations.
+
+        If a list of mutant residue strings is provided,
+        we will only consider the mutations in that list.
+        For example, if the wildtype_pdb_path has the
+        following residue string:
+
+        "MSEMETKQV"
+
+        and the mutant_residue_strings is:
+
+        ["ASEMETKQV", "RSEMETKQV", "NSEMETKQV"]
+
+        then the output dataframe will only contain the
+        mutations M1A, M1R, and M1N.
+
+        If no mutant_residue_strings is provided, then
+        we will consider ALL single-site mutations.
         """
+        # TODO: this is the convention inside the cleaning scripts,
+        # but it feels flimsy. We should probably change it.
+        pdb_id = wildtype_pdb_path.stem.split("_")[0]
         pdb_filename_for_df = (
-            self.working_dir
-            / "parsed"
-            / f"{wildtype_pdb_path.stem}_coordinate_features.npz"
+            self.working_dir / "parsed" / f"{pdb_id}_coordinate_features.npz"
         )
         assert pdb_filename_for_df.exists(), (
             f"{pdb_filename_for_df} does not exist."
@@ -327,6 +362,12 @@ class RaspInterface:
             "W",
             "Y",
         ]
+
+        # Considering ALL single mutations in ALL sites.
+        wildtype_residue_string = "".join(
+            [v[0] for v in df_structure_no_mt["variant"].values]
+        )
+
         df_structure = pd.DataFrame(
             df_structure_no_mt.values.repeat(20, axis=0),
             columns=df_structure_no_mt.columns,
@@ -336,6 +377,56 @@ class RaspInterface:
                 df_structure.iloc[i + j, :]["variant"] = (
                     df_structure.iloc[i + j, :]["variant"][:-1] + aa_list[j]
                 )
+
+        # This is a silly and inefficient way of doing this.
+        # We should instead only build df_structure to have
+        # the relevant variants from the start. That way
+        # we avoid the above two-for-loops. But they're
+        # practically instantaneous, so it's not a big deal.
+        # (O(nm) doesn't matter all that much if n < 1000
+        # and m is always 20)
+        if mutant_residue_strings is not None:
+            # Compute the mutations associated to all strings in
+            # mutant_residue_strings.
+
+            # First, the following function computes where
+            # the mutations are between the wildtype and
+            # the mutant residue strings.
+            # These are in the format ("replace", index_in_wildtype, index_in_mutant)
+            mutations_in_rasp_format = []
+            for mutant_residue_string in mutant_residue_strings:
+                if mutant_residue_string == wildtype_residue_string:
+                    # Then we append a mock mutation.
+                    mutations_in_rasp_format.append(
+                        wildtype_residue_string[0] + f"{1}" + wildtype_residue_string[0]
+                    )
+                    continue
+
+                edits_ = edits_between_strings(
+                    wildtype_residue_string, mutant_residue_string
+                )
+                for edit_ in edits_:
+                    _, i, _ = edit_
+                    mutations_in_rasp_format.append(
+                        wildtype_residue_string[i] + f"{i+1}" + mutant_residue_string[i]
+                    )
+
+            # Filter df_structure to only contain the mutations in
+            # mutations_in_rasp_format. (i.e. we need to focus on
+            # only some of the positions, which are in the middle
+            # of each string in mutations_in_rasp_format).
+            df_structure = df_structure[
+                df_structure["variant"].str.startswith(
+                    tuple(
+                        set(
+                            [
+                                mutation_in_rasp_format
+                                for mutation_in_rasp_format in mutations_in_rasp_format
+                            ]
+                        )
+                    )
+                )
+            ]
 
         df_structure.drop(columns="index", inplace=True)
 
