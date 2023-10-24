@@ -10,7 +10,6 @@ import numpy as np
 import torch
 
 from Bio.PDB.Polypeptide import index_to_one, one_to_index
-from Bio.SeqUtils import seq1
 
 from .inner_rasp.cavity_model import (
     CavityModel,

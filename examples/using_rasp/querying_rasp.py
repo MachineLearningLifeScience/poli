@@ -6,7 +6,7 @@ from pathlib import Path
 
 import numpy as np
 
-from poli.objective_repository.rasp.register import RaspBlackBox
+from poli.objective_repository.rasp.register import RaspBlackBox, RaspProblemFactory
 from poli.core.problem_setup_information import ProblemSetupInformation
 
 from poli.core.util.proteins.defaults import AMINO_ACIDS
@@ -18,21 +18,5 @@ THIS_DIR = Path(__file__).parent.resolve()
 if __name__ == "__main__":
     wildtype_pdb_file = THIS_DIR / "101m.pdb"
 
-    info = ProblemSetupInformation(
-        name="rasp", max_sequence_length=np.inf, alphabet=AMINO_ACIDS, aligned=False
-    )
-
-    f = RaspBlackBox(info=info, wildtype_pdb_path=wildtype_pdb_file)
-
-    clean_wildtype_pdb_file = f.clean_wildtype_pdb_files[0]
-
-    wildtype_residue_string = parse_pdb_as_residue_strings(clean_wildtype_pdb_file)
-
-    # Mutating one position at random
-    # to a random amino acid
-    x0 = np.array([wildtype_residue_string])
-    x = np.copy(x0)
-    x[0, np.random.randint(0, x0.shape[1])] = np.random.choice(AMINO_ACIDS)
-
-    # Evaluating on this single mutation
-    y = f(x)
+    f, x0, y0 = RaspProblemFactory().create(wildtype_pdb_path=wildtype_pdb_file)
+    print(x0, y0)

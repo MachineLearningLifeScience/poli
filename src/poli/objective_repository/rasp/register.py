@@ -10,7 +10,7 @@ or Rosetta.
 
 [1] TODO: add reference and implementation.
 """
-from typing import Union, List
+from typing import Union, List, Tuple
 from pathlib import Path
 from uuid import uuid4
 from time import time
@@ -29,6 +29,10 @@ from poli.core.util.proteins.pdb_parsing import (
     parse_pdb_as_residues,
 )
 from poli.core.util.proteins.mutations import find_closest_wildtype_pdb_file_to_mutant
+from poli.core.util.proteins.defaults import AMINO_ACIDS
+from poli.core.util.seeding import seed_numpy, seed_python
+
+import numpy as np
 
 RASP_NUM_ENSEMBLE = 10
 RASP_DEVICE = "cpu"
@@ -262,6 +266,86 @@ class RaspBlackBox(AbstractBlackBox):
         )
 
         return df_ml["score_ml"].values.reshape(x.shape[0], 1)
+
+
+class RaspProblemFactory(AbstractProblemFactory):
+    def get_setup_information(self) -> ProblemSetupInformation:
+        """
+        TODO: document
+        """
+        alphabet = AMINO_ACIDS
+
+        return ProblemSetupInformation(
+            name="foldx_stability_and_sasa",
+            max_sequence_length=np.inf,
+            alphabet=alphabet,
+            aligned=False,
+        )
+
+    def create(
+        self,
+        seed: int = None,
+        batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
+        wildtype_pdb_path: Union[Path, List[Path]] = None,
+        alphabet: List[str] = None,
+        experiment_id: str = None,
+        tmp_folder: Path = None,
+    ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+        seed_numpy(seed)
+        seed_python(seed)
+
+        if wildtype_pdb_path is None:
+            raise ValueError(
+                "Missing required argument wildtype_pdb_path. "
+                "Did you forget to pass it to create()?"
+            )
+
+        if isinstance(wildtype_pdb_path, str):
+            wildtype_pdb_path = [Path(wildtype_pdb_path.strip())]
+        elif isinstance(wildtype_pdb_path, Path):
+            wildtype_pdb_path = [wildtype_pdb_path]
+        elif isinstance(wildtype_pdb_path, list):
+            if isinstance(wildtype_pdb_path[0], str):
+                wildtype_pdb_path = [Path(x.strip()) for x in wildtype_pdb_path]
+            elif isinstance(wildtype_pdb_path[0], Path):
+                pass
+        else:
+            raise ValueError(
+                "Invalid type for wildtype_pdb_path. "
+                "It must be a string, a Path, or a list of strings or Paths."
+            )
+
+        if alphabet is None:
+            alphabet = self.get_setup_information().alphabet
+
+        f = RaspBlackBox(
+            info=self.get_setup_information(),
+            batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
+            wildtype_pdb_path=wildtype_pdb_path,
+            alphabet=alphabet,
+            experiment_id=experiment_id,
+            tmp_folder=tmp_folder,
+        )
+
+        # Constructing x0
+        # (from the clean wildtype pdb files inside f)
+        x0_pre_array = []
+        for clean_wildtype_pdb_file in f.clean_wildtype_pdb_files:
+            # Loads up the wildtype pdb files as strings
+            wildtype_string = parse_pdb_as_residue_strings(clean_wildtype_pdb_file)
+            x0_pre_array.append(list(wildtype_string))
+
+        # Padding all of them to the longest sequence
+        max_len = max([len(x) for x in x0_pre_array])
+        x0_pre_array = [x + [""] * (max_len - len(x)) for x in x0_pre_array]
+
+        x0 = np.array(x0_pre_array)
+
+        return f, x0, f(x0)
 
 
 if __name__ == "__main__":
