@@ -8,8 +8,6 @@ import Bio
 import Bio.PDB
 import numpy as np
 
-# import simtk
-# import simtk.openmm
 import openmm.app
 import simtk.unit
 

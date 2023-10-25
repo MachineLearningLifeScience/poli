@@ -7,21 +7,14 @@ import subprocess
 import pandas as pd
 import numpy as np
 
-import torch
-
 from Bio.PDB.Polypeptide import index_to_one, one_to_index
 
 from .inner_rasp.cavity_model import (
-    CavityModel,
-    DownstreamModel,
     ResidueEnvironmentsDataset,
 )
 
 from .inner_rasp.helpers import (
-    init_lin_weights,
     ds_pred,
-    # cavity_to_prism,
-    # get_seq_from_variant,
 )
 from .inner_rasp.pdb_parser_scripts.clean_pdb import (
     clean_pdb,
@@ -36,27 +29,6 @@ THIS_DIR = Path(__file__).parent.resolve()
 HOME_DIR = THIS_DIR.home()
 RASP_DIR = HOME_DIR / ".poli_objectives" / "rasp"
 RASP_DIR.mkdir(parents=True, exist_ok=True)
-
-
-def load_cavity_and_downstream_models(DEVICE: str = "cpu"):
-    # DEVICE = "cpu"
-
-    # TODO: Ask why this was implemented this way.
-    # A transparent alternative would be to simply
-    # load the model from the path itself.
-    best_cavity_model_path = RASP_DIR / "cavity_model_15.pt"
-    cavity_model_net = CavityModel(get_latent=True).to(DEVICE)
-    cavity_model_net.load_state_dict(
-        torch.load(f"{best_cavity_model_path}", map_location=DEVICE)
-    )
-    cavity_model_net.eval()
-    ds_model_net = DownstreamModel().to(DEVICE)
-    ds_model_net.apply(init_lin_weights)
-    ds_model_net.eval()
-
-    return cavity_model_net, ds_model_net
-
-    ...
 
 
 class RaspInterface:
@@ -134,11 +106,7 @@ class RaspInterface:
         df_total = df_structure.merge(
             df_ml, on=["pdbid", "chainid", "variant"], how="outer"
         )
-        # df_total["b_factors"] = df_total.apply(lambda row: row["resenv"].b_factors, axis=1)
         df_total = df_total.drop("resenv", axis=1)
-        # print(
-        #     f"{len(df_structure)-len(df_ml)} data points dropped when matching total data with ml predictions in: {dataset_key}."
-        # )
 
         # Removed by MGD: we don't need the PRISM files, we only
         # need the dataframe.
