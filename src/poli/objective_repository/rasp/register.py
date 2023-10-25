@@ -14,6 +14,7 @@ from typing import Union, List, Tuple
 from pathlib import Path
 from uuid import uuid4
 from time import time
+from collections import defaultdict
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
@@ -225,7 +226,10 @@ class RaspBlackBox(AbstractBlackBox):
         # sequences in x. For this, we need to compute the
         # Hamming distance between each of the sequences in x
         # and each of the wildtypes in self.wildtype_residue_strings.
-        closest_wildtypes = []
+
+        # closest_wildtypes will be a dictionary
+        # of the form {wildtype_path: List[str] of mutations}
+        closest_wildtypes = defaultdict(list)
         mutant_residue_strings = []
         for x_i in x:
             # Assuming x_i is an array of strings
@@ -242,30 +246,57 @@ class RaspBlackBox(AbstractBlackBox):
             if hamming_distance > 1:
                 raise ValueError("RaSP is only able to simulate single mutations.")
 
-            closest_wildtypes.append(closest_wildtype_pdb_file)
+            closest_wildtypes[closest_wildtype_pdb_file].append(mutant_residue_string)
             mutant_residue_strings.append(mutant_residue_string)
 
-        # STEP 2:
-        # Creating the dataframe with the relevant mutations
-        df_structure = self.rasp_interface.create_df_structure(
-            closest_wildtype_pdb_file,
-            mutant_residue_strings=mutant_residue_strings,
-        )
-
-        # STEP 3:
-        # Predicting
+        # Loading the models in preparation for inference
         cavity_model_net, ds_model_net = load_cavity_and_downstream_models()
         dataset_key = "predictions"
-        df_ml = self.rasp_interface.predict(
-            cavity_model_net,
-            ds_model_net,
-            df_structure,
-            dataset_key,
-            RASP_NUM_ENSEMBLE,
-            RASP_DEVICE,
-        )
 
-        return df_ml["score_ml"].values.reshape(x.shape[0], 1)
+        # STEP 2 and 3:
+        # Creating the dataframe with the relevant mutations
+        # PER wildtype pdb file.
+
+        # We will store the results in a dictionary
+        # of the form {mutant_string: score}.
+        results = {}
+        for (
+            closest_wildtype_pdb_file,
+            mutant_residue_strings_for_wildtype,
+        ) in closest_wildtypes.items():
+            df_structure = self.rasp_interface.create_df_structure(
+                closest_wildtype_pdb_file,
+                mutant_residue_strings=mutant_residue_strings_for_wildtype,
+            )
+
+            # STEP 3:
+            # Predicting
+            df_ml = self.rasp_interface.predict(
+                cavity_model_net,
+                ds_model_net,
+                df_structure,
+                dataset_key,
+                RASP_NUM_ENSEMBLE,
+                RASP_DEVICE,
+            )
+
+            for (
+                mutant_residue_string_for_wildtype
+            ) in mutant_residue_strings_for_wildtype:
+                results[mutant_residue_string_for_wildtype] = df_ml["score_ml"][
+                    df_ml["mutant_residue_string"] == mutant_residue_string_for_wildtype
+                ].values
+
+        # To reconstruct the final score, we rely
+        # on mutant_residue_strings, which is a list
+        # of strings IN THE SAME ORDER as the input
+        # vector x.
+        return np.array(
+            [
+                results[mutant_residue_string]
+                for mutant_residue_string in mutant_residue_strings
+            ]
+        ).reshape(-1, 1)
 
 
 class RaspProblemFactory(AbstractProblemFactory):
@@ -276,7 +307,7 @@ class RaspProblemFactory(AbstractProblemFactory):
         alphabet = AMINO_ACIDS
 
         return ProblemSetupInformation(
-            name="foldx_stability_and_sasa",
+            name="rasp",
             max_sequence_length=np.inf,
             alphabet=alphabet,
             aligned=False,
@@ -349,31 +380,10 @@ class RaspProblemFactory(AbstractProblemFactory):
 
 
 if __name__ == "__main__":
-    THIS_DIR = Path(__file__).parent.resolve()
-    wildtype_pdb_path = THIS_DIR / "101m.pdb"
-    chain_to_keep = "A"
+    from poli.core.registry import register_problem
 
-    cavity_model_net, ds_model_net = load_cavity_and_downstream_models()
-    rasp_interface = RaspInterface(THIS_DIR / "tmp")
-
-    rasp_interface.raw_pdb_to_unique_chain(wildtype_pdb_path, chain_to_keep)
-    rasp_interface.unique_chain_to_clean_pdb(wildtype_pdb_path)
-    rasp_interface.cleaned_to_parsed_pdb(wildtype_pdb_path)
-
-    df_structure = rasp_interface.create_df_structure(wildtype_pdb_path)
-    print(df_structure.head())
-
-    # Loading the models
-
-    # Predicting
-    dataset_key = "predictions"
-    df_ml = rasp_interface.predict(
-        cavity_model_net,
-        ds_model_net,
-        df_structure,
-        dataset_key,
-        RASP_NUM_ENSEMBLE,
-        RASP_DEVICE,
+    rasp_problem_factory = RaspProblemFactory()
+    register_problem(
+        rasp_problem_factory,
+        conda_environment_name="poli__rasp",
     )
-
-    print(df_ml.head())

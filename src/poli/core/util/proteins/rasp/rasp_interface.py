@@ -1,3 +1,11 @@
+"""
+This module takes and adapts RaSP's original implementation
+(which can be found at [1]), and writes an interface that 
+handles the preprocessing and inference steps.
+
+[1] TODO: add.
+"""
+
 from typing import List
 from pathlib import Path
 import os, stat
@@ -380,7 +388,9 @@ class RaspInterface:
         # we avoid the above two-for-loops. But they're
         # practically instantaneous, so it's not a big deal.
         # (O(nm) doesn't matter all that much if n < 1000
-        # and m is always 20)
+        # , m is always 20, and the cost of each operation
+        # is negligible)
+        df_structure["mutant_residue_string"] = [""] * len(df_structure)
         if mutant_residue_strings is not None:
             # Compute the mutations associated to all strings in
             # mutant_residue_strings.
@@ -397,11 +407,21 @@ class RaspInterface:
                     position_in_chain = res_info.iloc[0]["pos"]
                     mutant_residue_as_single_character = wildtype_residue_string[0]
 
-                    mutations_in_rasp_format.append(
+                    mutation_in_rasp_format = (
                         original_residue_as_single_character
                         + f"{position_in_chain}"
                         + mutant_residue_as_single_character
                     )
+
+                    mutations_in_rasp_format.append(mutation_in_rasp_format)
+
+                    mask_for_this_mutation = df_structure["variant"].str.startswith(
+                        mutation_in_rasp_format
+                    )
+
+                    df_structure.loc[
+                        mask_for_this_mutation, "mutant_residue_string"
+                    ] = mutant_residue_string
                     continue
 
                 edits_ = edits_between_strings(
@@ -412,12 +432,22 @@ class RaspInterface:
                     original_residue_as_single_character = wildtype_residue_string[i]
                     position_in_chain = res_info.iloc[i]["pos"]
                     mutant_residue_as_single_character = mutant_residue_string[i]
-
-                    mutations_in_rasp_format.append(
+                    mutation_in_rasp_format = (
                         original_residue_as_single_character
                         + f"{position_in_chain}"
                         + mutant_residue_as_single_character
                     )
+
+                    mutations_in_rasp_format.append(mutation_in_rasp_format)
+
+                    # Add the mutant residue string to the dataframe.
+                    mask_for_this_mutation = df_structure["variant"].str.startswith(
+                        mutation_in_rasp_format
+                    )
+
+                    df_structure.loc[
+                        mask_for_this_mutation, "mutant_residue_string"
+                    ] = mutant_residue_string
 
             # Filter df_structure to only contain the mutations in
             # mutations_in_rasp_format. (i.e. we need to focus on
@@ -425,16 +455,12 @@ class RaspInterface:
             # of each string in mutations_in_rasp_format).
             df_structure = df_structure[
                 df_structure["variant"].str.startswith(
-                    tuple(
-                        set(
-                            [
-                                mutation_in_rasp_format
-                                for mutation_in_rasp_format in mutations_in_rasp_format
-                            ]
-                        )
-                    )
+                    tuple(set(mutations_in_rasp_format))
                 )
             ]
+
+            # We should attach the original mutant string to each
+            # row in df_structure.
 
         df_structure.drop(columns="index", inplace=True)
 
