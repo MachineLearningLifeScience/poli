@@ -6,11 +6,11 @@ import time
 
 import Bio
 import Bio.PDB
-import Bio.PDB.Vector
 import numpy as np
-import simtk
-import simtk.openmm
-import simtk.openmm.app
+
+# import simtk
+# import simtk.openmm
+import openmm.app
 import simtk.unit
 
 basepath = os.path.dirname(os.path.realpath(__file__))
@@ -70,7 +70,7 @@ def extract_atomic_features(pdb_filename):
     resids_pdb = np.array(resids_pdb)
 
     # Extract positions using OpenMM.
-    pdb_simtk = simtk.openmm.app.PDBFile(pdb_filename)
+    pdb_simtk = openmm.app.PDBFile(pdb_filename)
     positions = pdb_simtk.getPositions()
 
     # Save features in a dictionary

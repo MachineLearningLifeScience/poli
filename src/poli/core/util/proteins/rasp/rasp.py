@@ -20,8 +20,8 @@ from .inner_rasp.cavity_model import (
 from .inner_rasp.helpers import (
     init_lin_weights,
     ds_pred,
-    cavity_to_prism,
-    get_seq_from_variant,
+    # cavity_to_prism,
+    # get_seq_from_variant,
 )
 from .inner_rasp.pdb_parser_scripts.clean_pdb import (
     clean_pdb,
@@ -136,37 +136,40 @@ class RaspInterface:
         )
         # df_total["b_factors"] = df_total.apply(lambda row: row["resenv"].b_factors, axis=1)
         df_total = df_total.drop("resenv", axis=1)
-        print(
-            f"{len(df_structure)-len(df_ml)} data points dropped when matching total data with ml predictions in: {dataset_key}."
-        )
+        # print(
+        #     f"{len(df_structure)-len(df_ml)} data points dropped when matching total data with ml predictions in: {dataset_key}."
+        # )
 
+        # Removed by MGD: we don't need the PRISM files, we only
+        # need the dataframe.
+        #
         # Parse output into separate files by pdb, print to PRISM format
-        for pdbid in df_total["pdbid"].unique():
-            df_pdb = df_total[df_total["pdbid"] == pdbid]
-            for chainid in df_pdb["chainid"].unique():
-                pred_outdir = self.working_dir / "output" / f"{dataset_key}"
-                pred_outdir.mkdir(parents=True, exist_ok=True)
-                pred_outfile = pred_outdir / f"cavity_pred_{pdbid}_{chainid}.csv"
-                print(
-                    f"Parsing predictions from pdb: {pdbid}{chainid} into {pred_outfile}"
-                )
-                df_chain = df_pdb[df_pdb["chainid"] == chainid]
-                df_chain = df_chain.assign(pos=df_chain["variant"].str[1:-1])
-                df_chain["pos"] = pd.to_numeric(df_chain["pos"])
-                first_res_no = min(df_chain["pos"])
-                df_chain = df_chain.assign(wt_AA=df_chain["variant"].str[0])
-                df_chain = df_chain.assign(mt_AA=df_chain["variant"].str[-1])
-                seq = get_seq_from_variant(df_chain)
-                df_chain.to_csv(pred_outfile, index=False)
-                prism_outfile = pred_outdir / f"prism_cavity_{pdbid}_{chainid}.txt"
+        # for pdbid in df_total["pdbid"].unique():
+        #     df_pdb = df_total[df_total["pdbid"] == pdbid]
+        #     for chainid in df_pdb["chainid"].unique():
+        #         pred_outdir = self.working_dir / "output" / f"{dataset_key}"
+        #         pred_outdir.mkdir(parents=True, exist_ok=True)
+        #         pred_outfile = pred_outdir / f"cavity_pred_{pdbid}_{chainid}.csv"
+        #         print(
+        #             f"Parsing predictions from pdb: {pdbid}{chainid} into {pred_outfile}"
+        #         )
+        #         df_chain = df_pdb[df_pdb["chainid"] == chainid]
+        #         df_chain = df_chain.assign(pos=df_chain["variant"].str[1:-1])
+        #         df_chain["pos"] = pd.to_numeric(df_chain["pos"])
+        #         first_res_no = min(df_chain["pos"])
+        #         df_chain = df_chain.assign(wt_AA=df_chain["variant"].str[0])
+        #         df_chain = df_chain.assign(mt_AA=df_chain["variant"].str[-1])
+        #         seq = get_seq_from_variant(df_chain)
+        #         df_chain.to_csv(pred_outfile, index=False)
+        #         prism_outfile = pred_outdir / f"prism_cavity_{pdbid}_{chainid}.txt"
 
-                # if (AF_ID !=''):
-                #   prism_outfile = f"/content/output/{dataset_key}/prism_cavity_{AF_ID}_{chainid}.txt"
-                # elif (PDB_ID !=''):
-                #   prism_outfile = f"/content/output/{dataset_key}/prism_cavity_{PDB_ID}_{chainid}.txt"
-                # elif PDB_custom:
-                #   prism_outfile = f"/content/output/{dataset_key}/prism_cavity_XXXX_{chainid}.txt"
-                cavity_to_prism(df_chain, pdbid, chainid, seq, prism_outfile)
+        #         # if (AF_ID !=''):
+        #         #   prism_outfile = f"/content/output/{dataset_key}/prism_cavity_{AF_ID}_{chainid}.txt"
+        #         # elif (PDB_ID !=''):
+        #         #   prism_outfile = f"/content/output/{dataset_key}/prism_cavity_{PDB_ID}_{chainid}.txt"
+        #         # elif PDB_custom:
+        #         #   prism_outfile = f"/content/output/{dataset_key}/prism_cavity_XXXX_{chainid}.txt"
+        #         # cavity_to_prism(df_chain, pdbid, chainid, seq, prism_outfile)
 
         return df_total
 

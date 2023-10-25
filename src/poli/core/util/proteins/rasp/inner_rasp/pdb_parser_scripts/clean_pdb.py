@@ -11,9 +11,8 @@ import Bio.PDB
 import Bio.PDB.Polypeptide
 import Bio.SeqIO
 import pdbfixer
-import simtk
-import simtk.openmm
-import simtk.openmm.app
+
+import openmm.app
 
 
 PDBIO = Bio.PDB.PDBIO()
@@ -94,9 +93,7 @@ def _step_3_pdbfixer(first_model, temp3):
 
 
 def _step_4_fix_numbering(fixer, temp3, temp4):
-    simtk.openmm.app.PDBFile.writeFile(
-        fixer.topology, fixer.positions, temp4, keepIds=False
-    )
+    openmm.app.PDBFile.writeFile(fixer.topology, fixer.positions, temp4, keepIds=False)
     temp4.flush()
     # Fix IDs manually since pdbfixer does not preserve insertion codes
     structure_before = PDB_PARSER.get_structure(temp3.name, temp3.name)

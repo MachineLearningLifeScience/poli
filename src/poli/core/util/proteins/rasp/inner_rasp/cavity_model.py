@@ -255,15 +255,31 @@ class CavityModel(torch.nn.Module):
         return lin_spacing
 
     def model(self):
-        self.xx, self.yy, self.zz = torch.tensor(
-            np.meshgrid(
-                self.lin_spacing(),
-                self.lin_spacing(),
-                self.lin_spacing(),
-                indexing="ij",
-            ),
-            dtype=torch.float32,
+        """
+        TODO: document
+        """
+        # REMOVED by MGD to squelch a warning
+        # from torch, and replaced with the following
+        # self.xx, self.yy, self.zz = torch.tensor(
+        #     np.meshgrid(
+        #         self.lin_spacing(),
+        #         self.lin_spacing(),
+        #         self.lin_spacing(),
+        #         indexing="ij",
+        #     ),
+        #     dtype=torch.float32,
+        # )
+
+        x_, y_, z_ = np.meshgrid(
+            self.lin_spacing(),
+            self.lin_spacing(),
+            self.lin_spacing(),
+            indexing="ij",
         )
+
+        self.xx = torch.tensor(x_, dtype=torch.float32)
+        self.yy = torch.tensor(y_, dtype=torch.float32)
+        self.zz = torch.tensor(z_, dtype=torch.float32)
 
         self.conv1 = torch.nn.Sequential(
             torch.nn.Conv3d(6, 16, kernel_size=(3, 3, 3), stride=1, padding=1),
