@@ -1,6 +1,5 @@
 from typing import List
 from pathlib import Path
-import subprocess
 import os, stat
 import subprocess
 
@@ -45,6 +44,9 @@ class RaspInterface:
         self.reduce_executable_path = None
         self.get_and_compile_reduce()
 
+        # At this point, we should have the reduce executable
+        # at self.reduce_executable_path.
+
         # Downloading the cavity and downstream models.
         # TODO: implement this. What's the best way of doing this?
         # Where should we store the models?
@@ -65,20 +67,35 @@ class RaspInterface:
             # Clone it using git.
             # TODO: Is there a way of downloading the contents
             # of the repo without cloning it?
-            subprocess.run(
-                "git clone https://github.com/rlabduke/reduce.git",
-                cwd=RASP_DIR,
-                shell=True,
-                stdout=subprocess.DEVNULL,
-            )
+            try:
+                subprocess.run(
+                    "git clone https://github.com/rlabduke/reduce.git",
+                    cwd=RASP_DIR,
+                    shell=True,
+                    stdout=subprocess.DEVNULL,
+                    check=True,
+                )
+            except subprocess.CalledProcessError:
+                raise RuntimeError(
+                    "Could not clone the reduce repository. "
+                    "Please check your internet connection."
+                )
 
             # compile it.
-
-            subprocess.run(
-                "make",
-                cwd=REDUCE_DIR,
-                stdout=subprocess.DEVNULL,
-            )
+            try:
+                subprocess.run(
+                    "make",
+                    cwd=REDUCE_DIR,
+                    stdout=subprocess.DEVNULL,
+                    check=True,
+                )
+            except subprocess.CalledProcessError:
+                # TODO: should we be purging it ourselves?
+                raise RuntimeError(
+                    "Something went wrong while compiling reduce. "
+                    "Purge the folder ~/.poli_objectives/rasp/reduce "
+                    " and try again."
+                )
 
             # Change its permissions.
             os.chmod(EXECUTABLE_PATH, stat.S_IEXEC)
@@ -192,12 +209,21 @@ class RaspInterface:
             str(raw_output_path.resolve()),
         ]
 
-        subprocess.run(
-            " ".join(pdb_tools_command_for_cleanup),
-            check=True,
-            cwd=self.working_dir,
-            shell=True,
-        )
+        try:
+            subprocess.run(
+                " ".join(pdb_tools_command_for_cleanup),
+                check=True,
+                cwd=self.working_dir,
+                shell=True,
+            )
+        except subprocess.CalledProcessError:
+            raise RuntimeError(
+                "Something went wrong while running pdbtools. "
+                "Make sure they are installed in the relevant environment, "
+                "and that you have the correct permissions to run them.\n"
+                "The command for installing them is:\n"
+                "pip install pdb-tools"
+            )
 
     def unique_chain_to_clean_pdb(self, wildtype_pdb_path: Path):
         """

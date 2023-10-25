@@ -11,9 +11,7 @@ import numpy as np
 import openmm.app
 import simtk.unit
 
-basepath = os.path.dirname(os.path.realpath(__file__))
-sys.path.insert(1, basepath)
-import grid
+from . import grid
 
 
 def extract_atomic_features(pdb_filename):
