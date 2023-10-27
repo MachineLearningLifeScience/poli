@@ -31,6 +31,9 @@ from .inner_rasp.pdb_parser_scripts.extract_environments import (
 )
 
 from poli.core.util.proteins.mutations import edits_between_strings
+from poli.core.util.files.download_files_from_github import (
+    download_file_from_github_repository,
+)
 
 THIS_DIR = Path(__file__).parent.resolve()
 HOME_DIR = THIS_DIR.home()
@@ -39,7 +42,7 @@ RASP_DIR.mkdir(parents=True, exist_ok=True)
 
 
 class RaspInterface:
-    def __init__(self, working_dir: Path) -> None:
+    def __init__(self, working_dir: Path, verbose: bool = False) -> None:
         self.working_dir = working_dir
 
         # Making the appropriate folders:
@@ -58,7 +61,7 @@ class RaspInterface:
         # Downloading the cavity and downstream models.
         # TODO: implement this. What's the best way of doing this?
         # Where should we store the models?
-        # self.download_cavity_and_downstream_models()
+        self.download_cavity_and_downstream_models(verbose=verbose)
 
     def get_and_compile_reduce(self):
         """
@@ -166,7 +169,7 @@ class RaspInterface:
 
         return df_total
 
-    def download_cavity_and_downstream_models(self):
+    def download_cavity_and_downstream_models(self, verbose: bool = False):
         """
         This function downloads the cavity and downstream models
         at the ~/.poli_objectives/rasp directory.
@@ -174,7 +177,52 @@ class RaspInterface:
         TODO: Find a way to download the models without
         having to clone the entire repo.
         """
-        raise NotImplementedError
+        cavity_model_path = RASP_DIR / "cavity_model_15.pt"
+        ds_models_paths = [
+            RASP_DIR / "ds_models" / f"ds_model_{i}" / "model.pt" for i in range(10)
+        ]
+
+        repository_name = "KULL-Centre/papers"
+        output_folder_in_repository = "2022/ML-ddG-Blaabjerg-et-al/output"
+        commit_sha = "3ccebe87e017b6bd737f88e1943557d128c85616"
+
+        if verbose:
+            print("Downloading the cavity and downstream models")
+            print(f"Repository: {repository_name}")
+            print(f"Commit: {commit_sha}")
+
+        # Downloading the cavity model.
+        if not cavity_model_path.exists():
+            if verbose:
+                print("Downloading the cavity model")
+
+            download_file_from_github_repository(
+                repository_name=repository_name,
+                file_path_in_repository=f"{output_folder_in_repository}/cavity_models/cavity_model_15.pt",
+                download_path_for_file=cavity_model_path,
+                commit_sha=commit_sha,
+                exist_ok=True,
+                verbose=verbose,
+            )
+        elif verbose:
+            print("Cavity model already exists. Skipping.")
+
+        # Downloading the downstream models
+        for path_ in ds_models_paths:
+            if not path_.exists():
+                if verbose:
+                    print(f"Downloading the downstream model {path_.parent}")
+
+                local_path_in_directory = path_.relative_to(RASP_DIR)
+                download_file_from_github_repository(
+                    repository_name=repository_name,
+                    file_path_in_repository=f"{output_folder_in_repository}/{local_path_in_directory}",
+                    download_path_for_file=path_,
+                    commit_sha=commit_sha,
+                    exist_ok=False,
+                )
+            elif verbose:
+                print(f"Downstream model {path_.name} already exists. Skipping.")
 
     def raw_pdb_to_unique_chain(self, wildtype_pdb_path: Path, chain: str = "A"):
         """
@@ -484,3 +532,7 @@ class RaspInterface:
         )
 
         return df_structure
+
+
+if __name__ == "__main__":
+    rasp_interface = RaspInterface(THIS_DIR / "test")
