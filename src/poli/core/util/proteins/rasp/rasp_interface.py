@@ -20,6 +20,11 @@ and tools will be cached in the ~/.poli_objectives/rasp directory,
 so you will only need internet access once.
 
 [1] TODO: add.
+[2] TODO: add.
+
+RaSP's source code was provided with an Apache 2.0 license. Modifications
+from the source have been duly noted. Most of the source code can be found
+at ./inner_rasp.
 """
 
 from typing import List
@@ -60,8 +65,15 @@ RASP_DIR.mkdir(parents=True, exist_ok=True)
 
 
 class RaspInterface:
-    def __init__(self, working_dir: Path, verbose: bool = False) -> None:
+    def __init__(
+        self,
+        working_dir: Path,
+        verbose: bool = False,
+        verify_integrity_of_download: bool = True,
+    ) -> None:
         self.working_dir = working_dir
+        self.verbose = verbose
+        self.verify_integrity_of_download = verify_integrity_of_download
 
         # Making the appropriate folders:
         (self.working_dir / "raw").mkdir(parents=True, exist_ok=True)
@@ -81,7 +93,9 @@ class RaspInterface:
         # Downloading the cavity and downstream models.
         # TODO: should we be doing this eagerly? Or should
         # we wait to download and install it until we need it?
-        self.download_cavity_and_downstream_models(verbose=verbose)
+        self.download_cavity_and_downstream_models(
+            verbose=verbose, verify_integrity_of_download=verify_integrity_of_download
+        )
 
     def get_and_compile_reduce(self):
         """
@@ -190,7 +204,7 @@ class RaspInterface:
         return df_total
 
     def download_cavity_and_downstream_models(
-        self, verbose: bool = False, strict: bool = True
+        self, verbose: bool = False, verify_integrity_of_download: bool = True
     ):
         """
         This function downloads the cavity and downstream models
@@ -250,7 +264,7 @@ class RaspInterface:
                 downloaded_md5_checksum
                 != precomputed_model_md5_checksums[cavity_model_path]
             ):
-                if strict:
+                if verify_integrity_of_download:
                     raise RuntimeError(
                         "The downloaded cavity model does not match the expected md5 checksum. "
                         "This could be due to a corrupted download, or a malicious attack. "
@@ -285,7 +299,7 @@ class RaspInterface:
                     downloaded_md5_checksum
                     != precomputed_model_md5_checksums[path_.parent.name]
                 ):
-                    if strict:
+                    if verify_integrity_of_download:
                         raise RuntimeError(
                             f"The downloaded downstream model {path_.parent.name} does not match the expected md5 checksum. "
                             "This could be due to a corrupted download, or a malicious attack. "

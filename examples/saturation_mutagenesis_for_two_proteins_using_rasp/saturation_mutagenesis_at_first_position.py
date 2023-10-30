@@ -39,7 +39,10 @@ def saturation_mutagenesis_for_protein_at_position(
 
 
 if __name__ == "__main__":
-    wildtype_pdb_paths_for_rasp = list((THIS_DIR / "two_proteins").glob("*.pdb"))
+    wildtype_pdb_paths_for_rasp = [
+        THIS_DIR / "two_proteins" / "3ned.pdb",
+        THIS_DIR / "two_proteins" / "2vae.pdb",
+    ]
 
     _, f_rasp, x0, y0, _ = objective_factory.create(
         name="rasp",
@@ -74,4 +77,5 @@ if __name__ == "__main__":
         ]
     )
 
-    print(df.head())
+    print(df.head(20))
+    print(df.values[:20, 1])
