@@ -102,3 +102,11 @@ try:
     AVAILABLE_PROBLEM_FACTORIES["gfp_select"] = GFPSelectionProblemFactory
 except (ImportError, FileNotFoundError):
     pass
+
+
+try:
+    from .rasp.register import RaspProblemFactory
+
+    AVAILABLE_PROBLEM_FACTORIES["rasp"] = RaspProblemFactory
+except (ImportError, FileNotFoundError):
+    pass

@@ -12,7 +12,7 @@ When dependencies get tough, this library provides a way to encapsulate objectiv
 
 ### Installation
 
-Run the following from the main directory (where this README file is also located) to install the package in development mode (that is, modifications to the source code is directly visible to file importing it without the need for reinstallation).
+Run the following from the main directory (where this README file is also located) to install the package in development mode (this way you could modify its contents and have these changes be reflected without having to re-install).
 ```
 pip install -e .
 ```

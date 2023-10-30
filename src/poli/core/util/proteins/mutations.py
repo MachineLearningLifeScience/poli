@@ -19,17 +19,24 @@ from Bio.SeqUtils import seq1
 from poli.core.util.proteins.pdb_parsing import parse_pdb_as_residue_strings
 
 
-def edits_between_strings(string_1: str, string_2: str) -> List[Tuple[str, int, int]]:
+def edits_between_strings(
+    string_1: str, string_2: str, strict: bool = True
+) -> List[Tuple[str, int, int]]:
     """
     Overwriting editops to only consider replacements between strings.
     This returns ("replace", pos_in_string_1, pos_in_string_2).
     """
+    if strict:
+        assert len(string_1) == len(string_2), (
+            f"string_1 and string_2 have different lengths: "
+            f"{len(string_1)} and {len(string_2)}."
+        )
     for i, (a, b) in enumerate(zip(string_1, string_2)):
         if a != b:
             yield ("replace", i, i)
 
 
-def mutations_from_wildtype_and_mutant(
+def mutations_from_wildtype_residues_and_mutant(
     wildtype_residues: List[Residue], mutated_residue_string: str
 ) -> List[str]:
     """
@@ -89,8 +96,10 @@ def mutations_from_wildtype_and_mutant(
 
 
 def find_closest_wildtype_pdb_file_to_mutant(
-    wildtype_pdb_files: List[Path], mutated_residue_string: str
-) -> Path:
+    wildtype_pdb_files: List[Path],
+    mutated_residue_string: str,
+    return_hamming_distance: bool = False,
+) -> Union[Path, Tuple[Path, int]]:
     # First, we load up these pdb files as residue strings
     wildtype_residue_strings = {
         pdb_file: "".join(parse_pdb_as_residue_strings(pdb_file))
@@ -124,4 +133,7 @@ def find_closest_wildtype_pdb_file_to_mutant(
             f"Lengths allowed: {set([len(x) for x in wildtype_residue_strings.values()])}"
         )
 
-    return best_candidate_pdb_file
+    if return_hamming_distance:
+        return best_candidate_pdb_file, min_hamming_distance
+    else:
+        return best_candidate_pdb_file

@@ -13,7 +13,9 @@ from Bio.PDB.Residue import Residue
 from Bio.PDB import SASA
 from Bio.SeqUtils import seq1
 
-from poli.core.util.proteins.mutations import mutations_from_wildtype_and_mutant
+from poli.core.util.proteins.mutations import (
+    mutations_from_wildtype_residues_and_mutant,
+)
 from poli.core.util.proteins.pdb_parsing import (
     parse_pdb_as_residues,
     parse_pdb_as_structure,
@@ -256,7 +258,7 @@ class FoldxInterface:
             # from M to A; and one at residue 5, which is
             # mutated from A to G.
             # The A in between is the chain ID.
-            mutations_in_line = mutations_from_wildtype_and_mutant(
+            mutations_in_line = mutations_from_wildtype_residues_and_mutant(
                 wildtype_resiudes, mutation
             )
 
