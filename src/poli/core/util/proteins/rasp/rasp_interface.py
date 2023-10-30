@@ -3,6 +3,22 @@ This module takes and adapts RaSP's original implementation
 (which can be found at [1]), and writes an interface that 
 handles the preprocessing and inference steps.
 
+RaSP, like foldx [2], predicts the effect of mutations on protein
+stability. However, it does so using a deep learning model
+instead of actual simulations. The drawback being that
+only additive mutations are supported (indeed, we currently
+only support one-mutation-from-wildtype).
+
+To perform inference, RaSP requires downloading the following:
+- the `reduce` executable, which is used to clean the PDB files.
+- the cavity model, which is used to predict the cavity features.
+- the downstream models, which are used to predict the ddG values.
+
+This means that you will need internet access to use this interface
+(and the "rasp" objective function) for the first time. These models
+and tools will be cached in the ~/.poli_objectives/rasp directory,
+so you will only need internet access once.
+
 [1] TODO: add.
 """
 
@@ -10,6 +26,7 @@ from typing import List
 from pathlib import Path
 import os, stat
 import subprocess
+import logging
 
 import pandas as pd
 import numpy as np
@@ -34,6 +51,7 @@ from poli.core.util.proteins.mutations import edits_between_strings
 from poli.core.util.files.download_files_from_github import (
     download_file_from_github_repository,
 )
+from poli.core.util.files.integrity import compute_md5_from_filepath
 
 THIS_DIR = Path(__file__).parent.resolve()
 HOME_DIR = THIS_DIR.home()
@@ -52,6 +70,8 @@ class RaspInterface:
         (self.working_dir / "output").mkdir(parents=True, exist_ok=True)
 
         # Downloading reduce and compile it.
+        # TODO: should we be doing this eagerly? Or should
+        # we wait to download and install it until we need it?
         self.reduce_executable_path = None
         self.get_and_compile_reduce()
 
@@ -59,8 +79,8 @@ class RaspInterface:
         # at self.reduce_executable_path.
 
         # Downloading the cavity and downstream models.
-        # TODO: implement this. What's the best way of doing this?
-        # Where should we store the models?
+        # TODO: should we be doing this eagerly? Or should
+        # we wait to download and install it until we need it?
         self.download_cavity_and_downstream_models(verbose=verbose)
 
     def get_and_compile_reduce(self):
@@ -169,13 +189,16 @@ class RaspInterface:
 
         return df_total
 
-    def download_cavity_and_downstream_models(self, verbose: bool = False):
+    def download_cavity_and_downstream_models(
+        self, verbose: bool = False, strict: bool = True
+    ):
         """
         This function downloads the cavity and downstream models
         at the ~/.poli_objectives/rasp directory.
 
-        TODO: Find a way to download the models without
-        having to clone the entire repo.
+        If strict is True, then we will raise an error if the
+        models we download don't match the expected MD5 checksums.
+        Otherwise, we will just log a warning.
         """
         cavity_model_path = RASP_DIR / "cavity_model_15.pt"
         ds_models_paths = [
@@ -185,6 +208,22 @@ class RaspInterface:
         repository_name = "KULL-Centre/papers"
         output_folder_in_repository = "2022/ML-ddG-Blaabjerg-et-al/output"
         commit_sha = "3ccebe87e017b6bd737f88e1943557d128c85616"
+
+        # We will compare the md5 checksums of the models
+        # we download against these pre-computed md5s.
+        precomputed_model_md5_checksums = {
+            cavity_model_path: "7f039dab359da67f5870e4c8ba4204ee",
+            "ds_model_0": "88d8d836f4070245d23532ec46ff886b",
+            "ds_model_1": "4ceca5dda221251f1333cc67717339f2",
+            "ds_model_2": "9126cb60c340d2c165e05e7a8e5b3ffa",
+            "ds_model_3": "d3cc21c451b1e5dbe797937fd6c34d3e",
+            "ds_model_4": "a0d23110519a3763205a795fb713b5bf",
+            "ds_model_5": "6c0bc930643aa51ebeba44ddea3b5865",
+            "ds_model_6": "1ad01d6e52160f9f4083775f247d6127",
+            "ds_model_7": "2470800d25b8c3c088c1eb17e6c2e440",
+            "ds_model_8": "313b25729790e7698ce9f35b0b632177",
+            "ds_model_9": "9f02a8de64a4a354eb4734d54ee9ba23",
+        }
 
         if verbose:
             print("Downloading the cavity and downstream models")
@@ -204,6 +243,24 @@ class RaspInterface:
                 exist_ok=True,
                 verbose=verbose,
             )
+
+            # Verifying the integrity of the file we just downloaded.
+            downloaded_md5_checksum = compute_md5_from_filepath(cavity_model_path)
+            if (
+                downloaded_md5_checksum
+                != precomputed_model_md5_checksums[cavity_model_path]
+            ):
+                if strict:
+                    raise RuntimeError(
+                        "The downloaded cavity model does not match the expected md5 checksum. "
+                        "This could be due to a corrupted download, or a malicious attack. "
+                        "Delete the files at ~/.poli_objectives/rasp and try again."
+                    )
+                else:
+                    logging.warning(
+                        "The downloaded cavity model does not match the expected md5 checksum. "
+                        "This could be due to a corrupted download, or a malicious attack. "
+                    )
         elif verbose:
             print("Cavity model already exists. Skipping.")
 
@@ -221,8 +278,26 @@ class RaspInterface:
                     commit_sha=commit_sha,
                     exist_ok=False,
                 )
+
+                # Verifying the integrity of the file we just downloaded.
+                downloaded_md5_checksum = compute_md5_from_filepath(path_)
+                if (
+                    downloaded_md5_checksum
+                    != precomputed_model_md5_checksums[path_.parent.name]
+                ):
+                    if strict:
+                        raise RuntimeError(
+                            f"The downloaded downstream model {path_.parent.name} does not match the expected md5 checksum. "
+                            "This could be due to a corrupted download, or a malicious attack. "
+                            "Delete the files at ~/.poli_objectives/rasp and try again."
+                        )
+                    else:
+                        logging.warning(
+                            f"The downloaded downstream model {path_.name} does not match the expected md5 checksum. "
+                            "This could be due to a corrupted download, or a malicious attack. "
+                        )
             elif verbose:
-                print(f"Downstream model {path_.name} already exists. Skipping.")
+                print(f"Downstream model {path_.parent.name} already exists. Skipping.")
 
     def raw_pdb_to_unique_chain(self, wildtype_pdb_path: Path, chain: str = "A"):
         """
@@ -532,7 +607,3 @@ class RaspInterface:
         )
 
         return df_structure
-
-
-if __name__ == "__main__":
-    rasp_interface = RaspInterface(THIS_DIR / "test")
