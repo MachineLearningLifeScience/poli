@@ -38,6 +38,12 @@ import numpy as np
 
 from Bio.PDB.Polypeptide import index_to_one, one_to_index
 
+from pdbtools.pdb_selchain import run as pdb_selchain_run
+from pdbtools.pdb_delhetatm import run as pdb_delhetatm_run
+from pdbtools.pdb_delres import run as pdb_delres_run
+from pdbtools.pdb_fixinsert import run as pdb_fixinsert_run
+from pdbtools.pdb_tidy import run as pdb_tidy_run
+
 from .inner_rasp.cavity_model import (
     ResidueEnvironmentsDataset,
 )
@@ -52,11 +58,13 @@ from .inner_rasp.pdb_parser_scripts.extract_environments import (
     extract_environments,
 )
 
+
 from poli.core.util.proteins.mutations import edits_between_strings
 from poli.core.util.files.download_files_from_github import (
     download_file_from_github_repository,
 )
 from poli.core.util.files.integrity import compute_md5_from_filepath
+
 
 THIS_DIR = Path(__file__).parent.resolve()
 HOME_DIR = THIS_DIR.home()
@@ -116,6 +124,15 @@ class RaspInterface:
                 subprocess.run(
                     "git clone https://github.com/rlabduke/reduce.git",
                     cwd=RASP_DIR,
+                    shell=True,
+                    stdout=subprocess.DEVNULL,
+                    check=True,
+                )
+
+                # Pinning to commit hash bd23a0bf...
+                subprocess.run(
+                    "git checkout bd23a0bf627ae9b08842102a5c2e9404b4a81924",
+                    cwd=REDUCE_DIR,
                     shell=True,
                     stdout=subprocess.DEVNULL,
                     check=True,
@@ -337,38 +354,34 @@ class RaspInterface:
             / "raw"
             / f"{wildtype_pdb_path.stem}_query_protein_uniquechain.pdb"
         )
-        pdb_tools_command_for_cleanup = [
-            "pdb_selchain",
-            f"-{chain}",
-            str(wildtype_pdb_path.resolve()),
-            "|",
-            "pdb_delhetatm",
-            "|",
-            "pdb_delres",
-            "--999:0:1",
-            "|",
-            "pdb_fixinsert",
-            "|",
-            "pdb_tidy",
-            ">",
-            str(raw_output_path.resolve()),
-        ]
 
-        try:
-            subprocess.run(
-                " ".join(pdb_tools_command_for_cleanup),
-                check=True,
-                cwd=self.working_dir,
-                shell=True,
-            )
-        except subprocess.CalledProcessError:
-            raise RuntimeError(
-                "Something went wrong while running pdbtools. "
-                "Make sure they are installed in the relevant environment, "
-                "and that you have the correct permissions to run them.\n"
-                "The command for installing them is:\n"
-                "pip install pdb-tools"
-            )
+        # We need to load and transform the pdb file into
+        # a line buffer that pdbtools can understand.
+        with open(wildtype_pdb_path, "r") as fp:
+            all_lines = fp.readlines()
+
+        # Step 1: selecting the chain
+        selchain_result = pdb_selchain_run(all_lines, chain)
+
+        # Step 2: deleting heteroatoms
+        deleting_heteroatoms_result = pdb_delhetatm_run(selchain_result)
+
+        # Step 3: deleting residues between -999 and 0
+        deleting_residues_result = pdb_delres_run(
+            deleting_heteroatoms_result, residue_range=(-999, 0), step=1
+        )
+
+        # Step 4: fixing insertions
+        fix_inserts_result = pdb_fixinsert_run(deleting_residues_result, [])
+
+        # Step 5: tidying up the pdb
+        tidy_result = pdb_tidy_run(fix_inserts_result)
+
+        # tidy_result is now a generator of lines, we can use
+        # it to write the output file.
+        with open(raw_output_path, "w") as fp:
+            for line in tidy_result:
+                fp.write(line)
 
     def unique_chain_to_clean_pdb(self, wildtype_pdb_path: Path):
         """

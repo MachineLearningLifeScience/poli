@@ -386,4 +386,5 @@ if __name__ == "__main__":
     register_problem(
         rasp_problem_factory,
         conda_environment_name="poli__rasp",
+        force=True,
     )

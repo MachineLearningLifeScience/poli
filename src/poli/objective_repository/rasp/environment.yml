@@ -10,6 +10,8 @@ dependencies:
   - openbabel
   - openmm
   - mpl-scatter-density
+  - clang
+  - cmake
   - pip
   - pip:
     - "git+https://github.com/MachineLearningLifeScience/poli.git@dev"

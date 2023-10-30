@@ -365,7 +365,7 @@ def test_rasp_on_3ned_against_notebooks_results():
         wildtype_pdb_path=THIS_DIR / "3ned.pdb",
     )
 
-    wildtype_sequence = "".join(x0.flatten())
+    wildtype_sequence = "".join(x0[0])
     three_mutations = [
         "A" + wildtype_sequence[1:],
         "R" + wildtype_sequence[1:],
