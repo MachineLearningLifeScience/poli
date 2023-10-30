@@ -6,13 +6,14 @@ channels:
   - defaults
 dependencies:
   - python=3.9
-  - pdbfixer
+  - pdbfixer==1.9
   - openbabel
   - openmm
   - mpl-scatter-density
+  - pip
   - pip:
     - "git+https://github.com/MachineLearningLifeScience/poli.git@dev"
-    - biopython==1.75
+    - biopython==1.72
     - torch
     - pandas
     - matplotlib
@@ -20,3 +21,4 @@ dependencies:
     - ptitprince
     - scikit-learn
     - pyyaml
+    - PyGithub

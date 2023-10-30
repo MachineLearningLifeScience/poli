@@ -78,4 +78,3 @@ if __name__ == "__main__":
     )
 
     print(df.head(20))
-    print(df.values[:20, 1])
