@@ -26,8 +26,15 @@ Since we are testing multiple conda environments, we settled for using a combina
 
 ```bash
 pip install tox
-tox              # from root of project
+
+# To test linting (from the root of the project)
+tox -e lint
+
+# To test in the base environment for poli
+tox -e poli-base-py39
 ```
+
+If you want to run tests in all environments, remove `-e poli-base-py39` and just run `tox`.
 
 ## Create a pull request to dev
 
