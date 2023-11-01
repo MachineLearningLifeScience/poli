@@ -24,7 +24,11 @@ class AbstractProblemFactory(metaclass=MetaProblemFactory):
         raise NotImplementedError("abstract method")
 
     def create(
-        self, seed: int = 0, batch_size: int = None
+        self,
+        seed: int = None,
+        batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         """
         Returns a blackbox function and initial observations.

@@ -4,10 +4,6 @@ from pathlib import Path
 from .white_noise.register import WhiteNoiseProblemFactory
 from .aloha.register import AlohaProblemFactory
 
-# These have more complex dependencies
-# from .super_mario_bros.register import SuperMarioBrosBlackBox
-# from .rdkit_qed.register import QEDBlackBox
-
 
 THIS_DIR = Path(__file__).parent.resolve()
 
@@ -62,9 +58,9 @@ except (ImportError, FileNotFoundError):
 
 
 try:
-    from .foldx_rfp.register import RFPWrapperFactory
+    from .foldx_rfp_lambo.register import RFPWrapperFactory
 
-    AVAILABLE_PROBLEM_FACTORIES["foldx_rfp"] = RFPWrapperFactory
+    AVAILABLE_PROBLEM_FACTORIES["foldx_rfp_lambo"] = RFPWrapperFactory
 except (ImportError, FileNotFoundError):
     pass
 
@@ -75,5 +71,38 @@ try:
     AVAILABLE_PROBLEM_FACTORIES[
         "foldx_stability_and_sasa"
     ] = FoldXStabilityAndSASAProblemFactory
+except (ImportError, FileNotFoundError):
+    pass
+
+
+try:
+    from .penalized_logp_lambo.register import PenalizedLogPLamboProblemFactory
+
+    AVAILABLE_PROBLEM_FACTORIES[
+        "penalized_logp_lambo"
+    ] = PenalizedLogPLamboProblemFactory
+except (ImportError, FileNotFoundError):
+    pass
+
+try:
+    from .drd3_docking.register import DDR3ProblemFactory
+
+    AVAILABLE_PROBLEM_FACTORIES["drd3_docking"] = DDR3ProblemFactory
+except (ImportError, FileNotFoundError):
+    pass
+
+
+try:
+    from .gfp_select.register import GFPSelectionProblemFactory
+
+    AVAILABLE_PROBLEM_FACTORIES["gfp_select"] = GFPSelectionProblemFactory
+except (ImportError, FileNotFoundError):
+    pass
+
+
+try:
+    from .rasp.register import RaspProblemFactory
+
+    AVAILABLE_PROBLEM_FACTORIES["rasp"] = RaspProblemFactory
 except (ImportError, FileNotFoundError):
     pass

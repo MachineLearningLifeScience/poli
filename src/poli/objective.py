@@ -2,7 +2,6 @@ import logging
 import os
 import sys
 import argparse
-from typing import List
 import traceback
 
 from poli.core.abstract_problem_factory import AbstractProblemFactory
@@ -10,6 +9,34 @@ from poli.core.util.inter_process_communication.process_wrapper import get_conne
 
 
 ADDITIONAL_IMPORT_SEARCH_PATHES_KEY = "ADDITIONAL_IMPORT_PATHS"
+
+
+def parse_factory_kwargs(factory_kwargs: str) -> dict:
+    if factory_kwargs == "":
+        # Then the user didn't pass any arguments
+        kwargs = {}
+    else:
+        factory_kwargs = factory_kwargs.split()
+        kwargs = {}
+        for item in factory_kwargs:
+            item = item.strip("--")
+            key, value = item.split("=")
+            if value.startswith("list:"):
+                # Then we assume that the value was a list
+                value = value.strip("list:")
+                value = value.split(",")
+            elif value.startswith("int:"):
+                value = int(value.strip("int:"))
+            elif value.startswith("float:"):
+                value = float(value.strip("float:"))
+            elif value.startswith("bool:"):
+                value = value.strip("bool:") == "True"
+            elif value.startswith("none:"):
+                value = None
+
+            kwargs[key] = value
+
+    return kwargs
 
 
 def dynamically_instantiate(obj: str, **kwargs):
@@ -20,14 +47,16 @@ def dynamically_instantiate(obj: str, **kwargs):
     sys.path.extend(os.environ[ADDITIONAL_IMPORT_SEARCH_PATHES_KEY].split(":"))
     # sys.path.extend(os.environ['PYTHONPATH'].split(':'))
     last_dot = obj.rfind(".")
+
+    command = (
+        "from "
+        + obj[:last_dot]
+        + " import "
+        + obj[last_dot + 1 :]
+        + " as DynamicObject"
+    )
     try:
-        exec(
-            "from "
-            + obj[:last_dot]
-            + " import "
-            + obj[last_dot + 1 :]
-            + " as DynamicObject"
-        )
+        exec(command)
         instantiated_object = eval("DynamicObject")(**kwargs)
     except ImportError as e:
         logging.fatal(f"Path: {os.environ['PATH']}")
@@ -47,21 +76,7 @@ def run(factory_kwargs: str, objective_name: str, port: int, password: str) -> N
     :param objective_name:
         problem factory name including python packages, e.g. package.subpackage.MyFactoryName
     """
-    if factory_kwargs == "":
-        # Then the user didn't pass any arguments
-        kwargs = {}
-    else:
-        factory_kwargs = factory_kwargs.split()
-        kwargs = {}
-        for item in factory_kwargs:
-            item = item.strip("--")
-            key, value = item.split("=")
-            if value.startswith("list:"):
-                # Then we assume that the value was a list
-                value = value.strip("list:")
-                value = value.split(",")
-
-            kwargs[key] = value
+    kwargs = parse_factory_kwargs(factory_kwargs)
 
     # make connection with the mother process
     conn = get_connection(port, password)

@@ -22,40 +22,61 @@ _RUN_SCRIPT_LOCATION = "run_script_location"
 HOME_DIR = Path.home().resolve()
 (HOME_DIR / ".poli_objectives").mkdir(exist_ok=True)
 
-# config_file = os.path.join(os.path.dirname(__file__), "..", "config.rc")
 config_file = str(HOME_DIR / ".poli_objectives" / "config.rc")
 config = configparser.ConfigParser(defaults={_OBSERVER: ""})
 ls = config.read(config_file)
-# if len(ls) == 0:
-#     warnings.warn("Could not find configuration file: %s" % config_file)
 
 
 def set_observer(
     observer: AbstractObserver,
     conda_environment_location: str = None,
     python_paths: List[str] = None,
+    observer_name: str = None,
 ):
+    """Defines an external observer to be run in a separate process.
+
+    This function takes an observer, a conda environment, a list of python
+    environments, and an observer name. With these, it creates a script that
+    can be run to instantiate the observer in a separate process. If no
+    observer name is passed, the observer is set as the default observer.
+
+    After registering an observer using this function, the user can instantiate
+    it by using the ExternalObserver class, passing the relevant observer name.
+    """
     run_script_location = make_observer_script(
         observer, conda_environment_location, python_paths
     )
-    set_observer_run_script(run_script_location)
+    set_observer_run_script(run_script_location, observer_name=observer_name)
 
 
-def set_observer_run_script(script_file_name: str) -> None:
-    """
-    Sets a run_script to be called on observer instantiation.
+def set_observer_run_script(script_file_name: str, observer_name: str = None) -> None:
+    """Sets a run_script to be called on observer instantiation.
+
+    This function takes as input the location of a script, and an observer name.
+    Using these, it sets the configuration. If no observer name is passed, the
+    observer is set as the default observer.
+
     VERY IMPORTANT: the observer script MUST accept port and password as arguments
     :param script_file_name:
         path to the script
     """
+    if observer_name is None:
+        observer_name = _DEFAULT
+    else:
+        if observer_name not in config.sections():
+            config.add_section(observer_name)
+
     # VERY IMPORTANT: the observer script MUST accept port and password as arguments
-    config[_DEFAULT][_OBSERVER] = script_file_name
+    config[observer_name][_OBSERVER] = script_file_name
     _write_config()
 
 
-def delete_observer_run_script() -> str:
-    location = config[_DEFAULT][_OBSERVER]  # no need to copy
-    config[_DEFAULT][_OBSERVER] = ""
+def delete_observer_run_script(observer_name: str = None) -> str:
+    if observer_name is None:
+        observer_name = _DEFAULT
+
+    location = config[observer_name][_OBSERVER]  # no need to copy
+    config[observer_name][_OBSERVER] = ""
     _write_config()
     return location
 
@@ -101,11 +122,27 @@ def register_problem_from_repository(name: str):
     #    we can't import the factory: it may have
     #    dependencies that are not installed)
 
-    # Moreover, we should only be doing this
-    # if the problem is not already registered.
+    # Load up the environment name
     PATH_TO_REPOSITORY = (
         Path(__file__).parent.parent / "objective_repository"
     ).resolve()
+
+    with open(PATH_TO_REPOSITORY / name / "environment.yml", "r") as f:
+        # This is a really crude way of doing this,
+        # but it works. We should probably use a
+        # yaml parser instead, but the idea is to keep
+        # the dependencies to a minimum.
+        yml = f.read()
+        lines = yml.split("\n")
+        conda_env_name_line = lines[0]
+        assert conda_env_name_line.startswith("name:"), (
+            "The first line of the environment.yml file "
+            "should be the name of the environment"
+        )
+        env_name = lines[0].split(":")[1].strip()
+
+    # Moreover, we should only be doing this
+    # if the problem is not already registered.
 
     if name in config.sections():
         warnings.warn(f"Problem {name} already registered. Skipping")
@@ -129,7 +166,7 @@ def register_problem_from_repository(name: str):
         )
     except subprocess.CalledProcessError as e:
         if "already exists" in e.stderr.decode():
-            warnings.warn(f"Environment {name} already exists. Will not create it.")
+            warnings.warn(f"Environment {env_name} already exists. Will not create it.")
         else:
             raise e
 
@@ -137,23 +174,7 @@ def register_problem_from_repository(name: str):
     #    we can't import the factory: it may have
     #    dependencies that are not installed)
 
-    # 2.1. Loading up the yml file to get the name
-    # of the environment
-    with open(PATH_TO_REPOSITORY / name / "environment.yml", "r") as f:
-        # This is a really crude way of doing this,
-        # but it works. We should probably use a
-        # yaml parser instead, but the idea is to keep
-        # the dependencies to a minimum.
-        yml = f.read()
-        lines = yml.split("\n")
-        conda_env_name_line = lines[0]
-        assert conda_env_name_line.startswith("name:"), (
-            "The first line of the environment.yml file "
-            "should be the name of the environment"
-        )
-        env_name = lines[0].split(":")[1].strip()
-
-    # 2.2. Running the file
+    # Running the file
     file_to_run = PATH_TO_REPOSITORY / name / "register.py"
     command = " ".join(["conda", "run", "-n", env_name, "python", str(file_to_run)])
     warnings.warn("Running the following command: %s. " % command)

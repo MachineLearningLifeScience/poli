@@ -39,6 +39,8 @@ from poli.core.problem_setup_information import ProblemSetupInformation
 
 from poli.core.util.chemistry.string_to_molecule import strings_to_molecules
 
+from poli.core.util.seeding import seed_numpy, seed_python
+
 
 class QEDBlackBox(AbstractBlackBox):
     """
@@ -59,9 +61,12 @@ class QEDBlackBox(AbstractBlackBox):
         self,
         info: ProblemSetupInformation,
         batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
         alphabet: List[str] = None,
         from_selfies: bool = False,
     ):
+        super().__init__(info, batch_size, parallelize, num_workers)
         if alphabet is None:
             # TODO: remove this as soon as we have a default alphabet
             assert info.alphabet is not None, (
@@ -78,7 +83,12 @@ class QEDBlackBox(AbstractBlackBox):
         self.from_selfies = from_selfies
         self.from_smiles = not from_selfies
 
-        super().__init__(info, batch_size)
+        super().__init__(
+            info=info,
+            batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
+        )
 
     # The only method you have to define
     def _black_box(self, x: np.ndarray, context: dict = None) -> np.ndarray:
@@ -133,18 +143,23 @@ class QEDProblemFactory(AbstractProblemFactory):
         return ProblemSetupInformation(
             name="rdkit_qed",
             max_sequence_length=np.inf,
-            aligned=False,
+            aligned=True,
             alphabet=None,
         )
 
     def create(
         self,
-        seed: int = 0,
+        seed: int = None,
+        batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
         alphabet: List[str] = None,
         path_to_alphabet: Path = None,
         string_representation: str = "SMILES",
-        batch_size: int = None,
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+        seed_numpy(seed)
+        seed_python(seed)
+
         if path_to_alphabet is None and alphabet is None:
             # TODO: add support for more file types
             raise ValueError(
@@ -180,9 +195,11 @@ class QEDProblemFactory(AbstractProblemFactory):
         problem_info = self.get_setup_information()
         f = QEDBlackBox(
             info=problem_info,
+            batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
             alphabet=self.alphabet,
             from_selfies=string_representation.upper() == "SELFIES",
-            batch_size=batch_size,
         )
 
         # The sequence "C"

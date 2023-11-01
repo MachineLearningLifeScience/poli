@@ -36,7 +36,9 @@ class OurAlohaProblemFactory(AbstractProblemFactory):
             alphabet=alphabet,
         )
 
-    def create(self, seed: int = 0) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+    def create(
+        self, seed: int = None, **kwargs
+    ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         problem_info = self.get_setup_information()
         f = OurAlohaBlackBox(info=problem_info)
         x0 = np.array([["A", "L", "O", "O", "F"]])
