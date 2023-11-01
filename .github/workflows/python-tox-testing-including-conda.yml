@@ -26,4 +26,4 @@ jobs:
         tox -e lint
     - name: Test poli-base with tox (ignoring RaSP)
       run: |
-        tox -e poli-base-py39 --ignore=src/poli/tests/registry/proteins/test_rasp.py
+        tox -e poli-base-py39 -- --ignore=src/poli/tests/registry/proteins/test_rasp.py
