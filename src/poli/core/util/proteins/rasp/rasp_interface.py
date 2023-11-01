@@ -32,6 +32,7 @@ from pathlib import Path
 import os, stat
 import subprocess
 import logging
+import traceback
 
 import pandas as pd
 import numpy as np
@@ -138,6 +139,8 @@ class RaspInterface:
                     check=True,
                 )
             except subprocess.CalledProcessError:
+                # Printing the traceback
+                traceback.print_exc()
                 raise RuntimeError(
                     "Could not clone the reduce repository. "
                     "Please check your internet connection."
@@ -153,6 +156,7 @@ class RaspInterface:
                 )
             except subprocess.CalledProcessError:
                 # TODO: should we be purging it ourselves?
+                traceback.print_exc()
                 raise RuntimeError(
                     "Something went wrong while compiling reduce. "
                     "Purge the folder ~/.poli_objectives/rasp/reduce "

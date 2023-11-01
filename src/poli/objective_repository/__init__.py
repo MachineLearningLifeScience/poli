@@ -4,10 +4,6 @@ from pathlib import Path
 from .white_noise.register import WhiteNoiseProblemFactory
 from .aloha.register import AlohaProblemFactory
 
-# These have more complex dependencies
-# from .super_mario_bros.register import SuperMarioBrosBlackBox
-# from .rdkit_qed.register import QEDBlackBox
-
 
 THIS_DIR = Path(__file__).parent.resolve()
 
