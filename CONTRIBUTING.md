@@ -20,7 +20,7 @@ pip install black
 black ./path/to/files
 ```
 
-## Testing your changes
+## Testing your changes for `dev``
 
 Since we are testing multiple conda environments, we settled for using a combination of `tox` and `pytest`.
 
@@ -38,7 +38,7 @@ If you want to run tests in all environments, remove `-e poli-base-py39` and jus
 
 ## More thorough testing
 
-In many cases, testing with the instructions above should be enough. However, since we are dealing with creating conda environments, the definite test comes by building the Docker container specified in `Dockerfile.test`, and running it as an image.
+In many cases, testing with the instructions above should be enough. However, since we are dealing with creating conda environments, the definite test comes by building the Docker image specified in `Dockerfile.test`, and running it.
 
 When contributing to the `@master` branch (i.e. to release), we will run these tests.
 
