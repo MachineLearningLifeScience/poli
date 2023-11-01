@@ -1,4 +1,4 @@
-name: Test (conda, python 3.9)
+name: Test (dev, conda, python 3.9)
 
 on: [push]
 
@@ -23,7 +23,7 @@ jobs:
         python -m pip install tox
     - name: Test linting with tox
       run: |
-        tox -e lint
+        tox -c tox.dev.ini -e lint
     - name: Test poli-base with tox (ignoring RaSP)
       run: |
         tox -c tox.dev.ini -e poli-base-py39 -- --ignore=src/poli/tests/registry/proteins/test_rasp.py
