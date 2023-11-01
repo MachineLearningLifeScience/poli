@@ -36,6 +36,12 @@ tox -e poli-base-py39
 
 If you want to run tests in all environments, remove `-e poli-base-py39` and just run `tox`.
 
+## More thorough testing
+
+In many cases, testing with the instructions above should be enough. However, since we are dealing with creating conda environments, the definite test comes by building the Docker container specified in `Dockerfile.test`, and running it as an image.
+
+When contributing to the `@master` branch (i.e. to release), we will run these tests.
+
 ## Create a pull request to dev
 
 Once all tests pass and you are ready to share your changes, create a pull request to the `dev` branch.
