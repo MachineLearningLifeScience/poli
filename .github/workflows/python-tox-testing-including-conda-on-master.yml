@@ -1,6 +1,10 @@
 name: Test (conda, python 3.9)
 
-on: [push]
+on:
+  push:
+  pull-request:
+    branches:
+      - master
 
 jobs:
   build-linux:
@@ -24,6 +28,12 @@ jobs:
     - name: Test linting with tox
       run: |
         tox -e lint
-    - name: Test poli-base with tox (ignoring RaSP)
+    - name: Test poli-base with tox
       run: |
-        tox -e poli-base-py39 --ignore=src/poli/tests/registry/proteins/test_rasp.py
+        tox -e poli-base-py39
+    - name: Test poli-chem with tox
+      run: |
+        tox -e poli-chem-py39
+    - name: Test poli-protein with tox
+      run: |
+        tox -e poli-protein-py39
