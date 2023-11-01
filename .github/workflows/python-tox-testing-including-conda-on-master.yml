@@ -1,8 +1,7 @@
 name: Test (conda, python 3.9)
 
 on:
-  push:
-  pull-request:
+  pull_request:
     branches:
       - master
 
@@ -27,13 +26,13 @@ jobs:
         python -m pip install tox
     - name: Test linting with tox
       run: |
-        tox -e lint
+        tox -c tox.master.ini -e lint
     - name: Test poli-base with tox
       run: |
-        tox -e poli-base-py39
+        tox -c tox.master.ini -e poli-base-py39
     - name: Test poli-chem with tox
       run: |
-        tox -e poli-chem-py39
+        tox -c tox.master.ini -e poli-chem-py39
     - name: Test poli-protein with tox
       run: |
-        tox -e poli-protein-py39
+        tox -c tox.master.ini -e poli-protein-py39
