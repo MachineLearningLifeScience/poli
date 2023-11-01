@@ -24,7 +24,8 @@ def edits_between_strings(
 ) -> List[Tuple[str, int, int]]:
     """
     Overwriting editops to only consider replacements between strings.
-    This returns ("replace", pos_in_string_1, pos_in_string_2).
+    This returns ("replace", pos_in_string_1, pos_in_string_2). Since
+    we only consider replacements, pos_in_string_1 == pos_in_string_2.
     """
     if strict:
         assert len(string_1) == len(string_2), (
@@ -46,17 +47,33 @@ def mutations_from_wildtype_residues_and_mutant(
     keeping track of the replacements.
 
     This method returns a list of strings which are to be written
-    in a single line of individual_list.txt.
+    in a single line of individual_list.txt. Each string is a
+    mutation in the format foldx expects (e.g. "EA1R", meaning
+    that an E was mutated to an R in position 1 of chain A. The
+    first letter is the original residue, the second letter is
+    the chain, the third letter is the position, and the fourth
+    letter is the mutant residue).
 
     If the mutated residue string is the same as the wildtype residue
     string, we still need to pass a dummy mutation to foldx, so we
     "mutate" the first residue in the wildtype string to itself.
+
+    For example:
+        wildtype_residue_string = "ECDE..."
+        mutated_residue_string =  "ACDE..."
+
+    This function would return (assuming that we are mutating the
+    chain "A"):
+        ["EA1A"]
 
     TODO: add description of inputs and outputs
     """
     wildtype_residue_string = "".join(
         [seq1(res.get_resname()) for res in wildtype_residues]
     )
+
+    # Making sure we treat the mutant string as uppercase
+    mutated_residue_string = mutated_residue_string.upper()
 
     assert len(mutated_residue_string) == len(wildtype_residue_string), (
         f"wildtype residue string and mutated residue string "
@@ -67,7 +84,7 @@ def mutations_from_wildtype_residues_and_mutant(
     # If the mutated string is the same as the wildtype string,
     # there are no mutations. Still, FoldX expects us to pass
     # a dummy mutation, so we "mutate" the first residue in the
-    # wildtype string.
+    # wildtype string to itself.
     if mutated_residue_string == wildtype_residue_string:
         first_residue = wildtype_residues[0]
         first_residue_name = seq1(first_residue.get_resname())
@@ -117,7 +134,7 @@ def find_closest_wildtype_pdb_file_to_mutant(
 
         hamming_distance = np.sum(
             [
-                wildtype_residue_string[i] != mutated_residue_string[i]
+                wildtype_residue_string.upper()[i] != mutated_residue_string.upper()[i]
                 for i in range(len(wildtype_residue_string))
             ]
         )
