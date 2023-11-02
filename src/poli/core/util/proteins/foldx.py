@@ -3,7 +3,7 @@ This module contains utilities for querying
 foldx for repairing and simulating the mutations
 of proteins. 
 """
-from typing import List
+from typing import List, Union
 from pathlib import Path
 import shutil
 import subprocess
@@ -50,14 +50,23 @@ if not (PATH_TO_FOLDX_FILES / "rotabase.txt").exists():
 
 
 class FoldxInterface:
-    def __init__(self, working_dir: Path):
+    def __init__(self, working_dir: Union[Path, str]):
+        if isinstance(working_dir, str):
+            working_dir = Path(working_dir)
+
         self.working_dir = working_dir
 
-    def repair(self, pdb_file: Path, remove_and_rename: bool = False) -> None:
+    def repair(
+        self, pdb_file: Union[str, Path], remove_and_rename: bool = False
+    ) -> None:
         """
         This method repairs a PDB file with FoldX, overwriting
         the original file if remove_and_rename is True (default: False).
         """
+        # Make sure the pdb file is a path
+        if isinstance(pdb_file, str):
+            pdb_file = Path(pdb_file)
+
         # Make sure the relevant files are in the
         # working directory
         self.copy_foldx_files(pdb_file)
