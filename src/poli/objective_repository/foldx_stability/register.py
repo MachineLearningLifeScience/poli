@@ -171,12 +171,19 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
             alphabet=alphabet,
         )
 
+        # During the creation of the black box,
+        # we might have repaired the PDB files.
+        # Thus, we need to compute the initial
+        # values of all wildtypes in wildtype_pdb_path
+        # using the repaired PDB files instead.
+        repaired_wildtype_pdb_paths = f.wildtype_pdb_paths
+
         # We need to compute the initial values of all wildtypes
         # in wildtype_pdb_path. For this, we need to specify x0,
         # a vector of wildtype sequences. These are padded to
         # match the maximum length with empty strings.
         wildtype_amino_acids_ = []
-        for pdb_file in wildtype_pdb_path:
+        for pdb_file in repaired_wildtype_pdb_paths:
             wildtype_residues = parse_pdb_as_residues(pdb_file)
             wildtype_amino_acids_.append(
                 [

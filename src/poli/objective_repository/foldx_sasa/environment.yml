@@ -10,4 +10,5 @@ dependencies:
     - biopython
     - python-levenshtein
     - numpy
+    - pdb-tools
     - "git+https://github.com/MachineLearningLifeScience/poli.git@master"
