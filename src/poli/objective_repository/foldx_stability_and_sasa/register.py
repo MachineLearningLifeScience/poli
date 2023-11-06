@@ -35,6 +35,7 @@ class FoldXStabilityAndSASABlackBox(FoldxBlackBox):
         alphabet: List[str] = None,
         experiment_id: str = None,
         tmp_folder: Path = None,
+        eager_repair: bool = False,
     ):
         super().__init__(
             info=info,
@@ -45,6 +46,7 @@ class FoldXStabilityAndSASABlackBox(FoldxBlackBox):
             alphabet=alphabet,
             experiment_id=experiment_id,
             tmp_folder=tmp_folder,
+            eager_repair=eager_repair,
         )
 
     def _black_box(self, x: np.ndarray, context: None) -> np.ndarray:
@@ -121,6 +123,9 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
         num_workers: int = None,
         wildtype_pdb_path: Union[Path, List[Path]] = None,
         alphabet: List[str] = None,
+        experiment_id: str = None,
+        tmp_folder: Path = None,
+        eager_repair: bool = False,
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         seed_numpy(seed)
         seed_python(seed)
@@ -160,6 +165,9 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
             num_workers=num_workers,
             wildtype_pdb_path=wildtype_pdb_path,
             alphabet=alphabet,
+            experiment_id=experiment_id,
+            tmp_folder=tmp_folder,
+            eager_repair=eager_repair,
         )
 
         # We need to compute the initial values of all wildtypes

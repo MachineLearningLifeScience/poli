@@ -13,7 +13,6 @@ dependencies:
   - clang
   - cmake
   - make
-  - gcc
   - pip
   - pip:
     - "git+https://github.com/MachineLearningLifeScience/poli.git@dev"

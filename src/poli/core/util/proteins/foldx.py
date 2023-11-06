@@ -8,10 +8,13 @@ from pathlib import Path
 import shutil
 import subprocess
 import os
+import logging
 
 from Bio.PDB.Residue import Residue
 from Bio.PDB import SASA
 from Bio.SeqUtils import seq1
+
+from pdbtools.pdb_delhetatm import run as pdb_delhetatm_run
 
 from poli.core.util.proteins.mutations import (
     mutations_from_wildtype_residues_and_mutant,
@@ -57,7 +60,11 @@ class FoldxInterface:
         self.working_dir = working_dir
 
     def repair(
-        self, pdb_file: Union[str, Path], remove_and_rename: bool = False
+        self,
+        pdb_file: Union[str, Path],
+        remove_and_rename: bool = False,
+        pH: float = 7.0,
+        remove_heteroatoms: bool = True,
     ) -> None:
         """
         This method repairs a PDB file with FoldX, overwriting
@@ -77,10 +84,20 @@ class FoldxInterface:
             "--command=RepairPDB",
             "--pdb",
             f"{pdb_file.stem}.pdb",
+            "--water",
+            "-CRYSTAL",
+            "--pH",
+            f"{pH}",
         ]
 
         # Running it in the working directory
-        subprocess.run(command, cwd=self.working_dir)
+        try:
+            subprocess.run(command, cwd=self.working_dir, check=True)
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError(
+                f"FoldX failed to repair the pdb file {pdb_file}. "
+                f"Please check the working directory: {self.working_dir}. "
+            ) from e
 
         # Checking that the file was generated
         repaired_pdb_file = self.working_dir / f"{pdb_file.stem}_Repair.pdb"
@@ -89,6 +106,19 @@ class FoldxInterface:
             f"Please check the working directory: {self.working_dir}. "
         )
 
+        # If remove heteroatoms is True, we remove them
+        # using pdbtools
+        if remove_heteroatoms:
+            # We load up the repaired file
+            with open(repaired_pdb_file) as f:
+                lines = f.readlines()
+
+            deleting_heteroatoms_result = pdb_delhetatm_run(lines)
+
+            # We write the result to the same file
+            with open(repaired_pdb_file, "w") as f:
+                f.writelines(deleting_heteroatoms_result)
+
         # Removing the old pdb file, and renaming the repaired one
         if remove_and_rename:
             shutil.rmtree(self.working_dir / f"{pdb_file.stem}.pdb")
@@ -96,6 +126,28 @@ class FoldxInterface:
                 self.working_dir / f"{pdb_file.stem}_Repair.pdb",
                 self.working_dir / f"{pdb_file.stem}.pdb",
             )
+
+    def _repair_if_necessary_and_provide_path(self, pdb_file: Path) -> Path:
+        """
+        If the pdb_file's name doesn't end in "_Repair.pdb",
+        then we repair it and return the path of the repaired
+        pdb. Otherwise, we return the same path as the input.
+        """
+        # Make sure that we don't have a repaired pdb file
+        # in the working directory (which is usually a cache)
+        if (self.working_dir / f"{pdb_file.stem}_Repair.pdb").exists():
+            logging.warning(
+                f"Found a repaired pdb file in the cache for {pdb_file.stem}. Using it instead of repairing."
+            )
+            return self.working_dir / f"{pdb_file.stem}_Repair.pdb"
+
+        # If the file's already fixed, then we don't need to
+        # do anything. Else, we repair it.
+        if "_Repair" in pdb_file.name:
+            return pdb_file
+        else:
+            self.repair(pdb_file)
+            return self.working_dir / f"{pdb_file.stem}_Repair.pdb"
 
     def _simulate_mutations(self, pdb_file: Path, mutations: List[str] = None) -> None:
         """

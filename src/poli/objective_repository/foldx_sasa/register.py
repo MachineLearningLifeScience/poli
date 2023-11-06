@@ -37,16 +37,18 @@ class FoldXSASABlackBox(FoldxBlackBox):
         alphabet: List[str] = None,
         experiment_id: str = None,
         tmp_folder: Path = None,
+        eager_repair: bool = False,
     ):
         super().__init__(
-            info,
-            batch_size,
-            parallelize,
-            num_workers,
-            wildtype_pdb_path,
-            alphabet,
-            experiment_id,
-            tmp_folder,
+            info=info,
+            batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
+            wildtype_pdb_path=wildtype_pdb_path,
+            alphabet=alphabet,
+            experiment_id=experiment_id,
+            tmp_folder=tmp_folder,
+            eager_repair=eager_repair,
         )
 
     def _black_box(self, x: np.ndarray, context: None) -> np.ndarray:
@@ -121,6 +123,9 @@ class FoldXSASAProblemFactory(AbstractProblemFactory):
         num_workers: int = None,
         wildtype_pdb_path: Union[Path, List[Path]] = None,
         alphabet: List[str] = None,
+        experiment_id: str = None,
+        tmp_folder: Path = None,
+        eager_repair: bool = False,
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         """
         TODO: document
@@ -165,6 +170,9 @@ class FoldXSASAProblemFactory(AbstractProblemFactory):
             num_workers=num_workers,
             wildtype_pdb_path=wildtype_pdb_path,
             alphabet=alphabet,
+            experiment_id=experiment_id,
+            tmp_folder=tmp_folder,
+            eager_repair=eager_repair,
         )
 
         # We need to compute the initial values of all wildtypes
