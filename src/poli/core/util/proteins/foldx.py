@@ -8,6 +8,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import os
+import logging
 
 from Bio.PDB.Residue import Residue
 from Bio.PDB import SASA
@@ -132,11 +133,21 @@ class FoldxInterface:
         then we repair it and return the path of the repaired
         pdb. Otherwise, we return the same path as the input.
         """
-        if "_Repair" not in pdb_file.name:
+        # Make sure that we don't have a repaired pdb file
+        # in the working directory (which is usually a cache)
+        if (self.working_dir / f"{pdb_file.stem}_Repair.pdb").exists():
+            logging.warning(
+                f"Found a repaired pdb file in the cache for {pdb_file.stem}. Using it instead of repairing."
+            )
+            return self.working_dir / f"{pdb_file.stem}_Repair.pdb"
+
+        # If the file's already fixed, then we don't need to
+        # do anything. Else, we repair it.
+        if "_Repair" in pdb_file.name:
+            return pdb_file
+        else:
             self.repair(pdb_file)
             return self.working_dir / f"{pdb_file.stem}_Repair.pdb"
-        else:
-            return pdb_file
 
     def _simulate_mutations(self, pdb_file: Path, mutations: List[str] = None) -> None:
         """

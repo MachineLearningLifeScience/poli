@@ -32,6 +32,7 @@ class FoldxBlackBox(AbstractBlackBox):
         alphabet: List[str] = None,
         experiment_id: str = None,
         tmp_folder: Path = None,
+        eager_repair: bool = False,
     ):
         """
         TODO: Document
@@ -83,22 +84,25 @@ class FoldxBlackBox(AbstractBlackBox):
 
         # At this point, wildtype_pdb_path is a list of Path objects.
         # We need to ensure that these are repaired pdb files.
-        path_for_repairing_pdbs = (
-            self.tmp_folder / "foldx_tmp_files_for_repair" / self.experiment_id
-        )
-        path_for_repairing_pdbs.mkdir(exist_ok=True, parents=True)
-        foldx_interface_for_repairing = FoldxInterface(path_for_repairing_pdbs)
+        # We do this by creating a temporary folder and repairing
+        # the pdbs there.
+        if eager_repair:
+            path_for_repairing_pdbs = self.tmp_folder / "foldx_tmp_files_for_repair"
+            path_for_repairing_pdbs.mkdir(exist_ok=True, parents=True)
+            foldx_interface_for_repairing = FoldxInterface(path_for_repairing_pdbs)
 
-        # Re-writing wildtype_pdb_path to be the list of repaired pdb files.
-        repaired_wildtype_pdb_files = [
-            foldx_interface_for_repairing._repair_if_necessary_and_provide_path(
-                pdb_file
-            )
-            for pdb_file in wildtype_pdb_path
-        ]
+            # Re-writing wildtype_pdb_path to be the list of repaired pdb files.
+            repaired_wildtype_pdb_files = [
+                foldx_interface_for_repairing._repair_if_necessary_and_provide_path(
+                    pdb_file
+                )
+                for pdb_file in wildtype_pdb_path
+            ]
 
-        # At this point, wildtype_pdb_path is a list of Path objects.
-        self.wildtype_pdb_paths = repaired_wildtype_pdb_files
+            # At this point, wildtype_pdb_path is a list of Path objects.
+            self.wildtype_pdb_paths = repaired_wildtype_pdb_files
+        else:
+            self.wildtype_pdb_paths = wildtype_pdb_path
 
         self.wildtype_resiudes = [
             parse_pdb_as_residues(pdb_file) for pdb_file in self.wildtype_pdb_paths

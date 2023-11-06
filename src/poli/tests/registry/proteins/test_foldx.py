@@ -184,6 +184,7 @@ def test_foldx_from_non_repaired_file():
     _, f, _, y0, _ = objective_factory.create(
         name="foldx_stability",
         wildtype_pdb_path=wildtype_pdb_path,
+        eager_repair=True,
     )
 
     assert np.isclose(y0, 32.6135).all()
