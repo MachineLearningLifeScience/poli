@@ -106,3 +106,10 @@ try:
     AVAILABLE_PROBLEM_FACTORIES["rasp"] = RaspProblemFactory
 except (ImportError, FileNotFoundError):
     pass
+
+try:
+    from .dockstring.register import DockstringProblemFactory
+
+    AVAILABLE_PROBLEM_FACTORIES["dockstring"] = DockstringProblemFactory
+except ImportError:
+    pass
