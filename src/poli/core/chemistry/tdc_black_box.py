@@ -2,7 +2,10 @@
 In this module, we implement a synthetic-accessibility 
 objective using the TDC oracles [1].
 
-[1] TODO: add reference.
+[1] Huang, Kexin, Tianfan Fu, Wenhao Gao, Yue Zhao, Yusuf Roohani, Jure Leskovec, Connor W. Coley, Cao Xiao, Jimeng Sun, and Marinka Zitnik. “Artificial Intelligence Foundation for Therapeutic Science.” Nature Chemical Biology 18, no. 10 (October 2022): 1033-36. https://doi.org/10.1038/s41589-022-01131-2.
+
+See also:
+    - The website for TDC: https://tdcommons.ai/
 """
 
 import numpy as np
