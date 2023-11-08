@@ -2,7 +2,8 @@
 This script implements and registers a black box
 objective function (and a repository) for dockstring [1].
 
-[1] TODO: add.
+[1] García-Ortegón, Miguel, Gregor N. C. Simm, Austin J. Tripp, José Miguel Hernández-Lobato, Andreas Bender, and Sergio Bacallado. “DOCKSTRING: Easy Molecular Docking Yields Better Benchmarks for Ligand Design.” Journal of Chemical Information and Modeling 62, no. 15 (August 8, 2022): 3486-3502. https://doi.org/10.1021/acs.jcim.1c01334.
+
 """
 from typing import Tuple
 
