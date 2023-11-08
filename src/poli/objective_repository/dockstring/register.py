@@ -117,8 +117,9 @@ class DockstringProblemFactory(AbstractProblemFactory):
             # TODO: replace for proper smiles tokenization.
             x0 = np.array([list(risperidone_smiles)])
         elif string_representation.upper() == "SELFIES":
-            risperidone_selfies = translate_smiles_to_selfies(risperidone_smiles)
-            x0 = np.array([sf.split_selfies(risperidone_selfies)])
+            risperidone_selfies = translate_smiles_to_selfies([risperidone_smiles])[0]
+            risperidone_selfies_as_tokens = list(sf.split_selfies(risperidone_selfies))
+            x0 = np.array([risperidone_selfies_as_tokens])
         else:
             raise ValueError(
                 f"Invalid string representation. Expected SMILES or SELFIES but received {string_representation}."

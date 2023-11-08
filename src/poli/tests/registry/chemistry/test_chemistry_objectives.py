@@ -146,3 +146,72 @@ def test_penalized_logp_lambo():
     print(x0)
     print(y0)
     f.terminate()
+
+
+def test_querying_dockstring_using_smiles():
+    """
+    In this test, we force-register and query dockstring.
+    """
+    from poli import objective_factory
+
+    _, f, x0, y0, _ = objective_factory.create(
+        name="dockstring",
+        target_name="DRD2",
+        string_representation="SMILES",
+        force_register=True,
+    )
+
+    # Docking another smiles
+    x1 = np.array([list("CC(=O)OC1=CC=CC=C1C(=O)O")])
+    y1 = f(x1)
+
+    f.terminate()
+
+
+def test_querying_dockstring_using_selfies():
+    """
+    In this test, we check whether dockstring still
+    works when using SELFIES instead of SMILES.
+    """
+    from poli import objective_factory
+
+    _, f, x0, y0, _ = objective_factory.create(
+        name="dockstring",
+        target_name="ABL1",
+        string_representation="SELFIES",
+        force_register=True,
+    )
+
+    # Docking another smiles
+    selfies_aspirin = np.array(
+        [
+            [
+                "[C]",
+                "[C]",
+                "[=Branch1]",
+                "[C]",
+                "[=O]",
+                "[O]",
+                "[C]",
+                "[=C]",
+                "[C]",
+                "[=C]",
+                "[C]",
+                "[=C]",
+                "[Ring1]",
+                "[=Branch1]",
+                "[C]",
+                "[=Branch1]",
+                "[C]",
+                "[=O]",
+                "[O]",
+            ]
+        ]
+    )
+
+    y1 = f(selfies_aspirin)
+    f.terminate()
+
+
+if __name__ == "__main__":
+    test_querying_dockstring_using_selfies()
