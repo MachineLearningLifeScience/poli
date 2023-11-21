@@ -212,9 +212,7 @@ def easom(xy: np.ndarray) -> np.ndarray:
     """
     x = xy[..., 0]
     y = xy[..., 1]
-    return (
-        np.cos(x) * np.cos(y) * np.exp(-((x - np.pi) ** 2 + (y - np.pi) ** 2))
-    )
+    return np.cos(x) * np.cos(y) * np.exp(-((x - np.pi) ** 2 + (y - np.pi) ** 2))
 
 
 def cross_in_tray(xy: np.ndarray) -> np.ndarray:
@@ -227,12 +225,7 @@ def cross_in_tray(xy: np.ndarray) -> np.ndarray:
     y = xy[..., 1]
     quotient = np.sqrt(x**2 + y**2) / np.pi
     return (
-        1
-        * (
-            np.abs(np.sin(x) * np.sin(y) * np.exp(np.abs(10 - quotient)))
-            + 1
-        )
-        ** 0.1
+        1 * (np.abs(np.sin(x) * np.sin(y) * np.exp(np.abs(10 - quotient))) + 1) ** 0.1
     )
 
 

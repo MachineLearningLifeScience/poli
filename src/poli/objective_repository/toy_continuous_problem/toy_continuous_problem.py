@@ -150,9 +150,7 @@ class ToyContinuousProblem:
             self.optima_location = np.array([512, 404.2319])
             self.solution_length = 2
         else:
-            raise ValueError(
-                f'Expected {name} to be one of {POSSIBLE_FUNCTIONS}'
-            )
+            raise ValueError(f"Expected {name} to be one of {POSSIBLE_FUNCTIONS}")
 
         self.optima = self.function(self.optima_location)
 
