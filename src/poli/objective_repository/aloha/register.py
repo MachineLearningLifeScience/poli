@@ -8,7 +8,7 @@ The problem is registered as 'aloha', and it uses
 a conda environment called 'poli__base' (see the
 environment.yml file in this folder).
 """
-from typing import Tuple, Dict
+from typing import Tuple
 from string import ascii_uppercase
 
 import numpy as np
@@ -17,11 +17,24 @@ from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem_setup_information import ProblemSetupInformation
 
+from poli.core.util.seeding import seed_numpy, seed_python
+
 
 class AlohaBlackBox(AbstractBlackBox):
-    def __init__(self, info: ProblemSetupInformation, batch_size: int = None):
+    def __init__(
+        self,
+        info: ProblemSetupInformation,
+        batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
+    ):
         self.alphabet = {symbol: idx for idx, symbol in enumerate(info.alphabet)}
-        super().__init__(info, batch_size)
+        super().__init__(
+            info=info,
+            batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
+        )
 
     # The only method you have to define
     def _black_box(self, x: np.ndarray, context: dict = None) -> np.ndarray:
@@ -54,9 +67,24 @@ class AlohaProblemFactory(AbstractProblemFactory):
             alphabet=alphabet,
         )
 
-    def create(self, seed: int = 0) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+    def create(
+        self,
+        seed: int = None,
+        batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
+    ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+        # We set the seed for numpy and python
+        seed_numpy(seed)
+        seed_python(seed)
+
         problem_info = self.get_setup_information()
-        f = AlohaBlackBox(info=problem_info)
+        f = AlohaBlackBox(
+            info=problem_info,
+            batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
+        )
         x0 = np.array([["A", "L", "O", "O", "F"]])
 
         return f, x0, f(x0)

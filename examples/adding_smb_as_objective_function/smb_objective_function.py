@@ -58,7 +58,9 @@ class SMBProblemFactory(AbstractProblemFactory):
             alphabet=alphabet,
         )
 
-    def create(self, seed: int = 0) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+    def create(
+        self, seed: int = None
+    ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         problem_info = self.get_setup_information()
         f = SMBBlackBox(info=problem_info)
         sequence_length = problem_info.get_max_sequence_length()

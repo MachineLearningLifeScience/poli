@@ -1,4 +1,5 @@
 import numpy as np
+from multiprocessing import Pool, cpu_count
 
 from poli.core.problem_setup_information import ProblemSetupInformation
 
@@ -7,9 +8,27 @@ from poli.core.util.batch import batched
 
 
 class AbstractBlackBox:
-    def __init__(self, info: ProblemSetupInformation, batch_size: int = None):
+    def __init__(
+        self,
+        info: ProblemSetupInformation,
+        batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
+    ):
         self.info = info
         self.observer = None
+        self.parallelize = parallelize
+
+        if num_workers is None:
+            num_workers = cpu_count() // 2
+
+        self.num_workers = num_workers
+
+        # if not self.info.sequences_are_aligned():
+        #     # assert (
+        #     #     batch_size is None or batch_size == 1
+        #     # ), "For unaligned problems only batch size 1 is supported!"
+        #     batch_size = 1
         self.batch_size = batch_size
 
     def set_observer(self, observer: AbstractObserver):
@@ -30,12 +49,16 @@ class AbstractBlackBox:
         # dimension should match the maximum sequence length of
         # the problem. One can opt out of this by setting L=np.inf
         # or L=None.
-        assert len(x.shape) == 2
+        if self.info.sequences_are_aligned():
+            assert len(x.shape) == 2
         maximum_sequence_length = self.info.get_max_sequence_length()
 
         # We assert that the length matches L if the maximum sequence length
         # specified in the problem is different from np.inf or None.
-        if maximum_sequence_length not in [np.inf, None]:
+        if (
+            maximum_sequence_length not in [np.inf, None]
+            and self.info.sequences_are_aligned()
+        ):
             assert x.shape[1] == maximum_sequence_length, (
                 "The length of the input is not the same as the length of the input of the problem. "
                 f"(L={maximum_sequence_length}, x.shape[1]={x.shape[1]}). "
@@ -46,9 +69,26 @@ class AbstractBlackBox:
         # the whole input at once.
         batch_size = self.batch_size if self.batch_size is not None else x.shape[0]
         f_evals = []
+
+        # We evaluate x in batches.
         for x_batch_ in batched(x, batch_size):
-            x_batch = np.concatenate(x_batch_, axis=0).reshape(batch_size, -1)
-            f_batch = self._black_box(x_batch, context)
+            # We reshape the batch to be 2D, even if the batch size is 1.
+            x_batch = (
+                np.concatenate(x_batch_, axis=0).reshape(len(x_batch_), -1)
+                if batch_size > 1
+                else np.array(x_batch_)
+            )
+
+            # We evaluate the batch in parallel if the user wants to.
+            if self.parallelize:
+                with Pool(self.num_workers) as pool:
+                    f_batch_ = pool.starmap(
+                        self._black_box, [(x.reshape(1, -1), context) for x in x_batch]
+                    )
+                    f_batch = np.array(f_batch_).reshape(len(x_batch_), -1)
+            else:  # iterative treatment
+                f_batch = self._black_box(x_batch, context)
+
             assert (
                 len(f_batch.shape) == 2
             ), f"len(f(x).shape)={len(f_batch.shape)}, expected 2"
@@ -57,9 +97,20 @@ class AbstractBlackBox:
                 f_batch, np.ndarray
             ), f"type(f)={type(f_batch)}, not np.ndarray"
 
+            assert (
+                x_batch.shape[0] == f_batch.shape[0]
+            ), f"Inconsistent evaluation axis=0 x={x_batch.shape} != black_box y={f_batch.shape}"
+
             # We pass the information to the observer, if any.
             if self.observer is not None:
-                self.observer.observe(x_batch, f_batch, context)
+                # observer logic s.t. observations are individual - later aggregate w.r.t batch_size
+                if x_batch.shape[0] > 1:
+                    for i in range(x_batch.shape[0]):
+                        _x = np.atleast_2d(x_batch[i])
+                        _y = np.atleast_2d(f_batch[i])
+                        self.observer.observe(_x, _y, context)
+                else:
+                    self.observer.observe(x_batch, f_batch, context)
 
             f_evals.append(f_batch)
 
@@ -70,8 +121,11 @@ class AbstractBlackBox:
     def _black_box(self, x, context=None):
         raise NotImplementedError("abstract method")
 
-    def terminate(self):
-        pass
+    def terminate(self) -> None:
+        # if self.observer is not None:
+        #     # NOTE: terminating a problem should gracefully end the observer process -> write the last state.
+        #     self.observer.finish()
+        return
 
     def __enter__(self):
         return self

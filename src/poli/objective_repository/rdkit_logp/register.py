@@ -26,7 +26,7 @@ pip install rdkit selfies
 [1] TODO: add reference
 """
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Tuple, List
 import json
 
 import numpy as np
@@ -38,6 +38,8 @@ from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem_setup_information import ProblemSetupInformation
 
 from poli.core.util.chemistry.string_to_molecule import strings_to_molecules
+
+from poli.core.util.seeding import seed_numpy, seed_python
 
 
 class LogPBlackBox(AbstractBlackBox):
@@ -57,9 +59,11 @@ class LogPBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        info: int = np.inf,
+        info: ProblemSetupInformation,
         batch_size: int = None,
-        alphabet: Dict[str, int] = None,
+        parallelize: bool = False,
+        num_workers: int = None,
+        alphabet: List[str] = None,
         from_selfies: bool = False,
     ):
         if alphabet is None:
@@ -77,7 +81,12 @@ class LogPBlackBox(AbstractBlackBox):
         self.from_selfies = from_selfies
         self.from_smiles = not from_selfies
 
-        super().__init__(info, batch_size)
+        super().__init__(
+            info=info,
+            batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
+        )
 
     # The only method you have to define
     def _black_box(self, x: np.ndarray, context: dict = None) -> np.ndarray:
@@ -137,17 +146,23 @@ class LogPProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
-        seed: int = 0,
-        path_to_alphabet: Path = None,
-        string_representation: str = "SMILES",
+        seed: int = None,
         batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
+        path_to_alphabet: Path = None,
+        alphabet: List[str] = None,
+        string_representation: str = "SMILES",
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
-        if path_to_alphabet is None:
+        seed_numpy(seed)
+        seed_python(seed)
+
+        if path_to_alphabet is None and alphabet is None:
             # TODO: add support for more file types
             raise ValueError(
-                "Missing required keyword argument: path_to_alphabet: Path. "
-                "Path to alphabet (a json file {str: int}) must be provided "
-                " to the QEDProblemFactory."
+                "Missing required keyword argument: either path_to_alphabet or alphabet must be provided. \n"
+                "- alphabet could be a List[str], or \n "
+                "- path_to_alphabet could be the Path to a json file [token_1, token_2, ...] \n "
             )
 
         if string_representation.upper() not in ["SMILES", "SELFIES"]:
@@ -156,20 +171,21 @@ class LogPProblemFactory(AbstractProblemFactory):
                 "String representation must be either 'SMILES' or 'SELFIES'."
             )
 
-        if isinstance(path_to_alphabet, str):
-            path_to_alphabet = Path(path_to_alphabet.strip()).resolve()
+        if alphabet is None:
+            if isinstance(path_to_alphabet, str):
+                path_to_alphabet = Path(path_to_alphabet.strip()).resolve()
 
-        if not path_to_alphabet.exists():
-            raise ValueError(f"Path to alphabet {path_to_alphabet} does not exist.")
+            if not path_to_alphabet.exists():
+                raise ValueError(f"Path to alphabet {path_to_alphabet} does not exist.")
 
-        if not path_to_alphabet.suffix == ".json":
-            # TODO: add support for more file types
-            raise ValueError(
-                f"Path to alphabet {path_to_alphabet} must be a json file."
-            )
+            if not path_to_alphabet.suffix == ".json":
+                # TODO: add support for more file types
+                raise ValueError(
+                    f"Path to alphabet {path_to_alphabet} must be a json file."
+                )
 
-        with open(path_to_alphabet, "r") as f:
-            alphabet = json.load(f)
+            with open(path_to_alphabet, "r") as f:
+                alphabet = json.load(f)
 
         self.alphabet = alphabet
 
@@ -177,6 +193,8 @@ class LogPProblemFactory(AbstractProblemFactory):
         f = LogPBlackBox(
             info=problem_info,
             batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
             alphabet=self.alphabet,
             from_selfies=string_representation.upper() == "SELFIES",
         )

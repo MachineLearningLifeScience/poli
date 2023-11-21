@@ -1,0 +1,28 @@
+name: poli__rasp
+channels:
+  - omnia
+  - conda-forge
+  - anaconda
+  - defaults
+dependencies:
+  - python=3.9
+  - pdbfixer==1.9
+  - openbabel
+  - openmm
+  - mpl-scatter-density
+  - clang
+  - cmake
+  - make
+  - gcc
+  - pip
+  - pip:
+    - "git+https://github.com/MachineLearningLifeScience/poli.git@dev"
+    - biopython==1.72
+    - torch
+    - pandas
+    - matplotlib
+    - pdb-tools
+    - ptitprince
+    - scikit-learn
+    - pyyaml
+    - PyGithub

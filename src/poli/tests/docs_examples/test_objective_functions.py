@@ -38,29 +38,75 @@ def test_aloha_example():
 
 
 def test_qed_example():
-    from pathlib import Path
     import numpy as np
     from poli import objective_factory
 
-    # The path to your alphabet
-    THIS_DIR = Path(__file__).parent.resolve()
-    path_to_alphabet = THIS_DIR / "alphabet_selfies.json"
+    # Your alphabet
+    alphabet = ["", "C", "..."]
 
     # How to create
     problem_info, f, x0, y0, run_info = objective_factory.create(
         name="rdkit_qed",
-        path_to_alphabet=path_to_alphabet,
-        string_representation="SELFIES",  # it is "SMILES" by default.
+        alphabet=alphabet,
+        string_representation="SMILES",  # it is "SMILES" by default.
         force_register=True,
     )
 
     # Example input: a single carbon
-    x = np.array([[1]])
+    x = np.array(["C"]).reshape(1, -1)
 
     # Querying:
     y = f(x)
     print(y)  # Should be close to 0.35978
     assert np.isclose(y, 0.35978494).all()
+
+
+def test_qed_example_using_strings():
+    import numpy as np
+    from poli import objective_factory
+
+    # Your alphabet
+    alphabet = ["", "C", "..."]
+
+    # How to create
+    problem_info, f, x0, y0, run_info = objective_factory.create(
+        name="rdkit_qed",
+        alphabet=alphabet,
+        string_representation="SMILES",  # it is "SMILES" by default.
+        force_register=True,
+    )
+
+    # Example input: a single carbon
+    x = np.array(["C"]).reshape(1, -1)
+
+    # Querying:
+    y = f(x)
+    print(y)  # Should be close to 0.35978494
+    assert np.isclose(y, 0.35978494).all()
+
+
+def test_logp_example_using_strings():
+    import numpy as np
+    from poli import objective_factory
+
+    # Your alphabet
+    alphabet = ["", "C", "..."]
+
+    # How to create
+    problem_info, f, x0, y0, run_info = objective_factory.create(
+        name="rdkit_logp",
+        alphabet=alphabet,
+        string_representation="SMILES",  # it is "SMILES" by default.
+        force_register=True,
+    )
+
+    # Example input: a single carbon
+    x = np.array(["C"]).reshape(1, -1)
+
+    # Querying:
+    y = f(x)
+    print(y)  # Should be close to 0.6361
+    assert np.isclose(y, 0.6361).all()
 
 
 def test_logp_example():
@@ -70,13 +116,13 @@ def test_logp_example():
 
     # The path to your alphabet
     THIS_DIR = Path(__file__).parent.resolve()
-    path_to_alphabet = THIS_DIR / "alphabet_selfies.json"
+    alphabet = ["", "C", "..."]
 
     # How to create
     problem_info, f, x0, y0, run_info = objective_factory.create(
         name="rdkit_logp",
-        path_to_alphabet=path_to_alphabet,
-        string_representation="SELFIES",  # it is "SMILES" by default.
+        alphabet=alphabet,
+        string_representation="SMILES",  # it is "SMILES" by default.
         force_register=True,
     )
 
@@ -87,3 +133,7 @@ def test_logp_example():
     y = f(x)
     print(y)  # Should be close to 0.6361
     assert np.isclose(y, 0.6361).all()
+
+
+if __name__ == "__main__":
+    test_qed_example()
