@@ -2,7 +2,11 @@
 This script implements and registers a black box
 objective function (and a repository) for dockstring [1].
 
-[1] García-Ortegón, Miguel, Gregor N. C. Simm, Austin J. Tripp, José Miguel Hernández-Lobato, Andreas Bender, and Sergio Bacallado. “DOCKSTRING: Easy Molecular Docking Yields Better Benchmarks for Ligand Design.” Journal of Chemical Information and Modeling 62, no. 15 (August 8, 2022): 3486-3502. https://doi.org/10.1021/acs.jcim.1c01334.
+[1] García-Ortegón, Miguel, Gregor N. C. Simm, Austin J. Tripp,
+    José Miguel Hernández-Lobato, Andreas Bender, and Sergio Bacallado.
+    “DOCKSTRING: Easy Molecular Docking Yields Better Benchmarks for Ligand Design.”
+    Journal of Chemical Information and Modeling 62, no. 15 (August 8, 2022): 3486-3502.
+    https://doi.org/10.1021/acs.jcim.1c01334.
 
 """
 from typing import Tuple
@@ -64,7 +68,13 @@ class DockstringBlackBox(AbstractBlackBox):
             molecules_as_smiles = molecules_as_strings
 
         # TODO: Should we parallelize?
-        scores = [self.target.dock(smiles)[0] for smiles in molecules_as_smiles]
+        scores = []
+        for smiles in molecules_as_smiles:
+            try:
+                score = self.target.dock(smiles)[0]
+            except Exception as e:
+                score = np.nan
+            scores.append(score)
 
         # Since our goal is maximization, and scores in dockstring
         # are better if they are lower, we return the negative of
