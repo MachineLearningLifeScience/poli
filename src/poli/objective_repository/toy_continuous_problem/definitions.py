@@ -27,8 +27,8 @@ def ackley_function_01(x: np.ndarray) -> np.ndarray:
 
     _, d = x.shape
 
-    first = np.exp(-0.2 * np.sqrt((1 / d) * np.sum(x**2, dim=1)))
-    second = np.exp((1 / d) * np.sum(np.cos(2 * np.pi * x), dim=1))
+    first = np.exp(-0.2 * np.sqrt((1 / d) * np.sum(x**2, axis=1)))
+    second = np.exp((1 / d) * np.sum(np.cos(2 * np.pi * x), axis=1))
     res = 20 * first + second - np.exp(1.0) - 20
 
     # Remove the batch dim if it wasn't there in the beginning

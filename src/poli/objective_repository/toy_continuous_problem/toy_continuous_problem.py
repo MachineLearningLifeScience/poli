@@ -152,10 +152,10 @@ class ToyContinuousProblem:
         else:
             raise ValueError(f"Expected {name} to be one of {POSSIBLE_FUNCTIONS}")
 
-        self.optima = self.function(self.optima_location)
+        self.optima = self.function(self.optima_location.reshape(1, -1))
 
     def evaluate_objective(self, x: np.array, **kwargs) -> np.array:
         return self.function(x)
 
     def __call__(self, x: np.array) -> np.array:
-        return self.function(x)
+        return self.function(x).reshape(-1, 1)
