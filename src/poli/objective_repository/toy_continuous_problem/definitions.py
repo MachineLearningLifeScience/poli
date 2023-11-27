@@ -46,7 +46,7 @@ def alpine_01(x: np.ndarray) -> np.ndarray:
     else:
         batched = True
 
-    res = -np.sum(np.abs(x * np.sin(x) + 0.1 * x), dim=1)
+    res = -np.sum(np.abs(x * np.sin(x) + 0.1 * x), axis=1)
 
     # Remove the batch dim if it wasn't there in the beginning
     if not batched:
@@ -63,7 +63,7 @@ def alpine_02(x: np.ndarray) -> np.ndarray:
     else:
         batched = True
 
-    res = np.prod(np.sin(x) * np.sqrt(x), dim=1)
+    res = np.prod(np.sin(x) * np.sqrt(x), axis=1)
 
     # Remove the batch dim if it wasn't there in the beginning
     if not batched:
@@ -81,7 +81,7 @@ def bent_cigar(x: np.ndarray) -> np.ndarray:
         batched = True
 
     first = x[..., 0] ** 2
-    second = 1e6 * np.sum(x[..., 1:] ** 1, dim=1)
+    second = 1e6 * np.sum(x[..., 1:] ** 1, axis=1)
     res = -(first + second)
 
     # Remove the batch dim if it wasn't there in the beginning
@@ -102,7 +102,7 @@ def brown(x: np.ndarray) -> np.ndarray:
     first = x[..., :-1] ** 2
     second = x[..., 1:] ** 2
 
-    res = -np.sum(first ** (second + 1) + second ** (first + 1), dim=1)
+    res = -np.sum(first ** (second + 1) + second ** (first + 1), axis=1)
 
     # Remove the batch dim if it wasn't there in the beginning
     if not batched:
@@ -119,7 +119,7 @@ def chung_reynolds(x: np.ndarray) -> np.ndarray:
     else:
         batched = True
 
-    res = -(np.sum(x**2, dim=1) ** 2)
+    res = -(np.sum(x**2, axis=1) ** 2)
 
     # Remove the batch dim if it wasn't there in the beginning
     if not batched:
@@ -136,8 +136,8 @@ def cosine_mixture(x: np.ndarray) -> np.ndarray:
     else:
         batched = True
 
-    first = 0.1 * np.sum(np.cos(5 * np.pi * x), dim=1)
-    second = np.sum(x**2, dim=1)
+    first = 0.1 * np.sum(np.cos(5 * np.pi * x), axis=1)
+    second = np.sum(x**2, axis=1)
 
     res = first - second
 
@@ -157,7 +157,7 @@ def deb_01(x: np.ndarray) -> np.ndarray:
         batched = True
 
     _, d = x.shape
-    res = (1 / d) * np.sum(np.sin(5 * np.pi * x) ** 6, dim=1)
+    res = (1 / d) * np.sum(np.sin(5 * np.pi * x) ** 6, axis=1)
 
     # Remove the batch dim if it wasn't there in the beginning
     if not batched:
@@ -175,7 +175,7 @@ def deb_02(x: np.ndarray) -> np.ndarray:
         batched = True
 
     _, d = x.shape
-    res = (1 / d) * np.sum(np.sin(5 * np.pi * (x ** (3 / 4) - 0.05)) ** 6, dim=1)
+    res = (1 / d) * np.sum(np.sin(5 * np.pi * (x ** (3 / 4) - 0.05)) ** 6, axis=1)
 
     # Remove the batch dim if it wasn't there in the beginning
     if not batched:
@@ -194,7 +194,7 @@ def deflected_corrugated_spring(
     else:
         batched = True
 
-    sum_of_squares = np.sum((x - alpha) ** 2, dim=1)
+    sum_of_squares = np.sum((x - alpha) ** 2, axis=1)
     res = -((0.1) * sum_of_squares - np.cos(k * np.sqrt(sum_of_squares)))
 
     # Remove the batch dim if it wasn't there in the beginning
@@ -260,7 +260,7 @@ def shifted_sphere(x: np.ndarray) -> np.ndarray:
     else:
         batched = True
 
-    res = -np.sum((x - 1) ** 2, dim=1)
+    res = -np.sum((x - 1) ** 2, axis=1)
 
     # Remove the batch dim if it wasn't there in the beginning
     if not batched:
