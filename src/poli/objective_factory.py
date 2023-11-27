@@ -16,6 +16,7 @@ from poli.core.registry import (
     register_problem_from_repository,
 )
 from poli.core.util.abstract_observer import AbstractObserver
+from poli.core.util.external_observer import ExternalObserver
 from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
 
 from poli.objective_repository import AVAILABLE_OBJECTIVES, AVAILABLE_PROBLEM_FACTORIES
@@ -214,7 +215,7 @@ def create(
     *,
     seed: int = None,
     caller_info: dict = None,
-    observer: AbstractObserver = None,
+    instantiate_observer: bool = True,
     force_register: bool = False,
     force_isolation: bool = False,
     batch_size: int = None,
@@ -252,6 +253,9 @@ def create(
         y0: f(x0)
         observer_info: information from the observer_info about the instantiated run (allows the calling algorithm to connect)
     """
+    observer_info = None
+    observer = ExternalObserver()  # the constructor does nothing, real instantiation happens later
+
     # If the user can run it with the envionment they currently
     # have, then we do not need to install it.
     if name in AVAILABLE_PROBLEM_FACTORIES and not force_isolation:
@@ -265,8 +269,7 @@ def create(
         )
         problem_info = f.info
 
-        observer_info = None
-        if observer is not None:
+        if instantiate_observer:
             observer_info = observer.initialize_observer(
                 problem_info, caller_info, x0, y0, seed
             )
@@ -291,8 +294,7 @@ def create(
     problem_information = f.info
 
     # instantiate observer (if desired)
-    observer_info = None
-    if observer is not None:
+    if instantiate_observer:
         observer_info = observer.initialize_observer(
             problem_information, caller_info, x0, y0, seed
         )
