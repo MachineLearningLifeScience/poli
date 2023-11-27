@@ -8,8 +8,8 @@ from poli.objective_repository.toy_continuous_problem.register import POSSIBLE_F
 
 
 @pytest.mark.parametrize("function_name", POSSIBLE_FUNCTIONS)
-def test_create_ackley_function_01(function_name):
-    """Tests the instancing of the Ackley function in 2D."""
+def test_create_toy_objective_function(function_name):
+    """Tests the instancing the given objective function."""
     from poli import objective_factory
 
     _, f, _, _, _ = objective_factory.create(
@@ -30,3 +30,4 @@ def test_create_ackley_function_01_on_more_dimensions():
         function_name="ackley_function_01",
         n_dimensions=10,
     )
+    f_ackley(np.array([[0.0] * 10]))
