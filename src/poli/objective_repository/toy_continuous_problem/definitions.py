@@ -20,7 +20,7 @@ import numpy as np
 def ackley_function_01(x: np.ndarray) -> np.ndarray:
     if len(x.shape) == 1:
         # Add a batch dimension if it's missing
-        x = x.unsqueeze(0)
+        x = x.reshape(-1, x.shape[0])
         batched = False
     else:
         batched = True
@@ -41,7 +41,7 @@ def ackley_function_01(x: np.ndarray) -> np.ndarray:
 def alpine_01(x: np.ndarray) -> np.ndarray:
     if len(x.shape) == 1:
         # Add a batch dimension if it's missing
-        x = x.unsqueeze(0)
+        x = x.reshape(-1, x.shape[0])
         batched = False
     else:
         batched = True
@@ -58,7 +58,7 @@ def alpine_01(x: np.ndarray) -> np.ndarray:
 def alpine_02(x: np.ndarray) -> np.ndarray:
     if len(x.shape) == 1:
         # Add a batch dimension if it's missing
-        x = x.unsqueeze(0)
+        x = x.reshape(-1, x.shape[0])
         batched = False
     else:
         batched = True
@@ -75,7 +75,7 @@ def alpine_02(x: np.ndarray) -> np.ndarray:
 def bent_cigar(x: np.ndarray) -> np.ndarray:
     if len(x.shape) == 1:
         # Add a batch dimension if it's missing
-        x = x.unsqueeze(0)
+        x = x.reshape(-1, x.shape[0])
         batched = False
     else:
         batched = True
@@ -94,7 +94,7 @@ def bent_cigar(x: np.ndarray) -> np.ndarray:
 def brown(x: np.ndarray) -> np.ndarray:
     if len(x.shape) == 1:
         # Add a batch dimension if it's missing
-        x = x.unsqueeze(0)
+        x = x.reshape(-1, x.shape[0])
         batched = False
     else:
         batched = True
@@ -114,7 +114,7 @@ def brown(x: np.ndarray) -> np.ndarray:
 def chung_reynolds(x: np.ndarray) -> np.ndarray:
     if len(x.shape) == 1:
         # Add a batch dimension if it's missing
-        x = x.unsqueeze(0)
+        x = x.reshape(-1, x.shape[0])
         batched = False
     else:
         batched = True
@@ -131,7 +131,7 @@ def chung_reynolds(x: np.ndarray) -> np.ndarray:
 def cosine_mixture(x: np.ndarray) -> np.ndarray:
     if len(x.shape) == 1:
         # Add a batch dimension if it's missing
-        x = x.unsqueeze(0)
+        x = x.reshape(-1, x.shape[0])
         batched = False
     else:
         batched = True
@@ -151,7 +151,7 @@ def cosine_mixture(x: np.ndarray) -> np.ndarray:
 def deb_01(x: np.ndarray) -> np.ndarray:
     if len(x.shape) == 1:
         # Add a batch dimension if it's missing
-        x = x.unsqueeze(0)
+        x = x.reshape(-1, x.shape[0])
         batched = False
     else:
         batched = True
@@ -169,7 +169,7 @@ def deb_01(x: np.ndarray) -> np.ndarray:
 def deb_02(x: np.ndarray) -> np.ndarray:
     if len(x.shape) == 1:
         # Add a batch dimension if it's missing
-        x = x.unsqueeze(0)
+        x = x.reshape(-1, x.shape[0])
         batched = False
     else:
         batched = True
@@ -189,7 +189,7 @@ def deflected_corrugated_spring(
 ) -> np.ndarray:
     if len(x.shape) == 1:
         # Add a batch dimension if it's missing
-        x = x.unsqueeze(0)
+        x = x.reshape(-1, x.shape[0])
         batched = False
     else:
         batched = True
@@ -210,6 +210,8 @@ def easom(xy: np.ndarray) -> np.ndarray:
 
     Only works in 2D.
     """
+    assert len(xy.shape) == 2, "Easom only works in 2D. "
+    assert xy.shape[1] == 2, "Easom only works in 2D. "
     x = xy[..., 0]
     y = xy[..., 1]
     return np.cos(x) * np.cos(y) * np.exp(-((x - np.pi) ** 2 + (y - np.pi) ** 2))
@@ -221,6 +223,8 @@ def cross_in_tray(xy: np.ndarray) -> np.ndarray:
 
     Only works in 2D.
     """
+    assert len(xy.shape) == 2, "Easom only works in 2D. "
+    assert xy.shape[1] == 2, "Easom only works in 2D. "
     x = xy[..., 0]
     y = xy[..., 1]
     quotient = np.sqrt(x**2 + y**2) / np.pi
@@ -235,6 +239,8 @@ def egg_holder(xy: np.ndarray) -> np.ndarray:
 
     We only know the optima's location in 2D.
     """
+    assert len(xy.shape) == 2, "Easom only works in 2D. "
+    assert xy.shape[1] == 2, "Easom only works in 2D. "
     x = xy[..., 0]
     y = xy[..., 1]
     return (y + 47) * np.sin(np.sqrt(np.abs(x / 2 + (y + 47)))) + (
@@ -249,7 +255,7 @@ def shifted_sphere(x: np.ndarray) -> np.ndarray:
     """
     if len(x.shape) == 1:
         # Add a batch dimension if it's missing
-        x = x.unsqueeze(0)
+        x = x.reshape(-1, x.shape[0])
         batched = False
     else:
         batched = True
@@ -261,3 +267,21 @@ def shifted_sphere(x: np.ndarray) -> np.ndarray:
         res = res.squeeze(0)
 
     return res
+
+
+def camelback_2d(x: np.ndarray) -> np.ndarray:
+    """
+    Taken directly from the LineBO repository [1].
+
+    [1] https://github.com/kirschnj/LineBO/blob/master/febo/environment/benchmarks/functions.py
+    """
+    assert len(x.shape) == 2, "Camelback2D only works in 2D. "
+    assert x.shape[1] == 2, "Camelback2D only works in 2D. "
+    xx = x[:, 0]
+    yy = x[:, 1]
+    y = (
+        (4.0 - 2.1 * xx**2 + (xx**4) / 3.0) * (xx**2)
+        + xx * yy
+        + (-4.0 + 4 * (yy**2)) * (yy**2)
+    )
+    return np.maximum(-y, -2.5)
