@@ -18,6 +18,10 @@ AVAILABLE_PROBLEM_FACTORIES = {
     "aloha": AlohaProblemFactory,
 }
 
+# Adding the toy continuois problem factory.
+from .toy_continuous_problem.register import ToyContinuousProblemFactory
+
+AVAILABLE_PROBLEM_FACTORIES["toy_continuous_problem"] = ToyContinuousProblemFactory
 
 try:
     # TODO: the case of SMB is a little bit more delicate, since

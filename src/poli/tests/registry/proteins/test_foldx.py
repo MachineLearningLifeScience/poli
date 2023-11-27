@@ -39,6 +39,7 @@ def test_foldx_stability_is_available():
 
     _ = pytest.importorskip("Bio")
     _ = pytest.importorskip("Levenshtein")
+    _ = pytest.importorskip("pdbtools")
 
     from poli.objective_repository import AVAILABLE_PROBLEM_FACTORIES
 
@@ -171,6 +172,7 @@ def test_registering_foldx_stability_and_sasa():
     assert np.isclose(y0[:, 1], 8411.45578009).all()
 
 
+@pytest.mark.slow()
 def test_foldx_from_non_repaired_file():
     """
     In this test, we check whether foldx properly
@@ -205,4 +207,4 @@ def test_foldx_from_repaired_file():
 
 
 if __name__ == "__main__":
-    test_foldx_from_non_repaired_file()
+    test_foldx_stability_is_available()
