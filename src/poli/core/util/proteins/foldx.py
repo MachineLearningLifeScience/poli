@@ -397,7 +397,8 @@ class FoldxInterface:
         Returns:
         -------
         float
-            The stability of the protein structure.
+            The stability of the protein structure (defined as the negative
+            change in energy).
 
         Raises:
         ------
@@ -418,7 +419,28 @@ class FoldxInterface:
         return stability
 
     def compute_sasa(self, pdb_file: Path, mutations: List[str] = None) -> float:
-        # if not (self.working_dir / f"Raw_{pdb_file.stem}.fxout").exists():
+        """
+        Compute the solvent-accessible surface area (SASA) score for a given protein structure.
+
+        Parameters:
+        ----------
+        pdb_file : Path
+            The path to the PDB file of the protein structure.
+        mutations : List[str], optional
+            A list of mutations to be simulated on the protein structure. Only single mutations are supported.
+            Pass no mutations if you want to compute the SASA of the wildtype.
+
+        Returns:
+        -------
+        float
+            The computed SASA score.
+
+        Raises:
+        ------
+        AssertionError
+            If the number of mutations is not 0 or 1.
+
+        """
         if mutations is not None:
             assert len(mutations) in [
                 0,
@@ -430,9 +452,16 @@ class FoldxInterface:
         return sasa_score
 
     def compute_stability_and_sasa(self, pdb_file: Path, mutations: List[str] = None):
-        """
-        This function computes stability and sasa with a single foldx run,
+        """Computes stability and sasa with a single foldx run,
         instead of two separate runs.
+
+        Parameters:
+        ----------
+        pdb_file : Path
+            The path to the PDB file of the protein structure.
+        mutations : List[str], optional
+            A list of mutations to be simulated on the protein structure. Only single mutations are supported.
+            Pass no mutations if you want to compute the SASA of the wildtype.
         """
         if mutations is not None:
             assert len(mutations) in [
@@ -447,8 +476,12 @@ class FoldxInterface:
         return stability, sasa_score
 
     def copy_foldx_files(self, pdb_file: Path):
-        """
-        We copy the rotabase and pdb file to the working directory.
+        """Copies the rotabase and pdb file to the working directory.
+
+        Parameters:
+        ----------
+        pdb_file : Path
+            The path to the PDB file of the protein structure.
         """
         if not (self.working_dir / "rotabase.txt").exists():
             os.symlink(
@@ -463,9 +496,17 @@ class FoldxInterface:
     def write_mutations_to_file(
         wildtype_resiudes: List[Residue], mutations: List[str], output_dir: Path
     ) -> None:
-        """
-        This method writes the list of mutations to a file
+        """Writes the list of mutations to a file
         in the given directory.
+
+        Parameters:
+        ----------
+        wildtype_resiudes : List[Residue]
+            The list of wildtype residues.
+        mutations : List[str]
+            The list of mutations to simulate.
+        output_dir : Path
+            The directory to write the file to.
         """
         # Write the mutations in the format of individual_list.txt
         lines = []

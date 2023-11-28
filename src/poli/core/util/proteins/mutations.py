@@ -19,13 +19,44 @@ from Bio.SeqUtils import seq1
 from poli.core.util.proteins.pdb_parsing import parse_pdb_as_residue_strings
 
 
+from typing import List, Tuple
+
+
 def edits_between_strings(
     string_1: str, string_2: str, strict: bool = True
 ) -> List[Tuple[str, int, int]]:
     """
-    Overwriting editops to only consider replacements between strings.
-    This returns ("replace", pos_in_string_1, pos_in_string_2). Since
-    we only consider replacements, pos_in_string_1 == pos_in_string_2.
+    Compute the edit operations between two strings.
+
+    Parameters
+    ----------
+    string_1 : str
+        The first string.
+    string_2 : str
+        The second string.
+    strict : bool, optional
+        If True, check if the lengths of string_1 and string_2 are equal.
+        Defaults to True.
+
+    Returns
+    -------
+    List[Tuple[str, int, int]]
+        A list of tuples representing the edit operations between the two strings.
+        Each tuple contains the operation type ("replace"), the position in string_1,
+        and the position in string_2.
+
+    Raises
+    ------
+    AssertionError
+        If strict is True and the lengths of string_1 and string_2 are different.
+
+    Examples
+    --------
+    >>> edits_between_strings("abc", "abd")
+    [('replace', 2, 2)]
+
+    >>> edits_between_strings("abc", "def")
+    [('replace', 0, 0), ('replace', 1, 1), ('replace', 2, 2)]
     """
     if strict:
         assert len(string_1) == len(string_2), (
@@ -40,7 +71,9 @@ def edits_between_strings(
 def mutations_from_wildtype_residues_and_mutant(
     wildtype_residues: List[Residue], mutated_residue_string: str
 ) -> List[str]:
-    """
+    """Computes the mutations from a wildtype list of residues
+    and a mutated residue string.
+
     Since foldx expects an individual_list.txt file of mutations,
     this function computes the Levenshtein distance between
     the wildtype residue string and the mutated residue string,
@@ -66,7 +99,17 @@ def mutations_from_wildtype_residues_and_mutant(
     chain "A"):
         ["EA1A"]
 
-    TODO: add description of inputs and outputs
+    Parameters
+    ----------
+    wildtype_residues : List[Residue]
+        The list of wildtype residues.
+    mutated_residue_string : str
+        The mutated residue string.
+
+    Returns
+    -------
+    mutations: List[str]
+        The list of mutations in the format foldx expects.
     """
     wildtype_residue_string = "".join(
         [seq1(res.get_resname()) for res in wildtype_residues]
@@ -117,6 +160,31 @@ def find_closest_wildtype_pdb_file_to_mutant(
     mutated_residue_string: str,
     return_hamming_distance: bool = False,
 ) -> Union[Path, Tuple[Path, int]]:
+    """
+    Find the closest wildtype PDB file to a given mutant residue string.
+
+    Parameters:
+    ----------
+    wildtype_pdb_files : List[Path]
+        A list of paths to wildtype PDB files.
+    mutated_residue_string : str
+        The mutated residue string.
+    return_hamming_distance : bool, optional
+        If True, return the hamming distance along with the best candidate PDB file.
+        Default is False.
+
+    Returns:
+    -------
+    Union[Path, Tuple[Path, int]]
+        If return_hamming_distance is True, returns a tuple containing the best candidate PDB file
+        and the hamming distance. Otherwise, returns the best candidate PDB file.
+
+    Raises:
+    ------
+    ValueError
+        If no PDB file of the same length as the mutated residue string is found.
+
+    """
     # First, we load up these pdb files as residue strings
     wildtype_residue_strings = {
         pdb_file: "".join(parse_pdb_as_residue_strings(pdb_file))

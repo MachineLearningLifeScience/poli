@@ -1,5 +1,6 @@
+"""This module contains utilities for registering problems and observers.
+"""
 from typing import List, Union, Dict
-import os
 import configparser
 from pathlib import Path
 import warnings
@@ -42,6 +43,21 @@ def set_observer(
 
     After registering an observer using this function, the user can instantiate
     it by using the ExternalObserver class, passing the relevant observer name.
+
+    Parameters
+    ----------
+    observer : AbstractObserver
+        The observer to be registered.
+    conda_environment_location : str
+        The location of the conda environment to be used.
+    python_paths : List[str]
+        A list of paths to append to the python path of the run script.
+    observer_name : str
+        The name of the observer to be registered.
+
+    Notes
+    -----
+    The observer script MUST accept port and password as arguments.
     """
     run_script_location = make_observer_script(
         observer, conda_environment_location, python_paths
@@ -56,9 +72,16 @@ def set_observer_run_script(script_file_name: str, observer_name: str = None) ->
     Using these, it sets the configuration. If no observer name is passed, the
     observer is set as the default observer.
 
-    VERY IMPORTANT: the observer script MUST accept port and password as arguments
-    :param script_file_name:
-        path to the script
+    Parameters
+    ----------
+    script_file_name : str
+        The location of the script to be run.
+    observer_name : str
+        The name of the observer to be registered.
+
+    Notes
+    -----
+    The observer script MUST accept port and password as arguments.
     """
     if observer_name is None:
         observer_name = _DEFAULT
@@ -72,6 +95,26 @@ def set_observer_run_script(script_file_name: str, observer_name: str = None) ->
 
 
 def delete_observer_run_script(observer_name: str = None) -> str:
+    """Deletes the run script for the given observer.
+
+    This function takes as input an observer name. Using this, it deletes the
+    run script for the given observer. If no observer name is passed, the
+    default observer is deleted.
+
+    Parameters
+    ----------
+    observer_name : str
+        The name of the observer to be deleted.
+
+    Returns
+    -------
+    location : str
+        The location of the deleted run script.
+
+    Notes
+    -----
+    The observer script MUST accept port and password as arguments.
+    """
     if observer_name is None:
         observer_name = _DEFAULT
 
@@ -88,6 +131,27 @@ def register_problem(
     force: bool = False,
     **kwargs,
 ):
+    """Registers a problem.
+
+    This function takes a problem factory, a conda environment, a list of python
+    environments, and additional keyword arguments. With these, it creates a
+    script that can be run to instantiate the problem factory in a separate
+    process. It also sets the configuration so that the problem factory can be
+    instantiated later.
+
+    Parameters
+    ----------
+    problem_factory : AbstractProblemFactory or str
+        The problem factory to be registered.
+    conda_environment_name : str or Path
+        The name or path of the conda environment to be used.
+    python_paths : List[str]
+        A list of paths to append to the python path of the run script.
+    force : bool
+        Flag indicating whether to overwrite the existing problem.
+    **kwargs : dict
+        Additional keyword arguments to be passed to the problem factory.
+    """
     if "conda_environment_location" in kwargs:
         conda_environment_name = kwargs["conda_environment_location"]
 
@@ -114,6 +178,21 @@ def register_problem(
 
 
 def register_problem_from_repository(name: str):
+    """Registers a problem from the repository.
+
+    This function takes a problem name, and registers it. The problem name
+    corresponds to a folder inside the objective_repository folder. The
+    function will:
+    1. create the environment from the yaml file
+    2. run the file from said enviroment (since
+       we can't import the factory: it may have
+       dependencies that are not installed)
+
+    Parameters
+    ----------
+    name : str
+        The name of the problem to be registered.
+    """
     # the name is actually the folder inside
     # poli/objective_repository, so we need
     # to
@@ -188,11 +267,38 @@ def register_problem_from_repository(name: str):
 
 
 def delete_problem(problem_name: str):
+    """Deletes a problem.
+
+    This function takes a problem name, and deletes it from the configuration.
+
+    Parameters
+    ----------
+    problem_name : str
+        The name of the problem to be deleted.
+    """
     config.remove_section(problem_name)
     _write_config()
 
 
 def get_problems(include_repository: bool = False) -> List[str]:
+    """Returns a list of registered problems.
+
+    Parameters
+    ----------
+    include_repository : bool
+        Whether to include the problems from the repository.
+
+    Returns
+    -------
+    problem_list: List[str]
+        A list of registered problems.
+
+    Notes
+    -----
+    If include_repository is True, the problems from the repository will be
+    included in the list. Otherwise, only the problems registered by the user
+    will be included.
+    """
     problems = config.sections()
     # problems.remove(_DEFAULT)  # no need to remove default section
 
@@ -216,6 +322,11 @@ def get_problems(include_repository: bool = False) -> List[str]:
 def get_problem_factories() -> Dict[str, AbstractProblemFactory]:
     """
     Returns a dictionary with the problem factories
+
+    Returns
+    -------
+    problem_factories: Dict[str, AbstractProblemFactory]
+        A dictionary with the problem factories that are available.
     """
     return AVAILABLE_PROBLEM_FACTORIES
 

@@ -17,15 +17,30 @@ class MultiObjectiveBlackBox(AbstractBlackBox):
     by concatenating the results of evaluating individual
     objective functions.
 
-    Args:
-        info (ProblemSetupInformation): The problem setup information.
-        batch_size (int, optional): The batch size for evaluating the black box function. Defaults to None.
-        objective_functions (List[AbstractBlackBox], optional): The list of objective functions to be evaluated.
-            Defaults to None.
+    Parameters:
+    -----------
+    info : ProblemSetupInformation
+        The problem setup information.
+    batch_size : int, optional
+        The batch size for evaluating the black box function. Defaults to None.
+    objective_functions : List[AbstractBlackBox], required
+        The list of objective functions to be evaluated. Defaults to None.
+
+    Attributes:
+    -----------
+    objective_functions : List[AbstractBlackBox]
+        The list of objective functions to be evaluated.
+
+    Methods:
+    --------
+    _black_box(x, context=None)
+        Evaluate the black box function for the given input.
 
     Raises:
-        ValueError: If objective_functions is not provided as a list of AbstractBlackBox instances or inherited classes.
-
+    -------
+    ValueError
+        If objective_functions is not provided as a list of AbstractBlackBox
+        instances or inherited classes.
     """
 
     # TODO: Should we evaluate in parallel?
@@ -42,13 +57,19 @@ class MultiObjectiveBlackBox(AbstractBlackBox):
         """
         Initialize the MultiObjectiveBlackBox class.
 
-        Args:
-            info (ProblemSetupInformation): The problem setup information.
-            batch_size (int, optional): The batch size. Defaults to None.
-            objective_functions (List[AbstractBlackBox], required): The list of objective functions. Defaults to None.
+        Parameters:
+        -----------
+        info : ProblemSetupInformation
+            The problem setup information.
+        batch_size : int, optional
+            The batch size. Defaults to None.
+        objective_functions : List[AbstractBlackBox], required
+            The list of objective functions. Defaults to None.
 
         Raises:
-            ValueError: If objective_functions is not provided as a list of AbstractBlackBox instances or inherited classes.
+        -------
+        ValueError:
+            If objective_functions is not provided as a list of AbstractBlackBox instances or inherited classes.
         """
         if objective_functions is None:
             raise ValueError(
@@ -59,15 +80,19 @@ class MultiObjectiveBlackBox(AbstractBlackBox):
 
         self.objective_functions = objective_functions
 
-    def _black_box(self, x, context=None):
+    def _black_box(self, x: np.ndarray, context=None) -> np.ndarray:
         """
         Evaluate the black box function for a given input.
 
-        Args:
-            x (array-like): The input values to evaluate the black box function.
-            context (optional): Additional context information for the evaluation.
+        Parameters:
+        -----------
+        x : np.ndarray
+            The input values to evaluate the black box function.
+        context : any, optional
+            Additional context information for the evaluation.
 
         Returns:
+        --------
             array-like: The concatenated results of evaluating the objective functions on the input.
         """
         # TODO: Decide on whether we want to evaluate on parallel or not.

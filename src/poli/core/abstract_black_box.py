@@ -1,3 +1,7 @@
+"""This module implements the abstract black box class, from which
+all objective functions should inherit.
+"""
+
 import numpy as np
 from multiprocessing import Pool, cpu_count
 
@@ -8,6 +12,53 @@ from poli.core.util.batch import batched
 
 
 class AbstractBlackBox:
+    """
+    Abstract base class for a black box optimization problem.
+
+    Parameters
+    ----------
+    info : ProblemSetupInformation
+        The problem setup information object that provides details about the problem.
+    batch_size : int, optional
+        The batch size for evaluating the black box function. Default is None.
+    parallelize : bool, optional
+        Flag indicating whether to evaluate the black box function in parallel. Default is False.
+    num_workers : int, optional
+        The number of workers to use for parallel evaluation. Default is None, which uses half of the available CPU cores.
+
+    Attributes
+    ----------
+    info : ProblemSetupInformation
+        The problem setup information object.
+    observer : AbstractObserver or None
+        The observer object for recording observations during evaluation.
+    parallelize : bool
+        Flag indicating whether to evaluate the black box function in parallel.
+    num_workers : int
+        The number of workers to use for parallel evaluation.
+    batch_size : int or None
+        The batch size for evaluating the black box function.
+
+    Methods
+    -------
+    set_observer(observer)
+        Set the observer object for recording observations during evaluation.
+    __call__(x, context=None)
+        Evaluate the black box function for the given input.
+    _black_box(x, context=None)
+        Abstract method for evaluating the black box function.
+    terminate()
+        Terminate the black box optimization problem.
+    __enter__()
+        Enter the context manager.
+    __exit__(exc_type, exc_val, exc_tb)
+        Exit the context manager.
+    __del__()
+        Destructor for the black box optimization problem.
+    __neg__()
+        Create a new black box with the objective function as the negative of the original one.
+    """
+
     def __init__(
         self,
         info: ProblemSetupInformation,
@@ -15,6 +66,20 @@ class AbstractBlackBox:
         parallelize: bool = False,
         num_workers: int = None,
     ):
+        """
+        Initialize the AbstractBlackBox object.
+
+        Parameters
+        ----------
+        info : ProblemSetupInformation
+            The problem setup information object.
+        batch_size : int, optional
+            The batch size for parallel execution, by default None.
+        parallelize : bool, optional
+            Flag indicating whether to parallelize the execution, by default False.
+        num_workers : int, optional
+            The number of workers for parallel execution, by default None.
+        """
         self.info = info
         self.observer = None
         self.parallelize = parallelize
@@ -24,25 +89,49 @@ class AbstractBlackBox:
 
         self.num_workers = num_workers
 
-        # if not self.info.sequences_are_aligned():
-        #     # assert (
-        #     #     batch_size is None or batch_size == 1
-        #     # ), "For unaligned problems only batch size 1 is supported!"
-        #     batch_size = 1
         self.batch_size = batch_size
 
     def set_observer(self, observer: AbstractObserver):
+        """
+        Set the observer object for recording observations during evaluation.
+
+        Parameters
+        ----------
+        observer : AbstractObserver
+            The observer object.
+        """
         self.observer = observer
 
     def __call__(self, x: np.array, context=None):
-        """
+        """Calls the black box function.
+
         The purpose of this function is to enforce that inputs are equal across problems.
         The inputs are usually assumed to be strings, and all objective functions in our
         repository will assume that the inputs are strings. Some also allow for integers
-        (i.e. token ids) to be passed as inputs.
-        :param x:
-        :param context:
-        :return:
+        (i.e. token ids) to be passed as inputs. Some problems have continuous inputs, too.
+
+        Parameters
+        ----------
+        x : np.array
+            The input to the black box function.
+        context : object, optional
+            Additional context information for the evaluation, by default None.
+
+        Returns
+        -------
+        y: np.array
+            The output of the black box function.
+
+        Raises
+        ------
+        AssertionError
+            If the input is not a 2D array.
+        AssertionError
+            If the length of the input does not match the maximum sequence length of the problem.
+        AssertionError
+            If the output is not a 2D array.
+        AssertionError
+            If the length of the output does not match the length of the input.
         """
         # We will always assume that the inputs is a 2D array.
         # The first dimension is the batch size, and the second
@@ -118,10 +207,33 @@ class AbstractBlackBox:
         f = np.concatenate(f_evals, axis=0)
         return f
 
-    def _black_box(self, x, context=None):
+    def _black_box(self, x: np.ndarray, context=None) -> np.ndarray:
+        """
+        Abstract method for evaluating the black box function.
+
+        Parameters
+        ----------
+        x : np.ndarray
+            The input values to evaluate the black box function.
+        context : any, optional
+            Additional context information for the evaluation. Defaults to None.
+
+        Returns
+        -------
+        y: np.ndarray
+            The output of the black box function.
+
+        Raises
+        ------
+        NotImplementedError
+            If the method is not implemented in the derived class.
+        """
         raise NotImplementedError("abstract method")
 
     def terminate(self) -> None:
+        """
+        Terminate the black box optimization problem.
+        """
         # if self.observer is not None:
         #     # NOTE: terminating a problem should gracefully end the observer process -> write the last state.
         #     self.observer.finish()
