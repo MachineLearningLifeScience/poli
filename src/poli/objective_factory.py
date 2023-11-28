@@ -154,6 +154,7 @@ def __create_as_isolated_process(
     # TODO: add signal listener that intercepts when proc ends
     # wait for connection from objective process
     # TODO: potential (unlikely) race condition! (process might try to connect before listener is ready!)
+    # TODO: We could be sending all the kwargs for the factory here.
     process_wrapper.send(("SETUP", seed))
 
     msg_type, *msg = process_wrapper.recv()

@@ -18,6 +18,32 @@ from github.Repository import Repository
 def get_sha_for_tag(repository: Repository, tag: str) -> str:
     """
     Returns a commit PyGithub object for the specified repository and tag.
+
+    Parameters
+    ----------
+    repository : Repository
+        The repository.
+    tag : str
+        The tag.
+
+    Returns
+    -------
+    commit_sha: str
+        The commit SHA for the specified repository and tag.
+
+    Raises
+    ------
+    ValueError
+        If no tag or branch exists with the specified name.
+
+    Examples
+    --------
+    >>> from github import Github
+    >>> from github.Repository import Repository
+    >>> github = Github()
+    >>> repository = github.get_repo("rdkit/rdkit")
+    >>> get_sha_for_tag(repository, "Release_2023_09")
+    '068441957858f786c227825d90eb2c43f4f2b000'
     """
     branches = repository.get_branches()
     matched_branches = [match for match in branches if match.name == tag]
@@ -28,6 +54,7 @@ def get_sha_for_tag(repository: Repository, tag: str) -> str:
     matched_tags = [match for match in tags if match.name == tag]
     if not matched_tags:
         raise ValueError("No Tag or Branch exists with that name")
+
     return matched_tags[0].commit.sha
 
 
@@ -42,16 +69,34 @@ def download_file_from_github_repository(
     strict: bool = True,
 ) -> None:
     """
-    repository_name: str (expected to be "user/repo")
-    file_path_in_repository: str (path to file in repo)
-    download_path: str (path to download to)
-    tag: str (tag or branch to download)
-    sha: str (sha of commit to download, overwrites tag if specified)
-    exists_ok: bool (whether to overwrite existing files)
+    Download a file from a Github repository.
 
-    This function will use an environment variable called GITHUB_TOKEN_FOR_POLI
-    if it exists. If it does not exist, it will try to download without it.
-    Note that, for anonymous requests, the rate limit is 60 requests per hour.
+    Parameters
+    ----------
+    repository_name: str, required
+        The name of the repository (i.e. "user/repo")
+    file_path_in_repository: str, required
+        path to file in repo
+    download_path: str, required
+        path to download to
+    tag: str, optional
+        tag or branch to download, defaults to master
+    sha: str, optional
+        sha of commit to download, overwrites tag if specified
+    exists_ok: bool, optional
+        whether to overwrite existing files
+    verbose: bool, optional
+        whether to print progress
+    strict: bool, optional
+        whether to raise exceptions on errors
+
+    Warnings
+    --------
+
+    This function will use an environment variable called
+    GITHUB_TOKEN_FOR_POLI if it exists. If it does not exist,
+    it will try to download without it. Note that, for anonymous
+    requests, the rate limit is 60 requests per hour.
     """
     github = Github(login_or_token=os.environ.get("GITHUB_TOKEN_FOR_POLI"))
     repository = github.get_repo(repository_name)
@@ -80,8 +125,28 @@ def _download_file_from_github_repo(
     strict: bool = True,
 ) -> None:
     """
-    Download all contents at server_path with commit tag sha in
-    the repository.
+    Download a file from a GitHub repository.
+
+    Parameters
+    ----------
+    repository : Repository
+        The GitHub repository object.
+    commit_sha : str
+        The commit SHA of the file in the repository.
+    file_path_in_repository : str
+        The path of the file in the repository.
+    download_path_for_file : str
+        The path where the file will be downloaded.
+    exist_ok : bool, optional
+        If False and the download path already exists, a
+        FileExistsError will be raised.
+        If True, the download will proceed even if the path
+        already exists. (default is False)
+    verbose : bool, optional
+        If True, print the progress of the download. (default is False)
+    strict : bool, optional
+        If True, raise an exception if there is an error during the download.
+        If False, print an error message and continue. (default is True)
     """
     if os.path.exists(download_path_for_file):
         if not exist_ok:

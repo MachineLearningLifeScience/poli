@@ -41,7 +41,7 @@ class DockstringBlackBox(AbstractBlackBox):
     ):
         assert (
             target_name is not None
-        ), "Missing mandatory keyword argument 'target_name'. "
+        ), "Missing required keyword argument 'target_name'. "
 
         super().__init__(
             info=info,
@@ -107,7 +107,7 @@ class DockstringProblemFactory(AbstractProblemFactory):
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         assert (
             target_name is not None
-        ), "Missing mandatory keyword argument 'target_name'. "
+        ), "Missing required keyword argument 'target_name'. "
 
         seed_numpy(seed)
         seed_python(seed)

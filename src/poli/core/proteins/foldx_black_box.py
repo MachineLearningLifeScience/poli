@@ -1,3 +1,13 @@
+"""This module implements the FoldX black box and objective factory.
+
+FoldX [1] is a simulator that allows for computing the difference
+in free energy between a wildtype protein and a mutated protein.
+
+[1] Schymkowitz, J., Borg, J., Stricher, F., Nys, R., Rousseau, F.,
+    & Serrano, L. (2005). The FoldX web server: an online force field.
+    Nucleic acids research, 33(suppl_2), W382-W388.
+"""
+
 from typing import Union, List
 from pathlib import Path
 from time import time
@@ -22,6 +32,52 @@ DEFAULT_TMP_PATH = Path("/tmp").resolve()
 
 
 class FoldxBlackBox(AbstractBlackBox):
+    """
+    A class representing the FoldxBlackBox, which is used for simulating protein mutations using FoldX.
+
+    Parameters:
+    -----------
+    info : ProblemSetupInformation, required
+        The problem setup information object. (default: None)
+    batch_size : int, optional
+        The batch size for parallelization. (default: None)
+    parallelize : bool, optional
+        Flag indicating whether to parallelize the simulations. (default: False)
+    num_workers : int, optional
+        The number of workers for parallelization. (default: None)
+    wildtype_pdb_path : Union[Path, List[Path]], required
+        The path(s) to the wildtype PDB file(s). (default: None)
+    alphabet : List[str], optional
+        The list of allowed amino acids. (default: None)
+    experiment_id : str, optional
+        The experiment ID. (default: None)
+    tmp_folder : Path, optional
+        The temporary folder path. (default: None)
+    eager_repair : bool, optional
+        Flag indicating whether to eagerly repair the PDB files. (default: False)
+
+    Attributes:
+    -----------
+    experiment_id : str
+        The experiment ID.
+    tmp_folder : Path
+        The temporary folder path.
+    wildtype_pdb_paths : List[Path]
+        The list of repaired wildtype PDB file paths.
+    wildtype_residues : List[List[Residue]]
+        The list of wildtype residues for each PDB file.
+    wildtype_amino_acids : List[List[str]]
+        The list of wildtype amino acids for each PDB file.
+    wildtype_residue_strings : List[str]
+        The list of wildtype residue strings for each PDB file.
+
+    Methods:
+    --------
+    create_working_directory() -> Path:
+        Creates and returns the working directory path for the black box.
+
+    """
+
     def __init__(
         self,
         info: ProblemSetupInformation = None,
@@ -35,7 +91,28 @@ class FoldxBlackBox(AbstractBlackBox):
         eager_repair: bool = False,
     ):
         """
-        TODO: Document
+        Initialize the FoldxBlackBox.
+
+        Parameters:
+        -----------
+        info : ProblemSetupInformation, optional
+            The problem setup information object. (default: None)
+        batch_size : int, optional
+            The batch size for parallelization. (default: None)
+        parallelize : bool, optional
+            Flag indicating whether to parallelize the simulations. (default: False)
+        num_workers : int, optional
+            The number of workers for parallelization. (default: None)
+        wildtype_pdb_path : Union[Path, List[Path]], optional
+            The path(s) to the wildtype PDB file(s). (default: None)
+        alphabet : List[str], optional
+            The list of allowed amino acids. (default: None)
+        experiment_id : str, optional
+            The experiment ID. (default: None)
+        tmp_folder : Path, optional
+            The temporary folder path. (default: None)
+        eager_repair : bool, optional
+            Flag indicating whether to eagerly repair the PDB files. (default: False)
         """
         # WARNING: notice how the batch-size is set to 1.
         # This is because we only support simulating one
@@ -119,7 +196,12 @@ class FoldxBlackBox(AbstractBlackBox):
 
     def create_working_directory(self) -> Path:
         """
-        TODO: document.
+        Create and return the working directory path for the black box.
+
+        Returns:
+        --------
+        Path
+            The path to the working directory.
         """
         sub_experiment_id = str(uuid4())[:8]
 

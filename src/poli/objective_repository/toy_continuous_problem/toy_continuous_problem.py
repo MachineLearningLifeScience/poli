@@ -26,8 +26,11 @@ from .definitions import (
     deb_01,
     deb_02,
     deflected_corrugated_spring,
+    camelback_2d,
 )
 
+# Notice: these will be used by pytest to test the
+# instancing of the toy objective functions.
 POSSIBLE_FUNCTIONS = [
     "ackley_function_01",
     "alpine_01",
@@ -43,6 +46,7 @@ POSSIBLE_FUNCTIONS = [
     "easom",
     "cross_in_tray",
     "egg_holder",
+    "camelback_2d",
 ]
 
 
@@ -73,6 +77,7 @@ class ToyContinuousProblem:
             "easom",
             "cross_in_tray",
             "egg_holder",
+            "camelback_2d",
         ],
         n_dims: int = 2,
     ) -> None:
@@ -148,6 +153,11 @@ class ToyContinuousProblem:
             self.function = egg_holder
             self.limits = [-700, 700]
             self.optima_location = np.array([512, 404.2319])
+            self.solution_length = 2
+        elif name == "camelback_2d":
+            self.function = camelback_2d
+            self.limits = [-5, 5]
+            self.optima_location = np.array([0.0898, -0.7126])
             self.solution_length = 2
         else:
             raise ValueError(f"Expected {name} to be one of {POSSIBLE_FUNCTIONS}")

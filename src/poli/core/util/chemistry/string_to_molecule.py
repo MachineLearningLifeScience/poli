@@ -1,5 +1,4 @@
-"""
-Utilities for transforming string representations of
+"""Utilities for transforming string representations of
 molecules into molecules in RDKit.
 """
 from typing import List
@@ -17,6 +16,18 @@ def translate_smiles_to_selfies(
     into SELFIES strings. If strict is True, it raises an error
     if a SMILES string in the list cannot be parsed. Else, it
     returns None for those.
+
+    Parameters
+    ----------
+    smiles_strings : List[str]
+        A list of SMILES strings.
+    strict : bool, optional
+        If True, raise an error if a SMILES string in the list cannot be parsed.
+
+    Returns
+    -------
+    List[str]
+        A list of SELFIES strings.
     """
     selfies_strings = []
     for smile in smiles_strings:
