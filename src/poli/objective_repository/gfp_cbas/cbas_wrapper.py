@@ -190,29 +190,3 @@ class ConvertedTorchVaeEncoder(torch.nn.Module):
     def forward(self, x):
         t = self.first_part(x)
         return self.mu(t), self.log_var(t)
-
-
-if __name__ == "__main__":
-    AA = 20
-    L = 237
-    vae_wrapper = CBASVAEWrapper(AA=AA, L=L).vae
-    w = vae_wrapper.vae_
-    kt_layers = {layer.name: layer for layer in w.layers}
-    kt_counter = 0
-
-    latent_dimensionality = 20
-    enc1_units = 50
-
-    with torch.no_grad():
-        z = torch.randn([1, latent_dimensionality], dtype=torch.float64)
-        out_gt = vae_wrapper.decoder_.predict(z.numpy())
-        out = ConvertedTorchVaeDecoder(
-            vae_wrapper, AA, L, latent_dimensionality, enc1_units
-        )(z)
-
-        x = torch.randn([1, AA * L], dtype=torch.float64)
-        out_gt = vae_wrapper.encoder_.predict(x.numpy().reshape([1, L, AA]))
-        out = ConvertedTorchVaeEncoder(
-            vae_wrapper, AA, L, latent_dimensionality, enc1_units
-        )(x)
-        pass
