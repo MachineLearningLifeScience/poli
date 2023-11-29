@@ -95,6 +95,13 @@ try:
 except (ImportError, FileNotFoundError):
     pass
 
+try:
+    from .gfp_cbas.register import GFPCBasProblemFactory
+
+    AVAILABLE_PROBLEM_FACTORIES["gfp_cbas"] = GFPCBasProblemFactory
+except (ImportError, FileNotFoundError):
+    pass
+
 
 try:
     from .gfp_select.register import GFPSelectionProblemFactory
