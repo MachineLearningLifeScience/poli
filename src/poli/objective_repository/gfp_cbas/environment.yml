@@ -1,0 +1,19 @@
+name: poli__protein_cbas
+channels:
+  - defaults
+dependencies:
+  - python=3.9
+  - pip
+  - pip:
+    - biopython
+    - python-levenshtein
+    - numpy
+    - pandas
+    - scipy
+    - "git+https://github.com/MachineLearningLifeScience/poli.git@master"
+    - torch
+    - torchvision
+    - torchaudio
+    - keras-core
+    - tensorflow
+
