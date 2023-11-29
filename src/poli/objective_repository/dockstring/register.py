@@ -1,5 +1,5 @@
 """
-This script implements and registers a black box
+This module implements and registers a black box
 objective function (and a repository) for dockstring [1].
 
 [1] García-Ortegón, Miguel, Gregor N. C. Simm, Austin J. Tripp,
@@ -30,6 +30,47 @@ from poli.core.util.seeding import seed_numpy, seed_python
 
 
 class DockstringBlackBox(AbstractBlackBox):
+    """
+    Black box implementation for the Dockstring problem.
+
+    Dockstring is a simple API for assessing the docking score
+    of a small molecule to a given protein [1].
+
+    Parameters
+    ----------
+    info : ProblemSetupInformation
+        The problem setup information.
+    batch_size : int, optional
+        The batch size for processing multiple inputs simultaneously, by default None.
+    parallelize : bool, optional
+        Flag indicating whether to parallelize the computation, by default False.
+    num_workers : int, optional
+        The number of workers to use for parallel computation, by default None.
+    target_name : str
+        The name of the target protein.
+    string_representation : str
+        The string representation of the molecules. Either SMILES or SELFIES.
+        Default is SMILES.
+
+    Attributes
+    ----------
+    alphabet : dict
+        The mapping of symbols to their corresponding indices in the alphabet.
+
+    Methods
+    -------
+    _black_box(x, context=None)
+        The black box function.
+
+    References
+    ----------
+    [1] García-Ortegón, Miguel, Gregor N. C. Simm, Austin J. Tripp,
+        José Miguel Hernández-Lobato, Andreas Bender, and Sergio Bacallado.
+        “DOCKSTRING: Easy Molecular Docking Yields Better Benchmarks for Ligand Design.”
+        Journal of Chemical Information and Modeling 62, no. 15 (August 8, 2022): 3486-3502.
+        https://doi.org/10.1021/acs.jcim.1c01334.
+    """
+
     def __init__(
         self,
         info: ProblemSetupInformation,
@@ -39,6 +80,25 @@ class DockstringBlackBox(AbstractBlackBox):
         target_name: str = None,
         string_representation: str = "SMILES",
     ):
+        """
+        Initialize the dockstring black box object.
+
+        Parameters
+        ----------
+        info : ProblemSetupInformation
+            The problem setup information object.
+        batch_size : int, optional
+            The batch size for processing data, by default None.
+        parallelize : bool, optional
+            Flag indicating whether to parallelize the processing, by default False.
+        num_workers : int, optional
+            The number of workers to use for parallel processing, by default None.
+        target_name : str
+            The name of the target protein.
+        string_representation : str
+            The string representation of the molecules. Either SMILES or SELFIES.
+            Default is SMILES.
+        """
         assert (
             target_name is not None
         ), "Missing required keyword argument 'target_name'. "
@@ -55,9 +115,29 @@ class DockstringBlackBox(AbstractBlackBox):
         self.target = load_target(target_name)
 
     def _black_box(self, x: np.ndarray, context=None) -> np.ndarray:
-        """
-        Assuming that x is an array of strings (either in
-        SMILES or in SELFIES representation).
+        """Evaluating the black box function.
+
+        Parameters
+        ----------
+        x : np.ndarray
+            A molecule represented as a string of shape [b, L],
+            where b is the batch size and L is the length of the string.
+            We expect the elements in a row of x to be the tokens
+            of a molecule string representation.
+        context : any, optional
+            Additional context information for the evaluation. Defaults to None.
+
+        Returns
+        -------
+        y: np.ndarray
+            The output of the black box function.
+
+        Raises
+        ------
+        AssertionError
+            If the input is not a 2D array of strings.
+        Exception
+            If the docking score cannot be computed.
         """
         assert len(x.shape) == 2, "Expected a 2D array of strings. "
         molecules_as_strings = ["".join(x_i) for x_i in x]
