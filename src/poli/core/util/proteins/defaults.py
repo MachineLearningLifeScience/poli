@@ -1,3 +1,7 @@
+"""This module contains the default values for the amino acid encoding.
+
+"""
+
 AMINO_ACIDS = [
     "A",
     "R",

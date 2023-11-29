@@ -1,7 +1,11 @@
 """
 This module contains utilities for querying
 foldx for repairing and simulating the mutations
-of proteins. 
+of proteins.
+
+If this module is imported from a script, it will
+automatically check that the foldx files are in the
+expected location, and raise an error if they are not.
 """
 from typing import List, Union
 from pathlib import Path
@@ -53,7 +57,52 @@ if not (PATH_TO_FOLDX_FILES / "rotabase.txt").exists():
 
 
 class FoldxInterface:
+    """
+    A class for interacting with FoldX, a protein engineering software.
+
+    Parameters
+    ----------
+    working_dir : Union[Path, str]
+        The working directory where FoldX files and output will be stored.
+
+    Methods
+    -------
+    repair(pdb_file, remove_and_rename=False, pH=7.0, remove_heteroatoms=True)
+        Repairs a PDB file with FoldX, overwriting the original file if remove_and_rename is True.
+    _repair_if_necessary_and_provide_path(pdb_file)
+        Repairs a PDB file if necessary and returns the path of the repaired PDB.
+    _simulate_mutations(pdb_file, mutations=None)
+        Simulates mutations on a PDB file with FoldX.
+    _read_energy(pdb_file)
+        Reads the energy from a FoldX results file.
+    _compute_sasa(pdb_file)
+        Computes the SASA (solvent-accessible surface area) from a FoldX results file.
+    compute_stability(pdb_file, mutations=None)
+        Computes the stability of a protein structure using FoldX.
+    compute_sasa(pdb_file, mutations=None)
+        Computes the SASA (solvent-accessible surface area) of a protein structure using FoldX.
+    compute_stability_and_sasa(pdb_file, mutations=None)
+        Computes the stability and SASA (solvent-accessible surface area) of a protein structure using FoldX in a single run.
+    copy_foldx_files(pdb_file)
+        Copies the necessary FoldX files to the working directory.
+    write_mutations_to_file(wildtype_resiudes, mutations, output_dir)
+        Writes the list of mutations to a file in the given directory.
+
+    Attributes
+    ----------
+    working_dir : Union[Path, str]
+        The working directory for FoldX.
+    """
+
     def __init__(self, working_dir: Union[Path, str]):
+        """
+        Initialize the FoldX object.
+
+        Parameters
+        ----------
+        working_dir : Union[Path, str]
+            The working directory for FoldX.
+        """
         if isinstance(working_dir, str):
             working_dir = Path(working_dir)
 
@@ -67,8 +116,30 @@ class FoldxInterface:
         remove_heteroatoms: bool = True,
     ) -> None:
         """
-        This method repairs a PDB file with FoldX, overwriting
+        Repairs a PDB file with FoldX, overwriting
         the original file if remove_and_rename is True (default: False).
+
+        Parameters:
+        ----------
+        pdb_file : Union[str, Path]
+            The path to the PDB file to be repaired.
+        remove_and_rename : bool, optional
+            If True, the original file will be removed and the repaired file will be renamed to the original file name.
+            Default is False.
+        pH : float, optional
+            The pH value for the repair process. Default is 7.0.
+        remove_heteroatoms : bool, optional
+            If True, heteroatoms will be removed from the repaired PDB file using pdbtools.
+            Default is True.
+
+        Raises:
+        ------
+        RuntimeError
+            If FoldX fails to repair the PDB file.
+
+        Notes:
+        ------
+        This method repairs a PDB file using FoldX. It overwrites the original file if remove_and_rename is True.
         """
         # Make sure the pdb file is a path
         if isinstance(pdb_file, str):
@@ -132,6 +203,17 @@ class FoldxInterface:
         If the pdb_file's name doesn't end in "_Repair.pdb",
         then we repair it and return the path of the repaired
         pdb. Otherwise, we return the same path as the input.
+
+        Parameters:
+        ----------
+        pdb_file : Path
+            The path to the PDB file to be repaired.
+
+        Returns:
+        -------
+        repaired_path: Path
+            The path to the repaired PDB file.
+
         """
         # Make sure that we don't have a repaired pdb file
         # in the working directory (which is usually a cache)
@@ -150,7 +232,36 @@ class FoldxInterface:
             return self.working_dir / f"{pdb_file.stem}_Repair.pdb"
 
     def _simulate_mutations(self, pdb_file: Path, mutations: List[str] = None) -> None:
-        """
+        """Simulates mutations, starting from a wildtype PDB file.
+
+        This method simulates mutations on a PDB file with FoldX.
+        The list of mutations must be as expected by the
+        individual_list.txt, i.e. a list of strings of the following
+        form:
+            - the first letter is the original residue,
+            - the second letter is the chain ID,
+            - the third letter is the position of the mutation,
+            - the fourth letter is the mutant residue.
+        e.g. ["MA0A"] means that the first residue in the chain
+        is mutated from M to A.
+
+        Parameters:
+        ----------
+        pdb_file : Path
+            The path to the PDB file to be repaired.
+        mutations : List[str], optional
+            The list of mutations to simulate. If None, we simulate
+            the wildtype. Default is None.
+
+        Raises:
+        ------
+        AssertionError
+            If the number of mutations is not 0 or 1.
+        RuntimeError
+            If FoldX fails to simulate the mutations.
+
+        Notes:
+        ------
         This method simulates mutations on a PDB file with FoldX.
         The list of mutations must be as expected by the
         individual_list.txt, i.e. a list of strings of the following
@@ -220,6 +331,21 @@ class FoldxInterface:
         This method reads the energy from a FoldX results file,
         assuming that there was a single mutation.
         TODO: add support for multiple mutations.
+
+        Parameters:
+        ----------
+        pdb_file : Path
+            The path to the PDB file to be repaired.
+
+        Returns:
+        -------
+        energy: float
+            The change of energy (ddG) of the mutated structure.
+
+        Raises:
+        ------
+        AssertionError
+            If the results file was not generated.
         """
         assert (
             self.working_dir / f"Raw_{pdb_file.stem}.fxout"
@@ -234,6 +360,16 @@ class FoldxInterface:
         """
         This method computes the SASA from a FoldX results file,
         assuming that there was a single mutation.
+
+        Parameters:
+        ----------
+        pdb_file : Path
+            The path to the PDB file to be repaired.
+
+        Returns:
+        -------
+        sasa_score: float
+            The SASA score of the mutated structure.
         """
         mutated_structure = parse_pdb_as_structure(
             self.working_dir / f"{pdb_file.stem}_1.pdb", structure_name="pdb_mutated"
@@ -248,6 +384,28 @@ class FoldxInterface:
         return mutated_structure.sasa
 
     def compute_stability(self, pdb_file: Path, mutations: List[str] = None) -> float:
+        """
+        Compute the stability of a protein structure using FoldX.
+
+        Parameters:
+        ----------
+        pdb_file : Path
+            The path to the PDB file of the protein structure.
+        mutations : List[str], optional
+            A list of mutations to be simulated. Only single mutations are supported. Pass no mutations to compute the energy of the wildtype.
+
+        Returns:
+        -------
+        float
+            The stability of the protein structure (defined as the negative
+            change in energy).
+
+        Raises:
+        ------
+        AssertionError
+            If the number of mutations is not 0 or 1.
+
+        """
         # if not (self.working_dir / f"Raw_{pdb_file.stem}.fxout").exists():
         if mutations is not None:
             assert len(mutations) in [
@@ -261,7 +419,28 @@ class FoldxInterface:
         return stability
 
     def compute_sasa(self, pdb_file: Path, mutations: List[str] = None) -> float:
-        # if not (self.working_dir / f"Raw_{pdb_file.stem}.fxout").exists():
+        """
+        Compute the solvent-accessible surface area (SASA) score for a given protein structure.
+
+        Parameters:
+        ----------
+        pdb_file : Path
+            The path to the PDB file of the protein structure.
+        mutations : List[str], optional
+            A list of mutations to be simulated on the protein structure. Only single mutations are supported.
+            Pass no mutations if you want to compute the SASA of the wildtype.
+
+        Returns:
+        -------
+        float
+            The computed SASA score.
+
+        Raises:
+        ------
+        AssertionError
+            If the number of mutations is not 0 or 1.
+
+        """
         if mutations is not None:
             assert len(mutations) in [
                 0,
@@ -273,9 +452,16 @@ class FoldxInterface:
         return sasa_score
 
     def compute_stability_and_sasa(self, pdb_file: Path, mutations: List[str] = None):
-        """
-        This function computes stability and sasa with a single foldx run,
+        """Computes stability and sasa with a single foldx run,
         instead of two separate runs.
+
+        Parameters:
+        ----------
+        pdb_file : Path
+            The path to the PDB file of the protein structure.
+        mutations : List[str], optional
+            A list of mutations to be simulated on the protein structure. Only single mutations are supported.
+            Pass no mutations if you want to compute the SASA of the wildtype.
         """
         if mutations is not None:
             assert len(mutations) in [
@@ -290,8 +476,12 @@ class FoldxInterface:
         return stability, sasa_score
 
     def copy_foldx_files(self, pdb_file: Path):
-        """
-        We copy the rotabase and pdb file to the working directory.
+        """Copies the rotabase and pdb file to the working directory.
+
+        Parameters:
+        ----------
+        pdb_file : Path
+            The path to the PDB file of the protein structure.
         """
         if not (self.working_dir / "rotabase.txt").exists():
             os.symlink(
@@ -306,9 +496,17 @@ class FoldxInterface:
     def write_mutations_to_file(
         wildtype_resiudes: List[Residue], mutations: List[str], output_dir: Path
     ) -> None:
-        """
-        This method writes the list of mutations to a file
+        """Writes the list of mutations to a file
         in the given directory.
+
+        Parameters:
+        ----------
+        wildtype_resiudes : List[Residue]
+            The list of wildtype residues.
+        mutations : List[str]
+            The list of mutations to simulate.
+        output_dir : Path
+            The directory to write the file to.
         """
         # Write the mutations in the format of individual_list.txt
         lines = []

@@ -1,11 +1,11 @@
-"""
-In this module, we implement a synthetic-accessibility 
+"""In this module, we implement a synthetic-accessibility 
 objective using the TDC oracles [1].
 
 [1] Huang, Kexin, Tianfan Fu, Wenhao Gao, Yue Zhao, Yusuf Roohani, Jure Leskovec, Connor W. Coley, Cao Xiao, Jimeng Sun, and Marinka Zitnik. “Artificial Intelligence Foundation for Therapeutic Science.” Nature Chemical Biology 18, no. 10 (October 2022): 1033-36. https://doi.org/10.1038/s41589-022-01131-2.
 
-See also:
-    - The website for TDC: https://tdcommons.ai/
+See also
+-------
+The website for TDC: https://tdcommons.ai/
 """
 
 import numpy as np
@@ -19,6 +19,34 @@ from poli.core.util.chemistry.string_to_molecule import translate_selfies_to_smi
 
 
 class TDCBlackBox(AbstractBlackBox):
+    """
+    TDCBlackBox is a class that represents a black box for the
+    TDC (Therapeutics Data Commons) problems.
+    It inherits from the AbstractBlackBox class.
+
+    Parameters:
+    -----------
+    oracle_name : str
+        The name of the oracle used for computing the docking score.
+    info : ProblemSetupInformation
+        An instance of the ProblemSetupInformation class that contains information about the problem setup.
+    batch_size : int, optional
+        The batch size for processing multiple inputs in parallel. Defaults to None.
+    parallelize : bool, optional
+        Flag indicating whether to parallelize the computation. Defaults to False.
+    num_workers : int, optional
+        The number of workers to use for parallel computation. Defaults to None.
+    from_smiles : bool, optional
+        Flag indicating whether the input molecules are in SMILES format. Defaults to True.
+
+    Attributes:
+    -----------
+    oracle : Oracle
+        An instance of the Oracle class from TDC.
+    from_smiles : bool
+        Flag indicating whether the input molecules are in SMILES format.
+    """
+
     def __init__(
         self,
         oracle_name: str,
@@ -28,6 +56,24 @@ class TDCBlackBox(AbstractBlackBox):
         num_workers: int = None,
         from_smiles: bool = True,
     ):
+        """
+        Initialize the TDCBlackBox class.
+
+        Parameters
+        ----------
+        oracle_name : str
+            The name of the oracle.
+        info : ProblemSetupInformation
+            The problem setup information.
+        batch_size : int, optional
+            The batch size, by default None.
+        parallelize : bool, optional
+            Whether to parallelize the computation, by default False.
+        num_workers : int, optional
+            The number of workers to use for parallel computation, by default None.
+        from_smiles : bool, optional
+            Whether to use SMILES representation, by default True.
+        """
         super().__init__(info, batch_size, parallelize, num_workers)
         self.oracle = Oracle(name=oracle_name)
         self.from_smiles = from_smiles
@@ -37,6 +83,18 @@ class TDCBlackBox(AbstractBlackBox):
         Assuming x is an array of strings,
         we concatenate them and then
         compute the docking score.
+
+        Parameters:
+        -----------
+        x : array-like
+            An array of strings representing the input molecules.
+        context : any, optional
+            Additional context information. Defaults to None.
+
+        Returns:
+        --------
+        scores : array-like
+            An array of docking scores computed for each input molecule.
         """
         if not x.dtype.kind in ["U", "S"]:
             raise ValueError(

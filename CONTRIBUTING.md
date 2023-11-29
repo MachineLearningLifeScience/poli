@@ -9,7 +9,11 @@ This note details how to contribute to `poli`.
 
 ## Forking and making pull requests
 
-The main development branch is called `dev`. To contribute, we recommend creating a fork of this repository and making changes on your version. Once you are ready to contribute, we expect you to lint and test.
+The main development branch is called `dev`. To contribute, we recommend creating a fork of this repository and making changes on your version. Once you are ready to contribute, we expect you to document, lint and test.
+
+## Documentation standards
+
+We follow [numpy's documentation standards](https://numpydoc.readthedocs.io/en/latest/format.html).
 
 ## Linting your changes
 

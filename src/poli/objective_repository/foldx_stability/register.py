@@ -1,5 +1,17 @@
 """
-This script registers FoldX stability as an objective function.
+This script registers the stability FoldX black box and objective factory.
+
+FoldX [1] is a simulator that allows for computing the difference
+in free energy between a wildtype protein and a mutated protein. We 
+also use biopython for pre-processing the PDB files [2].
+
+[1] Schymkowitz, J., Borg, J., Stricher, F., Nys, R., Rousseau, F.,
+    & Serrano, L. (2005). The FoldX web server: an online force field.
+    Nucleic acids research, 33(suppl_2), W382-W388.
+[2] Cock PA, Antao T, Chang JT, Chapman BA, Cox CJ, Dalke A, Friedberg I,
+    Hamelryck T, Kauff F, Wilczynski B and de Hoon MJL (2009) Biopython:
+    freely available Python tools for computational molecular biology and 
+    bioinformatics. Bioinformatics, 25, 1422-1423
 """
 from pathlib import Path
 from typing import List, Tuple, Union
@@ -36,6 +48,37 @@ TMP_PATH = Path("/tmp").resolve()
 
 
 class FoldXStabilityBlackBox(FoldxBlackBox):
+    """
+    A black box implementation for evaluating the stability of protein structures using FoldX.
+
+    Parameters
+    ----------
+    info : ProblemSetupInformation, optional
+        The problem setup information (default is None).
+    batch_size : int, optional
+        The batch size for parallel processing (default is None).
+    parallelize : bool, optional
+        Whether to parallelize the computation (default is False).
+    num_workers : int, optional
+        The number of workers for parallel processing (default is None).
+    wildtype_pdb_path : Union[Path, List[Path]], required
+        The path(s) to the wildtype PDB file(s) (default is None).
+    alphabet : List[str], optional
+        The alphabet of amino acids (default is None).
+    experiment_id : str, optional
+        The ID of the experiment (default is None).
+    tmp_folder : Path, optional
+        The path to the temporary folder (default is None).
+    eager_repair : bool, optional
+        Whether to eagerly repair the protein structures (default is False).
+
+    Methods
+    -------
+    _black_box(x, context)
+        Runs the given input x and pdb files provided in the context through FoldX and returns the total stability score.
+
+    """
+
     def __init__(
         self,
         info: ProblemSetupInformation = None,
@@ -67,12 +110,21 @@ class FoldXStabilityBlackBox(FoldxBlackBox):
         total energy score.
 
         Since the goal is MINIMIZING the energy,
-        we return the negative of the total energy.
+        we return the negative of the total energy
+        (a.k.a. the stability).
 
-        To accomodate for the initial call, if the
-        path_to_mutation_list is not provided (or
-        if it's None), we assume that we're supposed
-        to evaluate the energy of the wildtype sequence.
+        Parameters
+        ----------
+        x : np.ndarray
+            The input array representing the mutations.
+        context : None
+            The context for the computation.
+
+        Returns
+        -------
+        np.ndarray
+            The array of stability scores.
+
         """
         # TODO: add support for multiple mutations.
         # For now, we assume that the batch size is
@@ -112,7 +164,17 @@ class FoldXStabilityBlackBox(FoldxBlackBox):
 class FoldXStabilityProblemFactory(AbstractProblemFactory):
     def get_setup_information(self) -> ProblemSetupInformation:
         """
-        TODO: document
+        Get the setup information for the foldx_sasa objective.
+
+        Returns
+        -------
+        ProblemSetupInformation
+            The setup information for the objective.
+
+        Notes
+        -----
+        By default, the method uses the 20 amino acids shown in
+        poli.core.util.proteins.defaults.
         """
         alphabet = AMINO_ACIDS
 
@@ -134,9 +196,44 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
         experiment_id: str = None,
         tmp_folder: Path = None,
         eager_repair: bool = False,
-    ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
-        seed_numpy(seed)
-        seed_python(seed)
+    ) -> Tuple[FoldXStabilityBlackBox, np.ndarray, np.ndarray]:
+        """
+        Creates a FoldX stability black box function and initial observations.
+
+        Parameters
+        ----------
+        seed : int, optional
+            Seed for random number generation.
+        batch_size : int, optional
+            Number of sequences to process in parallel.
+        parallelize : bool, optional
+            Whether to parallelize the computation.
+        num_workers : int, optional
+            Number of worker processes to use for parallel computation.
+        wildtype_pdb_path : Union[Path, List[Path]], required
+            Path(s) to the wildtype PDB file(s).
+        alphabet : List[str], optional
+            List of amino acids to use as the alphabet.
+        experiment_id : str, optional
+            Identifier for the experiment.
+        tmp_folder : Path, optional
+            Path to the temporary folder for storing intermediate files.
+        eager_repair : bool, optional
+            Whether to eagerly repair the protein structures.
+
+        Returns
+        -------
+        Tuple[AbstractBlackBox, np.ndarray, np.ndarray]
+            A tuple containing the created black box function, the initial sequence(s), and the initial fitness value(s).
+
+        Raises:
+        ------
+        ValueError
+            If wildtype_pdb_path is missing or has an invalid type.
+        """
+        if seed is not None:
+            seed_numpy(seed)
+            seed_python(seed)
 
         if wildtype_pdb_path is None:
             raise ValueError(

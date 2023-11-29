@@ -1,6 +1,4 @@
-"""
-This is the main module relevant for user-defined observers.
-When registering an observer, this module is called and instantiates the user's observer.
+"""This script gets called by the mother process to start an observer process.
 """
 
 import sys
@@ -13,6 +11,27 @@ from poli.objective import dynamically_instantiate, parse_factory_kwargs
 
 
 def start_observer_process(observer_name, port: int, password: str):
+    """
+    Start the observer process.
+
+    Parameters
+    ----------
+    observer_name : str
+        The name of the observer to instantiate.
+    port : int
+        The port number for the connection with the mother process.
+    password : str
+        The password for the connection with the mother process.
+
+    Notes
+    -----
+    This function starts the observer process by establishing a connection with the mother process,
+    receiving setup information, instantiating the observer, initializing the observer with the setup
+    information, and then waiting for observe calls. If an exception occurs during observation or
+    attribute retrieval, it is sent back to the mother process.
+
+    The observer process can be terminated by sending a "QUIT" message.
+    """
     # make connection with the mother process
     conn = get_connection(port, password)
 

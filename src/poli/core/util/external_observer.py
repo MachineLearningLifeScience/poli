@@ -8,12 +8,38 @@ from poli.core.registry import config, _DEFAULT, _OBSERVER
 
 
 class ExternalObserver(AbstractObserver):
-    """
-    This is an observer class used by poli to wrap observer functionality.
-    User-defined observers typically do NOT inherit from here.
+    """An external version of the observer class to be instantiated in isolated processes.
+
+    Parameters
+    ----------
+    observer_name : str, optional
+        The name of the observer. If not provided, the default observer name will be used.
+    **kwargs_for_observer
+        Additional keyword arguments to be passed to the observer.
+
+    Methods
+    -------
+    observe(x, y, context=None)
+        Sends the observation to the observer process and verifies if it was logged correctly.
+    initialize_observer(setup_info, caller_info, x0, y0, seed)
+        Starts the observer process and sends the setup information.
+    finish()
+        Closes the observer process.
+    __getattr__(__name)
+        Retrieves the attribute of the underlying observer.
     """
 
     def __init__(self, observer_name: str = None, **kwargs_for_observer):
+        """
+        Initialize the ExternalObserver object.
+
+        Parameters
+        ----------
+        observer_name : str, optional
+            The name of the observer. If not provided, the default observer will be used.
+        **kwargs_for_observer
+            Additional keyword arguments to be passed to the observer.
+        """
         if observer_name is None:
             observer_name = _DEFAULT
 
@@ -22,6 +48,24 @@ class ExternalObserver(AbstractObserver):
         self.kwargs_for_observer = kwargs_for_observer
 
     def observe(self, x: np.ndarray, y: np.ndarray, context=None) -> None:
+        """
+        Observe the given data points.
+
+        Parameters:
+        ----------
+        x: np.ndarray
+            The input data points.
+        y: np.ndarray
+            The output data points.
+        context: object
+            Additional context for the observation.
+
+        Raises:
+        -------
+        Exception:
+            If the underlying observer process raises an exception.
+        """
+
         # We send the observation
         self.process_wrapper.send(["OBSERVATION", x, y, context])
 
@@ -37,6 +81,35 @@ class ExternalObserver(AbstractObserver):
     def initialize_observer(
         self, setup_info: ProblemSetupInformation, caller_info, x0, y0, seed
     ) -> str:
+        """
+        Initialize the observer.
+
+        Parameters
+        ----------
+        problem_setup_info : ProblemSetupInformation
+            The information about the problem setup.
+        caller_info : object
+            The information about the caller.
+        x0 : np.ndarray
+            The initial x values.
+        y0 : np.ndarray
+            The initial y values.
+        seed : int
+            The seed value for random number generation.
+
+        Returns
+        -------
+        observer_info: object
+            Relevant information returned by the underlying observer's
+            initialize_observer method.
+
+        Raises
+        ------
+        Exception:
+            Any exception raised by the underlying observer.
+        ValueError:
+            If the message type received from the observer process is unknown.
+        """
         # start observer process
         # VERY IMPORTANT: the observer script MUST accept port and password as arguments
         self.process_wrapper = ProcessWrapper(self.observer_script)
@@ -61,6 +134,10 @@ class ExternalObserver(AbstractObserver):
         return observer_info
 
     def finish(self) -> None:
+        """Finish the external observer process.
+
+        This method sends a "QUIT" message to the process wrapper and closes it.
+        """
         if self.process_wrapper is not None:
             self.process_wrapper.send(["QUIT", None])
             self.process_wrapper.close()

@@ -1,5 +1,19 @@
 """
-This script registers FoldX stability as an objective function.
+This script registers the stability and SASA FoldX black box
+and objective factory.
+
+FoldX [1] is a simulator that allows for computing the difference
+in free energy between a wildtype protein and a mutated protein.
+We pair this with biopython [2] to compute the SASA of the mutated
+protein.
+
+[1] Schymkowitz, J., Borg, J., Stricher, F., Nys, R., Rousseau, F.,
+    & Serrano, L. (2005). The FoldX web server: an online force field.
+    Nucleic acids research, 33(suppl_2), W382-W388.
+[2] Cock PA, Antao T, Chang JT, Chapman BA, Cox CJ, Dalke A, Friedberg I,
+    Hamelryck T, Kauff F, Wilczynski B and de Hoon MJL (2009) Biopython:
+    freely available Python tools for computational molecular biology and 
+    bioinformatics. Bioinformatics, 25, 1422-1423
 """
 from pathlib import Path
 from typing import List, Tuple, Union
@@ -25,6 +39,31 @@ from poli.core.util.seeding import seed_numpy, seed_python
 
 
 class FoldXStabilityAndSASABlackBox(FoldxBlackBox):
+    """
+    A black box implementation for computing the solvent accessible surface area (SASA) score using FoldX.
+
+    Parameters:
+    -----------
+    info : ProblemSetupInformation, optional
+        The problem setup information. Default is None.
+    batch_size : int, optional
+        The batch size for parallel processing. Default is None.
+    parallelize : bool, optional
+        Whether to parallelize the computation. Default is False.
+    num_workers : int, optional
+        The number of workers for parallel processing. Default is None.
+    wildtype_pdb_path : Union[Path, List[Path]], required
+        The path(s) to the wildtype PDB file(s). Default is None.
+    alphabet : List[str], optional
+        The alphabet of amino acids. Default is None.
+    experiment_id : str, optional
+        The ID of the experiment. Default is None.
+    tmp_folder : Path, optional
+        The path to the temporary folder. Default is None.
+    eager_repair : bool, optional
+        Whether to perform eager repair. Default is False.
+    """
+
     def __init__(
         self,
         info: ProblemSetupInformation = None,
@@ -58,10 +97,17 @@ class FoldXStabilityAndSASABlackBox(FoldxBlackBox):
         Since the goal is MINIMIZING the energy,
         we return the negative of the total energy.
 
-        To accomodate for the initial call, if the
-        path_to_mutation_list is not provided (or
-        if it's None), we assume that we're supposed
-        to evaluate the energy of the wildtype sequence.
+        Parameters:
+        -----------
+        x : np.ndarray
+            The input array representing the mutations.
+        context : None
+            The context for the black box computation.
+
+        Returns:
+        --------
+        y: np.ndarray
+            The computed stability and SASA score(s) as a numpy array.
         """
         # TODO: add support for multiple mutations.
         # For now, we assume that the batch size is
@@ -102,9 +148,30 @@ class FoldXStabilityAndSASABlackBox(FoldxBlackBox):
 
 
 class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
+    """
+    Factory class for creating FoldX SASA (Solvent Accessible Surface Area) problems.
+
+    Methods:
+    --------
+    get_setup_information:
+        Returns the setup information for the problem.
+    create:
+        Creates a problem instance with the specified parameters.
+    """
+
     def get_setup_information(self) -> ProblemSetupInformation:
         """
-        TODO: document
+        Get the setup information for the foldx_sasa objective.
+
+        Returns
+        -------
+        ProblemSetupInformation
+            The setup information for the objective.
+
+        Notes
+        -----
+        By default, the method uses the 20 amino acids shown in
+        poli.core.util.proteins.defaults.
         """
         alphabet = AMINO_ACIDS
 
@@ -127,6 +194,41 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
         tmp_folder: Path = None,
         eager_repair: bool = False,
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+        """
+        Create a FoldXSASABlackBox object and compute the initial values of wildtypes.
+
+        Parameters:
+        ----------
+        seed : int, optional
+            Seed for random number generators. If None is passed,
+            the seeding doesn't take place.
+        batch_size : int, optional
+            Number of samples per batch for parallel computation.
+        parallelize : bool, optional
+            Flag indicating whether to parallelize the computation.
+        num_workers : int, optional
+            Number of worker processes for parallel computation.
+        wildtype_pdb_path : Union[Path, List[Path]], required
+            Path or list of paths to the wildtype PDB files.
+        alphabet : List[str], optional
+            List of amino acid symbols.
+        experiment_id : str, optional
+            Identifier for the experiment.
+        tmp_folder : Path, optional
+            Path to the temporary folder for intermediate files.
+        eager_repair : bool, optional
+            Flag indicating whether to perform eager repair.
+
+        Returns:
+        -------
+        Tuple[AbstractBlackBox, np.ndarray, np.ndarray]
+            A tuple containing the FoldXSASABlackBox object, the initial wildtype sequences, and the initial fitness values.
+
+        Raises:
+        ------
+        ValueError
+            If wildtype_pdb_path is missing or has an invalid type.
+        """
         seed_numpy(seed)
         seed_python(seed)
 
