@@ -27,6 +27,7 @@ from .definitions import (
     deb_02,
     deflected_corrugated_spring,
     camelback_2d,
+    styblinski_tang,
 )
 
 # Notice: these will be used by pytest to test the
@@ -42,6 +43,7 @@ POSSIBLE_FUNCTIONS = [
     "deb_01",
     "deb_02",
     "deflected_corrugated_spring",
+    "styblinski_tang",
     "shifted_sphere",
     "easom",
     "cross_in_tray",
@@ -80,6 +82,7 @@ class ToyContinuousProblem:
             "deb_01",
             "deb_02",
             "deflected_corrugated_spring",
+            "styblinski_tang",
             "shifted_sphere",
             "easom",
             "cross_in_tray",
@@ -151,6 +154,11 @@ class ToyContinuousProblem:
             self.function = deflected_corrugated_spring
             self.limits = [0.0, 10.0]
             self.optima_location = np.array([5.0] * n_dims)
+            self.solution_length = n_dims
+        elif name == "styblinski_tang":
+            self.function = styblinski_tang
+            self.limits = [-5.0, 5.0]
+            self.optima_location = np.array([-2.903534] * n_dims)
             self.solution_length = n_dims
         elif name == "shifted_sphere":
             self.function = shifted_sphere
