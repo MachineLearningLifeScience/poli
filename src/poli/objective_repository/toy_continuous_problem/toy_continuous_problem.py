@@ -7,7 +7,7 @@ When run, this script plots the three example functions provided.
 See for more examples:
 https://en.wikipedia.org/wiki/Test_functions_for_optimization
 """
-from typing import Callable, Literal
+from typing import Literal
 
 import numpy as np
 
@@ -48,6 +48,13 @@ POSSIBLE_FUNCTIONS = [
     "egg_holder",
     "camelback_2d",
 ]
+TWO_DIMENSIONAL_PROBLEMS = [
+    "shifted_sphere",
+    "easom",
+    "cross_in_tray",
+    "egg_holder",
+    "camelback_2d",
+]
 
 
 class ToyContinuousProblem:
@@ -80,9 +87,20 @@ class ToyContinuousProblem:
             "camelback_2d",
         ],
         n_dims: int = 2,
+        embed_in: int = None,
     ) -> None:
         self.maximize = True
         self.known_optima = True
+        self.dimensions_to_embed_in = None
+
+        if n_dims != 2 and name in TWO_DIMENSIONAL_PROBLEMS:
+            if embed_in is None:
+                raise ValueError(
+                    f"Function {name} can only be instantiated in two dimensions (received {n_dims})."
+                    " Alternatively, you can embed the function in higher dimensions by setting"
+                    " embed_in: int to the desired dimension. When doing so, the 2 dimensions will be "
+                    "randomly selected among the embed_in."
+                )
 
         if name == "ackley_function_01":
             self.function = ackley_function_01
@@ -163,6 +181,34 @@ class ToyContinuousProblem:
             raise ValueError(f"Expected {name} to be one of {POSSIBLE_FUNCTIONS}")
 
         self.optima = self.function(self.optima_location.reshape(1, -1))
+
+        # If embed_in is not None, then we will embed the
+        # function in embed_in dimensions. This is useful for testing
+        # algorithms that leverage low intrinsic dimensionality.
+        if embed_in is not None:
+            assert n_dims < embed_in, (
+                f"Expected the intrinsic dimensionality of the problem to be lower than the "
+                f"dimensionality of the space, but got {self.solution_length} and {n_dims} respectively."
+            )
+
+            self.dimensions_to_embed_in = np.random.permutation(embed_in)[:n_dims]
+            self.solution_length = embed_in
+            self.limits = [self.limits[0]] * embed_in, [self.limits[1]] * embed_in
+            previous_optima_location = self.optima_location.copy()
+            self.optima_location = np.zeros(embed_in)
+            self.optima_location[self.dimensions_to_embed_in] = previous_optima_location
+
+            _current_function = self.function
+            self.function = lambda x: _current_function(
+                x[:, self.dimensions_to_embed_in]
+            )
+        else:
+            # We need to make sure that the user specified a feasible
+            # number of dimensions. If not, we raise an error.
+            assert n_dims == self.solution_length, (
+                f"The solution length for {name} should be {self.solution_length},"
+                f" but received {n_dims}."
+            )
 
     def evaluate_objective(self, x: np.array, **kwargs) -> np.array:
         return self.function(x)

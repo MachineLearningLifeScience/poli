@@ -80,6 +80,8 @@ def run(factory_kwargs: str, objective_name: str, port: int, password: str) -> N
 
     # make connection with the mother process
     conn = get_connection(port, password)
+
+    # TODO: We could be receiving the kwargs for the factory here.
     msg_type, seed = conn.recv()
 
     # dynamically load objective function module
