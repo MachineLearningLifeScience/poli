@@ -39,6 +39,7 @@ class ToyContinuousBlackBox(AbstractBlackBox):
         num_workers: int = None,
         function_name: str = None,
         n_dimensions: int = 2,
+        embed_in: int = None,
     ):
         self.alphabet = None
 
@@ -47,7 +48,13 @@ class ToyContinuousBlackBox(AbstractBlackBox):
         ), f"'{function_name}' is not a valid function name. Expected it to be one of {POSSIBLE_FUNCTIONS}."
 
         self.function_name = function_name
-        self.function = ToyContinuousProblem(function_name, n_dims=n_dimensions)
+        self.n_dimensions = n_dimensions
+        self.embed_in = embed_in
+        self.function = ToyContinuousProblem(
+            function_name,
+            n_dims=n_dimensions,
+            embed_in=embed_in,
+        )
 
         super().__init__(
             info=info,
@@ -86,6 +93,7 @@ class ToyContinuousProblemFactory(AbstractProblemFactory):
         num_workers: int = None,
         function_name: str = None,
         n_dimensions: int = 2,
+        embed_in: int = None,
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         assert (
             function_name in POSSIBLE_FUNCTIONS
@@ -103,8 +111,12 @@ class ToyContinuousProblemFactory(AbstractProblemFactory):
             num_workers=num_workers,
             function_name=function_name,
             n_dimensions=n_dimensions,
+            embed_in=embed_in,
         )
-        x0 = np.array([[0.0] * n_dimensions])
+        if embed_in is None:
+            x0 = np.array([[0.0] * n_dimensions])
+        else:
+            x0 = np.array([[0.0] * embed_in])
 
         return f, x0, f(x0)
 
