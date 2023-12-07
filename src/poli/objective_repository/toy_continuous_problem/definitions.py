@@ -1,7 +1,7 @@
 """
 This script defines all the artificial landscapes with
 signature [np.ndarray] -> np.ndarray. You might
-see that the signs have been flipped from [1]. This is
+see that the signs have been flipped from [1] or [2]. This is
 because we're dealing with maximizations instead of
 minimizations.
 
@@ -13,6 +13,8 @@ the design space).
     Functions Repository [https://www.al-roomi.org/benchmarks/unconstrained].
     Halifax, Nova Scotia, Canada: Dalhousie University, Electrical and Computer
     Engineering.
+[2] Surjanovic, S. and Bingham, D. Virtual Library of Simulation Experiments:
+    Test Functions and Datasets. [https://www.sfu.ca/~ssurjano/optimization.html]
 """
 import numpy as np
 
@@ -202,6 +204,24 @@ def deflected_corrugated_spring(
         res = res.squeeze(0)
 
     return res
+
+
+def styblinski_tang(x: np.ndarray, normalize: bool = True) -> np.ndarray:
+    """
+    This function is maximized at (-2.903534, ..., -2.903534), with
+    a value of -39.16599 * d.
+
+    If normalize is True, then the function is normalized to be
+    maximized at -39.16599 (i.e. we divide the objective by d).
+    """
+    assert len(x.shape) == 2
+    d = x.shape[1]
+
+    y = (x**4) - (16 * (x**2)) + (5 * x)
+    if normalize:
+        return -0.5 * np.sum(y, axis=1) / d
+    else:
+        return -0.5 * np.sum(y, axis=1)
 
 
 def easom(xy: np.ndarray) -> np.ndarray:
