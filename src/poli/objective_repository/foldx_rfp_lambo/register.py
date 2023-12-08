@@ -24,7 +24,6 @@ from lambo import __file__ as project_root_file
 
 
 project_root = os.path.dirname(os.path.dirname(project_root_file))
-conf = None
 
 
 class RFPWrapper(AbstractBlackBox):
@@ -87,7 +86,6 @@ class RFPWrapperFactory(AbstractProblemFactory):
         num_workers: int = None,
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         config = get_config()
-        config = conf  # TODO: cleanup
         # make problem reproducible
         random.seed(seed)
         torch.manual_seed(seed)
@@ -122,14 +120,11 @@ class RFPWrapperFactory(AbstractProblemFactory):
 tokenizer = {"_target_": "lambo.utils.ResidueTokenizer"}
 Config = namedtuple("config", ["task", "tokenizer", "log_dir", "job_name", "timestamp"])
 
-name_is_main = __name__ == "__main__"
 
-
-def get_config():
+def get_config() -> Config:
     """
     Utility function with lambo specifc config to RFP task.
     """
-    global conf
     task = yaml.safe_load(
         Path(
             str(Path(lambo.__file__).parent.resolve().parent.resolve())
@@ -148,11 +143,10 @@ def get_config():
         job_name="null",
         timestamp="timestamp",
     )
-    conf = config
     return config
 
 
-if name_is_main:
+if __name__ == "__main__":
     from poli.core.registry import register_problem
 
     rfp_problem_factory = RFPWrapperFactory()
