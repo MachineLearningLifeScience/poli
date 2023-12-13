@@ -207,4 +207,5 @@ def test_foldx_from_repaired_file():
 
 
 if __name__ == "__main__":
-    test_foldx_stability_is_available()
+    # test_foldx_stability_is_available()
+    test_force_registering_foldx_sasa()

@@ -58,6 +58,7 @@ class AlohaBlackBox(AbstractBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
     ):
         """
         Initialize the aloha black box object.
@@ -72,6 +73,8 @@ class AlohaBlackBox(AbstractBlackBox):
             Flag indicating whether to parallelize the processing, by default False.
         num_workers : int, optional
             The number of workers to use for parallel processing, by default None.
+        evaluation_budget:  int
+            The maximum number of function evaluations. Default is infinity.
         """
         self.alphabet = {symbol: idx for idx, symbol in enumerate(info.alphabet)}
         super().__init__(
@@ -79,6 +82,7 @@ class AlohaBlackBox(AbstractBlackBox):
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
         )
 
     # The only method you have to define
@@ -153,6 +157,7 @@ class AlohaProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         """
         Returns an Aloha blackbox function and initial observations.
@@ -167,6 +172,8 @@ class AlohaProblemFactory(AbstractProblemFactory):
             Flag indicating whether to parallelize the evaluation. Default is False.
         num_workers:  int
             The number of workers for parallel evaluation. Default is None.
+        evaluation_budget:  int
+            The maximum number of function evaluations. Default is infinity.
 
         Returns:
         --------
@@ -186,6 +193,7 @@ class AlohaProblemFactory(AbstractProblemFactory):
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
         )
         x0 = np.array([["A", "L", "O", "O", "F"]])
 

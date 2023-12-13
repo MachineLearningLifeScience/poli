@@ -25,12 +25,14 @@ class WhiteNoiseBlackBox(AbstractBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
     ):
         super().__init__(
             info=info,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
         )
 
     # The only method you have to define
@@ -56,6 +58,7 @@ class WhiteNoiseProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         seed_numpy(seed)
         seed_python(seed)
@@ -66,6 +69,7 @@ class WhiteNoiseProblemFactory(AbstractProblemFactory):
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
         )
         x0 = np.array([["1", "2", "3"]])
 

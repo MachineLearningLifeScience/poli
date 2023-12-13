@@ -36,6 +36,8 @@ class TDCBlackBox(AbstractBlackBox):
         Flag indicating whether to parallelize the computation. Defaults to False.
     num_workers : int, optional
         The number of workers to use for parallel computation. Defaults to None.
+    evaluation_budget : int, optional
+        The evaluation budget. Defaults to infinity.
     from_smiles : bool, optional
         Flag indicating whether the input molecules are in SMILES format. Defaults to True.
 
@@ -54,6 +56,7 @@ class TDCBlackBox(AbstractBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
         from_smiles: bool = True,
     ):
         """
@@ -74,7 +77,7 @@ class TDCBlackBox(AbstractBlackBox):
         from_smiles : bool, optional
             Whether to use SMILES representation, by default True.
         """
-        super().__init__(info, batch_size, parallelize, num_workers)
+        super().__init__(info, batch_size, parallelize, num_workers, evaluation_budget)
         self.oracle = Oracle(name=oracle_name)
         self.from_smiles = from_smiles
 

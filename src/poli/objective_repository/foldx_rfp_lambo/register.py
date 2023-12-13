@@ -35,12 +35,14 @@ class RFPWrapper(AbstractBlackBox):
         parallelize: bool = False,
         num_workers: int = None,
         batch_size: int = None,
+        evaluation_budget: int = float("inf"),
     ):
         super().__init__(
             RFPWrapperFactory().get_setup_information(),
             parallelize=parallelize,
             num_workers=num_workers,
             batch_size=batch_size,
+            evaluation_budget=evaluation_budget,
         )
         self.task = task
         self.base_candidates = base_candidates
@@ -85,6 +87,7 @@ class RFPWrapperFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         config = get_config()
         config = conf  # TODO: cleanup
@@ -113,6 +116,7 @@ class RFPWrapperFactory(AbstractProblemFactory):
                 parallelize=parallelize,
                 num_workers=num_workers,
                 batch_size=batch_size,
+                evaluation_budget=evaluation_budget,
             ),
             all_seqs,
             all_targets,

@@ -52,6 +52,8 @@ class FoldXSASABlackBox(FoldxBlackBox):
         Whether to parallelize the computation. Default is False.
     num_workers : int, optional
         The number of workers for parallel processing. Default is None.
+    evaluation_budget : int, optional
+        The maximum number of function evaluations. Default is infinity.
     wildtype_pdb_path : Union[Path, List[Path]], required
         The path(s) to the wildtype PDB file(s). Default is None.
     alphabet : List[str], optional
@@ -70,6 +72,7 @@ class FoldXSASABlackBox(FoldxBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
         wildtype_pdb_path: Union[Path, List[Path]] = None,
         alphabet: List[str] = None,
         experiment_id: str = None,
@@ -81,6 +84,7 @@ class FoldXSASABlackBox(FoldxBlackBox):
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
             wildtype_pdb_path=wildtype_pdb_path,
             alphabet=alphabet,
             experiment_id=experiment_id,
@@ -184,6 +188,7 @@ class FoldXSASAProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
         wildtype_pdb_path: Union[Path, List[Path]] = None,
         alphabet: List[str] = None,
         experiment_id: str = None,
@@ -204,6 +209,8 @@ class FoldXSASAProblemFactory(AbstractProblemFactory):
             Flag indicating whether to parallelize the computation.
         num_workers : int, optional
             Number of worker processes for parallel computation.
+        evaluation_budget : int, optional
+            The maximum number of function evaluations. Default is infinity.
         wildtype_pdb_path : Union[Path, List[Path]], required
             Path or list of paths to the wildtype PDB files.
         alphabet : List[str], optional
@@ -263,6 +270,7 @@ class FoldXSASAProblemFactory(AbstractProblemFactory):
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
             wildtype_pdb_path=wildtype_pdb_path,
             alphabet=alphabet,
             experiment_id=experiment_id,

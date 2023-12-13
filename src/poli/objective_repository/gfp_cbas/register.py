@@ -24,6 +24,7 @@ class GFPCBasBlackBox(AbstractBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
         seed: int = None,
         functional_only: bool = False,
         ignore_stops: bool = True,
@@ -49,7 +50,7 @@ class GFPCBasBlackBox(AbstractBlackBox):
             idx = data_df.loc[~data_df["aaSequence"].str.contains("!")].index
         self.data_df = data_df.loc[idx]
         # self.X, self.y = get_gfp_X_y_aa(self.gfp_lookup_df)
-        super().__init__(info, batch_size, parallelize, num_workers)
+        super().__init__(info, batch_size, parallelize, num_workers, evaluation_budget)
 
     def _black_box(self, x: np.array, context=None) -> np.ndarray:
         """
@@ -85,6 +86,7 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
         x0_size: int = 128,  # TODO: this should go into problem info instead?
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         seed_numpy(seed)
@@ -95,6 +97,7 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
             seed=seed,
         )
         x0 = np.array([list(s) for s in f.data_df.iloc[:x0_size].aaSequence])

@@ -32,9 +32,21 @@ THIS_DIR = Path(__file__).parent.resolve()
 
 
 class SMBBlackBox(AbstractBlackBox):
-    def __init__(self, L: int):
-        super().__init__(L)
-
+    def __init__(
+        self,
+        info: ProblemSetupInformation,
+        batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
+        evaluation_budget: int = float("inf"),
+    ):
+        super().__init__(
+            info=info,
+            batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
+        )
         self.model = load_example_model(THIS_DIR / "example.pt")
 
     def _black_box(self, x: np.ndarray, context=None) -> np.ndarray:
@@ -72,14 +84,25 @@ class SMBProblemFactory(AbstractProblemFactory):
         )
 
     def create(
-        self, seed: int = None
+        self,
+        seed: int = None,
+        batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
+        evaluation_budget: int = float("inf"),
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         seed_numpy(seed)
         seed_python(seed)
 
-        L = self.get_setup_information().get_max_sequence_length()
-        f = SMBBlackBox(L)
-        x0 = np.ones([1, L])
+        info = self.get_setup_information()
+        f = SMBBlackBox(
+            info=info,
+            batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
+        )
+        x0 = np.ones([1, info.max_sequence_length])
 
         return f, x0, f(x0)
 

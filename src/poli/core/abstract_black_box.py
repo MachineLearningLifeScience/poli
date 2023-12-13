@@ -9,6 +9,7 @@ from poli.core.problem_setup_information import ProblemSetupInformation
 
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.batch import batched
+from poli.core.exceptions import BudgetExhaustedException
 
 
 class AbstractBlackBox:
@@ -25,6 +26,8 @@ class AbstractBlackBox:
         Flag indicating whether to evaluate the black box function in parallel. Default is False.
     num_workers : int, optional
         The number of workers to use for parallel evaluation. Default is None, which uses half of the available CPU cores.
+    evaluation_budget : int, optional
+        The maximum number of evaluations allowed for the black box function. Default is float("inf").
 
     Attributes
     ----------
@@ -65,6 +68,7 @@ class AbstractBlackBox:
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
     ):
         """
         Initialize the AbstractBlackBox object.
@@ -79,10 +83,14 @@ class AbstractBlackBox:
             Flag indicating whether to parallelize the execution, by default False.
         num_workers : int, optional
             The number of workers for parallel execution, by default None.
+        evaluation_budget : int, optional
+            The maximum number of evaluations allowed for the black box function, by default float("inf").
         """
         self.info = info
         self.observer = None
         self.parallelize = parallelize
+        self.evaluation_budget = evaluation_budget
+        self._num_evaluations = 0
 
         if num_workers is None:
             num_workers = cpu_count() // 2
@@ -101,6 +109,9 @@ class AbstractBlackBox:
             The observer object.
         """
         self.observer = observer
+
+    def reset_evaluation_budget(self):
+        self._num_evaluations = 0
 
     def __call__(self, x: np.array, context=None):
         """Calls the black box function.
@@ -156,8 +167,19 @@ class AbstractBlackBox:
 
         # Evaluate f by batches. If batch_size is None, then we evaluate
         # the whole input at once.
-        batch_size = self.batch_size if self.batch_size is not None else x.shape[0]
+        if self.batch_size is None:
+            batch_size = x.shape[0]
+        else:
+            batch_size = self.batch_size
         f_evals = []
+
+        # Check whether we have enough budget to evaluate the black box function.
+        if self._num_evaluations + batch_size > self.evaluation_budget:
+            raise BudgetExhaustedException(
+                f"Exhausted the evaluation budget of {self.evaluation_budget} evaluations."
+                f" (tried to evaluate {batch_size}, but we have already"
+                f" evaluated {self._num_evaluations}/{self.evaluation_budget})."
+            )
 
         # We evaluate x in batches.
         for x_batch_ in batched(x, batch_size):
@@ -202,6 +224,9 @@ class AbstractBlackBox:
                     self.observer.observe(x_batch, f_batch, context)
 
             f_evals.append(f_batch)
+
+            # We update the number of evaluations.
+            self._num_evaluations += x_batch.shape[0]
 
         # Finally, we append the results of the batches.
         f = np.concatenate(f_evals, axis=0)
