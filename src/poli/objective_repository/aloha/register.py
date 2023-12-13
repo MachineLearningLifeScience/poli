@@ -38,6 +38,8 @@ class AlohaBlackBox(AbstractBlackBox):
         Flag indicating whether to parallelize the computation, by default False.
     num_workers : int, optional
         The number of workers to use for parallel computation, by default None.
+    evaluation_budget:  int, optional
+        The maximum number of function evaluations. Default is infinity.
 
     Attributes
     ----------
@@ -73,7 +75,7 @@ class AlohaBlackBox(AbstractBlackBox):
             Flag indicating whether to parallelize the processing, by default False.
         num_workers : int, optional
             The number of workers to use for parallel processing, by default None.
-        evaluation_budget:  int
+        evaluation_budget:  int, optional
             The maximum number of function evaluations. Default is infinity.
         """
         self.alphabet = {symbol: idx for idx, symbol in enumerate(info.alphabet)}
@@ -164,15 +166,15 @@ class AlohaProblemFactory(AbstractProblemFactory):
 
         Parameters:
         -----------
-        seed:  int
+        seed:  int, optional
             The seed for random number generation. Default is None.
-        batch_size:  int
+        batch_size:  int, optional
             The batch size for parallel evaluation. Default is None.
-        parallelize : bool
+        parallelize : bool, optional
             Flag indicating whether to parallelize the evaluation. Default is False.
-        num_workers:  int
+        num_workers:  int, optional
             The number of workers for parallel evaluation. Default is None.
-        evaluation_budget:  int
+        evaluation_budget:  int, optional
             The maximum number of function evaluations. Default is infinity.
 
         Returns:

@@ -80,7 +80,7 @@ class AbstractProblemFactory(metaclass=MetaProblemFactory):
             Flag indicating whether to parallelize the evaluation. Default is False.
         num_workers:  int
             The number of workers for parallel evaluation. Default is None.
-        evaluation_budget:  int
+        evaluation_budget:  int, optional
             The maximum number of function evaluations. Default is infinity.
 
         Returns:

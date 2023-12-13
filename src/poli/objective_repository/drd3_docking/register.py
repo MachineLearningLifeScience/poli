@@ -33,7 +33,7 @@ class DRD3BlackBox(TDCBlackBox):
         Flag indicating whether to parallelize execution, by default False.
     num_workers : int, optional
         The number of workers for parallel execution, by default None.
-    evaluation_budget:  int
+    evaluation_budget:  int, optional
         The maximum number of function evaluations. Default is infinity.
     from_smiles : bool, optional
         Flag indicating whether to use SMILES strings as input, by default True.
@@ -126,7 +126,7 @@ class DRD3ProblemFactory(AbstractProblemFactory):
             Whether to parallelize the docking process. Default is False.
         num_workers : int, optional
             Number of worker processes to use for parallelization. If None, the number of available CPU cores is used.
-        evaluation_budget:  int
+        evaluation_budget:  int, optional
             The maximum number of function evaluations. Default is infinity.
         string_representation : str, optional
             The string representation of the molecules. Must be either 'SMILES' or 'SELFIES'. Default is 'SMILES'.

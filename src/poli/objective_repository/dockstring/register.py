@@ -46,7 +46,7 @@ class DockstringBlackBox(AbstractBlackBox):
         Flag indicating whether to parallelize the computation, by default False.
     num_workers : int, optional
         The number of workers to use for parallel computation, by default None.
-    evaluation_budget:  int
+    evaluation_budget:  int, optional
         The maximum number of function evaluations. Default is infinity.
     target_name : str
         The name of the target protein.
@@ -96,7 +96,7 @@ class DockstringBlackBox(AbstractBlackBox):
             Flag indicating whether to parallelize the processing, by default False.
         num_workers : int, optional
             The number of workers to use for parallel processing, by default None.
-        evaluation_budget:  int
+        evaluation_budget:  int, optional
             The maximum number of function evaluations. Default is infinity.
         target_name : str
             The name of the target protein.
