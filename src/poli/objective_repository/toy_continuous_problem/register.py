@@ -37,6 +37,7 @@ class ToyContinuousBlackBox(AbstractBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
         function_name: str = None,
         n_dimensions: int = 2,
         embed_in: int = None,
@@ -61,6 +62,7 @@ class ToyContinuousBlackBox(AbstractBlackBox):
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
         )
 
     # The only method you have to define
@@ -91,6 +93,7 @@ class ToyContinuousProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
         function_name: str = None,
         n_dimensions: int = 2,
         embed_in: int = None,
@@ -109,6 +112,7 @@ class ToyContinuousProblemFactory(AbstractProblemFactory):
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
             function_name=function_name,
             n_dimensions=n_dimensions,
             embed_in=embed_in,

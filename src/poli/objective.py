@@ -28,7 +28,12 @@ def parse_factory_kwargs(factory_kwargs: str) -> dict:
             elif value.startswith("int:"):
                 value = int(value.strip("int:"))
             elif value.startswith("float:"):
-                value = float(value.strip("float:"))
+                if value == "float:inf":
+                    value = float("inf")
+                elif value == "float:-inf":
+                    value = float("-inf")
+                else:
+                    value = float(value.strip("float:"))
             elif value.startswith("bool:"):
                 value = value.strip("bool:") == "True"
             elif value.startswith("none:"):

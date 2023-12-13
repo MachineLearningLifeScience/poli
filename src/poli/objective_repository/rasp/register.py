@@ -75,6 +75,7 @@ class RaspBlackBox(AbstractBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
         wildtype_pdb_path: Union[Path, List[Path]] = None,
         chains_to_keep: List[str] = None,
         alphabet: List[str] = None,
@@ -94,6 +95,7 @@ class RaspBlackBox(AbstractBlackBox):
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
         )
 
         if alphabet is None:
@@ -319,6 +321,7 @@ class RaspProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
         wildtype_pdb_path: Union[Path, List[Path]] = None,
         alphabet: List[str] = None,
         experiment_id: str = None,
@@ -356,6 +359,7 @@ class RaspProblemFactory(AbstractProblemFactory):
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
             wildtype_pdb_path=wildtype_pdb_path,
             alphabet=alphabet,
             experiment_id=experiment_id,

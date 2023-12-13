@@ -34,13 +34,22 @@ class PenalizedLogPLamboBlackBox(AbstractBlackBox):
         self,
         info: ProblemSetupInformation,
         batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
+        evaluation_budget: int = float("inf"),
         from_smiles: bool = True,
         penalized: bool = True,
     ):
         """
         TODO: document
         """
-        super().__init__(info, batch_size)
+        super().__init__(
+            info=info,
+            batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
+        )
         self.from_smiles = from_smiles
         self.penalized = penalized
 
@@ -87,6 +96,10 @@ class PenalizedLogPLamboProblemFactory(AbstractProblemFactory):
     def create(
         self,
         seed: int = None,
+        batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
+        evaluation_budget: int = float("inf"),
         penalized: bool = True,
         string_representation: str = "SMILES",
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
@@ -102,6 +115,10 @@ class PenalizedLogPLamboProblemFactory(AbstractProblemFactory):
         problem_info = self.get_setup_information()
         f = PenalizedLogPLamboBlackBox(
             problem_info,
+            batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
             from_smiles=(string_representation.upper() == "SMILES"),
             penalized=penalized,
         )

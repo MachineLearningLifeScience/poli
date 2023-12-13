@@ -61,6 +61,8 @@ class FoldXStabilityBlackBox(FoldxBlackBox):
         Whether to parallelize the computation (default is False).
     num_workers : int, optional
         The number of workers for parallel processing (default is None).
+    evaluation_budget:  int, optional
+        The maximum number of function evaluations. Default is infinity.
     wildtype_pdb_path : Union[Path, List[Path]], required
         The path(s) to the wildtype PDB file(s) (default is None).
     alphabet : List[str], optional
@@ -85,6 +87,7 @@ class FoldXStabilityBlackBox(FoldxBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
         wildtype_pdb_path: Union[Path, List[Path]] = None,
         alphabet: List[str] = None,
         experiment_id: str = None,
@@ -96,6 +99,7 @@ class FoldXStabilityBlackBox(FoldxBlackBox):
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
             wildtype_pdb_path=wildtype_pdb_path,
             alphabet=alphabet,
             experiment_id=experiment_id,
@@ -191,6 +195,7 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
         wildtype_pdb_path: Union[Path, List[Path]] = None,
         alphabet: List[str] = None,
         experiment_id: str = None,
@@ -210,6 +215,8 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
             Whether to parallelize the computation.
         num_workers : int, optional
             Number of worker processes to use for parallel computation.
+        evaluation_budget:  int, optional
+            The maximum number of function evaluations. Default is infinity.
         wildtype_pdb_path : Union[Path, List[Path]], required
             Path(s) to the wildtype PDB file(s).
         alphabet : List[str], optional
@@ -269,6 +276,7 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
             wildtype_pdb_path=wildtype_pdb_path,
             alphabet=alphabet,
             experiment_id=experiment_id,

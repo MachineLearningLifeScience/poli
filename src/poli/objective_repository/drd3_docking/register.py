@@ -33,6 +33,8 @@ class DRD3BlackBox(TDCBlackBox):
         Flag indicating whether to parallelize execution, by default False.
     num_workers : int, optional
         The number of workers for parallel execution, by default None.
+    evaluation_budget:  int, optional
+        The maximum number of function evaluations. Default is infinity.
     from_smiles : bool, optional
         Flag indicating whether to use SMILES strings as input, by default True.
 
@@ -53,6 +55,7 @@ class DRD3BlackBox(TDCBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
         from_smiles: bool = True,
     ):
         oracle_name = "3pbl_docking"
@@ -62,6 +65,7 @@ class DRD3BlackBox(TDCBlackBox):
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
             from_smiles=from_smiles,
         )
 
@@ -106,6 +110,7 @@ class DRD3ProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
         string_representation: str = "SMILES",
     ) -> Tuple[TDCBlackBox, np.ndarray, np.ndarray]:
         """
@@ -121,6 +126,8 @@ class DRD3ProblemFactory(AbstractProblemFactory):
             Whether to parallelize the docking process. Default is False.
         num_workers : int, optional
             Number of worker processes to use for parallelization. If None, the number of available CPU cores is used.
+        evaluation_budget:  int, optional
+            The maximum number of function evaluations. Default is infinity.
         string_representation : str, optional
             The string representation of the molecules. Must be either 'SMILES' or 'SELFIES'. Default is 'SMILES'.
 
@@ -152,6 +159,7 @@ class DRD3ProblemFactory(AbstractProblemFactory):
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
             from_smiles=string_representation.upper() == "SMILES",
         )
 

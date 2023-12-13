@@ -84,6 +84,7 @@ class FoldxBlackBox(AbstractBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
         wildtype_pdb_path: Union[Path, List[Path]] = None,
         alphabet: List[str] = None,
         experiment_id: str = None,
@@ -103,6 +104,8 @@ class FoldxBlackBox(AbstractBlackBox):
             Flag indicating whether to parallelize the simulations. (default: False)
         num_workers : int, optional
             The number of workers for parallelization. (default: None)
+        evaluation_budget : int, optional
+            The evaluation budget. (default: float('inf'))
         wildtype_pdb_path : Union[Path, List[Path]], optional
             The path(s) to the wildtype PDB file(s). (default: None)
         alphabet : List[str], optional
@@ -129,6 +132,7 @@ class FoldxBlackBox(AbstractBlackBox):
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
         )
 
         # Defining the experiment id

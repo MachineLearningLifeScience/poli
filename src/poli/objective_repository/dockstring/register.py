@@ -46,6 +46,8 @@ class DockstringBlackBox(AbstractBlackBox):
         Flag indicating whether to parallelize the computation, by default False.
     num_workers : int, optional
         The number of workers to use for parallel computation, by default None.
+    evaluation_budget:  int, optional
+        The maximum number of function evaluations. Default is infinity.
     target_name : str
         The name of the target protein.
     string_representation : str
@@ -77,6 +79,7 @@ class DockstringBlackBox(AbstractBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
         target_name: str = None,
         string_representation: str = "SMILES",
     ):
@@ -93,6 +96,8 @@ class DockstringBlackBox(AbstractBlackBox):
             Flag indicating whether to parallelize the processing, by default False.
         num_workers : int, optional
             The number of workers to use for parallel processing, by default None.
+        evaluation_budget:  int, optional
+            The maximum number of function evaluations. Default is infinity.
         target_name : str
             The name of the target protein.
         string_representation : str
@@ -108,6 +113,7 @@ class DockstringBlackBox(AbstractBlackBox):
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
         )
         self.target_name = target_name
         self.string_representation = string_representation
@@ -182,6 +188,7 @@ class DockstringProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
         target_name: str = None,
         string_representation: str = "SMILES",
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
@@ -197,6 +204,7 @@ class DockstringProblemFactory(AbstractProblemFactory):
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
             target_name=target_name,
             string_representation=string_representation,
         )

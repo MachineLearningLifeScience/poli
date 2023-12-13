@@ -63,6 +63,7 @@ class LogPBlackBox(AbstractBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
         alphabet: List[str] = None,
         from_selfies: bool = False,
     ):
@@ -86,6 +87,7 @@ class LogPBlackBox(AbstractBlackBox):
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
         )
 
     # The only method you have to define
@@ -150,6 +152,7 @@ class LogPProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
         path_to_alphabet: Path = None,
         alphabet: List[str] = None,
         string_representation: str = "SMILES",
@@ -195,6 +198,7 @@ class LogPProblemFactory(AbstractProblemFactory):
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
             alphabet=self.alphabet,
             from_selfies=string_representation.upper() == "SELFIES",
         )

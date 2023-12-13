@@ -18,6 +18,7 @@ class GFPBlackBox(AbstractBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
         seed: int = None,
     ):
         gfp_df_path = Path(__file__).parent.resolve() / "assets" / "gfp_data.csv"
@@ -26,7 +27,7 @@ class GFPBlackBox(AbstractBlackBox):
         self.gfp_lookup_df = pd.read_csv(gfp_df_path)[
             ["medianBrightness", "aaSequence"]
         ]
-        super().__init__(info, batch_size, parallelize, num_workers)
+        super().__init__(info, batch_size, parallelize, num_workers, evaluation_budget)
 
     def _black_box(self, x: np.array, context=None) -> np.ndarray:
         """
@@ -70,6 +71,7 @@ class GFPSelectionProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         seed_numpy(seed)
         seed_python(seed)
@@ -79,6 +81,7 @@ class GFPSelectionProblemFactory(AbstractProblemFactory):
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
             seed=seed,
         )
 

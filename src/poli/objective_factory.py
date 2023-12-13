@@ -99,6 +99,7 @@ def __create_from_repository(
     batch_size: int = None,
     parallelize: bool = False,
     num_workers: int = None,
+    evaluation_budget: int = float("inf"),
     observer: AbstractObserver = None,
     **kwargs_for_factory,
 ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
@@ -118,6 +119,7 @@ def __create_from_repository(
         batch_size=batch_size,
         parallelize=parallelize,
         num_workers=num_workers,
+        evaluation_budget=evaluation_budget,
         **kwargs_for_factory,
     )
 
@@ -133,6 +135,7 @@ def __create_as_isolated_process(
     batch_size: int = None,
     parallelize: bool = False,
     num_workers: int = None,
+    evaluation_budget: int = float("inf"),
     **kwargs_for_factory,
 ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
     """
@@ -148,6 +151,7 @@ def __create_as_isolated_process(
     kwargs_for_factory["batch_size"] = batch_size
     kwargs_for_factory["parallelize"] = parallelize
     kwargs_for_factory["num_workers"] = num_workers
+    kwargs_for_factory["evaluation_budget"] = evaluation_budget
     process_wrapper = ProcessWrapper(
         config[name][_RUN_SCRIPT_LOCATION], **kwargs_for_factory
     )
@@ -221,6 +225,7 @@ def create(
     batch_size: int = None,
     parallelize: bool = False,
     num_workers: int = None,
+    evaluation_budget: int = float("inf"),
     **kwargs_for_factory,
 ) -> Tuple[ProblemSetupInformation, AbstractBlackBox, np.ndarray, np.ndarray, object]:
     """
@@ -262,6 +267,7 @@ def create(
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
             **kwargs_for_factory,
         )
         problem_info = f.info
@@ -287,6 +293,7 @@ def create(
         batch_size=batch_size,
         parallelize=parallelize,
         num_workers=num_workers,
+        evaluation_budget=evaluation_budget,
         **kwargs_for_factory,
     )
     problem_information = f.info

@@ -26,6 +26,7 @@ class SABlackBox(TDCBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
         from_smiles: bool = True,
     ):
         oracle_name = "SA"
@@ -35,6 +36,7 @@ class SABlackBox(TDCBlackBox):
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
             from_smiles=from_smiles,
         )
 
@@ -54,6 +56,7 @@ class SAProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
+        evaluation_budget: int = float("inf"),
         string_representation: str = "SMILES",
     ) -> Tuple[SABlackBox, np.ndarray, np.ndarray]:
         """
@@ -74,6 +77,7 @@ class SAProblemFactory(AbstractProblemFactory):
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
             from_smiles=string_representation.upper() == "SMILES",
         )
 
