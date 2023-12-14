@@ -114,7 +114,10 @@ class AlohaBlackBox(AbstractBlackBox):
             x = np.array([[inverse_alphabet[i] for i in x[0]]])
 
         matches = x == np.array(["A", "L", "O", "H", "A"])
-        return np.sum(matches.reshape(-1, 1), axis=0, keepdims=True)
+        values = np.sum(matches.reshape(x.shape[0], 5), axis=1, keepdims=True).reshape(
+            x.shape[0], 1
+        )
+        return values
 
 
 class AlohaProblemFactory(AbstractProblemFactory):
