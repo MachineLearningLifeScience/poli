@@ -56,6 +56,7 @@ class ToyContinuousBlackBox(AbstractBlackBox):
             n_dims=n_dimensions,
             embed_in=embed_in,
         )
+        self.bounds = self.function.limits
 
         super().__init__(
             info=info,
