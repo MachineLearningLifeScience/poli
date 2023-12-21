@@ -25,6 +25,7 @@ poli.objective\_repository.gfp\_select
 
 .. autosummary::
    :toctree:
+   :template: custom-module-template.rst
    :recursive:
 
    poli.objective_repository.gfp_select.register

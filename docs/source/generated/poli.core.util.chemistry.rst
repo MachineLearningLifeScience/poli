@@ -25,6 +25,7 @@ poli.core.util.chemistry
 
 .. autosummary::
    :toctree:
+   :template: custom-module-template.rst
    :recursive:
 
    poli.core.util.chemistry.string_to_molecule

@@ -16,6 +16,7 @@ poli.objective\_repository.toy\_continuous\_problem.register
    .. rubric:: Classes
 
    .. autosummary::
+    :toctree:
    
       ToyContinuousBlackBox
       ToyContinuousProblemFactory

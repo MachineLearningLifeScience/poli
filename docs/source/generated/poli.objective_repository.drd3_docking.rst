@@ -25,6 +25,7 @@ poli.objective\_repository.drd3\_docking
 
 .. autosummary::
    :toctree:
+   :template: custom-module-template.rst
    :recursive:
 
    poli.objective_repository.drd3_docking.register

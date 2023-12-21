@@ -20,6 +20,7 @@ poli.core.exceptions
    .. rubric:: Exceptions
 
    .. autosummary::
+    :toctree:
    
       BudgetExhaustedException
       PoliException

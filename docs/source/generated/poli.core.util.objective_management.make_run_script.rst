@@ -12,6 +12,7 @@ poli.core.util.objective\_management.make\_run\_script
    .. rubric:: Functions
 
    .. autosummary::
+    :toctree:
    
       make_observer_script
       make_run_script

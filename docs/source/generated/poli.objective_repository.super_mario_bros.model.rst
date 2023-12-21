@@ -12,6 +12,7 @@ poli.objective\_repository.super\_mario\_bros.model
    .. rubric:: Functions
 
    .. autosummary::
+    :toctree:
    
       load_example_model
    
@@ -22,6 +23,7 @@ poli.objective\_repository.super\_mario\_bros.model
    .. rubric:: Classes
 
    .. autosummary::
+    :toctree:
    
       VAEMario
    

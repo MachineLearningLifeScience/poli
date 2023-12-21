@@ -25,6 +25,7 @@ poli.objective\_repository.dockstring
 
 .. autosummary::
    :toctree:
+   :template: custom-module-template.rst
    :recursive:
 
    poli.objective_repository.dockstring.register

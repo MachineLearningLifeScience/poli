@@ -16,6 +16,7 @@ poli.objective\_repository.rdkit\_qed.register
    .. rubric:: Classes
 
    .. autosummary::
+    :toctree:
    
       QEDBlackBox
       QEDProblemFactory

@@ -16,6 +16,7 @@ poli.objective\_repository.rdkit\_logp.register
    .. rubric:: Classes
 
    .. autosummary::
+    :toctree:
    
       LogPBlackBox
       LogPProblemFactory

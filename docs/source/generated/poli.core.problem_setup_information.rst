@@ -16,6 +16,7 @@ poli.core.problem\_setup\_information
    .. rubric:: Classes
 
    .. autosummary::
+    :toctree:
    
       ProblemSetupInformation
    

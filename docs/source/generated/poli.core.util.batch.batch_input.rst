@@ -12,6 +12,7 @@ poli.core.util.batch.batch\_input
    .. rubric:: Functions
 
    .. autosummary::
+    :toctree:
    
       batched
    

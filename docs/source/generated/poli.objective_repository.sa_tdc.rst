@@ -25,6 +25,7 @@ poli.objective\_repository.sa\_tdc
 
 .. autosummary::
    :toctree:
+   :template: custom-module-template.rst
    :recursive:
 
    poli.objective_repository.sa_tdc.register

@@ -25,6 +25,7 @@ poli.objective\_repository.rdkit\_qed
 
 .. autosummary::
    :toctree:
+   :template: custom-module-template.rst
    :recursive:
 
    poli.objective_repository.rdkit_qed.register

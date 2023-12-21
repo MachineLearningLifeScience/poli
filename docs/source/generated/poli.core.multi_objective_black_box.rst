@@ -16,6 +16,7 @@ poli.core.multi\_objective\_black\_box
    .. rubric:: Classes
 
    .. autosummary::
+    :toctree:
    
       MultiObjectiveBlackBox
    

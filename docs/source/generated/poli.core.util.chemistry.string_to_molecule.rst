@@ -12,6 +12,7 @@ poli.core.util.chemistry.string\_to\_molecule
    .. rubric:: Functions
 
    .. autosummary::
+    :toctree:
    
       selfies_to_molecules
       smiles_to_molecules

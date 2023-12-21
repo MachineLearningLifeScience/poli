@@ -12,6 +12,7 @@ poli.core.util.observer\_wrapper
    .. rubric:: Functions
 
    .. autosummary::
+    :toctree:
    
       start_observer_process
    

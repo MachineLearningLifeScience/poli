@@ -25,6 +25,7 @@ poli.core.chemistry
 
 .. autosummary::
    :toctree:
+   :template: custom-module-template.rst
    :recursive:
 
    poli.core.chemistry.tdc_black_box

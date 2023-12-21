@@ -16,6 +16,7 @@ poli.objective\_repository.aloha.register
    .. rubric:: Classes
 
    .. autosummary::
+    :toctree:
    
       AlohaBlackBox
       AlohaProblemFactory

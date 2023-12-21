@@ -16,6 +16,7 @@ poli.core.abstract\_black\_box
    .. rubric:: Classes
 
    .. autosummary::
+    :toctree:
    
       AbstractBlackBox
       NegativeBlackBox

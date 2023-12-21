@@ -25,6 +25,7 @@ poli.core.util.inter\_process\_communication
 
 .. autosummary::
    :toctree:
+   :template: custom-module-template.rst
    :recursive:
 
    poli.core.util.inter_process_communication.process_wrapper

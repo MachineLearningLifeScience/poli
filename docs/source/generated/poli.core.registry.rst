@@ -12,6 +12,7 @@ poli.core.registry
    .. rubric:: Functions
 
    .. autosummary::
+    :toctree:
    
       delete_observer_run_script
       delete_problem

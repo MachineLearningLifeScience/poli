@@ -25,6 +25,7 @@ poli.objective\_repository.super\_mario\_bros
 
 .. autosummary::
    :toctree:
+   :template: custom-module-template.rst
    :recursive:
 
    poli.objective_repository.super_mario_bros.level_utils

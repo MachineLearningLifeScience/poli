@@ -16,6 +16,7 @@ poli.core.abstract\_problem\_factory
    .. rubric:: Classes
 
    .. autosummary::
+    :toctree:
    
       AbstractProblemFactory
       MetaProblemFactory

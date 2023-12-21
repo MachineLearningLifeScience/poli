@@ -16,6 +16,7 @@ poli.objective\_repository.white\_noise.register
    .. rubric:: Classes
 
    .. autosummary::
+    :toctree:
    
       WhiteNoiseBlackBox
       WhiteNoiseProblemFactory

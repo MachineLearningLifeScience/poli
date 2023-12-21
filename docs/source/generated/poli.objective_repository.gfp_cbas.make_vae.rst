@@ -12,6 +12,7 @@ poli.objective\_repository.gfp\_cbas.make\_vae
    .. rubric:: Functions
 
    .. autosummary::
+    :toctree:
    
       build_vae
       identity_loss
@@ -24,6 +25,7 @@ poli.objective\_repository.gfp\_cbas.make\_vae
    .. rubric:: Classes
 
    .. autosummary::
+    :toctree:
    
       BaseVAE
       SimpleVAE

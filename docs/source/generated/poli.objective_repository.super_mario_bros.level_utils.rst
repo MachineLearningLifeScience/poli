@@ -12,6 +12,7 @@ poli.objective\_repository.super\_mario\_bros.level\_utils
    .. rubric:: Functions
 
    .. autosummary::
+    :toctree:
    
       add_padding_to_level
       clean_level

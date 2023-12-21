@@ -10,7 +10,8 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
+import os
+
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 import pathlib
@@ -18,6 +19,9 @@ import sys
 
 path_to_poli = (pathlib.Path(__file__).parents[2].resolve() / "src").as_posix()
 sys.path.insert(0, path_to_poli)
+
+for x in os.walk(path_to_poli):
+    sys.path.insert(0, x[0])
 
 
 # -- Project information -----------------------------------------------------
@@ -41,6 +45,8 @@ extensions = [
     "sphinx.ext.napoleon",
 ]
 autosummary_generate = True  # Turn on sphinx.ext.autosummary
+
+autodoc_mock_imports = ["biopython", "Bio"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]

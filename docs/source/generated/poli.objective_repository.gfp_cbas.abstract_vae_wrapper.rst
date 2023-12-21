@@ -16,6 +16,7 @@ poli.objective\_repository.gfp\_cbas.abstract\_vae\_wrapper
    .. rubric:: Classes
 
    .. autosummary::
+    :toctree:
    
       AbstractVAEWrapper
    

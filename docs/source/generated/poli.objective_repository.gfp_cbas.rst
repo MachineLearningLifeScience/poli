@@ -25,6 +25,7 @@ poli.objective\_repository.gfp\_cbas
 
 .. autosummary::
    :toctree:
+   :template: custom-module-template.rst
    :recursive:
 
    poli.objective_repository.gfp_cbas.abstract_vae_wrapper

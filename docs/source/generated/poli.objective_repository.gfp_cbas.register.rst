@@ -16,6 +16,7 @@ poli.objective\_repository.gfp\_cbas.register
    .. rubric:: Classes
 
    .. autosummary::
+    :toctree:
    
       GFPCBasBlackBox
       GFPCBasProblemFactory

@@ -25,6 +25,7 @@ poli.objective\_repository.white\_noise
 
 .. autosummary::
    :toctree:
+   :template: custom-module-template.rst
    :recursive:
 
    poli.objective_repository.white_noise.register

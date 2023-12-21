@@ -12,6 +12,7 @@ poli.core.util.proteins.pdb\_parsing
    .. rubric:: Functions
 
    .. autosummary::
+    :toctree:
    
       parse_pdb_as_residue_strings
       parse_pdb_as_residues

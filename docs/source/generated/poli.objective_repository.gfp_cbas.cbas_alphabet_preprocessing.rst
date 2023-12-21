@@ -12,6 +12,7 @@ poli.objective\_repository.gfp\_cbas.cbas\_alphabet\_preprocessing
    .. rubric:: Functions
 
    .. autosummary::
+    :toctree:
    
       convert_aas_to_idx_array
       convert_idx_array_to_aas

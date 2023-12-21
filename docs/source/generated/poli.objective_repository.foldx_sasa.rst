@@ -25,6 +25,7 @@ poli.objective\_repository.foldx\_sasa
 
 .. autosummary::
    :toctree:
+   :template: custom-module-template.rst
    :recursive:
 
    poli.objective_repository.foldx_sasa.foldx_utils

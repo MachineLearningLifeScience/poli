@@ -16,6 +16,7 @@ poli.objective\_repository.toy\_continuous\_problem.toy\_continuous\_problem
    .. rubric:: Classes
 
    .. autosummary::
+    :toctree:
    
       ToyContinuousProblem
    

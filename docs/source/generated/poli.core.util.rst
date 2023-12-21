@@ -25,6 +25,7 @@ poli.core.util
 
 .. autosummary::
    :toctree:
+   :template: custom-module-template.rst
    :recursive:
 
    poli.core.util.abstract_observer

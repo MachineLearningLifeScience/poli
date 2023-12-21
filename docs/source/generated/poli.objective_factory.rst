@@ -12,6 +12,7 @@
    .. rubric:: Functions
 
    .. autosummary::
+    :toctree:
    
       create
       load_config
@@ -24,6 +25,7 @@
    .. rubric:: Classes
 
    .. autosummary::
+    :toctree:
    
       ExternalBlackBox
    

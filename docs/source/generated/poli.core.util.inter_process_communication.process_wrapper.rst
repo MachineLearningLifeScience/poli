@@ -12,6 +12,7 @@ poli.core.util.inter\_process\_communication.process\_wrapper
    .. rubric:: Functions
 
    .. autosummary::
+    :toctree:
    
       get_connection
    
@@ -22,6 +23,7 @@ poli.core.util.inter\_process\_communication.process\_wrapper
    .. rubric:: Classes
 
    .. autosummary::
+    :toctree:
    
       ProcessWrapper
    

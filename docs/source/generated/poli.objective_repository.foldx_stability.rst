@@ -25,6 +25,7 @@ poli.objective\_repository.foldx\_stability
 
 .. autosummary::
    :toctree:
+   :template: custom-module-template.rst
    :recursive:
 
    poli.objective_repository.foldx_stability.foldx_utils

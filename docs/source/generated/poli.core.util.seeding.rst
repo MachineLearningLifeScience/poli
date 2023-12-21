@@ -25,6 +25,7 @@ poli.core.util.seeding
 
 .. autosummary::
    :toctree:
+   :template: custom-module-template.rst
    :recursive:
 
    poli.core.util.seeding.seeding

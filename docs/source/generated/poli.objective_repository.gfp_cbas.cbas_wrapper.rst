@@ -16,6 +16,7 @@ poli.objective\_repository.gfp\_cbas.cbas\_wrapper
    .. rubric:: Classes
 
    .. autosummary::
+    :toctree:
    
       CBASVAEWrapper
       ConvertedTorchVaeDecoder

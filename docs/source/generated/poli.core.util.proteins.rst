@@ -25,6 +25,7 @@ poli.core.util.proteins
 
 .. autosummary::
    :toctree:
+   :template: custom-module-template.rst
    :recursive:
 
    poli.core.util.proteins.defaults

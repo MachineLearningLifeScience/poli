@@ -16,6 +16,7 @@ poli.core.util.external\_observer
    .. rubric:: Classes
 
    .. autosummary::
+    :toctree:
    
       ExternalObserver
    

@@ -12,6 +12,7 @@ poli.core.util.proteins.mutations
    .. rubric:: Functions
 
    .. autosummary::
+    :toctree:
    
       edits_between_strings
       find_closest_wildtype_pdb_file_to_mutant

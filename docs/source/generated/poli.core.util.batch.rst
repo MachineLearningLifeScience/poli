@@ -25,6 +25,7 @@ poli.core.util.batch
 
 .. autosummary::
    :toctree:
+   :template: custom-module-template.rst
    :recursive:
 
    poli.core.util.batch.batch_input

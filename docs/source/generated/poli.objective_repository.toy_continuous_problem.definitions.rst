@@ -12,6 +12,7 @@ poli.objective\_repository.toy\_continuous\_problem.definitions
    .. rubric:: Functions
 
    .. autosummary::
+    :toctree:
    
       ackley_function_01
       alpine_01

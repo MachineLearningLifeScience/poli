@@ -16,6 +16,7 @@ poli.core.util.abstract\_observer
    .. rubric:: Classes
 
    .. autosummary::
+    :toctree:
    
       AbstractObserver
    
