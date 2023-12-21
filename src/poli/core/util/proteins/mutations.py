@@ -173,13 +173,13 @@ def find_closest_wildtype_pdb_file_to_mutant(
         If True, return the hamming distance along with the best candidate PDB file.
         Default is False.
 
-    Returns:
+    Returns
     -------
     Union[Path, Tuple[Path, int]]
         If return_hamming_distance is True, returns a tuple containing the best candidate PDB file
         and the hamming distance. Otherwise, returns the best candidate PDB file.
 
-    Raises:
+    Raises
     ------
     ValueError
         If no PDB file of the same length as the mutated residue string is found.

@@ -76,12 +76,8 @@ class DRD3ProblemFactory(AbstractProblemFactory):
 
     This class provides methods for creating DRD3 docking problems and retrieving setup information.
 
-    Attributes:
-    ----------
-        None
-
-    Methods:
-    -------
+    Methods
+    ------
     get_setup_information:
         Retrieves the setup information for the problem.
     create:
@@ -92,7 +88,7 @@ class DRD3ProblemFactory(AbstractProblemFactory):
         """
         Retrieves the setup information for the problem.
 
-        Returns:
+        Returns
         --------
         problem_info: ProblemSetupInformation
             The setup information for the problem.
@@ -131,12 +127,12 @@ class DRD3ProblemFactory(AbstractProblemFactory):
         string_representation : str, optional
             The string representation of the molecules. Must be either 'SMILES' or 'SELFIES'. Default is 'SMILES'.
 
-        Returns:
+        Returns
         -------
         Tuple[TDCBlackBox, np.ndarray, np.ndarray]
             A tuple containing the TDCBlackBox object, the initial input array, and the output array.
 
-        Raises:
+        Raises
         ------
         ValueError
             If the string_representation is not 'SMILES' or 'SELFIES'.

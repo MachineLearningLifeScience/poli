@@ -132,7 +132,7 @@ class FoldxInterface:
             If True, heteroatoms will be removed from the repaired PDB file using pdbtools.
             Default is True.
 
-        Raises:
+        Raises
         ------
         RuntimeError
             If FoldX fails to repair the PDB file.
@@ -209,7 +209,7 @@ class FoldxInterface:
         pdb_file : Path
             The path to the PDB file to be repaired.
 
-        Returns:
+        Returns
         -------
         repaired_path: Path
             The path to the repaired PDB file.
@@ -253,7 +253,7 @@ class FoldxInterface:
             The list of mutations to simulate. If None, we simulate
             the wildtype. Default is None.
 
-        Raises:
+        Raises
         ------
         AssertionError
             If the number of mutations is not 0 or 1.
@@ -337,12 +337,12 @@ class FoldxInterface:
         pdb_file : Path
             The path to the PDB file to be repaired.
 
-        Returns:
+        Returns
         -------
         energy: float
             The change of energy (ddG) of the mutated structure.
 
-        Raises:
+        Raises
         ------
         AssertionError
             If the results file was not generated.
@@ -366,7 +366,7 @@ class FoldxInterface:
         pdb_file : Path
             The path to the PDB file to be repaired.
 
-        Returns:
+        Returns
         -------
         sasa_score: float
             The SASA score of the mutated structure.
@@ -394,13 +394,13 @@ class FoldxInterface:
         mutations : List[str], optional
             A list of mutations to be simulated. Only single mutations are supported. Pass no mutations to compute the energy of the wildtype.
 
-        Returns:
+        Returns
         -------
         float
             The stability of the protein structure (defined as the negative
             change in energy).
 
-        Raises:
+        Raises
         ------
         AssertionError
             If the number of mutations is not 0 or 1.
@@ -430,12 +430,12 @@ class FoldxInterface:
             A list of mutations to be simulated on the protein structure. Only single mutations are supported.
             Pass no mutations if you want to compute the SASA of the wildtype.
 
-        Returns:
+        Returns
         -------
         float
             The computed SASA score.
 
-        Raises:
+        Raises
         ------
         AssertionError
             If the number of mutations is not 0 or 1.

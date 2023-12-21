@@ -41,8 +41,8 @@ class TDCBlackBox(AbstractBlackBox):
     from_smiles : bool, optional
         Flag indicating whether the input molecules are in SMILES format. Defaults to True.
 
-    Attributes:
-    -----------
+    Attributes
+    ----------
     oracle : Oracle
         An instance of the Oracle class from TDC.
     from_smiles : bool
@@ -94,7 +94,7 @@ class TDCBlackBox(AbstractBlackBox):
         context : any, optional
             Additional context information. Defaults to None.
 
-        Returns:
+        Returns
         --------
         scores : array-like
             An array of docking scores computed for each input molecule.

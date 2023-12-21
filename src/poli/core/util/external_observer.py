@@ -60,7 +60,7 @@ class ExternalObserver(AbstractObserver):
         context: object
             Additional context for the observation.
 
-        Raises:
+        Raises
         -------
         Exception:
             If the underlying observer process raises an exception.

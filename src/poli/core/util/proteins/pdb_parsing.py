@@ -28,7 +28,7 @@ def parse_pdb_as_structure(
     verbose : bool, optional
         If True, print the progress of the parsing. Defaults to False.
 
-    Returns:
+    Returns
     --------
     PDB.Structure.Structure
         The parsed structure.
@@ -52,7 +52,7 @@ def parse_pdb_as_residues(
     verbose: bool, optional
         Whether to print verbose output. Defaults to False.
 
-    Returns:
+    Returns
     --------
         residues: List[Residue]
             A list of Residue objects representing the parsed PDB file.
@@ -76,7 +76,7 @@ def parse_pdb_as_residue_strings(
     verbose : bool, optional
         Whether to print verbose output, by default False.
 
-    Returns:
+    Returns
     -------
     List[str]
         A list of residue strings.

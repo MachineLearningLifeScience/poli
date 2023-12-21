@@ -26,18 +26,18 @@ class MultiObjectiveBlackBox(AbstractBlackBox):
     objective_functions : List[AbstractBlackBox], required
         The list of objective functions to be evaluated. Defaults to None.
 
-    Attributes:
-    -----------
+    Attributes
+    ----------
     objective_functions : List[AbstractBlackBox]
         The list of objective functions to be evaluated.
 
-    Methods:
-    --------
+    Methods
+    -------
     _black_box(x, context=None)
         Evaluate the black box function for the given input.
 
-    Raises:
-    -------
+    Raises
+    ------
     ValueError
         If objective_functions is not provided as a list of AbstractBlackBox
         instances or inherited classes.
@@ -66,7 +66,7 @@ class MultiObjectiveBlackBox(AbstractBlackBox):
         objective_functions : List[AbstractBlackBox], required
             The list of objective functions. Defaults to None.
 
-        Raises:
+        Raises
         -------
         ValueError:
             If objective_functions is not provided as a list of AbstractBlackBox instances or inherited classes.
@@ -91,7 +91,7 @@ class MultiObjectiveBlackBox(AbstractBlackBox):
         context : any, optional
             Additional context information for the evaluation.
 
-        Returns:
+        Returns
         --------
             array-like: The concatenated results of evaluating the objective functions on the input.
         """

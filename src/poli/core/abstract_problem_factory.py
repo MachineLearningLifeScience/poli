@@ -31,12 +31,8 @@ class AbstractProblemFactory(metaclass=MetaProblemFactory):
 
     This class defines the interface for creating problem instances in the POLI framework.
 
-    Attributes:
-    -----------
-        None
-
-    Methods:
-    --------
+    Methods
+    -------
     get_setup_information:
         Returns the setup information for the problem.
     create:
@@ -47,12 +43,12 @@ class AbstractProblemFactory(metaclass=MetaProblemFactory):
         """
         Returns the setup information for the problem.
 
-        Returns:
+        Returns
         --------
         problem_info: ProblemSetupInformation
             The setup information for the problem.
 
-        Raises:
+        Raises
         -------
         NotImplementedError:
             This method is abstract and must be implemented by subclasses.
@@ -83,13 +79,13 @@ class AbstractProblemFactory(metaclass=MetaProblemFactory):
         evaluation_budget:  int, optional
             The maximum number of function evaluations. Default is infinity.
 
-        Returns:
+        Returns
         --------
             results: Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
                 A tuple containing the blackbox function, initial observations for
                 input variables, and initial observations for output variables.
 
-        Raises:
+        Raises
         -------
             NotImplementedError: This method is abstract and must be implemented by subclasses.
 

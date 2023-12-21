@@ -105,7 +105,7 @@ class FoldXSASABlackBox(FoldxBlackBox):
         context : None
             The context for the black box computation.
 
-        Returns:
+        Returns
         --------
         np.ndarray
             The computed SASA score(s) as a numpy array.
@@ -148,8 +148,8 @@ class FoldXSASAProblemFactory(AbstractProblemFactory):
     """
     Factory class for creating FoldX SASA (Solvent Accessible Surface Area) problems.
 
-    Methods:
-    --------
+    Methods
+    -------
     get_setup_information:
         Returns the setup information for the problem.
     create:
@@ -222,12 +222,12 @@ class FoldXSASAProblemFactory(AbstractProblemFactory):
         eager_repair : bool, optional
             Flag indicating whether to perform eager repair.
 
-        Returns:
+        Returns
         -------
         Tuple[AbstractBlackBox, np.ndarray, np.ndarray]
             A tuple containing the FoldXSASABlackBox object, the initial wildtype sequences, and the initial fitness values.
 
-        Raises:
+        Raises
         ------
         ValueError
             If wildtype_pdb_path is missing or has an invalid type.

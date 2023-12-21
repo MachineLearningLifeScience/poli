@@ -100,7 +100,7 @@ class AlohaBlackBox(AbstractBlackBox):
         context : dict, optional
             Additional context information (default is None).
 
-        Returns:
+        Returns
         -------
         y: np.ndarray
             Array of shape [b, 1] containing the distances to the sequence "ALOHA".
@@ -141,7 +141,7 @@ class AlohaProblemFactory(AbstractProblemFactory):
         """
         Returns the setup information for the problem.
 
-        Returns:
+        Returns
         --------
         problem_info: ProblemSetupInformation
             The setup information for the problem.
@@ -180,7 +180,7 @@ class AlohaProblemFactory(AbstractProblemFactory):
         evaluation_budget:  int, optional
             The maximum number of function evaluations. Default is infinity.
 
-        Returns:
+        Returns
         --------
         results: Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
             A tuple containing the blackbox function, initial observations

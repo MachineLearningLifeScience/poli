@@ -53,7 +53,7 @@ class ProblemSetupInformation:
     def as_dict(self) -> dict:
         """Returns all attributes as a dictionary.
 
-        Returns:
+        Returns
         --------
         dict
             A dictionary of all attributes.

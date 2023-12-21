@@ -56,8 +56,8 @@ class FoldxBlackBox(AbstractBlackBox):
     eager_repair : bool, optional
         Flag indicating whether to eagerly repair the PDB files. (default: False)
 
-    Attributes:
-    -----------
+    Attributes
+    ----------
     experiment_id : str
         The experiment ID.
     tmp_folder : Path
@@ -71,8 +71,8 @@ class FoldxBlackBox(AbstractBlackBox):
     wildtype_residue_strings : List[str]
         The list of wildtype residue strings for each PDB file.
 
-    Methods:
-    --------
+    Methods
+    -------
     create_working_directory() -> Path:
         Creates and returns the working directory path for the black box.
 
@@ -202,7 +202,7 @@ class FoldxBlackBox(AbstractBlackBox):
         """
         Create and return the working directory path for the black box.
 
-        Returns:
+        Returns
         --------
         Path
             The path to the working directory.

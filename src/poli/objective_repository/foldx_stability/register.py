@@ -233,7 +233,7 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
         Tuple[AbstractBlackBox, np.ndarray, np.ndarray]
             A tuple containing the created black box function, the initial sequence(s), and the initial fitness value(s).
 
-        Raises:
+        Raises
         ------
         ValueError
             If wildtype_pdb_path is missing or has an invalid type.

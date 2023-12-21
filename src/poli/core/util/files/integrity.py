@@ -21,7 +21,7 @@ def compute_md5_from_filepath(filepath: Path, read_mode: str = "rb") -> str:
     read_mode : str, optional
         The mode in which the file will be opened. Default is 'rb' (read in binary mode).
 
-    Returns:
+    Returns
     -------
     str
         The MD5 hex digest of the file.
