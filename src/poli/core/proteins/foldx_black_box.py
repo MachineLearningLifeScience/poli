@@ -35,7 +35,7 @@ class FoldxBlackBox(AbstractBlackBox):
     """
     A class representing the FoldxBlackBox, which is used for simulating protein mutations using FoldX.
 
-    Parameters:
+    Parameters
     -----------
     info : ProblemSetupInformation, required
         The problem setup information object. (default: None)
@@ -94,7 +94,7 @@ class FoldxBlackBox(AbstractBlackBox):
         """
         Initialize the FoldxBlackBox.
 
-        Parameters:
+        Parameters
         -----------
         info : ProblemSetupInformation, optional
             The problem setup information object. (default: None)

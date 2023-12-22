@@ -42,7 +42,7 @@ class FoldXStabilityAndSASABlackBox(FoldxBlackBox):
     """
     A black box implementation for computing the solvent accessible surface area (SASA) score using FoldX.
 
-    Parameters:
+    Parameters
     -----------
     info : ProblemSetupInformation, optional
         The problem setup information. Default is None.
@@ -101,7 +101,7 @@ class FoldXStabilityAndSASABlackBox(FoldxBlackBox):
         Since the goal is MINIMIZING the energy,
         we return the negative of the total energy.
 
-        Parameters:
+        Parameters
         -----------
         x : np.ndarray
             The input array representing the mutations.
@@ -202,7 +202,7 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
         """
         Create a FoldXSASABlackBox object and compute the initial values of wildtypes.
 
-        Parameters:
+        Parameters
         ----------
         seed : int, optional
             Seed for random number generators. If None is passed,

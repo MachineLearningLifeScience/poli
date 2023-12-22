@@ -24,7 +24,7 @@ class TDCBlackBox(AbstractBlackBox):
     TDC (Therapeutics Data Commons) problems.
     It inherits from the AbstractBlackBox class.
 
-    Parameters:
+    Parameters
     -----------
     oracle_name : str
         The name of the oracle used for computing the docking score.
@@ -87,7 +87,7 @@ class TDCBlackBox(AbstractBlackBox):
         we concatenate them and then
         compute the docking score.
 
-        Parameters:
+        Parameters
         -----------
         x : array-like
             An array of strings representing the input molecules.

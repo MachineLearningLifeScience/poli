@@ -112,7 +112,7 @@ class DRD3ProblemFactory(AbstractProblemFactory):
         """
         Create a TDCBlackBox object for DRD3 docking.
 
-        Parameters:
+        Parameters
         ----------
         seed : int, optional
             Seed for random number generators. If None, no seed is set.

@@ -66,7 +66,7 @@ class AbstractProblemFactory(metaclass=MetaProblemFactory):
         """
         Returns a blackbox function and initial observations.
 
-        Parameters:
+        Parameters
         -----------
         seed:  int
             The seed for random number generation. Default is None.

@@ -35,7 +35,7 @@ class AbstractObserver:
         """
         Observe the given data points.
 
-        Parameters:
+        Parameters
         ----------
         x: np.ndarray
             The input data points.

@@ -92,7 +92,7 @@ class AlohaBlackBox(AbstractBlackBox):
         """
         Compute the distance of x to the sequence "ALOHA".
 
-        Parameters:
+        Parameters
         ----------
         x : np.ndarray
             Input array of shape [b, 5] containing strings or integers.
@@ -167,7 +167,7 @@ class AlohaProblemFactory(AbstractProblemFactory):
         """
         Returns an Aloha blackbox function and initial observations.
 
-        Parameters:
+        Parameters
         -----------
         seed:  int, optional
             The seed for random number generation. Default is None.

@@ -163,7 +163,7 @@ def find_closest_wildtype_pdb_file_to_mutant(
     """
     Find the closest wildtype PDB file to a given mutant residue string.
 
-    Parameters:
+    Parameters
     ----------
     wildtype_pdb_files : List[Path]
         A list of paths to wildtype PDB files.

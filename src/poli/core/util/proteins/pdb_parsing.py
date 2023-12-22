@@ -18,7 +18,7 @@ def parse_pdb_as_structure(
     The parsing is done quietly by default,
     but you can set verbose=True to get some output.
 
-    Parameters:
+    Parameters
     -----------
     path_to_pdb : Path
         The path to the PDB file.
@@ -43,7 +43,7 @@ def parse_pdb_as_residues(
     """
     Parse a PDB file and return a list of Residue objects.
 
-    Parameters:
+    Parameters
     -----------
     path_to_pdb: Path
         The path to the PDB file.
@@ -67,7 +67,7 @@ def parse_pdb_as_residue_strings(
     """
     Parse a PDB file and return a list of residue strings.
 
-    Parameters:
+    Parameters
     ----------
     path_to_pdb : Path
         The path to the PDB file.

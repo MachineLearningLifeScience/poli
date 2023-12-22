@@ -14,7 +14,7 @@ def compute_md5_from_filepath(filepath: Path, read_mode: str = "rb") -> str:
     Computes the MD5 hex digest from a filepath,
     opening it in binary form by default.
 
-    Parameters:
+    Parameters
     ----------
     filepath : Path
         The path to the file for which the MD5 digest will be computed.

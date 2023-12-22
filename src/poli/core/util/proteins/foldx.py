@@ -119,7 +119,7 @@ class FoldxInterface:
         Repairs a PDB file with FoldX, overwriting
         the original file if remove_and_rename is True (default: False).
 
-        Parameters:
+        Parameters
         ----------
         pdb_file : Union[str, Path]
             The path to the PDB file to be repaired.
@@ -204,7 +204,7 @@ class FoldxInterface:
         then we repair it and return the path of the repaired
         pdb. Otherwise, we return the same path as the input.
 
-        Parameters:
+        Parameters
         ----------
         pdb_file : Path
             The path to the PDB file to be repaired.
@@ -245,7 +245,7 @@ class FoldxInterface:
         e.g. ["MA0A"] means that the first residue in the chain
         is mutated from M to A.
 
-        Parameters:
+        Parameters
         ----------
         pdb_file : Path
             The path to the PDB file to be repaired.
@@ -332,7 +332,7 @@ class FoldxInterface:
         assuming that there was a single mutation.
         TODO: add support for multiple mutations.
 
-        Parameters:
+        Parameters
         ----------
         pdb_file : Path
             The path to the PDB file to be repaired.
@@ -361,7 +361,7 @@ class FoldxInterface:
         This method computes the SASA from a FoldX results file,
         assuming that there was a single mutation.
 
-        Parameters:
+        Parameters
         ----------
         pdb_file : Path
             The path to the PDB file to be repaired.
@@ -387,7 +387,7 @@ class FoldxInterface:
         """
         Compute the stability of a protein structure using FoldX.
 
-        Parameters:
+        Parameters
         ----------
         pdb_file : Path
             The path to the PDB file of the protein structure.
@@ -422,7 +422,7 @@ class FoldxInterface:
         """
         Compute the solvent-accessible surface area (SASA) score for a given protein structure.
 
-        Parameters:
+        Parameters
         ----------
         pdb_file : Path
             The path to the PDB file of the protein structure.
@@ -455,7 +455,7 @@ class FoldxInterface:
         """Computes stability and sasa with a single foldx run,
         instead of two separate runs.
 
-        Parameters:
+        Parameters
         ----------
         pdb_file : Path
             The path to the PDB file of the protein structure.
@@ -478,7 +478,7 @@ class FoldxInterface:
     def copy_foldx_files(self, pdb_file: Path):
         """Copies the rotabase and pdb file to the working directory.
 
-        Parameters:
+        Parameters
         ----------
         pdb_file : Path
             The path to the PDB file of the protein structure.
@@ -499,7 +499,7 @@ class FoldxInterface:
         """Writes the list of mutations to a file
         in the given directory.
 
-        Parameters:
+        Parameters
         ----------
         wildtype_resiudes : List[Residue]
             The list of wildtype residues.

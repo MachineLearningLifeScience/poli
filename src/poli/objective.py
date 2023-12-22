@@ -1,3 +1,4 @@
+"""Utilities for instantiating and running objective functions in isolated enviroments."""
 import logging
 import os
 import sys

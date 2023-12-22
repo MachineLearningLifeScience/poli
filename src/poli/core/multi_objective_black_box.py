@@ -17,7 +17,7 @@ class MultiObjectiveBlackBox(AbstractBlackBox):
     by concatenating the results of evaluating individual
     objective functions.
 
-    Parameters:
+    Parameters
     -----------
     info : ProblemSetupInformation
         The problem setup information.
@@ -57,7 +57,7 @@ class MultiObjectiveBlackBox(AbstractBlackBox):
         """
         Initialize the MultiObjectiveBlackBox class.
 
-        Parameters:
+        Parameters
         -----------
         info : ProblemSetupInformation
             The problem setup information.
@@ -84,7 +84,7 @@ class MultiObjectiveBlackBox(AbstractBlackBox):
         """
         Evaluate the black box function for a given input.
 
-        Parameters:
+        Parameters
         -----------
         x : np.ndarray
             The input values to evaluate the black box function.

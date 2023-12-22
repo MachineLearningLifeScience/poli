@@ -6,7 +6,7 @@ def seed_numpy(seed: int = None) -> None:
     """
     Seed the NumPy random number generator.
 
-    Parameters:
+    Parameters
     ----------
     seed : int, optional
         Seed value for the random number generator. If None, the generator is initialized with a random seed.
@@ -23,7 +23,7 @@ def seed_python(seed: int = None) -> None:
     Seed the random number generator for Python.
 
 
-    Parameters:
+    Parameters
     ----------
     seed : int, optional
         Seed value for the random number generator. If None, the generator is initialized with a random seed.
