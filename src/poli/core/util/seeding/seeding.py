@@ -11,10 +11,6 @@ def seed_numpy(seed: int = None) -> None:
     ----------
     seed : int, optional
         Seed value for the random number generator. If None, then no seeding is performed.
-
-    Examples:
-    ---------
-    >>> seed_numpy(123)
     """
     if seed is not None:
         np.random.seed(seed)
@@ -44,7 +40,10 @@ def seed_torch(seed: int = None) -> None:
     seed : int, optional
         Seed value for the random number generator. If None, no seeding is performed.
     """
-    import torch
+    try:
+        import torch
+    except ImportError:
+        return
 
     if seed is not None:
         torch.manual_seed(seed)

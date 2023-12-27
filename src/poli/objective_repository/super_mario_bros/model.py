@@ -1,7 +1,5 @@
 """
 A categorical VAE that can train on Mario.
-
-The notation very much follows the original VAE paper.
 """
 from typing import Tuple
 from pathlib import Path

@@ -1,13 +1,10 @@
-"""
+"""Defines several continuous toy problems.
+
 This script defines all the artificial landscapes with
 signature [np.ndarray] -> np.ndarray. You might
 see that the signs have been flipped from [1] or [2]. This is
 because we're dealing with maximizations instead of
 minimizations.
-
-In what follows, x is a tensor of arbitrary dimension
-(either (b, d), or (d,), where d is the dimension of
-the design space).
 
 [1] Ali R. Al-Roomi (2015). Unconstrained Single-Objective Benchmark
     Functions Repository [https://www.al-roomi.org/benchmarks/unconstrained].

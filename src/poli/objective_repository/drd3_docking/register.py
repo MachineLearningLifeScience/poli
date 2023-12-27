@@ -1,6 +1,5 @@
 """
-This module implements the DDR3 docking task
-using the TDC oracles [1].
+Implements the DDR3 docking task using the TDC oracles [1].
 
 References
 ----------
@@ -31,7 +30,7 @@ class DRD3BlackBox(TDCBlackBox):
     info : ProblemSetupInformation
         The problem setup information.
     batch_size : int, optional
-        The batch size for parallel execution, by default None.
+        The batch size for simultaneous execution, by default None.
     parallelize : bool, optional
         Flag indicating whether to parallelize execution, by default False.
     num_workers : int, optional

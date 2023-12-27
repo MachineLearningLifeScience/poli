@@ -1,8 +1,10 @@
 """
-In this module, we implement a synthetic-accessibility 
-objective using the TDC oracles [1].
+Implements a synthetic-accessibility objective using the TDC oracles [1].
 
-[1] TODO: add reference.
+References
+----------
+[1] Artificial intelligence foundation for therapeutic science.
+    Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022). https://doi.org/10.1038/s41589-022-01131-2
 """
 from typing import Tuple
 
@@ -16,10 +18,28 @@ from poli.core.problem_setup_information import ProblemSetupInformation
 
 from poli.core.util.chemistry.string_to_molecule import translate_smiles_to_selfies
 
-from poli.core.util.seeding import seed_numpy, seed_python
+from poli.core.util.seeding import seed_numpy, seed_python, seed_python_numpy_and_torch
 
 
 class SABlackBox(TDCBlackBox):
+    """Synthetic-accessibility black box implementation using the TDC oracles [1].
+
+    Parameters
+    ----------
+    info : ProblemSetupInformation
+        The problem setup information.
+    batch_size : int, optional
+        The batch size for simultaneous execution, by default None.
+    parallelize : bool, optional
+        Flag indicating whether to parallelize execution, by default False.
+    num_workers : int, optional
+        The number of workers for parallel execution, by default None.
+    evaluation_budget:  int, optional
+        The maximum number of function evaluations. Default is infinity.
+    from_smiles : bool, optional
+        Flag indicating whether to use SMILES strings as input, by default True.
+    """
+
     def __init__(
         self,
         info: ProblemSetupInformation,
@@ -29,6 +49,24 @@ class SABlackBox(TDCBlackBox):
         evaluation_budget: int = float("inf"),
         from_smiles: bool = True,
     ):
+        """
+        Initialize the SABlackBox object.
+
+        Parameters
+        ----------
+        info : ProblemSetupInformation
+            The problem setup information object.
+        batch_size : int, optional
+            The batch size for parallel evaluation, by default None.
+        parallelize : bool, optional
+            Flag indicating whether to parallelize the evaluation, by default False.
+        num_workers : int, optional
+            The number of workers for parallel evaluation, by default None.
+        evaluation_budget : int, optional
+            The maximum number of evaluations, by default float("inf").
+        from_smiles : bool, optional
+            Flag indicating whether to use SMILES strings as input, by default True.
+        """
         oracle_name = "SA"
         super().__init__(
             oracle_name=oracle_name,
@@ -42,7 +80,25 @@ class SABlackBox(TDCBlackBox):
 
 
 class SAProblemFactory(AbstractProblemFactory):
+    """Problem factory for the synthetic-accessibility problem.
+
+    Methods
+    -------
+    get_setup_information()
+        Returns the setup information for the problem.
+    create(...)
+        Creates a synthetic-accessibility problem instance with the specified parameters.
+    """
+
     def get_setup_information(self) -> ProblemSetupInformation:
+        """
+        Returns the setup information for the problem.
+
+        Returns
+        --------
+        problem_info: ProblemSetupInformation
+            The setup information for the problem.
+        """
         return ProblemSetupInformation(
             name="sa_tdc",
             max_sequence_length=np.inf,
@@ -60,7 +116,31 @@ class SAProblemFactory(AbstractProblemFactory):
         string_representation: str = "SMILES",
     ) -> Tuple[SABlackBox, np.ndarray, np.ndarray]:
         """
-        TODO: document.
+        Creates a synthetic-accessibility problem instance with the specified parameters.
+
+        Parameters
+        -----------
+        seed:  int, optional
+            The seed for random number generation. Default is None.
+        batch_size:  int, optional
+            The batch size for simultaneous evaluation. Default is None.
+        parallelize : bool, optional
+            Flag indicating whether to parallelize the evaluation. Default is False.
+        num_workers:  int, optional
+            The number of workers for parallel evaluation. Default is None.
+        evaluation_budget:  int, optional
+            The maximum number of function evaluations. Default is infinity.
+        string_representation : str, optional
+            The string representation of the input molecules. Default is "SMILES".
+
+        Returns
+        --------
+        f: SABlackBox
+            The synthetic-accessibility black box function.
+        x0: np.ndarray
+            The initial input (taken from TDC: CCNC(=O)c1ccc(NC(=O)N2CC[C@H](C)[C@H](O)C2)c(C)c1).
+        y0: np.ndarray
+            The initial output (i.e. the corresponding SA).
         """
         seed_numpy(seed)
         seed_python(seed)
