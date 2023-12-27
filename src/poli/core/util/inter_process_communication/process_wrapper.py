@@ -94,6 +94,8 @@ class ProcessWrapper:
         # TODO: This is a very silly way to handle communication between processes,
         # and it is also very dangerous, because the user can pass arbitrary arguments
         # to the shell script. We should instead use a proper IPC library.
+        # TODO: if we decide to pass this information in the set-up phase (instead
+        # of here), we can remove this.
         string_for_kwargs = ""
         for key, value in kwargs_for_factory.items():
             if isinstance(value, str):

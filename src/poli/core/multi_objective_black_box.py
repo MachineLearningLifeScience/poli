@@ -51,8 +51,8 @@ class MultiObjectiveBlackBox(AbstractBlackBox):
     def __init__(
         self,
         info: ProblemSetupInformation,
+        objective_functions: List[AbstractBlackBox],
         batch_size: int = None,
-        objective_functions: List[AbstractBlackBox] = None,
     ) -> None:
         """
         Initialize the MultiObjectiveBlackBox class.
@@ -61,10 +61,10 @@ class MultiObjectiveBlackBox(AbstractBlackBox):
         -----------
         info : ProblemSetupInformation
             The problem setup information.
+        objective_functions : List[AbstractBlackBox]
+            The list of objective functions.
         batch_size : int, optional
             The batch size. Defaults to None.
-        objective_functions : List[AbstractBlackBox], required
-            The list of objective functions. Defaults to None.
 
         Raises
         -------

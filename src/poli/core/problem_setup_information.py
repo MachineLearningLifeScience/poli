@@ -1,6 +1,7 @@
-from typing import List, Dict, Union
-
-from pathlib import Path
+"""
+Implements the problem setup information, which contains the problem information (e.g. alphabet, sequence length...).
+"""
+from typing import List
 
 
 class ProblemSetupInformation:
@@ -36,18 +37,57 @@ class ProblemSetupInformation:
         self.log_transform_recommended = log_transform_recommended
 
     def get_problem_name(self) -> str:
+        """Returns the problem's name.
+
+        Returns
+        --------
+        name : str
+            The problem's name.
+        """
         return self.name
 
     def get_max_sequence_length(self) -> int:
+        """
+        Returns the maximum sequence length allowed by the black-box.
+
+        Returns
+        --------
+        max_sequence_length : int
+            The length of the longest sequence.
+        """
         return self.max_sequence_length
 
     def sequences_are_aligned(self) -> bool:
+        """
+        Returns whether the sequences need to be aligned.
+
+        Returns
+        --------
+        aligned : bool
+            Whether the sequences need to be aligned.
+        """
         return self.aligned
 
     def get_alphabet(self) -> list:
+        """
+        Returns the alphabet of allowed characters.
+
+        Returns
+        --------
+        alphabet : list[str]
+            List of tokens allowed by the black-box.
+        """
         return self.alphabet
 
     def log_transform_recommended(self) -> bool:
+        """
+        Returns whether the black-box recommends log-transforming the targets.
+
+        Returns
+        --------
+        log_transform_recommended : bool
+            Whether the black-box recommends log-transforming the targets.
+        """
         return self.log_transform_recommended
 
     def as_dict(self) -> dict:
@@ -55,8 +95,14 @@ class ProblemSetupInformation:
 
         Returns
         --------
-        dict
+        info : dict
             A dictionary of all attributes.
+
+        Notes
+        -----
+        - It's vital that this method is _not_ called __dict__, since
+          that breaks the serialization of the ProblemSetupInformation
+          when using pickle. (see https://stackoverflow.com/a/75777082/3516175)
         """
         return {
             "name": self.name,

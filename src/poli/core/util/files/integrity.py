@@ -1,4 +1,5 @@
-"""
+"""Utilities for verifying the integrity of files downloaded from the internet.
+
 This module contains utilities for checking the integrity of
 files downloaded from the internet. This is useful for
 reproducibility purposes, and to make sure no malicious
@@ -23,7 +24,7 @@ def compute_md5_from_filepath(filepath: Path, read_mode: str = "rb") -> str:
 
     Returns
     -------
-    str
+    hex_digest : str
         The MD5 hex digest of the file.
 
     Examples:

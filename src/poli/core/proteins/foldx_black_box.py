@@ -3,9 +3,12 @@
 FoldX [1] is a simulator that allows for computing the difference
 in free energy between a wildtype protein and a mutated protein.
 
-[1] Schymkowitz, J., Borg, J., Stricher, F., Nys, R., Rousseau, F.,
-    & Serrano, L. (2005). The FoldX web server: an online force field.
-    Nucleic acids research, 33(suppl_2), W382-W388.
+References
+----------
+[1] The FoldX web server: an online force field.
+    Nucleic acids research Schymkowitz, J., Borg, J., Stricher,
+    F., Nys, R., Rousseau, F., & Serrano, L. (2005). ,
+    33(suppl_2), W382-W388.
 """
 
 from typing import Union, List

@@ -1,4 +1,4 @@
-"""This script gets called by the mother process to start an observer process.
+"""Script that gets called by the mother process to start an external observer process.
 """
 
 import sys
@@ -12,7 +12,7 @@ from poli.objective import dynamically_instantiate, parse_factory_kwargs
 
 def start_observer_process(observer_name, port: int, password: str):
     """
-    Start the observer process.
+    Starts the observer process.
 
     Parameters
     ----------

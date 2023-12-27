@@ -29,7 +29,7 @@ class AbstractProblemFactory(metaclass=MetaProblemFactory):
     """
     Abstract base class for problem factories.
 
-    This class defines the interface for creating problem instances in the POLI framework.
+    This class defines the interface for creating problem instances in poli.
 
     Methods
     -------
@@ -81,9 +81,9 @@ class AbstractProblemFactory(metaclass=MetaProblemFactory):
 
         Returns
         --------
-            results: Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
-                A tuple containing the blackbox function, initial observations for
-                input variables, and initial observations for output variables.
+        results: Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+            A tuple containing the blackbox function, initial observations for
+            input variables, and initial observations for output variables.
 
         Raises
         -------

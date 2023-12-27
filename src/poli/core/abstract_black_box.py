@@ -46,6 +46,8 @@ class AbstractBlackBox:
     -------
     set_observer(observer)
         Set the observer object for recording observations during evaluation.
+    reset_evaluation_budget()
+        Reset the evaluation budget by setting the number of evaluations made to 0.
     __call__(x, context=None)
         Evaluate the black box function for the given input.
     _black_box(x, context=None)
@@ -111,6 +113,7 @@ class AbstractBlackBox:
         self.observer = observer
 
     def reset_evaluation_budget(self):
+        """Resets the evaluation budget by setting the number of evaluations made to 0."""
         self._num_evaluations = 0
 
     def __call__(self, x: np.array, context=None):
@@ -283,6 +286,16 @@ class AbstractBlackBox:
 
 
 class NegativeBlackBox(AbstractBlackBox):
+    """A wrapper for a black box that negates the objective function.
+
+    If you construct a black-box function f for maximizing, then -f is
+    a black-box function for minimizing. This class is a wrapper for
+    implementing the latter.
+
+    The only difference is that the __call__ method returns -f(x) instead
+    of f(x). The _black_box method is the same as the original black box.
+    """
+
     def __init__(self, f: AbstractBlackBox):
         self.f = f
         super().__init__(info=f.info, batch_size=f.batch_size)

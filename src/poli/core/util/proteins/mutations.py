@@ -1,4 +1,5 @@
-"""
+"""Utilities for defining and manipulating mutations on proteins.
+
 This module contains utilities for defining
 mutations on proteins according to foldx.
 
@@ -7,6 +8,9 @@ foldx expects mutations in a certain format:
     - the second letter is the position of the mutation
     - the third letter is the chain ID,
     - the fourth letter is the mutant residue.
+
+See the "Individual List Mode" of https://foldxsuite.crg.eu/parameter/mutant-file
+for more details.
 """
 from pathlib import Path
 from typing import List, Tuple, Union
@@ -17,9 +21,6 @@ from Bio.PDB.Residue import Residue
 from Bio.SeqUtils import seq1
 
 from poli.core.util.proteins.pdb_parsing import parse_pdb_as_residue_strings
-
-
-from typing import List, Tuple
 
 
 def edits_between_strings(

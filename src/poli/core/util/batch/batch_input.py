@@ -7,6 +7,10 @@ def batched(iterable: Iterable, chunk_size: int):
     """
     Generate batches of elements from an iterable.
 
+    If working on Python 3.12+, this function can be replaced
+    with the built-in function `batched` from `itertools`.
+    https://docs.python.org/3/library/itertools.html#itertools.batched
+
     Parameters
     ----------
     iterable : Iterable

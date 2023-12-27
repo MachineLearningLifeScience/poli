@@ -1,11 +1,18 @@
-"""
-This module contains utilities for querying
-foldx for repairing and simulating the mutations
-of proteins.
+"""FoldX interface for measuring stability and SASA.
+
+This module implements a `FoldxInterface` for querying
+foldx's repairing and simulating models [1].
 
 If this module is imported from a script, it will
 automatically check that the foldx files are in the
 expected location, and raise an error if they are not.
+
+References
+----------
+[1] The FoldX web server: an online force field.
+    Schymkowitz, J., Borg, J., Stricher, F., Nys, R.,
+    Rousseau, F., & Serrano, L. (2005).  Nucleic acids research,
+    33(suppl_2), W382-W388.
 """
 from typing import List, Union
 from pathlib import Path

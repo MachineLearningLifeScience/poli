@@ -1,13 +1,14 @@
-"""
-Taken and adapted from:
+"""Utilities for downloading files from GitHub repositories.
+
+This module requires the PyGithub package, install it with:
+    
+        pip install PyGithub
+
+Most of this code was taken and adapted from:
 https://gist.github.com/pdashford/2e4bcd4fc2343e2fd03efe4da17f577d?permalink_comment_id=4274705#gistcomment-4274705
 """
 import base64
-import getopt
 import os
-import shutil
-import sys
-from typing import Optional
 from pathlib import Path
 
 from github import Github, GithubException
@@ -95,8 +96,8 @@ def download_file_from_github_repository(
 
     This function will use an environment variable called
     GITHUB_TOKEN_FOR_POLI if it exists. If it does not exist,
-    it will try to download without it. Note that, for anonymous
-    requests, the rate limit is 60 requests per hour.
+    it will try to download without it. Note that the rate limit
+    is 60 requests per hour for anonymous requests.
     """
     github = Github(login_or_token=os.environ.get("GITHUB_TOKEN_FOR_POLI"))
     repository = github.get_repo(repository_name)
