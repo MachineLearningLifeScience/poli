@@ -1,4 +1,4 @@
-"""Utilities for instantiating and running objective functions in isolated enviroments."""
+"""Executable script used for isolation of objective factories and functions."""
 import logging
 import os
 import sys
@@ -13,6 +13,19 @@ ADDITIONAL_IMPORT_SEARCH_PATHES_KEY = "ADDITIONAL_IMPORT_PATHS"
 
 
 def parse_factory_kwargs(factory_kwargs: str) -> dict:
+    """Parses the factory kwargs passed to the objective function.
+
+    Parameters
+    ----------
+    factory_kwargs : str
+        The string containing the factory kwargs (see ProcessWrapper
+        for details about how this factory_kwargs strings is built).
+
+    Returns
+    -------
+    kwargs : dict
+        A dictionary containing the factory kwargs, parsed from the string.
+    """
     if factory_kwargs == "":
         # Then the user didn't pass any arguments
         kwargs = {}
@@ -46,6 +59,19 @@ def parse_factory_kwargs(factory_kwargs: str) -> dict:
 
 
 def dynamically_instantiate(obj: str, **kwargs):
+    """Dynamically instantiates an object from a string.
+
+    This function is used internally to instantiate objective
+    factories dynamically, inside isolated processes. It is
+    also used to instantiate external observers.
+
+    Parameters
+    ----------
+    obj : str
+        The string containing the name of the object to be instantiated.
+    **kwargs : dict
+        The keyword arguments to be passed to the object constructor.
+    """
     # FIXME: this method opens up a serious security vulnerability
     # TODO: possible alternative: importlib
     # TODO: another possible alternative: hydra
@@ -77,10 +103,19 @@ def dynamically_instantiate(obj: str, **kwargs):
 
 
 def run(factory_kwargs: str, objective_name: str, port: int, password: str) -> None:
-    """
-    Starts an objective function listener loop to wait for requests.
-    :param objective_name:
-        problem factory name including python packages, e.g. package.subpackage.MyFactoryName
+    """Starts an objective function listener loop to wait for requests.
+
+    Parameters
+    ----------
+    factory_kwargs : str
+        The string containing the factory kwargs (see ProcessWrapper
+        for details about how this factory_kwargs strings is built).
+    objective_name : str
+        The name of the objective function to be instantiated.
+    port : int
+        The port number for the connection with the mother process.
+    password : str
+        The password for the connection with the mother process.
     """
     kwargs = parse_factory_kwargs(factory_kwargs)
 
@@ -130,9 +165,6 @@ def run(factory_kwargs: str, objective_name: str, port: int, password: str) -> N
 
 
 if __name__ == "__main__":
-    # TODO: modify this to allow for passing more
-    # information to run. Said information can be interpreted
-    # as being used for instantiating the problem factory.
     parser = argparse.ArgumentParser()
     parser.add_argument("--objective-name", required=True)
     parser.add_argument("--port", required=True, type=int)
