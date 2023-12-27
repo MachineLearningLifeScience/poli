@@ -1,10 +1,12 @@
 """
-This module implements the DDR3 docking task
-using the TDC oracles [1].
+Implements the DDR3 docking task using the TDC oracles [1].
 
-[1] Huang, K., Fu, T., Gao, W. et al. Artificial intelligence foundation for therapeutic science. Nat Chem Biol 18, 1033-1036 (2022). https://doi.org/10.1038/s41589-022-01131-2
+References
+----------
+[1] Artificial intelligence foundation for therapeutic science.
+    Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022). https://doi.org/10.1038/s41589-022-01131-2
 """
-from typing import Tuple
+from typing import Tuple, Literal
 
 import numpy as np
 
@@ -28,7 +30,7 @@ class DRD3BlackBox(TDCBlackBox):
     info : ProblemSetupInformation
         The problem setup information.
     batch_size : int, optional
-        The batch size for parallel execution, by default None.
+        The batch size for simultaneous execution, by default None.
     parallelize : bool, optional
         Flag indicating whether to parallelize execution, by default False.
     num_workers : int, optional
@@ -76,12 +78,8 @@ class DRD3ProblemFactory(AbstractProblemFactory):
 
     This class provides methods for creating DRD3 docking problems and retrieving setup information.
 
-    Attributes:
-    ----------
-        None
-
-    Methods:
-    -------
+    Methods
+    ------
     get_setup_information:
         Retrieves the setup information for the problem.
     create:
@@ -92,7 +90,7 @@ class DRD3ProblemFactory(AbstractProblemFactory):
         """
         Retrieves the setup information for the problem.
 
-        Returns:
+        Returns
         --------
         problem_info: ProblemSetupInformation
             The setup information for the problem.
@@ -111,12 +109,12 @@ class DRD3ProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-        string_representation: str = "SMILES",
+        string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
     ) -> Tuple[TDCBlackBox, np.ndarray, np.ndarray]:
         """
         Create a TDCBlackBox object for DRD3 docking.
 
-        Parameters:
+        Parameters
         ----------
         seed : int, optional
             Seed for random number generators. If None, no seed is set.
@@ -131,12 +129,12 @@ class DRD3ProblemFactory(AbstractProblemFactory):
         string_representation : str, optional
             The string representation of the molecules. Must be either 'SMILES' or 'SELFIES'. Default is 'SMILES'.
 
-        Returns:
+        Returns
         -------
         Tuple[TDCBlackBox, np.ndarray, np.ndarray]
             A tuple containing the TDCBlackBox object, the initial input array, and the output array.
 
-        Raises:
+        Raises
         ------
         ValueError
             If the string_representation is not 'SMILES' or 'SELFIES'.

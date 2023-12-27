@@ -3,9 +3,12 @@
 FoldX [1] is a simulator that allows for computing the difference
 in free energy between a wildtype protein and a mutated protein.
 
-[1] Schymkowitz, J., Borg, J., Stricher, F., Nys, R., Rousseau, F.,
-    & Serrano, L. (2005). The FoldX web server: an online force field.
-    Nucleic acids research, 33(suppl_2), W382-W388.
+References
+----------
+[1] The FoldX web server: an online force field.
+    Nucleic acids research Schymkowitz, J., Borg, J., Stricher,
+    F., Nys, R., Rousseau, F., & Serrano, L. (2005). ,
+    33(suppl_2), W382-W388.
 """
 
 from typing import Union, List
@@ -35,7 +38,7 @@ class FoldxBlackBox(AbstractBlackBox):
     """
     A class representing the FoldxBlackBox, which is used for simulating protein mutations using FoldX.
 
-    Parameters:
+    Parameters
     -----------
     info : ProblemSetupInformation, required
         The problem setup information object. (default: None)
@@ -56,8 +59,8 @@ class FoldxBlackBox(AbstractBlackBox):
     eager_repair : bool, optional
         Flag indicating whether to eagerly repair the PDB files. (default: False)
 
-    Attributes:
-    -----------
+    Attributes
+    ----------
     experiment_id : str
         The experiment ID.
     tmp_folder : Path
@@ -71,8 +74,8 @@ class FoldxBlackBox(AbstractBlackBox):
     wildtype_residue_strings : List[str]
         The list of wildtype residue strings for each PDB file.
 
-    Methods:
-    --------
+    Methods
+    -------
     create_working_directory() -> Path:
         Creates and returns the working directory path for the black box.
 
@@ -94,7 +97,7 @@ class FoldxBlackBox(AbstractBlackBox):
         """
         Initialize the FoldxBlackBox.
 
-        Parameters:
+        Parameters
         -----------
         info : ProblemSetupInformation, optional
             The problem setup information object. (default: None)
@@ -202,7 +205,7 @@ class FoldxBlackBox(AbstractBlackBox):
         """
         Create and return the working directory path for the black box.
 
-        Returns:
+        Returns
         --------
         Path
             The path to the working directory.

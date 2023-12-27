@@ -17,7 +17,7 @@ class MultiObjectiveBlackBox(AbstractBlackBox):
     by concatenating the results of evaluating individual
     objective functions.
 
-    Parameters:
+    Parameters
     -----------
     info : ProblemSetupInformation
         The problem setup information.
@@ -26,18 +26,18 @@ class MultiObjectiveBlackBox(AbstractBlackBox):
     objective_functions : List[AbstractBlackBox], required
         The list of objective functions to be evaluated. Defaults to None.
 
-    Attributes:
-    -----------
+    Attributes
+    ----------
     objective_functions : List[AbstractBlackBox]
         The list of objective functions to be evaluated.
 
-    Methods:
-    --------
+    Methods
+    -------
     _black_box(x, context=None)
         Evaluate the black box function for the given input.
 
-    Raises:
-    -------
+    Raises
+    ------
     ValueError
         If objective_functions is not provided as a list of AbstractBlackBox
         instances or inherited classes.
@@ -51,22 +51,22 @@ class MultiObjectiveBlackBox(AbstractBlackBox):
     def __init__(
         self,
         info: ProblemSetupInformation,
+        objective_functions: List[AbstractBlackBox],
         batch_size: int = None,
-        objective_functions: List[AbstractBlackBox] = None,
     ) -> None:
         """
         Initialize the MultiObjectiveBlackBox class.
 
-        Parameters:
+        Parameters
         -----------
         info : ProblemSetupInformation
             The problem setup information.
+        objective_functions : List[AbstractBlackBox]
+            The list of objective functions.
         batch_size : int, optional
             The batch size. Defaults to None.
-        objective_functions : List[AbstractBlackBox], required
-            The list of objective functions. Defaults to None.
 
-        Raises:
+        Raises
         -------
         ValueError:
             If objective_functions is not provided as a list of AbstractBlackBox instances or inherited classes.
@@ -84,14 +84,14 @@ class MultiObjectiveBlackBox(AbstractBlackBox):
         """
         Evaluate the black box function for a given input.
 
-        Parameters:
+        Parameters
         -----------
         x : np.ndarray
             The input values to evaluate the black box function.
         context : any, optional
             Additional context information for the evaluation.
 
-        Returns:
+        Returns
         --------
             array-like: The concatenated results of evaluating the objective functions on the input.
         """

@@ -1,3 +1,4 @@
+"""External observer, which can be run in an isolated process."""
 from typing import Any
 import numpy as np
 
@@ -51,7 +52,7 @@ class ExternalObserver(AbstractObserver):
         """
         Observe the given data points.
 
-        Parameters:
+        Parameters
         ----------
         x: np.ndarray
             The input data points.
@@ -60,7 +61,7 @@ class ExternalObserver(AbstractObserver):
         context: object
             Additional context for the observation.
 
-        Raises:
+        Raises
         -------
         Exception:
             If the underlying observer process raises an exception.
@@ -144,7 +145,8 @@ class ExternalObserver(AbstractObserver):
             self.process_wrapper = None
 
     def __getattr__(self, __name: str) -> Any:
-        """
+        """Get an attribute of the underlying observer if it exists.
+
         Asks for the attribute of the underlying
         black-box function by sending a message
         to the process w. the msg_type "ATTRIBUTE".

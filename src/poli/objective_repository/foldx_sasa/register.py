@@ -1,4 +1,4 @@
-"""This script registers the SASA FoldX black box and objective factory.
+"""Registers the SASA FoldX black box and objective factory.
 
 FoldX [1] is a simulator that allows for computing the difference
 in free energy between a wildtype protein and a mutated protein.
@@ -42,7 +42,7 @@ class FoldXSASABlackBox(FoldxBlackBox):
     """
     A black box implementation for computing the solvent accessible surface area (SASA) score using FoldX.
 
-    Parameters:
+    Parameters
     -----------
     info : ProblemSetupInformation, optional
         The problem setup information. Default is None.
@@ -93,19 +93,20 @@ class FoldXSASABlackBox(FoldxBlackBox):
         )
 
     def _black_box(self, x: np.ndarray, context: None) -> np.ndarray:
-        """
+        """Computes the SASA score for a given mutation x.
+
         Runs the given input x and pdb files provided
         in the context through FoldX and returns the
         total SASA score.
 
-        Parameters:
+        Parameters
         -----------
         x : np.ndarray
             The input array representing the mutations.
         context : None
             The context for the black box computation.
 
-        Returns:
+        Returns
         --------
         np.ndarray
             The computed SASA score(s) as a numpy array.
@@ -148,8 +149,8 @@ class FoldXSASAProblemFactory(AbstractProblemFactory):
     """
     Factory class for creating FoldX SASA (Solvent Accessible Surface Area) problems.
 
-    Methods:
-    --------
+    Methods
+    -------
     get_setup_information:
         Returns the setup information for the problem.
     create:
@@ -198,7 +199,7 @@ class FoldXSASAProblemFactory(AbstractProblemFactory):
         """
         Create a FoldXSASABlackBox object and compute the initial values of wildtypes.
 
-        Parameters:
+        Parameters
         ----------
         seed : int, optional
             Seed for random number generators. If None is passed,
@@ -222,12 +223,12 @@ class FoldXSASAProblemFactory(AbstractProblemFactory):
         eager_repair : bool, optional
             Flag indicating whether to perform eager repair.
 
-        Returns:
+        Returns
         -------
         Tuple[AbstractBlackBox, np.ndarray, np.ndarray]
             A tuple containing the FoldXSASABlackBox object, the initial wildtype sequences, and the initial fitness values.
 
-        Raises:
+        Raises
         ------
         ValueError
             If wildtype_pdb_path is missing or has an invalid type.

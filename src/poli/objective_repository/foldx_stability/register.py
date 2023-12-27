@@ -20,7 +20,6 @@ import numpy as np
 
 from Bio.SeqUtils import seq1
 
-from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem_setup_information import ProblemSetupInformation
 
@@ -233,7 +232,7 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
         Tuple[AbstractBlackBox, np.ndarray, np.ndarray]
             A tuple containing the created black box function, the initial sequence(s), and the initial fitness value(s).
 
-        Raises:
+        Raises
         ------
         ValueError
             If wildtype_pdb_path is missing or has an invalid type.

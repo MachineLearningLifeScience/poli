@@ -1,3 +1,4 @@
+"""Utilities for seeding random number generators."""
 import numpy as np
 import random
 
@@ -6,16 +7,13 @@ def seed_numpy(seed: int = None) -> None:
     """
     Seed the NumPy random number generator.
 
-    Parameters:
+    Parameters
     ----------
     seed : int, optional
-        Seed value for the random number generator. If None, the generator is initialized with a random seed.
-
-    Examples:
-    ---------
-    >>> seed_numpy(123)
+        Seed value for the random number generator. If None, then no seeding is performed.
     """
-    np.random.seed(seed)
+    if seed is not None:
+        np.random.seed(seed)
 
 
 def seed_python(seed: int = None) -> None:
@@ -23,9 +21,46 @@ def seed_python(seed: int = None) -> None:
     Seed the random number generator for Python.
 
 
-    Parameters:
+    Parameters
     ----------
     seed : int, optional
-        Seed value for the random number generator. If None, the generator is initialized with a random seed.
+        Seed value for the random number generator. If None, then no seeding is performed.
     """
-    random.seed(seed)
+    if seed is not None:
+        random.seed(seed)
+
+
+def seed_torch(seed: int = None) -> None:
+    """
+    Seed the random number generator for PyTorch.
+
+
+    Parameters
+    ----------
+    seed : int, optional
+        Seed value for the random number generator. If None, no seeding is performed.
+    """
+    try:
+        import torch
+    except ImportError:
+        return
+
+    if seed is not None:
+        torch.manual_seed(seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed_all(seed)
+
+
+def seed_python_numpy_and_torch(seed: int = None) -> None:
+    """
+    Seed all random number generators.
+
+
+    Parameters
+    ----------
+    seed : int, optional
+        Seed value for the random number generator. If None, no seeding is performed.
+    """
+    seed_numpy(seed)
+    seed_python(seed)
+    seed_torch(seed)

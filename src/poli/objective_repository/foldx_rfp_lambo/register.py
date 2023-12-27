@@ -1,3 +1,4 @@
+"""RFP objective factory and black box function."""
 __author__ = "Simon Bartels"
 
 import logging

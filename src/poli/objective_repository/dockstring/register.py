@@ -1,15 +1,18 @@
-"""
-This module implements and registers a black box
-objective function (and a repository) for dockstring [1].
+"""Dockstring objective factory and function.
 
-[1] García-Ortegón, Miguel, Gregor N. C. Simm, Austin J. Tripp,
+This module implements and registers a black box objective function
+(and a repository) for dockstring [1], which is a simple API for
+assessing the docking score of a small molecule to a given protein.
+
+References
+----------
+[1] “DOCKSTRING: Easy Molecular Docking Yields Better Benchmarks for Ligand Design.”
+    García-Ortegón, Miguel, Gregor N. C. Simm, Austin J. Tripp,
     José Miguel Hernández-Lobato, Andreas Bender, and Sergio Bacallado.
-    “DOCKSTRING: Easy Molecular Docking Yields Better Benchmarks for Ligand Design.”
     Journal of Chemical Information and Modeling 62, no. 15 (August 8, 2022): 3486-3502.
     https://doi.org/10.1021/acs.jcim.1c01334.
-
 """
-from typing import Tuple
+from typing import Tuple, Literal
 
 import numpy as np
 
@@ -26,7 +29,7 @@ from poli.core.util.chemistry.string_to_molecule import (
     translate_smiles_to_selfies,
 )
 
-from poli.core.util.seeding import seed_numpy, seed_python
+from poli.core.util.seeding import seed_python_numpy_and_torch
 
 
 class DockstringBlackBox(AbstractBlackBox):
@@ -66,9 +69,9 @@ class DockstringBlackBox(AbstractBlackBox):
 
     References
     ----------
-    [1] García-Ortegón, Miguel, Gregor N. C. Simm, Austin J. Tripp,
+    [1] “DOCKSTRING: Easy Molecular Docking Yields Better Benchmarks for Ligand Design.”
+        García-Ortegón, Miguel, Gregor N. C. Simm, Austin J. Tripp,
         José Miguel Hernández-Lobato, Andreas Bender, and Sergio Bacallado.
-        “DOCKSTRING: Easy Molecular Docking Yields Better Benchmarks for Ligand Design.”
         Journal of Chemical Information and Modeling 62, no. 15 (August 8, 2022): 3486-3502.
         https://doi.org/10.1021/acs.jcim.1c01334.
     """
@@ -81,7 +84,7 @@ class DockstringBlackBox(AbstractBlackBox):
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
         target_name: str = None,
-        string_representation: str = "SMILES",
+        string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
     ):
         """
         Initialize the dockstring black box object.
@@ -153,7 +156,8 @@ class DockstringBlackBox(AbstractBlackBox):
         else:
             molecules_as_smiles = molecules_as_strings
 
-        # TODO: Should we parallelize?
+        # Parallelization is handled by the __call__ method of
+        # the AbstractBlackBox class.
         scores = []
         for smiles in molecules_as_smiles:
             try:
@@ -169,6 +173,27 @@ class DockstringBlackBox(AbstractBlackBox):
 
 
 class DockstringProblemFactory(AbstractProblemFactory):
+    """Problem factory for the Dockstring problem.
+
+    Dockstring is a simple API for assessing the docking score
+    of a small molecule to a given protein [1].
+
+    Methods
+    -------
+    get_setup_information()
+        Returns the setup information for the problem.
+    create(...)
+        Creates a problem instance with the specified parameters.
+
+    References
+    ----------
+    [1] “DOCKSTRING: Easy Molecular Docking Yields Better Benchmarks for Ligand Design.”
+        García-Ortegón, Miguel, Gregor N. C. Simm, Austin J. Tripp,
+        José Miguel Hernández-Lobato, Andreas Bender, and Sergio Bacallado.
+        Journal of Chemical Information and Modeling 62, no. 15 (August 8, 2022): 3486-3502.
+        https://doi.org/10.1021/acs.jcim.1c01334.
+    """
+
     def get_setup_information(self) -> ProblemSetupInformation:
         # TODO: We might change this in the future for a
         # default dictionary, depending on whether we
@@ -190,14 +215,41 @@ class DockstringProblemFactory(AbstractProblemFactory):
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
         target_name: str = None,
-        string_representation: str = "SMILES",
-    ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+        string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
+    ) -> Tuple[DockstringBlackBox, np.ndarray, np.ndarray]:
+        """Creates a dockstring black box function and initial observations.
+
+        Parameters
+        ----------
+        seed : int, optional
+            The seed value for random number generation, by default None.
+        batch_size : int, optional
+            The batch size for processing data, by default None.
+        parallelize : bool, optional
+            Flag indicating whether to parallelize the processing, by default False.
+        num_workers : int, optional
+            The number of workers to use for parallel processing, by default we
+            use half the number of available CPUs (rounded down).
+        evaluation_budget:  int, optional
+            The maximum number of function evaluations. Default is infinity.
+        target_name : str
+            The name of the target protein (see dockstring for more details).
+        string_representation : str
+            The string representation of the molecules. Either SMILES or SELFIES.
+            Default is SMILES.
+
+        Returns
+        -------
+        results: Tuple[DockstringBlackBox, np.ndarray, np.ndarray]:
+            A tuple containing the blackbox function, initial inputs,
+            and their respective outputs.
+        """
         assert (
             target_name is not None
         ), "Missing required keyword argument 'target_name'. "
 
-        seed_numpy(seed)
-        seed_python(seed)
+        if seed is not None:
+            seed_python_numpy_and_torch(seed)
 
         dockstring_black_box = DockstringBlackBox(
             info=self.get_setup_information(),

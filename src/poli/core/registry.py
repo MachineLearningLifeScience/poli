@@ -184,9 +184,9 @@ def register_problem_from_repository(name: str):
     corresponds to a folder inside the objective_repository folder. The
     function will:
     1. create the environment from the yaml file
-    2. run the file from said enviroment (since
-       we can't import the factory: it may have
-       dependencies that are not installed)
+    2. run the file from said enviroment (since we can't
+    import the factory: it may have dependencies that are
+    not installed)
 
     Parameters
     ----------

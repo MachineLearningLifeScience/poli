@@ -21,3 +21,7 @@ wandb/
 # Ignore temporary files
 tmp/
 src/poli/objective_repository/rasp/101m.pdb
+
+# Documentation
+docs/build/
+docs/source/generated/

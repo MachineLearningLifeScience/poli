@@ -1,3 +1,4 @@
+"""Abstract class for observers in poli."""
 import numpy as np
 from poli.core.problem_setup_information import ProblemSetupInformation
 
@@ -13,12 +14,8 @@ class AbstractObserver:
     by observing the values of the objective function and the decision variables
     at each iteration.
 
-    Attributes:
-    ----------
-        None
-
-    Methods:
-    --------
+    Methods
+    -------
         observe(x: np.ndarray, y: np.ndarray, context=None) -> None:
             Observes the values of the objective function and the decision variables
             at each iteration of the optimization algorithm. If the observer is
@@ -39,7 +36,7 @@ class AbstractObserver:
         """
         Observe the given data points.
 
-        Parameters:
+        Parameters
         ----------
         x: np.ndarray
             The input data points.
@@ -48,7 +45,7 @@ class AbstractObserver:
         context: object
             Additional context for the observation.
 
-        Raises:
+        Raises
         -------
         NotImplementedError:
             This method is meant to be overridden by subclasses.

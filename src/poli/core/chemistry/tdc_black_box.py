@@ -1,11 +1,14 @@
-"""In this module, we implement a synthetic-accessibility 
-objective using the TDC oracles [1].
+"""Implement a wrapper around the Therapeutics Data Commons (TDC) oracles [1].
 
-[1] Huang, Kexin, Tianfan Fu, Wenhao Gao, Yue Zhao, Yusuf Roohani, Jure Leskovec, Connor W. Coley, Cao Xiao, Jimeng Sun, and Marinka Zitnik. “Artificial Intelligence Foundation for Therapeutic Science.” Nature Chemical Biology 18, no. 10 (October 2022): 1033-36. https://doi.org/10.1038/s41589-022-01131-2.
+So far, we only support two oracles: `drd3` and `synthetic accessibility`. See
+the documentation on our black-box functions for more details.
 
-See also
--------
-The website for TDC: https://tdcommons.ai/
+References
+----------
+[1] “Artificial Intelligence Foundation for Therapeutic Science.”
+    Huang, Kexin, Tianfan Fu, Wenhao Gao, Yue Zhao, Yusuf Roohani, Jure Leskovec,
+    Connor W. Coley, Cao Xiao, Jimeng Sun, and Marinka Zitnik.  Nature Chemical Biology 18, no. 10
+    (October 2022): 1033-36. https://doi.org/10.1038/s41589-022-01131-2.
 """
 
 import numpy as np
@@ -24,7 +27,7 @@ class TDCBlackBox(AbstractBlackBox):
     TDC (Therapeutics Data Commons) problems.
     It inherits from the AbstractBlackBox class.
 
-    Parameters:
+    Parameters
     -----------
     oracle_name : str
         The name of the oracle used for computing the docking score.
@@ -41,8 +44,8 @@ class TDCBlackBox(AbstractBlackBox):
     from_smiles : bool, optional
         Flag indicating whether the input molecules are in SMILES format. Defaults to True.
 
-    Attributes:
-    -----------
+    Attributes
+    ----------
     oracle : Oracle
         An instance of the Oracle class from TDC.
     from_smiles : bool
@@ -58,6 +61,7 @@ class TDCBlackBox(AbstractBlackBox):
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
         from_smiles: bool = True,
+        **kwargs_for_oracle,
     ):
         """
         Initialize the TDCBlackBox class.
@@ -76,28 +80,30 @@ class TDCBlackBox(AbstractBlackBox):
             The number of workers to use for parallel computation, by default None.
         from_smiles : bool, optional
             Whether to use SMILES representation, by default True.
+        **kwargs_for_oracle : dict, optional
+            Additional keyword arguments for the oracle.
         """
         super().__init__(info, batch_size, parallelize, num_workers, evaluation_budget)
-        self.oracle = Oracle(name=oracle_name)
+        self.oracle = Oracle(name=oracle_name, **kwargs_for_oracle)
         self.from_smiles = from_smiles
 
     def _black_box(self, x, context=None):
         """
         Assuming x is an array of strings,
         we concatenate them and then
-        compute the docking score.
+        compute the oracle score.
 
-        Parameters:
+        Parameters
         -----------
         x : array-like
             An array of strings representing the input molecules.
         context : any, optional
             Additional context information. Defaults to None.
 
-        Returns:
+        Returns
         --------
         scores : array-like
-            An array of docking scores computed for each input molecule.
+            An array of oracle scores computed for each input molecule.
         """
         if not x.dtype.kind in ["U", "S"]:
             raise ValueError(

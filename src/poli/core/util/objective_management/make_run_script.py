@@ -109,7 +109,7 @@ def _make_run_script(
     cwd : str, optional
         The current working directory for the run script. If not provided, the current working directory is used.
     **kwargs : dict
-        Additional keyword arguments.
+        Additional keyword arguments (currently unused).
 
     Returns
     -------

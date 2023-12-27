@@ -1,5 +1,5 @@
 """
-This is the main file relevant for users who want to run objective functions.
+Creates objective functions by providing a common interface to all factories in the repository.
 """
 from typing import Tuple, Any
 import numpy as np
@@ -22,20 +22,62 @@ from poli.objective_repository import AVAILABLE_OBJECTIVES, AVAILABLE_PROBLEM_FA
 
 
 def load_config():
+    """Loads the configuration file containing which objectives are registered.
+
+    Returns
+    -------
+    config : configparser.ConfigParser
+        The configuration file.
+
+    """
     HOME_DIR = Path.home().resolve()
     config_file = str(HOME_DIR / ".poli_objectives" / "config.rc")
     config = configparser.ConfigParser(defaults={_OBSERVER: ""})
-    ls = config.read(config_file)
+    _ = config.read(config_file)
 
     return config
 
 
 class ExternalBlackBox(AbstractBlackBox):
-    def __init__(self, info: ProblemSetupInformation, process_wrapper):
+    """An external version of the black-box function to be instantiated in isolated processes."""
+
+    def __init__(self, info: ProblemSetupInformation, process_wrapper: ProcessWrapper):
+        """
+        Initialize the ExternalBlackBox object.
+
+        Parameters
+        ----------
+        info : ProblemSetupInformation
+            The information about the problem.
+        process_wrapper : ProcessWrapper
+            The process wrapper to communicate with the objective process.
+        """
         super().__init__(info)
         self.process_wrapper = process_wrapper
 
     def _black_box(self, x, context=None):
+        """
+        Evaluates the black-box function.
+
+        In this external black-box, the evaluation is done by sending a message
+        to the objective process and waiting for the response. The interprocess
+        communication is handled by the ProcessWrapper class, which maintains
+        an isolated process in which a black-box function runs with, potentially,
+        a completely different python executable (e.g. inside another conda
+        environment).
+
+        Parameters
+        ----------
+        x : np.ndarray
+            The input data points.
+        context : object
+            Additional context for the observation.
+
+        Returns
+        -------
+        y : np.ndarray
+            The output data points.
+        """
         self.process_wrapper.send(["QUERY", x, context])
         msg_type, *val = self.process_wrapper.recv()
         if msg_type == "EXCEPTION":
@@ -52,6 +94,7 @@ class ExternalBlackBox(AbstractBlackBox):
             )
 
     def terminate(self):
+        """Terminates the external black box."""
         # terminate objective process
         if self.process_wrapper is not None:
             try:
@@ -70,10 +113,21 @@ class ExternalBlackBox(AbstractBlackBox):
                 pass
 
     def __getattr__(self, __name: str) -> Any:
-        """
+        """Gets an attribute from the underlying black-box function.
+
         Asks for the attribute of the underlying
         black-box function by sending a message
         to the process w. the msg_type "ATTRIBUTE".
+
+        Parameters
+        ----------
+        __name : str
+            The name of the attribute.
+
+        Returns
+        -------
+        attribute : Any
+            The attribute of the underlying black-box function.
         """
         self.process_wrapper.send(["ATTRIBUTE", __name])
         msg_type, *msg = self.process_wrapper.recv()
@@ -103,10 +157,32 @@ def __create_from_repository(
     observer: AbstractObserver = None,
     **kwargs_for_factory,
 ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
-    """
+    """Creates the objective function from the repository.
+
     If the problem is available in AVAILABLE_PROBLEM_FACTORIES
     (i.e. if the user could import all the dependencies directly),
     we create the problem directly. Otherwise, we raise an error.
+
+    Parameters
+    ----------
+    name : str
+        The name of the objective function.
+    seed : int, optional
+        The seed value for random number generation.
+    batch_size : int, optional
+        The batch size, passed to the black box to run evaluations on batches.
+        If None, it will evaluate all inputs at once.
+    parallelize : bool, optional
+        If True, then the objective function runs in parallel.
+    num_workers : int, optional
+        When parallelize is True, this specifies the number of processes to use.
+        By default, it uses half the number of available CPUs (rounded down).
+    evaluation_budget : int, optional
+        The maximum number of evaluations allowed. By default, it is infinity.
+    observer : AbstractObserver, optional
+        The observer to use.
+    **kwargs_for_factory : dict, optional
+        Additional keyword arguments for the factory.
     """
     if name not in AVAILABLE_PROBLEM_FACTORIES:
         raise ValueError(
@@ -138,9 +214,30 @@ def __create_as_isolated_process(
     evaluation_budget: int = float("inf"),
     **kwargs_for_factory,
 ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
-    """
+    """Creates the objective function as an isolated process.
+
     If the problem is registered, we create it as an isolated
-    process. Otherwise, we raise an error.
+    process. Otherwise, we raise an error. That is, this function
+    expects the problem to be registered.
+
+    Parameters
+    ----------
+    name : str
+        The name of the objective function.
+    seed : int, optional
+        The seed value for random number generation.
+    batch_size : int, optional
+        The batch size, passed to the black box to run evaluations on batches.
+        If None, it will evaluate all inputs at once.
+    parallelize : bool, optional
+        If True, then the objective function runs in parallel.
+    num_workers : int, optional
+        When parallelize is True, this specifies the number of processes to use.
+        By default, it uses half the number of available CPUs (rounded down).
+    evaluation_budget : int, optional
+        The maximum number of evaluations allowed. By default, it is infinity.
+    **kwargs_for_factory : dict, optional
+        Additional keyword arguments for the factory.
     """
     config = load_config()
     if name not in config:
@@ -181,6 +278,21 @@ def __create_as_isolated_process(
 
 
 def __register_objective_if_available(name: str, force_register: bool = False):
+    """Registers the objective function if it is available in the repository.
+
+    If the objective function is not available in the repository,
+    then we raise an error. If it is available, then we ask the
+    user for confirmation to register it. If the user confirms,
+    then we register it. Otherwise, we raise an error.
+
+    Parameters
+    ----------
+    name : str
+        The name of the objective function.
+    force_register : bool, optional
+        If True, then the objective function is registered without asking
+        for confirmation, overwriting any previous registration.
+    """
     config = load_config()
     if name not in config:
         if name not in AVAILABLE_OBJECTIVES:
@@ -229,34 +341,49 @@ def create(
     **kwargs_for_factory,
 ) -> Tuple[ProblemSetupInformation, AbstractBlackBox, np.ndarray, np.ndarray, object]:
     """
-    Instantiantes a black-box function.
-    :param name:
-        The name of the objective function or a shell-script for execution.
-    :param seed:
-        Information for the objective in case randomization is involved.
-    :param caller_info:
+    Instantiantes a black-box function by calling the `create` method of the associated factory.
+
+    Parameters
+    ----------
+    name : str
+        The name of the objective function.
+    seed : int, optional
+        The seed value for random number generation.
+    caller_info : dict, optional
         Optional information about the caller that is forwarded to the logger to initialize the run.
-    :param observer:
-        Optional observer, external observer by default.
-    :param force_register:
+    observer : AbstractObserver, optional
+        The observer to use.
+    force_register : bool, optional
         If True, then the objective function is registered without asking
         for confirmation, overwriting any previous registration.
-    :param force_isolation:
+    force_isolation : bool, optional
         If True, then the objective function is instantiated as an isolated
         process.
-    :param batch_size:
+    batch_size : int, optional
         The batch size, passed to the black box to run evaluations on batches.
         If None, it will evaluate all inputs at once.
-    :param parallelize:
+    parallelize : bool, optional
         If True, then the objective function runs in parallel.
-    :param num_workers:
+    num_workers : int, optional
         When parallelize is True, this specifies the number of processes to use.
-    :return:
-        problem_information: a ProblemSetupInformation object holding basic properties about the problem
-        f: an objective function that accepts a numpy array and returns a numpy array
-        x0: initial inputs
-        y0: f(x0)
-        observer_info: information from the observer_info about the instantiated run (allows the calling algorithm to connect)
+        By default, it uses half the number of available CPUs (rounded down).
+    evaluation_budget : int, optional
+        The maximum number of evaluations allowed. By default, it is infinity.
+    **kwargs_for_factory : dict, optional
+        Additional keyword arguments for the factory.
+
+    Returns
+    -------
+    problem_information : ProblemSetupInformation
+        The information about the problem.
+    f : AbstractBlackBox
+        The black-box function.
+    x0 : np.ndarray
+        The initial x values.
+    y0 : np.ndarray
+        The initial y values.
+    observer_info : object
+        The information about the observer.
     """
     # If the user can run it with the envionment they currently
     # have, then we do not need to install it.
@@ -319,9 +446,10 @@ def start(
     force_isolation: bool = False,
     **kwargs_for_factory,
 ) -> AbstractBlackBox:
-    """
-    Works just like create, but it does not run the function on anything, and returns
-    only the black-box function.
+    """Starts the black-box function.
+
+    Works just like create, but it returns only the black-box function
+    and resets the evaluation budget.
 
     One example of running this function:
 
@@ -336,23 +464,44 @@ def start(
 
     If the black-box function is created as an isolated process, then
     it will automatically close when the context manager is closed.
+
+    Parameters
+    ----------
+    name : str
+        The name of the objective function.
+    seed : int, optional
+        The seed value for random number generation.
+    caller_info : dict, optional
+        Optional information about the caller that is forwarded to the logger to initialize the run.
+    observer : AbstractObserver, optional
+        The observer to use.
+    force_register : bool, optional
+        If True, then the objective function is registered without asking
+        for confirmation, overwriting any previous registration.
+    force_isolation : bool, optional
+        If True, then the objective function is instantiated as an isolated
+        process.
+    **kwargs_for_factory : dict, optional
+        Additional keyword arguments for the factory.
     """
     # Check if we can import the function immediately
     if name in AVAILABLE_PROBLEM_FACTORIES and not force_isolation:
         f, _, _ = __create_from_repository(name, seed=seed, **kwargs_for_factory)
-        return f
+    else:
+        # Check if the name is indeed registered, or
+        # available in the objective repository
+        __register_objective_if_available(name, force_register=force_register)
 
-    # Check if the name is indeed registered, or
-    # available in the objective repository
-    __register_objective_if_available(name, force_register=force_register)
-
-    # If not, then we create it as an isolated process
-    f, _, _ = __create_as_isolated_process(name, seed=seed, **kwargs_for_factory)
+        # If not, then we create it as an isolated process
+        f, _, _ = __create_as_isolated_process(name, seed=seed, **kwargs_for_factory)
 
     # instantiate observer (if desired)
     if observer is not None:
         observer.initialize_observer(f.info, caller_info, None, None, seed)
 
     f.set_observer(observer)
+
+    # Reset the counter of evaluations
+    f.reset_evaluation_budget()
 
     return f

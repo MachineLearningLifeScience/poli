@@ -7,9 +7,9 @@ import pandas as pd
 from scipy import stats
 from sklearn.metrics import mean_absolute_error
 
-plt.rcParams["figure.dpi"] = 300
-plt.rcParams["figure.figsize"] = [8.0, 8.0]
-plt.rcParams.update({"font.size": 14})
+# plt.rcParams["figure.dpi"] = 300
+# plt.rcParams["figure.figsize"] = [8.0, 8.0]
+# plt.rcParams.update({"font.size": 14})
 import glob
 import math
 import pickle

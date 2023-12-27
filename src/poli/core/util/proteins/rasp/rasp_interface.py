@@ -1,4 +1,5 @@
-"""
+"""An interface to the original RaSP codebase.
+
 This module takes and adapts RaSP's original implementation
 (which can be found at [1]), and writes an interface that 
 handles the preprocessing and inference steps.
@@ -19,12 +20,21 @@ This means that you will need internet access to use this interface
 and tools will be cached in the ~/.poli_objectives/rasp directory,
 so you will only need internet access once.
 
-[1] TODO: add.
-[2] TODO: add.
-
 RaSP's source code was provided with an Apache 2.0 license. Modifications
 from the source have been duly noted. Most of the source code can be found
 at ./inner_rasp.
+
+References
+----------
+[1] “Rapid Protein Stability Prediction Using Deep Learning Representations.”
+    Blaabjerg, Lasse M, Maher M Kassem, Lydia L Good, Nicolas Jonsson, Matteo Cagiada,
+    Kristoffer E Johansson, Wouter Boomsma, Amelie Stein, and Kresten Lindorff-Larsen.
+    Edited by José D Faraldo-Gómez, Detlef Weigel, Nir Ben-Tal, and Julian Echave.
+    eLife 12 (May 2023): e82593. https://doi.org/10.7554/eLife.82593.
+[2] The FoldX web server: an online force field.
+    Schymkowitz, J., Borg, J., Stricher, F., Nys, R.,
+    Rousseau, F., & Serrano, L. (2005).  Nucleic acids research,
+    33(suppl_2), W382-W388.
 """
 
 from typing import List

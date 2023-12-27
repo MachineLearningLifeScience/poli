@@ -127,7 +127,7 @@ class BaseVAE(object):
             epsilon_std: standard deviation of p(epsilon)
             kl_scale: weight of KL divergence loss
 
-        Returns:
+        Returns
             Variables representing z and epsilon
 
         """

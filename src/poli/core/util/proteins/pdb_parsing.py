@@ -2,7 +2,7 @@
 """
 
 from pathlib import Path
-from typing import Tuple, List
+from typing import List
 
 from Bio import PDB
 from Bio.PDB.Residue import Residue
@@ -18,7 +18,7 @@ def parse_pdb_as_structure(
     The parsing is done quietly by default,
     but you can set verbose=True to get some output.
 
-    Parameters:
+    Parameters
     -----------
     path_to_pdb : Path
         The path to the PDB file.
@@ -28,7 +28,7 @@ def parse_pdb_as_structure(
     verbose : bool, optional
         If True, print the progress of the parsing. Defaults to False.
 
-    Returns:
+    Returns
     --------
     PDB.Structure.Structure
         The parsed structure.
@@ -43,7 +43,7 @@ def parse_pdb_as_residues(
     """
     Parse a PDB file and return a list of Residue objects.
 
-    Parameters:
+    Parameters
     -----------
     path_to_pdb: Path
         The path to the PDB file.
@@ -52,7 +52,7 @@ def parse_pdb_as_residues(
     verbose: bool, optional
         Whether to print verbose output. Defaults to False.
 
-    Returns:
+    Returns
     --------
         residues: List[Residue]
             A list of Residue objects representing the parsed PDB file.
@@ -67,7 +67,7 @@ def parse_pdb_as_residue_strings(
     """
     Parse a PDB file and return a list of residue strings.
 
-    Parameters:
+    Parameters
     ----------
     path_to_pdb : Path
         The path to the PDB file.
@@ -76,7 +76,7 @@ def parse_pdb_as_residue_strings(
     verbose : bool, optional
         Whether to print verbose output, by default False.
 
-    Returns:
+    Returns
     -------
     List[str]
         A list of residue strings.

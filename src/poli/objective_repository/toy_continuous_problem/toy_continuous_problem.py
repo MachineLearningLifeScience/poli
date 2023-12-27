@@ -1,8 +1,5 @@
 """
-A series of testbed functions for optimization. FYI, we changed
-the functions from testing maximization instead of minimization.
-
-When run, this script plots the three example functions provided.
+A series of testbed functions for optimization.
 
 See for more examples:
 https://en.wikipedia.org/wiki/Test_functions_for_optimization
@@ -61,8 +58,7 @@ TWO_DIMENSIONAL_PROBLEMS = [
 
 class ToyContinuousProblem:
     """
-    This class will contain the toy objective functions, their limits,
-    and the optima location.
+    Contains the toy objective functions, their limits, and the optima location.
 
     For more information, check definitions.py and [1].
 

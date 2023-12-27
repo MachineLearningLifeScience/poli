@@ -1,4 +1,6 @@
+"""Utilities for loading up the cavity and downstream models for RaSP."""
 from pathlib import Path
+from typing import Tuple
 
 import torch
 
@@ -15,10 +17,27 @@ RASP_DIR = HOME_DIR / ".poli_objectives" / "rasp"
 RASP_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def load_cavity_and_downstream_models(DEVICE: str = "cpu"):
+def load_cavity_and_downstream_models(
+    DEVICE: str = "cpu",
+) -> Tuple[CavityModel, DownstreamModel]:
+    """Load the cavity and downstream models for RaSP.
+
+    Parameters
+    -----------
+    DEVICE : str, optional
+        The device to load the models on. Defaults to "cpu".
+
+    Returns
+    --------
+    cavity_model_net : CavityModel
+        The cavity model.
+    ds_model_net : DownstreamModel
+        The downstream model.
+    """
     # DEVICE = "cpu"
 
-    # TODO: Ask why this was implemented this way.
+    # TODO: Ask why this was implemented this way (i.e.
+    # loading from a "best_cavity_model_path").
     # A transparent alternative would be to simply
     # load the model from the path itself.
     best_cavity_model_path = RASP_DIR / "cavity_model_15.pt"
@@ -32,5 +51,3 @@ def load_cavity_and_downstream_models(DEVICE: str = "cpu"):
     ds_model_net.eval()
 
     return cavity_model_net, ds_model_net
-
-    ...

@@ -1,4 +1,5 @@
-"""
+"""Registers the toy continuous problem objective function and factory.
+
 This is a registration script for the toy continuous
 objectives which are usually used to benchmark continuous
 optimization algorithms in several dimensions.
@@ -9,12 +10,8 @@ dimensionality of the problem [1].
 The problem is registered as 'toy_continuous_problem',
 and it uses a conda environment called 'poli__base'
 (see the environment.yml file in this folder).
-
-The following problems are registered:
-TODO: write.
 """
 from typing import Tuple
-from string import ascii_uppercase
 
 import numpy as np
 
@@ -22,7 +19,7 @@ from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem_setup_information import ProblemSetupInformation
 
-from poli.core.util.seeding import seed_numpy, seed_python
+from poli.core.util.seeding import seed_python_numpy_and_torch
 
 from .toy_continuous_problem import (
     POSSIBLE_FUNCTIONS,
@@ -31,6 +28,51 @@ from .toy_continuous_problem import (
 
 
 class ToyContinuousBlackBox(AbstractBlackBox):
+    """
+    A black box implementation for evaluating the Toy Continuous Problem.
+
+    Parameters
+    ----------
+    info : ProblemSetupInformation
+        The problem setup information.
+    batch_size : int, optional
+        The batch size for parallel evaluation, by default None.
+    parallelize : bool, optional
+        Whether to parallelize the evaluation, by default False.
+    num_workers : int, optional
+        The number of workers for parallel evaluation, by default None.
+    evaluation_budget : int, optional
+        The maximum number of evaluations, by default float("inf").
+    function_name : str
+        The name of the toy continuous function to evaluate, by default None.
+    n_dimensions : int
+        The number of dimensions for the toy continuous function, by default 2.
+    embed_in : int, optional
+        If not None, the continuous problem is randomly embedded in this dimension.
+        By default, None.
+
+    Attributes
+    ----------
+    alphabet : None
+        The alphabet for the toy continuous problem.
+    function_name : str
+        The name of the toy continuous function.
+    n_dimensions : int
+        The number of dimensions for the toy continuous function.
+    embed_in : int
+        The dimension in which to embed the problem.
+    function : ToyContinuousProblem
+        The toy continuous problem instance.
+    bounds : Tuple[np.ndarray, np.ndarray]
+        The lower and upper bounds for the toy continuous problem.
+
+    Methods
+    -------
+    _black_box(x, context=None)
+        Evaluates the toy continuous problem on a continuous input x.
+
+    """
+
     def __init__(
         self,
         info: ProblemSetupInformation,
@@ -56,6 +98,7 @@ class ToyContinuousBlackBox(AbstractBlackBox):
             n_dims=n_dimensions,
             embed_in=embed_in,
         )
+        self.bounds = self.function.limits
 
         super().__init__(
             info=info,
@@ -65,13 +108,28 @@ class ToyContinuousBlackBox(AbstractBlackBox):
             evaluation_budget=evaluation_budget,
         )
 
-    # The only method you have to define
     def _black_box(self, x: np.ndarray, context: dict = None) -> np.ndarray:
-        # x is a [b, L] array of strings or ints, if they are
-        # ints, then we should convert them to strings
-        # using the alphabet.
-        # TODO: this assumes that the input is a batch of size 1.
-        # Address this when we change __call__.
+        """
+        Evaluates the toy continuous problem on a continuous input x.
+
+        Parameters
+        ----------
+        x : np.ndarray
+            The input to evaluate (expected to be an array [b, L] of floats).
+        context : dict, optional
+            The context of the evaluation, by default None.
+
+        Returns
+        -------
+        y : np.ndarray
+            The evaluation of the toy continuous problem.
+
+        Raises
+        ------
+        ValueError
+            If the input x is not of type float.
+
+        """
         if not x.dtype.kind == "f":
             raise ValueError("Expected a batch of floats. ")
 
@@ -80,6 +138,14 @@ class ToyContinuousBlackBox(AbstractBlackBox):
 
 class ToyContinuousProblemFactory(AbstractProblemFactory):
     def get_setup_information(self) -> ProblemSetupInformation:
+        """
+        Returns the setup information for the problem.
+
+        Returns
+        -------
+        problem_info : ProblemSetupInformation
+            The setup information for the problem.
+        """
         return ProblemSetupInformation(
             name="toy_continuous_problem",
             max_sequence_length=np.inf,
@@ -97,14 +163,51 @@ class ToyContinuousProblemFactory(AbstractProblemFactory):
         function_name: str = None,
         n_dimensions: int = 2,
         embed_in: int = None,
-    ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+    ) -> Tuple[ToyContinuousBlackBox, np.ndarray, np.ndarray]:
+        """
+        Creates a new instance of the toy continuous problem.
+
+        Parameters
+        ----------
+        seed : int, optional
+            The seed for the random number generator, by default None.
+        batch_size : int, optional
+            The batch size for simultaneous execution, by default None.
+        parallelize : bool, optional
+            Flag indicating whether to parallelize execution, by default False.
+        num_workers : int, optional
+            The number of workers for parallel execution, by default None.
+        evaluation_budget:  int, optional
+            The maximum number of function evaluations. Default is infinity.
+        function_name : str, optional
+            The name of the toy continuous function to evaluate, by default None.
+        n_dimensions : int, optional
+            The number of dimensions for the toy continuous function, by default 2.
+        embed_in : int, optional
+            If not None, the continuous problem is randomly embedded in this dimension.
+            By default, None.
+
+        Returns
+        -------
+        f : ToyContinuousBlackBox
+            The toy continuous black box instance.
+        x0 : np.ndarray
+            The initial input.
+        y0 : np.ndarray
+            The initial objective function value.
+
+        Raises
+        ------
+        ValueError
+            If the function_name is not one of the valid functions.
+        """
         assert (
             function_name in POSSIBLE_FUNCTIONS
         ), f"'{function_name}' is not a valid function name. Expected it to be one of {POSSIBLE_FUNCTIONS}."
 
         # We set the seed for numpy and python
-        seed_numpy(seed)
-        seed_python(seed)
+        if seed is not None:
+            seed_python_numpy_and_torch(seed)
 
         problem_info = self.get_setup_information()
         f = ToyContinuousBlackBox(

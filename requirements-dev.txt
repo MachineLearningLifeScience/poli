@@ -1,3 +1,5 @@
 black
 tox
 setuptools
+sphinx
+furo

@@ -1,4 +1,5 @@
-"""
+"""Utilities for defining and manipulating mutations on proteins.
+
 This module contains utilities for defining
 mutations on proteins according to foldx.
 
@@ -7,6 +8,9 @@ foldx expects mutations in a certain format:
     - the second letter is the position of the mutation
     - the third letter is the chain ID,
     - the fourth letter is the mutant residue.
+
+See the "Individual List Mode" of https://foldxsuite.crg.eu/parameter/mutant-file
+for more details.
 """
 from pathlib import Path
 from typing import List, Tuple, Union
@@ -17,9 +21,6 @@ from Bio.PDB.Residue import Residue
 from Bio.SeqUtils import seq1
 
 from poli.core.util.proteins.pdb_parsing import parse_pdb_as_residue_strings
-
-
-from typing import List, Tuple
 
 
 def edits_between_strings(
@@ -163,7 +164,7 @@ def find_closest_wildtype_pdb_file_to_mutant(
     """
     Find the closest wildtype PDB file to a given mutant residue string.
 
-    Parameters:
+    Parameters
     ----------
     wildtype_pdb_files : List[Path]
         A list of paths to wildtype PDB files.
@@ -173,13 +174,13 @@ def find_closest_wildtype_pdb_file_to_mutant(
         If True, return the hamming distance along with the best candidate PDB file.
         Default is False.
 
-    Returns:
+    Returns
     -------
     Union[Path, Tuple[Path, int]]
         If return_hamming_distance is True, returns a tuple containing the best candidate PDB file
         and the hamming distance. Otherwise, returns the best candidate PDB file.
 
-    Raises:
+    Raises
     ------
     ValueError
         If no PDB file of the same length as the mutated residue string is found.
