@@ -8,7 +8,13 @@ stability of a (single-site) mutant. For the informed reader,
 this black box can be considered a drop-in replacement of FoldX,
 or Rosetta.
 
-[1] TODO: add reference and implementation.
+[1] “Rapid Protein Stability Prediction Using Deep Learning Representations.”
+Blaabjerg, Lasse M, Maher M Kassem, Lydia L Good, Nicolas Jonsson,
+Matteo Cagiada, Kristoffer E Johansson, Wouter Boomsma, Amelie Stein,
+and Kresten Lindorff-Larsen.  Edited by José D Faraldo-Gómez,
+Detlef Weigel, Nir Ben-Tal, and Julian Echave. eLife 12
+(May 2023): e82593. https://doi.org/10.7554/eLife.82593.
+
 """
 from typing import Union, List, Tuple
 from pathlib import Path
@@ -31,7 +37,7 @@ from poli.core.util.proteins.pdb_parsing import (
 )
 from poli.core.util.proteins.mutations import find_closest_wildtype_pdb_file_to_mutant
 from poli.core.util.proteins.defaults import AMINO_ACIDS
-from poli.core.util.seeding import seed_numpy, seed_python
+from poli.core.util.seeding import seed_python_numpy_and_torch
 
 import numpy as np
 
@@ -69,6 +75,58 @@ DEFAULT_TMP_PATH = Path("/tmp").resolve()
 
 
 class RaspBlackBox(AbstractBlackBox):
+    """
+    RaSP Black Box implementation.
+
+    Parameters
+    ----------
+    info : ProblemSetupInformation
+        The problem setup information object.
+    batch_size : int, optional
+        The batch size for parallel evaluation, by default None.
+    parallelize : bool, optional
+        Flag indicating whether to parallelize evaluation, by default False.
+    num_workers : int, optional
+        The number of workers for parallel evaluation, by default None.
+    evaluation_budget : int, optional
+        The evaluation budget, by default float("inf").
+    wildtype_pdb_path : Union[Path, List[Path]]
+        The path(s) to the wildtype PDB file(s), by default None.
+    chains_to_keep : List[str], optional
+        The chains to keep in the PDB file(s), by default we
+        keep the chain "A" for all pdbs passed.
+    alphabet : List[str], optional
+        The alphabet for the problem, by default we use
+        the amino acid list provided in poli.core.util.proteins.defaults.
+    experiment_id : str, optional
+        The experiment ID, by default None.
+    tmp_folder : Path, optional
+        The temporary folder path, by default None.
+
+    Methods
+    -------
+    _black_box(x, context=None)
+        The main black box method that performs the computation, i.e.
+        it computes the stability of the mutant(s) in x.
+    _clean_wildtype_pdb_files()
+        This function cleans the wildtype pdb files
+        stored in self.wildtype_pdb_paths, using
+        cached results if they exist.
+
+
+    Raises
+    ------
+    AssertionError
+        If wildtype_pdb_path is not provided.
+
+    Notes
+    -----
+    - The wildtype_pdb_path can be a single Path object or a list of Path objects.
+    - If chains_to_keep is not provided, it defaults to keeping chain A for all wildtypes.
+    - If experiment_id is not provided, it is generated using the current timestamp and a random UUID.
+    - If tmp_folder is not provided, it defaults to the default temporary path.
+    """
+
     def __init__(
         self,
         info: ProblemSetupInformation,
@@ -83,7 +141,44 @@ class RaspBlackBox(AbstractBlackBox):
         tmp_folder: Path = None,
     ):
         """
-        TODO: document
+        Initialize the RaSP Register object.
+
+        Parameters:
+        -----------
+        info : ProblemSetupInformation
+            The problem setup information object.
+        batch_size : int, optional
+            The batch size for parallel evaluation, by default None.
+        parallelize : bool, optional
+            Flag indicating whether to parallelize evaluation, by default False.
+        num_workers : int, optional
+            The number of workers for parallel evaluation, by default None.
+        evaluation_budget : int, optional
+            The evaluation budget, by default float("inf").
+        wildtype_pdb_path : Union[Path, List[Path]]
+            The path(s) to the wildtype PDB file(s), by default None.
+        chains_to_keep : List[str], optional
+            The chains to keep in the PDB file(s), by default we
+            keep the chain "A" for all pdbs passed.
+        alphabet : List[str], optional
+            The alphabet for the problem, by default we use
+            the amino acid list provided in poli.core.util.proteins.defaults.
+        experiment_id : str, optional
+            The experiment ID, by default None.
+        tmp_folder : Path, optional
+            The temporary folder path, by default None.
+
+        Raises:
+        -------
+        AssertionError
+            If wildtype_pdb_path is not provided.
+
+        Notes:
+        ------
+        - The wildtype_pdb_path can be a single Path object or a list of Path objects.
+        - If chains_to_keep is not provided, it defaults to keeping chain A for all wildtypes.
+        - If experiment_id is not provided, it is generated using the current timestamp and a random UUID.
+        - If tmp_folder is not provided, it defaults to the default temporary path.
         """
         assert wildtype_pdb_path is not None, (
             "Missing required argument wildtype_pdb_file. "
@@ -214,8 +309,22 @@ class RaspBlackBox(AbstractBlackBox):
 
     def _black_box(self, x, context=None):
         """
-        TODO: document
+        Computes the stability of the mutant(s) in x.
 
+        Parameters
+        ----------
+        x : np.ndarray
+            Input array of shape [b, L] containing strings.
+        context : dict, optional
+            Additional context information (default is None).
+
+        Returns
+        -------
+        y : np.ndarray
+            The stability of the mutant(s) in x.
+
+        Notes
+        -----
         - x is a np.array[str] of shape [b, L], where L is the length
           of the longest sequence in the batch, and b is the batch size.
           We process it by concantenating the array into a single string,
@@ -304,7 +413,7 @@ class RaspBlackBox(AbstractBlackBox):
 class RaspProblemFactory(AbstractProblemFactory):
     def get_setup_information(self) -> ProblemSetupInformation:
         """
-        TODO: document
+        Returns the problem setup information for RaSP.
         """
         alphabet = AMINO_ACIDS
 
@@ -326,9 +435,45 @@ class RaspProblemFactory(AbstractProblemFactory):
         alphabet: List[str] = None,
         experiment_id: str = None,
         tmp_folder: Path = None,
-    ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
-        seed_numpy(seed)
-        seed_python(seed)
+    ) -> Tuple[RaspBlackBox, np.ndarray, np.ndarray]:
+        """
+        Creates a RaSP black box instance, alongside initial
+        observations.
+
+        Parameters
+        ----------
+        seed : int, optional
+            The seed value for random number generation, by default None.
+        batch_size : int, optional
+            The batch size for parallel evaluation, by default None.
+        parallelize : bool, optional
+            Flag indicating whether to parallelize evaluation, by default False.
+        num_workers : int, optional
+            The number of workers for parallel evaluation, by default None.
+        evaluation_budget : int, optional
+            The evaluation budget, by default float("inf").
+        wildtype_pdb_path : Union[Path, List[Path]]
+            (Required) The path(s) to the wildtype PDB file(s).
+        alphabet : List[str], optional
+            The alphabet for the problem, by default we use
+            the amino acid list provided in poli.core.util.proteins.defaults.
+        experiment_id : str, optional
+            The experiment ID, by default None.
+        tmp_folder : Path, optional
+            The temporary folder path, by default None.
+
+        Returns
+        -------
+        f : RaspBlackBox
+            The RaSP black box instance.
+        x0 : np.ndarray
+            The initial observations (i.e. the wildtypes as sequences
+            of amino acids).
+        y0 : np.ndarray
+            The initial observations (i.e. the stability of the wildtypes).
+        """
+        if seed is not None:
+            seed_python_numpy_and_torch(seed)
 
         if wildtype_pdb_path is None:
             raise ValueError(

@@ -1,7 +1,8 @@
-"""
+"""Registers the logP objective factory and black-box
+
 This is a registration script for the rdkit_logp problem,
 whose black box objective function returns the log quotient
-of solubility (a.k.a. logP) [1].
+of solubility (a.k.a. logP).
 
 This black box is a simple wrapper around RDKit's
 descriptors. We allow for both SMILES and SELFIES
@@ -19,14 +20,12 @@ these are the extra requirements:
 If you are interested in running this directly,
 instead of inside an isolated process, run:
 
-```
+`
 pip install rdkit selfies
-```
-
-[1] TODO: add reference
+`
 """
 from pathlib import Path
-from typing import Tuple, List
+from typing import Tuple, List, Literal
 import json
 
 import numpy as np
@@ -39,22 +38,59 @@ from poli.core.problem_setup_information import ProblemSetupInformation
 
 from poli.core.util.chemistry.string_to_molecule import strings_to_molecules
 
-from poli.core.util.seeding import seed_numpy, seed_python
+from poli.core.util.seeding import seed_python_numpy_and_torch
 
 
 class LogPBlackBox(AbstractBlackBox):
-    """
-    A simple black box that returns the QED
+    """Log-solubility of a small molecule.
+
+    A simple black box that returns the LogP
     of a molecule. By default, we assume that the
     result of concatenating the tokens will be
     a SMILES string, but you can set the context
     variable "from_selfies" to True to indicate
     that the input is a SELFIES string.
 
-    RDKit's Chem.MolFromSmiles function and qed are known
+    RDKit's Chem.MolFromSmiles function and logP are known
     for failing silently, so we return NaN if the
     molecule cannot be parsed or if qed returns
     something other than a float.
+
+    Parameters
+    ----------
+    info : ProblemSetupInformation
+        The problem setup information.
+    batch_size : int, optional
+        The batch size for processing multiple inputs simultaneously, by default None.
+    parallelize : bool, optional
+        Flag indicating whether to parallelize the computation, by default False.
+    num_workers : int, optional
+        The number of workers to use for parallel computation, by default None.
+    evaluation_budget:  int, optional
+        The maximum number of function evaluations. Default is infinity.
+    alphabet : List[str], optional
+        The alphabet to use for the black box. If not provided,
+        we use the alphabet from the problem setup information.
+    from_selfies : bool, optional
+        Flag indicating whether the input is a SELFIES string,
+        by default False (i.e. we expect a SMILES string).
+
+    Attributes
+    ----------
+    string_to_idx : dict
+        The mapping of symbols to their corresponding indices in the alphabet.
+    idx_to_string : dict
+        The mapping of indices to their corresponding symbols in the alphabet.
+    from_selfies : bool
+        Flag indicating whether the input is a SELFIES string.
+    from_smiles : bool
+        Flag indicating whether the input is a SMILES string.
+
+    Methods
+    -------
+    _black_box(x, context=None)
+        The main black box method that performs the computation, i.e.
+        it computes the logP of the molecule in x.
     """
 
     def __init__(
@@ -67,6 +103,28 @@ class LogPBlackBox(AbstractBlackBox):
         alphabet: List[str] = None,
         from_selfies: bool = False,
     ):
+        """
+        Initializes the LogP black box.
+
+        Parameters
+        ----------
+        info : ProblemSetupInformation
+            The problem setup information.
+        batch_size : int, optional
+            The batch size for processing multiple inputs simultaneously, by default None.
+        parallelize : bool, optional
+            Flag indicating whether to parallelize the computation, by default False.
+        num_workers : int, optional
+            The number of workers to use for parallel computation, by default None.
+        evaluation_budget:  int, optional
+            The maximum number of function evaluations. Default is infinity.
+        alphabet : List[str], optional
+            The alphabet to use for the black box. If not provided,
+            we use the alphabet from the problem setup information.
+        from_selfies : bool, optional
+            Flag indicating whether the input is a SELFIES string,
+            by default False (i.e. we expect a SMILES string).
+        """
         if alphabet is None:
             # TODO: remove this as soon as we have a default alphabet
             assert info.alphabet is not None, (
@@ -92,10 +150,11 @@ class LogPBlackBox(AbstractBlackBox):
 
     # The only method you have to define
     def _black_box(self, x: np.ndarray, context: dict = None) -> np.ndarray:
-        """
+        """Computes the logP of a molecule x (array of strings).
+
         Assuming that x is an array of integers of length L,
         we use the alphabet to construct a SMILES string,
-        and query QED from RDKit.
+        and query logP from RDKit.
         """
         if x.dtype.kind in ["U", "S"]:
             molecule_strings = ["".join([x_ij for x_ij in x_i.flatten()]) for x_i in x]
@@ -139,6 +198,14 @@ class LogPBlackBox(AbstractBlackBox):
 
 class LogPProblemFactory(AbstractProblemFactory):
     def get_setup_information(self) -> ProblemSetupInformation:
+        """
+        Returns the setup information for the logP problem.
+
+        Returns
+        -------
+        info : ProblemSetupInformation
+            The setup information for the logP problem.
+        """
         return ProblemSetupInformation(
             name="rdkit_logp",
             max_sequence_length=np.inf,
@@ -155,10 +222,42 @@ class LogPProblemFactory(AbstractProblemFactory):
         evaluation_budget: int = float("inf"),
         path_to_alphabet: Path = None,
         alphabet: List[str] = None,
-        string_representation: str = "SMILES",
-    ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
-        seed_numpy(seed)
-        seed_python(seed)
+        string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
+    ) -> Tuple[LogPBlackBox, np.ndarray, np.ndarray]:
+        """Creates a logP problem instance.
+
+        Parameters
+        ----------
+        seed : int, optional
+            The seed value for random number generation, by default None.
+        batch_size : int, optional
+            The batch size for processing multiple inputs simultaneously, by default None.
+        parallelize : bool, optional
+            Flag indicating whether to parallelize the computation, by default False.
+        num_workers : int, optional
+            The number of workers to use for parallel computation, by default None.
+        evaluation_budget:  int, optional
+            The maximum number of function evaluations. Default is infinity.
+        path_to_alphabet : Path, optional
+            The path to the alphabet file, by default None.
+        alphabet : List[str], optional
+            The alphabet to use for the black box. If not provided,
+            we use the alphabet from the problem setup information.
+        string_representation : str, optional
+            The string representation of the input, by default "SMILES".
+            Supported values are "SMILES" and "SELFIES".
+
+        Returns
+        -------
+        f : LogPBlackBox
+            The logP black box function.
+        x0 : np.ndarray
+            The initial input values (a single carbon).
+        y0 : np.ndarray
+            The initial output values (the logP of a single carbon).
+        """
+        if seed is not None:
+            seed_python_numpy_and_torch(seed)
 
         if path_to_alphabet is None and alphabet is None:
             # TODO: add support for more file types

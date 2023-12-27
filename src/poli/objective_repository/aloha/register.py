@@ -1,4 +1,5 @@
-"""
+"""Aloha objective factory and function.
+
 This is a registration script for the ALOHA problem,
 a simple example of a discrete black box objective
 function where the goal is to find the sequence
@@ -17,7 +18,7 @@ from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem_setup_information import ProblemSetupInformation
 
-from poli.core.util.seeding import seed_numpy, seed_python
+from poli.core.util.seeding import seed_python_numpy_and_torch
 
 
 class AlohaBlackBox(AbstractBlackBox):
@@ -189,8 +190,7 @@ class AlohaProblemFactory(AbstractProblemFactory):
         """
         # We set the seed for numpy and python
         if seed is not None:
-            seed_numpy(seed)
-            seed_python(seed)
+            seed_python_numpy_and_torch(seed)
 
         problem_info = self.get_setup_information()
         f = AlohaBlackBox(

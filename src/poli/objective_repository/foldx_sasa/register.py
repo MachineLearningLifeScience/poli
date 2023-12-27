@@ -1,4 +1,4 @@
-"""This script registers the SASA FoldX black box and objective factory.
+"""Registers the SASA FoldX black box and objective factory.
 
 FoldX [1] is a simulator that allows for computing the difference
 in free energy between a wildtype protein and a mutated protein.
@@ -93,7 +93,8 @@ class FoldXSASABlackBox(FoldxBlackBox):
         )
 
     def _black_box(self, x: np.ndarray, context: None) -> np.ndarray:
-        """
+        """Computes the SASA score for a given mutation x.
+
         Runs the given input x and pdb files provided
         in the context through FoldX and returns the
         total SASA score.

@@ -3,7 +3,12 @@ This module implements LogP in _exactly_ the same was
 as LaMBO does it [1]. We do this by importing the function
 they use to compute `logp`.
 
-[1]: TODO: add reference.
+References
+----------
+[1] “Accelerating Bayesian Optimization for Biological Sequence Design with Denoising Autoencoders.”
+Stanton, Samuel, Wesley Maddox, Nate Gruver, Phillip Maffettone,
+Emily Delaney, Peyton Greenside, and Andrew Gordon Wilson.
+arXiv, July 12, 2022. http://arxiv.org/abs/2203.12742.
 """
 from typing import Tuple
 import numpy as np

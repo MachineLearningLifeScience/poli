@@ -1,5 +1,5 @@
 """
-This script registers the stability and SASA FoldX black box
+Registers the stability and SASA FoldX black box
 and objective factory.
 
 FoldX [1] is a simulator that allows for computing the difference
