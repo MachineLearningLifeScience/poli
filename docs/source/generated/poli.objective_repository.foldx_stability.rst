@@ -28,6 +28,5 @@ poli.objective\_repository.foldx\_stability
    :template: custom-module-template.rst
    :recursive:
 
-   poli.objective_repository.foldx_stability.foldx_utils
    poli.objective_repository.foldx_stability.register
 

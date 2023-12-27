@@ -46,7 +46,31 @@ extensions = [
 ]
 autosummary_generate = True  # Turn on sphinx.ext.autosummary
 
-autodoc_mock_imports = ["biopython", "Bio"]
+autodoc_mock_imports = [
+    "biopython",
+    "Bio",
+    "tdc",
+    "pdbtools",
+    "torch",
+    "pandas",
+    "rdkit",
+    "lambo",
+    "selfies",
+    "github",
+    "yaml",
+    "pytz",
+    "matplotlib",
+    "scipy",
+    "sklearn",
+    "tensorflow",
+    "hydra",
+    "ptitprince",
+    "seaborn",
+    "pdbfixer",
+    "openmm",
+    "simtk",
+    "dockstring",
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]

@@ -85,3 +85,24 @@ x = np.array([["[C]", "[C]", "[C]"]])
 print(f"f({x}) = {f(x)}")
 
 ```
+
+## Where can I find the documentation?
+
+
+
+### Building the documentation locally
+
+If you install the `requirements-dev.txt` via
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+then you will have access to `sphinx`. You should be able to build the documentation by going to the docs folder and building it:
+
+```bash
+cd docs/
+make html
+```
+
+Afterwards, you can enter the `build` folder and open `index.html`.
