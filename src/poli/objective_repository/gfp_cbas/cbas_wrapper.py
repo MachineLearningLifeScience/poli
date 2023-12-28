@@ -27,7 +27,7 @@ class CBASVAEWrapper(AbstractVAEWrapper):
     def __init__(self, AA: int, L: int):
         self.L = L
         self.AA = AA
-        model_path = Path(__file__).parent.resolve() / "assets" / "models"
+        model_path = Path(__file__).parent.resolve() / "assets" / "models" / "vae"
         vae_0 = build_vae(
             latent_dim=20,
             n_tokens=self.AA,  # 20,  # TODO: test if this is self.AA?
@@ -76,7 +76,7 @@ class CBASVAEWrapper(AbstractVAEWrapper):
         else:
             return self._decoder(z)
 
-    def transform_sequences_to_atoms(self, x: [torch.Tensor]) -> torch.Tensor:
+    def transform_sequences_to_atoms(self, x: torch.Tensor) -> torch.Tensor:
         """
         Turns a sequence into an approximately Dirac distribution around the sequence.
         :param x:
