@@ -22,6 +22,9 @@ wandb/
 tmp/
 src/poli/objective_repository/rasp/101m.pdb
 
+# Include specific model assets even if npy applies
+!src/poli/objective_repository/gfp_cbas/assets/models/gp/*.npy
+
 # Documentation
 docs/build/
 docs/source/generated/
