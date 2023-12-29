@@ -119,7 +119,7 @@ class GFPCBasBlackBox(AbstractBlackBox):
         with torch.no_grad():
             cbas_mu = self.f(x)
         return np.array(cbas_mu)
-    
+
     def __iter__(self, *args, **kwargs):
         warn(f"{self.__class__.__name__} iteration invoked. Not implemented!")
 
