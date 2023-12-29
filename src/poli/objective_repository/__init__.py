@@ -101,6 +101,9 @@ try:
     from .gfp_cbas.register import GFPCBasProblemFactory
 
     AVAILABLE_PROBLEM_FACTORIES["gfp_cbas"] = GFPCBasProblemFactory
+    AVAILABLE_PROBLEM_FACTORIES["gfp_cbas_gp"] = GFPCBasProblemFactory
+    AVAILABLE_PROBLEM_FACTORIES["gfp_cbas_elbo"] = GFPCBasProblemFactory
+    AVAILABLE_PROBLEM_FACTORIES["gfp_cbas_vae"] = GFPCBasProblemFactory
 except (ImportError, FileNotFoundError):
     pass
 
