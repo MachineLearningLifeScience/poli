@@ -1,5 +1,4 @@
-from lib2to3.pytree import convert
-import os
+from warnings import warn
 from pathlib import Path
 from typing import List, Tuple
 import numpy as np
@@ -120,6 +119,9 @@ class GFPCBasBlackBox(AbstractBlackBox):
         with torch.no_grad():
             cbas_mu = self.f(x)
         return np.array(cbas_mu)
+    
+    def __iter__(self, *args, **kwargs):
+        warn(f"{self.__class__.__name__} iteration invoked. Not implemented!")
 
 
 class GFPCBasProblemFactory(AbstractProblemFactory):
@@ -187,6 +189,14 @@ if __name__ == "__main__":
     gfp_problem_factory.create(seed=12)
     # instantiate different types of CBas problems:
     gfp_problem_factory_vae = GFPCBasProblemFactory(problem_type="vae")
+    register_problem(
+        gfp_problem_factory_vae,
+        conda_environment_name="poli__protein_cbas",
+    )
     gfp_problem_factory_vae.create(seed=12)
     gfp_problem_factory_elbo = GFPCBasProblemFactory(problem_type="elbo")
-    gfp_problem_factory_elbo.create(seed=12)
+    register_problem(
+        gfp_problem_factory_elbo,
+        conda_environment_name="poli__protein_cbas",
+    )
+    # gfp_problem_factory_elbo.create(seed=12)
