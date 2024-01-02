@@ -11,4 +11,4 @@ dependencies:
   - pip
   - pip:
     - numpy
-    - "git+https://github.com/MachineLearningLifeScience/poli.git@master"
+    - "git+https://github.com/MachineLearningLifeScience/poli.git@dev"
