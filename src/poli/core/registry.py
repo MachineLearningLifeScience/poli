@@ -280,7 +280,7 @@ def delete_problem(problem_name: str):
     _write_config()
 
 
-def get_problems(include_repository: bool = False) -> List[str]:
+def get_problems(include_repository: bool = True) -> List[str]:
     """Returns a list of registered problems.
 
     Parameters
