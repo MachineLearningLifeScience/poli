@@ -134,7 +134,7 @@ class AlohaProblemFactory(AbstractProblemFactory):
     get_setup_information()
         Returns the setup information for the problem.
 
-    create(seed=None, batch_size=None, parallelize=False, num_workers=None)
+    create(...)
         Creates a problem instance with the specified parameters.
     """
 

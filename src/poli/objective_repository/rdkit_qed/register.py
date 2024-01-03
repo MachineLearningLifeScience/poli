@@ -232,19 +232,24 @@ class QEDProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
+        alphabet: List[str],
+        string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-        alphabet: List[str] = None,
-        path_to_alphabet: Path = None,
-        string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
     ) -> Tuple[QEDBlackBox, np.ndarray, np.ndarray]:
         """Creates a QED black box function and initial observations.
 
         Parameters
         ----------
+        alphabet : List[str]
+            The alphabet to use for encoding molecules. This alphabet
+            is usually dataset-dependent.
+        string_representation : str, optional
+            The string representation to use, by default "SMILES".
+            It must be either "SMILES" or "SELFIES".
         seed : int, optional
             The seed value for random number generation, by default None.
         batch_size : int, optional
@@ -255,17 +260,6 @@ class QEDProblemFactory(AbstractProblemFactory):
             The number of workers for parallel evaluation, by default None.
         evaluation_budget : int, optional
             The maximum number of evaluations, by default float("inf").
-        alphabet : List[str], optional
-            The alphabet to use for encoding molecules, by default None.
-            If not provided, the alphabet from the problem setup information
-            will be used. We strongly advice providing an alphabet.
-        path_to_alphabet : Path, optional
-            The path to a json file containing the alphabet, by default None.
-            If not provided, the alphabet from the problem setup information
-            will be used. We strongly advice providing an alphabet.
-        string_representation : str, optional
-            The string representation to use, by default "SMILES".
-            It must be either "SMILES" or "SELFIES".
 
         Returns
         -------
@@ -279,35 +273,11 @@ class QEDProblemFactory(AbstractProblemFactory):
         if seed is not None:
             seed_python_numpy_and_torch(seed)
 
-        if path_to_alphabet is None and alphabet is None:
-            # TODO: add support for more file types
-            raise ValueError(
-                "Missing required keyword argument: either path_to_alphabet or alphabet must be provided. \n"
-                "- alphabet could be a List[str], or \n "
-                "- path_to_alphabet could be the Path to a json file [token_1, token_2, ...] \n "
-            )
-
         if string_representation.upper() not in ["SMILES", "SELFIES"]:
             raise ValueError(
                 "Missing required keyword argument: string_representation: str. "
                 "String representation must be either 'SMILES' or 'SELFIES'."
             )
-
-        if alphabet is None:
-            if isinstance(path_to_alphabet, str):
-                path_to_alphabet = Path(path_to_alphabet.strip()).resolve()
-
-            if not path_to_alphabet.exists():
-                raise ValueError(f"Path to alphabet {path_to_alphabet} does not exist.")
-
-            if not path_to_alphabet.suffix == ".json":
-                # TODO: add support for more file types
-                raise ValueError(
-                    f"Path to alphabet {path_to_alphabet} must be a json file."
-                )
-
-            with open(path_to_alphabet, "r") as f:
-                alphabet = json.load(f)
 
         self.alphabet = alphabet
 

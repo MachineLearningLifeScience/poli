@@ -43,6 +43,11 @@ class DockstringBlackBox(AbstractBlackBox):
     ----------
     info : ProblemSetupInformation
         The problem setup information.
+    target_name : str
+        The name of the target protein.
+    string_representation : str, optional
+        The string representation of the molecules. Either SMILES or SELFIES.
+        Default is SMILES.
     batch_size : int, optional
         The batch size for processing multiple inputs simultaneously, by default None.
     parallelize : bool, optional
@@ -51,11 +56,6 @@ class DockstringBlackBox(AbstractBlackBox):
         The number of workers to use for parallel computation, by default None.
     evaluation_budget:  int, optional
         The maximum number of function evaluations. Default is infinity.
-    target_name : str
-        The name of the target protein.
-    string_representation : str
-        The string representation of the molecules. Either SMILES or SELFIES.
-        Default is SMILES.
 
     Attributes
     ----------
@@ -79,12 +79,12 @@ class DockstringBlackBox(AbstractBlackBox):
     def __init__(
         self,
         info: ProblemSetupInformation,
+        target_name: str,
+        string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-        target_name: str = None,
-        string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
     ):
         """
         Initialize the dockstring black box object.
@@ -209,18 +209,23 @@ class DockstringProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
+        target_name: str,
+        string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-        target_name: str = None,
-        string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
     ) -> Tuple[DockstringBlackBox, np.ndarray, np.ndarray]:
         """Creates a dockstring black box function and initial observations.
 
         Parameters
         ----------
+        target_name : str
+            The name of the target protein (see dockstring for more details).
+        string_representation : str, optional
+            The string representation of the molecules. Either SMILES or SELFIES.
+            Default is SMILES.
         seed : int, optional
             The seed value for random number generation, by default None.
         batch_size : int, optional
@@ -232,11 +237,6 @@ class DockstringProblemFactory(AbstractProblemFactory):
             use half the number of available CPUs (rounded down).
         evaluation_budget:  int, optional
             The maximum number of function evaluations. Default is infinity.
-        target_name : str
-            The name of the target protein (see dockstring for more details).
-        string_representation : str
-            The string representation of the molecules. Either SMILES or SELFIES.
-            Default is SMILES.
 
         Returns
         -------
