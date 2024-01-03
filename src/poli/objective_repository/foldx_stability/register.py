@@ -52,8 +52,19 @@ class FoldXStabilityBlackBox(FoldxBlackBox):
 
     Parameters
     ----------
-    info : ProblemSetupInformation, optional
-        The problem setup information (default is None).
+    info : ProblemSetupInformation
+        The problem setup information (usually provided by the factory).
+    wildtype_pdb_path : Union[Path, List[Path]]
+        The path(s) to the wildtype PDB file(s).
+    alphabet : List[str], optional
+        The alphabet of amino acids. By default, we use the 20
+        amino acids shown in poli.core.util.proteins.defaults.
+    experiment_id : str, optional
+        The ID of the experiment (default is None).
+    tmp_folder : Path, optional
+        The path to the temporary folder (default is None).
+    eager_repair : bool, optional
+        Whether to eagerly repair the protein structures (default is False).
     batch_size : int, optional
         The batch size for parallel processing (default is None).
     parallelize : bool, optional
@@ -62,16 +73,6 @@ class FoldXStabilityBlackBox(FoldxBlackBox):
         The number of workers for parallel processing (default is None).
     evaluation_budget:  int, optional
         The maximum number of function evaluations. Default is infinity.
-    wildtype_pdb_path : Union[Path, List[Path]], required
-        The path(s) to the wildtype PDB file(s) (default is None).
-    alphabet : List[str], optional
-        The alphabet of amino acids (default is None).
-    experiment_id : str, optional
-        The ID of the experiment (default is None).
-    tmp_folder : Path, optional
-        The path to the temporary folder (default is None).
-    eager_repair : bool, optional
-        Whether to eagerly repair the protein structures (default is False).
 
     Methods
     -------
@@ -190,22 +191,32 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
+        wildtype_pdb_path: Union[Path, List[Path]],
+        alphabet: List[str] = None,
+        experiment_id: str = None,
+        tmp_folder: Path = None,
+        eager_repair: bool = False,
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-        wildtype_pdb_path: Union[Path, List[Path]] = None,
-        alphabet: List[str] = None,
-        experiment_id: str = None,
-        tmp_folder: Path = None,
-        eager_repair: bool = False,
     ) -> Tuple[FoldXStabilityBlackBox, np.ndarray, np.ndarray]:
         """
         Creates a FoldX stability black box function and initial observations.
 
         Parameters
         ----------
+        wildtype_pdb_path : Union[Path, List[Path]]
+            Path(s) to the wildtype PDB file(s).
+        alphabet : List[str], optional
+            List of amino acids to use as the alphabet.
+        experiment_id : str, optional
+            Identifier for the experiment.
+        tmp_folder : Path, optional
+            Path to the temporary folder for storing intermediate files.
+        eager_repair : bool, optional
+            Whether to eagerly repair the protein structures.
         seed : int, optional
             Seed for random number generation.
         batch_size : int, optional
@@ -216,16 +227,6 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
             Number of worker processes to use for parallel computation.
         evaluation_budget:  int, optional
             The maximum number of function evaluations. Default is infinity.
-        wildtype_pdb_path : Union[Path, List[Path]], required
-            Path(s) to the wildtype PDB file(s).
-        alphabet : List[str], optional
-            List of amino acids to use as the alphabet.
-        experiment_id : str, optional
-            Identifier for the experiment.
-        tmp_folder : Path, optional
-            Path to the temporary folder for storing intermediate files.
-        eager_repair : bool, optional
-            Whether to eagerly repair the protein structures.
 
         Returns
         -------
@@ -272,15 +273,15 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
         # TODO: add support for a larger batch-size.
         f = FoldXStabilityBlackBox(
             info=problem_info,
-            batch_size=batch_size,
-            parallelize=parallelize,
-            num_workers=num_workers,
-            evaluation_budget=evaluation_budget,
             wildtype_pdb_path=wildtype_pdb_path,
             alphabet=alphabet,
             experiment_id=experiment_id,
             tmp_folder=tmp_folder,
             eager_repair=eager_repair,
+            batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
         )
 
         # During the creation of the black box,

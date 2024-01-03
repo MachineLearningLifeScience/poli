@@ -108,18 +108,20 @@ class SAProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
+        string_representation: str = "SMILES",
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-        string_representation: str = "SMILES",
     ) -> Tuple[SABlackBox, np.ndarray, np.ndarray]:
         """
         Creates a synthetic-accessibility problem instance with the specified parameters.
 
         Parameters
         -----------
+        string_representation : str, optional
+            The string representation of the input molecules. Default is "SMILES".
         seed:  int, optional
             The seed for random number generation. Default is None.
         batch_size:  int, optional
@@ -130,8 +132,6 @@ class SAProblemFactory(AbstractProblemFactory):
             The number of workers for parallel evaluation. Default is None.
         evaluation_budget:  int, optional
             The maximum number of function evaluations. Default is infinity.
-        string_representation : str, optional
-            The string representation of the input molecules. Default is "SMILES".
 
         Returns
         --------

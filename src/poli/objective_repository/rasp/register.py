@@ -130,15 +130,15 @@ class RaspBlackBox(AbstractBlackBox):
     def __init__(
         self,
         info: ProblemSetupInformation,
-        batch_size: int = None,
-        parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = float("inf"),
-        wildtype_pdb_path: Union[Path, List[Path]] = None,
+        wildtype_pdb_path: Union[Path, List[Path]],
         chains_to_keep: List[str] = None,
         alphabet: List[str] = None,
         experiment_id: str = None,
         tmp_folder: Path = None,
+        batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
+        evaluation_budget: int = float("inf"),
     ):
         """
         Initialize the RaSP Register object.
@@ -147,6 +147,8 @@ class RaspBlackBox(AbstractBlackBox):
         -----------
         info : ProblemSetupInformation
             The problem setup information object.
+        wildtype_pdb_path : Union[Path, List[Path]]
+            The path(s) to the wildtype PDB file(s).
         batch_size : int, optional
             The batch size for parallel evaluation, by default None.
         parallelize : bool, optional
@@ -155,8 +157,6 @@ class RaspBlackBox(AbstractBlackBox):
             The number of workers for parallel evaluation, by default None.
         evaluation_budget : int, optional
             The evaluation budget, by default float("inf").
-        wildtype_pdb_path : Union[Path, List[Path]]
-            The path(s) to the wildtype PDB file(s), by default None.
         chains_to_keep : List[str], optional
             The chains to keep in the PDB file(s), by default we
             keep the chain "A" for all pdbs passed.
@@ -426,15 +426,15 @@ class RaspProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
+        wildtype_pdb_path: Union[Path, List[Path]],
+        alphabet: List[str] = None,
+        experiment_id: str = None,
+        tmp_folder: Path = None,
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-        wildtype_pdb_path: Union[Path, List[Path]] = None,
-        alphabet: List[str] = None,
-        experiment_id: str = None,
-        tmp_folder: Path = None,
     ) -> Tuple[RaspBlackBox, np.ndarray, np.ndarray]:
         """
         Creates a RaSP black box instance, alongside initial
@@ -442,6 +442,15 @@ class RaspProblemFactory(AbstractProblemFactory):
 
         Parameters
         ----------
+        wildtype_pdb_path : Union[Path, List[Path]]
+            The path(s) to the wildtype PDB file(s).
+        alphabet : List[str], optional
+            The alphabet for the problem, by default we use
+            the amino acid list provided in poli.core.util.proteins.defaults.
+        experiment_id : str, optional
+            The experiment ID, by default None.
+        tmp_folder : Path, optional
+            The temporary folder path, by default None.
         seed : int, optional
             The seed value for random number generation, by default None.
         batch_size : int, optional
@@ -452,15 +461,6 @@ class RaspProblemFactory(AbstractProblemFactory):
             The number of workers for parallel evaluation, by default None.
         evaluation_budget : int, optional
             The evaluation budget, by default float("inf").
-        wildtype_pdb_path : Union[Path, List[Path]]
-            (Required) The path(s) to the wildtype PDB file(s).
-        alphabet : List[str], optional
-            The alphabet for the problem, by default we use
-            the amino acid list provided in poli.core.util.proteins.defaults.
-        experiment_id : str, optional
-            The experiment ID, by default None.
-        tmp_folder : Path, optional
-            The temporary folder path, by default None.
 
         Returns
         -------
@@ -501,14 +501,14 @@ class RaspProblemFactory(AbstractProblemFactory):
 
         f = RaspBlackBox(
             info=self.get_setup_information(),
-            batch_size=batch_size,
-            parallelize=parallelize,
-            num_workers=num_workers,
-            evaluation_budget=evaluation_budget,
             wildtype_pdb_path=wildtype_pdb_path,
             alphabet=alphabet,
             experiment_id=experiment_id,
             tmp_folder=tmp_folder,
+            batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
         )
 
         # Constructing x0

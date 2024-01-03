@@ -104,18 +104,20 @@ class DRD3ProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
+        string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-        string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
     ) -> Tuple[TDCBlackBox, np.ndarray, np.ndarray]:
         """
         Create a TDCBlackBox object for DRD3 docking.
 
         Parameters
         ----------
+        string_representation : str, optional
+            The string representation of the molecules. Must be either 'SMILES' or 'SELFIES'. Default is 'SMILES'.
         seed : int, optional
             Seed for random number generators. If None, no seed is set.
         batch_size : int, optional
@@ -126,8 +128,6 @@ class DRD3ProblemFactory(AbstractProblemFactory):
             Number of worker processes to use for parallelization. If None, the number of available CPU cores is used.
         evaluation_budget:  int, optional
             The maximum number of function evaluations. Default is infinity.
-        string_representation : str, optional
-            The string representation of the molecules. Must be either 'SMILES' or 'SELFIES'. Default is 'SMILES'.
 
         Returns
         -------

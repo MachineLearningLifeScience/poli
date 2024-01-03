@@ -100,13 +100,13 @@ class PenalizedLogPLamboProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
+        penalized: bool = True,
+        string_representation: str = "SMILES",
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-        penalized: bool = True,
-        string_representation: str = "SMILES",
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         seed_numpy(seed)
         seed_python(seed)

@@ -35,7 +35,7 @@ from poli.core.util.proteins.foldx import FoldxInterface
 
 from poli.core.proteins.foldx_black_box import FoldxBlackBox
 
-from poli.core.util.seeding import seed_numpy, seed_python
+from poli.core.util.seeding import seed_python_numpy_and_torch
 
 
 class FoldXSASABlackBox(FoldxBlackBox):
@@ -44,17 +44,9 @@ class FoldXSASABlackBox(FoldxBlackBox):
 
     Parameters
     -----------
-    info : ProblemSetupInformation, optional
-        The problem setup information. Default is None.
-    batch_size : int, optional
-        The batch size for parallel processing. Default is None.
-    parallelize : bool, optional
-        Whether to parallelize the computation. Default is False.
-    num_workers : int, optional
-        The number of workers for parallel processing. Default is None.
-    evaluation_budget : int, optional
-        The maximum number of function evaluations. Default is infinity.
-    wildtype_pdb_path : Union[Path, List[Path]], required
+    info : ProblemSetupInformation
+        The problem setup information (usually provided by the factory)
+    wildtype_pdb_path : Union[Path, List[Path]]
         The path(s) to the wildtype PDB file(s). Default is None.
     alphabet : List[str], optional
         The alphabet of amino acids. Default is None.
@@ -64,20 +56,28 @@ class FoldXSASABlackBox(FoldxBlackBox):
         The path to the temporary folder. Default is None.
     eager_repair : bool, optional
         Whether to perform eager repair. Default is False.
+    batch_size : int, optional
+        The batch size for parallel processing. Default is None.
+    parallelize : bool, optional
+        Whether to parallelize the computation. Default is False.
+    num_workers : int, optional
+        The number of workers for parallel processing. Default is None.
+    evaluation_budget : int, optional
+        The maximum number of function evaluations. Default is infinity.
     """
 
     def __init__(
         self,
-        info: ProblemSetupInformation = None,
-        batch_size: int = None,
-        parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = float("inf"),
-        wildtype_pdb_path: Union[Path, List[Path]] = None,
+        info: ProblemSetupInformation,
+        wildtype_pdb_path: Union[Path, List[Path]],
         alphabet: List[str] = None,
         experiment_id: str = None,
         tmp_folder: Path = None,
         eager_repair: bool = False,
+        batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
+        evaluation_budget: int = float("inf"),
     ):
         super().__init__(
             info=info,
@@ -185,22 +185,33 @@ class FoldXSASAProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
+        wildtype_pdb_path: Union[Path, List[Path]],
+        alphabet: List[str] = None,
+        experiment_id: str = None,
+        tmp_folder: Path = None,
+        eager_repair: bool = False,
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-        wildtype_pdb_path: Union[Path, List[Path]] = None,
-        alphabet: List[str] = None,
-        experiment_id: str = None,
-        tmp_folder: Path = None,
-        eager_repair: bool = False,
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         """
         Create a FoldXSASABlackBox object and compute the initial values of wildtypes.
 
         Parameters
         ----------
+        wildtype_pdb_path : Union[Path, List[Path]]
+            Path or list of paths to the wildtype PDB files.
+        alphabet : List[str], optional
+            List of amino acid symbols. By defualt, the 20 amino acids
+            shown in poli.core.util.proteins.defaults are used.
+        experiment_id : str, optional
+            Identifier for the experiment.
+        tmp_folder : Path, optional
+            Path to the temporary folder for intermediate files.
+        eager_repair : bool, optional
+            Flag indicating whether to perform eager repair.
         seed : int, optional
             Seed for random number generators. If None is passed,
             the seeding doesn't take place.
@@ -212,16 +223,6 @@ class FoldXSASAProblemFactory(AbstractProblemFactory):
             Number of worker processes for parallel computation.
         evaluation_budget : int, optional
             The maximum number of function evaluations. Default is infinity.
-        wildtype_pdb_path : Union[Path, List[Path]], required
-            Path or list of paths to the wildtype PDB files.
-        alphabet : List[str], optional
-            List of amino acid symbols.
-        experiment_id : str, optional
-            Identifier for the experiment.
-        tmp_folder : Path, optional
-            Path to the temporary folder for intermediate files.
-        eager_repair : bool, optional
-            Flag indicating whether to perform eager repair.
 
         Returns
         -------
@@ -234,8 +235,8 @@ class FoldXSASAProblemFactory(AbstractProblemFactory):
             If wildtype_pdb_path is missing or has an invalid type.
         """
         # We start by seeding the RNGs
-        seed_numpy(seed)
-        seed_python(seed)
+        if seed is not None:
+            seed_python_numpy_and_torch(seed)
 
         # We check whether the keyword arguments are valid
         if wildtype_pdb_path is None:
