@@ -215,19 +215,24 @@ class LogPProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
+        alphabet: List[str],
+        string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-        path_to_alphabet: Path = None,
-        alphabet: List[str] = None,
-        string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
     ) -> Tuple[LogPBlackBox, np.ndarray, np.ndarray]:
         """Creates a logP problem instance.
 
         Parameters
         ----------
+        alphabet : List[str].
+            The alphabet to use for the black box. This alphabet
+            is usually dataset-dependent.
+        string_representation : str, optional
+            The string representation of the input, by default "SMILES".
+            Supported values are "SMILES" and "SELFIES".
         seed : int, optional
             The seed value for random number generation, by default None.
         batch_size : int, optional
@@ -238,14 +243,6 @@ class LogPProblemFactory(AbstractProblemFactory):
             The number of workers to use for parallel computation, by default None.
         evaluation_budget:  int, optional
             The maximum number of function evaluations. Default is infinity.
-        path_to_alphabet : Path, optional
-            The path to the alphabet file, by default None.
-        alphabet : List[str], optional
-            The alphabet to use for the black box. If not provided,
-            we use the alphabet from the problem setup information.
-        string_representation : str, optional
-            The string representation of the input, by default "SMILES".
-            Supported values are "SMILES" and "SELFIES".
 
         Returns
         -------
@@ -259,35 +256,11 @@ class LogPProblemFactory(AbstractProblemFactory):
         if seed is not None:
             seed_python_numpy_and_torch(seed)
 
-        if path_to_alphabet is None and alphabet is None:
-            # TODO: add support for more file types
-            raise ValueError(
-                "Missing required keyword argument: either path_to_alphabet or alphabet must be provided. \n"
-                "- alphabet could be a List[str], or \n "
-                "- path_to_alphabet could be the Path to a json file [token_1, token_2, ...] \n "
-            )
-
         if string_representation.upper() not in ["SMILES", "SELFIES"]:
             raise ValueError(
                 "Missing required keyword argument: string_representation: str. "
                 "String representation must be either 'SMILES' or 'SELFIES'."
             )
-
-        if alphabet is None:
-            if isinstance(path_to_alphabet, str):
-                path_to_alphabet = Path(path_to_alphabet.strip()).resolve()
-
-            if not path_to_alphabet.exists():
-                raise ValueError(f"Path to alphabet {path_to_alphabet} does not exist.")
-
-            if not path_to_alphabet.suffix == ".json":
-                # TODO: add support for more file types
-                raise ValueError(
-                    f"Path to alphabet {path_to_alphabet} must be a json file."
-                )
-
-            with open(path_to_alphabet, "r") as f:
-                alphabet = json.load(f)
 
         self.alphabet = alphabet
 

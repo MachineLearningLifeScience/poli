@@ -124,6 +124,7 @@ def run(factory_kwargs: str, objective_name: str, port: int, password: str) -> N
 
     # TODO: We could be receiving the kwargs for the factory here.
     msg_type, seed = conn.recv()
+    kwargs["seed"] = seed
 
     # dynamically load objective function module
     # At this point, the black box objective function
@@ -133,7 +134,7 @@ def run(factory_kwargs: str, objective_name: str, port: int, password: str) -> N
         objective_factory: AbstractProblemFactory = dynamically_instantiate(
             objective_name
         )
-        f, x0, y0 = objective_factory.create(seed, **kwargs)
+        f, x0, y0 = objective_factory.create(**kwargs)
 
         # give mother process the signal that we're ready
         conn.send(["SETUP", x0, y0, objective_factory.get_setup_information()])

@@ -54,11 +54,12 @@ def test_force_registering_qed_with_context_manager():
     """
     Tests the objective_factory.start method on QED.
     """
+    alphabet = ["", "C", "..."]
     with objective_factory.start(
         name="rdkit_qed",
         force_register=True,
         force_isolation=True,
-        path_to_alphabet=THIS_DIR / "alphabet_qed.json",
+        alphabet=alphabet,
     ) as f:
         x = np.array([["C"]])
         y = f(x)
@@ -74,7 +75,6 @@ def test_force_registering_logp():
     _, f, _, y0, _ = objective_factory.create(
         name="rdkit_logp",
         alphabet=alphabet,
-        # path_to_alphabet=THIS_DIR / "alphabet_qed.json",
         force_register=True,
     )
 
@@ -93,9 +93,10 @@ def test_registering_qed():
     _ = pytest.importorskip("selfies")
     np = pytest.importorskip("numpy")
 
+    alphabet = ["", "C", "..."]
     _, f, _, y0, _ = objective_factory.create(
         name="rdkit_qed",
-        path_to_alphabet=THIS_DIR / "alphabet_qed.json",
+        alphabet=alphabet,
     )
     x = np.array([["C"]])
     y = f(x)
@@ -115,12 +116,13 @@ def test_registering_logp():
     rdkit = pytest.importorskip("rdkit")
     selfies = pytest.importorskip("selfies")
     np = pytest.importorskip("numpy")
+    alphabet = ["", "C", "..."]
 
     _, f, _, y0, _ = objective_factory.create(
         name="rdkit_logp",
-        path_to_alphabet=THIS_DIR / "alphabet_qed.json",
+        alphabet=alphabet,
     )
-    x = np.array([[1]])
+    x = np.array([["C"]])
     f(x)
 
     # Asserting that a single carbon atom has logp close

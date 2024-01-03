@@ -155,20 +155,22 @@ class ToyContinuousProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
+        function_name: str,
+        n_dimensions: int = 2,
+        embed_in: int = None,
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-        function_name: str = None,
-        n_dimensions: int = 2,
-        embed_in: int = None,
     ) -> Tuple[ToyContinuousBlackBox, np.ndarray, np.ndarray]:
         """
         Creates a new instance of the toy continuous problem.
 
         Parameters
         ----------
+        function_name : str
+            The name of the toy continuous function to evaluate.
         seed : int, optional
             The seed for the random number generator, by default None.
         batch_size : int, optional
@@ -179,8 +181,6 @@ class ToyContinuousProblemFactory(AbstractProblemFactory):
             The number of workers for parallel execution, by default None.
         evaluation_budget:  int, optional
             The maximum number of function evaluations. Default is infinity.
-        function_name : str, optional
-            The name of the toy continuous function to evaluate, by default None.
         n_dimensions : int, optional
             The number of dimensions for the toy continuous function, by default 2.
         embed_in : int, optional
