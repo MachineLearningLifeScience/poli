@@ -92,7 +92,7 @@ class AbstractBlackBox:
         self.observer = None
         self.parallelize = parallelize
         self.evaluation_budget = evaluation_budget
-        self._num_evaluations = 0
+        self.num_evaluations = 0
 
         if num_workers is None:
             num_workers = cpu_count() // 2
@@ -114,7 +114,7 @@ class AbstractBlackBox:
 
     def reset_evaluation_budget(self):
         """Resets the evaluation budget by setting the number of evaluations made to 0."""
-        self._num_evaluations = 0
+        self.num_evaluations = 0
 
     def __call__(self, x: np.array, context=None):
         """Calls the black box function.
@@ -177,11 +177,11 @@ class AbstractBlackBox:
         f_evals = []
 
         # Check whether we have enough budget to evaluate the black box function.
-        if self._num_evaluations + batch_size > self.evaluation_budget:
+        if self.num_evaluations + batch_size > self.evaluation_budget:
             raise BudgetExhaustedException(
                 f"Exhausted the evaluation budget of {self.evaluation_budget} evaluations."
                 f" (tried to evaluate {batch_size}, but we have already"
-                f" evaluated {self._num_evaluations}/{self.evaluation_budget})."
+                f" evaluated {self.num_evaluations}/{self.evaluation_budget})."
             )
 
         # We evaluate x in batches.
@@ -229,7 +229,7 @@ class AbstractBlackBox:
             f_evals.append(f_batch)
 
             # We update the number of evaluations.
-            self._num_evaluations += x_batch.shape[0]
+            self.num_evaluations += x_batch.shape[0]
 
         # Finally, we append the results of the batches.
         f = np.concatenate(f_evals, axis=0)

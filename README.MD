@@ -8,6 +8,13 @@
 
 When dependencies get tough, this library provides a way to encapsulate objective functions into isolated `conda` environments. The main benefit is that this allows to develop optimization algorithms that use (say) tensorflow without having to worry about the specific dependencies of the objective function. Moreover, `poli` provides a way to inject logging into the objective function evaluations using observers.
 
+## Available objective functions
+
+| Objective function (link to docs) |   Example |
+| --- | --- | 
+| [Toy continuous objectives](link-to-docs) | [![Open toy continuous objectives in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1ECZdhj5Q7kILLsR-uwzc6lveTWibV6nl?usp=sharing) |
+| [QED (using `rdkit`)](link-to-docs) |  [![Open toy continuous objectives in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1ECZdhj5Q7kILLsR-uwzc6lveTWibV6nl?usp=sharing) |
+
 ## Basic usage
 
 ### Installation
