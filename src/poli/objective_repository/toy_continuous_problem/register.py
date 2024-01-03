@@ -171,6 +171,11 @@ class ToyContinuousProblemFactory(AbstractProblemFactory):
         ----------
         function_name : str
             The name of the toy continuous function to evaluate.
+        n_dimensions : int, optional
+            The number of dimensions for the toy continuous function, by default 2.
+        embed_in : int, optional
+            If not None, the continuous problem is randomly embedded in this dimension.
+            By default, None.
         seed : int, optional
             The seed for the random number generator, by default None.
         batch_size : int, optional
@@ -181,11 +186,6 @@ class ToyContinuousProblemFactory(AbstractProblemFactory):
             The number of workers for parallel execution, by default None.
         evaluation_budget:  int, optional
             The maximum number of function evaluations. Default is infinity.
-        n_dimensions : int, optional
-            The number of dimensions for the toy continuous function, by default 2.
-        embed_in : int, optional
-            If not None, the continuous problem is randomly embedded in this dimension.
-            By default, None.
 
         Returns
         -------
