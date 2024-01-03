@@ -13,7 +13,7 @@ When dependencies get tough, this library provides a way to encapsulate objectiv
 | Objective function (link to docs) |   Example |
 | --- | --- | 
 | [Toy continuous objectives](link-to-docs) | [![Open toy continuous objectives in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1ECZdhj5Q7kILLsR-uwzc6lveTWibV6nl?usp=sharing) |
-| [QED (using `rdkit`)](link-to-docs) |  [![Open toy continuous objectives in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1ECZdhj5Q7kILLsR-uwzc6lveTWibV6nl?usp=sharing) |
+| [QED (using `rdkit`)](link-to-docs) |  [![Open qed example in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/10E5U7FB-0QQpxKVsSqaZ4wZ3-bohwaBM?usp=sharing) |
 
 ## Basic usage
 
