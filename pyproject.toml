@@ -6,7 +6,10 @@ build-backend = "setuptools.build_meta"
 name = "poli"
 version = "0.0.1"
 dependencies = [
-    "numpy"
+    "numpy",
+    "rdkit",
+    "selfies",
+    "dockstring"
 ]
 
 [tool.pytest.ini_options]
