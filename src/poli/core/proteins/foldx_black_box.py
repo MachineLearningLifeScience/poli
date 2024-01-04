@@ -130,6 +130,12 @@ class FoldxBlackBox(AbstractBlackBox):
             "Missing required argument wildtype_pdb_file. "
             "Did you forget to pass it to create and into the black box?"
         )
+
+        # In the specific case of FoldX black boxes,
+        # the default batch size is 1.
+        if batch_size is None:
+            batch_size = 1
+
         super().__init__(
             info=info,
             batch_size=batch_size,

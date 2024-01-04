@@ -41,13 +41,9 @@ def test_qed_example():
     import numpy as np
     from poli import objective_factory
 
-    # Your alphabet
-    alphabet = ["", "C", "..."]
-
     # How to create
     problem_info, f, x0, y0, run_info = objective_factory.create(
         name="rdkit_qed",
-        alphabet=alphabet,
         string_representation="SMILES",  # it is "SMILES" by default.
         force_register=True,
     )
@@ -61,73 +57,19 @@ def test_qed_example():
     assert np.isclose(y, 0.35978494).all()
 
 
-def test_qed_example_using_strings():
-    import numpy as np
-    from poli import objective_factory
-
-    # Your alphabet
-    alphabet = ["", "C", "..."]
-
-    # How to create
-    problem_info, f, x0, y0, run_info = objective_factory.create(
-        name="rdkit_qed",
-        alphabet=alphabet,
-        string_representation="SMILES",  # it is "SMILES" by default.
-        force_register=True,
-    )
-
-    # Example input: a single carbon
-    x = np.array(["C"]).reshape(1, -1)
-
-    # Querying:
-    y = f(x)
-    print(y)  # Should be close to 0.35978494
-    assert np.isclose(y, 0.35978494).all()
-
-
-def test_logp_example_using_strings():
-    import numpy as np
-    from poli import objective_factory
-
-    # Your alphabet
-    alphabet = ["", "C", "..."]
-
-    # How to create
-    problem_info, f, x0, y0, run_info = objective_factory.create(
-        name="rdkit_logp",
-        alphabet=alphabet,
-        string_representation="SMILES",  # it is "SMILES" by default.
-        force_register=True,
-    )
-
-    # Example input: a single carbon
-    x = np.array(["C"]).reshape(1, -1)
-
-    # Querying:
-    y = f(x)
-    print(y)  # Should be close to 0.6361
-    assert np.isclose(y, 0.6361).all()
-
-
 def test_logp_example():
-    from pathlib import Path
     import numpy as np
     from poli import objective_factory
-
-    # The path to your alphabet
-    THIS_DIR = Path(__file__).parent.resolve()
-    alphabet = ["", "C", "..."]
 
     # How to create
     problem_info, f, x0, y0, run_info = objective_factory.create(
         name="rdkit_logp",
-        alphabet=alphabet,
         string_representation="SMILES",  # it is "SMILES" by default.
         force_register=True,
     )
 
     # Example input: a single carbon
-    x = np.array([[1]])
+    x = np.array(["C"]).reshape(1, -1)
 
     # Querying:
     y = f(x)

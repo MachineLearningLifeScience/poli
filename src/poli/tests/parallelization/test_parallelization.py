@@ -29,14 +29,11 @@ def test_parallelization_in_aloha():
 
 
 def test_parallelization_in_qed():
-    alphabet = ["", "C", "(", ")", "c"]
-
     _, f, x0, y0, _ = objective_factory.create(
         "rdkit_qed",
         parallelize=True,
         num_workers=NUM_WORKERS,
         batch_size=4,
-        alphabet=alphabet,
         string_representation="SMILES",
         force_register=True,
     )

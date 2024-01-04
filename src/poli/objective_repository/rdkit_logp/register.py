@@ -68,19 +68,12 @@ class LogPBlackBox(AbstractBlackBox):
         The number of workers to use for parallel computation, by default None.
     evaluation_budget:  int, optional
         The maximum number of function evaluations. Default is infinity.
-    alphabet : List[str], optional
-        The alphabet to use for the black box. If not provided,
-        we use the alphabet from the problem setup information.
     from_selfies : bool, optional
         Flag indicating whether the input is a SELFIES string,
         by default False (i.e. we expect a SMILES string).
 
     Attributes
     ----------
-    string_to_idx : dict
-        The mapping of symbols to their corresponding indices in the alphabet.
-    idx_to_string : dict
-        The mapping of indices to their corresponding symbols in the alphabet.
     from_selfies : bool
         Flag indicating whether the input is a SELFIES string.
     from_smiles : bool
@@ -100,7 +93,6 @@ class LogPBlackBox(AbstractBlackBox):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-        alphabet: List[str] = None,
         from_selfies: bool = False,
     ):
         """
@@ -118,25 +110,10 @@ class LogPBlackBox(AbstractBlackBox):
             The number of workers to use for parallel computation, by default None.
         evaluation_budget:  int, optional
             The maximum number of function evaluations. Default is infinity.
-        alphabet : List[str], optional
-            The alphabet to use for the black box. If not provided,
-            we use the alphabet from the problem setup information.
         from_selfies : bool, optional
             Flag indicating whether the input is a SELFIES string,
             by default False (i.e. we expect a SMILES string).
         """
-        if alphabet is None:
-            # TODO: remove this as soon as we have a default alphabet
-            assert info.alphabet is not None, (
-                "We only support for the user to provide an alphabet (List[str]). "
-                "Provide an alphabet in objective_function.create(...)"
-            )
-            alphabet = info.alphabet
-
-        string_to_idx = {symbol: i for i, symbol in enumerate(alphabet)}
-
-        self.string_to_idx = string_to_idx
-        self.idx_to_string = {v: k for k, v in string_to_idx.items()}
         self.from_selfies = from_selfies
         self.from_smiles = not from_selfies
 
@@ -158,15 +135,10 @@ class LogPBlackBox(AbstractBlackBox):
         """
         if x.dtype.kind in ["U", "S"]:
             molecule_strings = ["".join([x_ij for x_ij in x_i.flatten()]) for x_i in x]
-        elif x.dtype.kind in ["i", "f"]:
-            molecule_strings = [
-                "".join([self.idx_to_string[x_ij] for x_ij in x_i.flatten()])
-                for x_i in x
-            ]
         else:
             raise ValueError(
                 f"Unsupported dtype: {x.dtype}. "
-                "The input must be an array of strings or integers."
+                "The input must be an array of strings."
             )
 
         # Transforms strings into RDKit molecules.
@@ -215,7 +187,6 @@ class LogPProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
-        alphabet: List[str],
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
         seed: int = None,
         batch_size: int = None,
@@ -227,9 +198,6 @@ class LogPProblemFactory(AbstractProblemFactory):
 
         Parameters
         ----------
-        alphabet : List[str].
-            The alphabet to use for the black box. This alphabet
-            is usually dataset-dependent.
         string_representation : str, optional
             The string representation of the input, by default "SMILES".
             Supported values are "SMILES" and "SELFIES".
@@ -262,8 +230,6 @@ class LogPProblemFactory(AbstractProblemFactory):
                 "String representation must be either 'SMILES' or 'SELFIES'."
             )
 
-        self.alphabet = alphabet
-
         problem_info = self.get_setup_information()
         f = LogPBlackBox(
             info=problem_info,
@@ -271,7 +237,6 @@ class LogPProblemFactory(AbstractProblemFactory):
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
-            alphabet=self.alphabet,
             from_selfies=string_representation.upper() == "SELFIES",
         )
 

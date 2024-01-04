@@ -5,12 +5,35 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "poli"
 version = "0.0.1"
+description = "poli, a library of discrete objective functions"
+readme = "README.md"
+authors = [{name="Miguel González-Duque", email="miguelgondu@gmail.com"}, {name="Simon Bartels"}]
+license = {file = "LICENSE"}
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+keywords = ["optimization", "molecular", "discrete", "proteins"]
 dependencies = [
     "numpy",
     "rdkit",
     "selfies",
     "dockstring"
 ]
+
+[project.optional-dependencies]
+dev = ["black", "tox", "pytest"]
+docs = ["sphinx", "furo"]
+
+[project.urls]
+Homepage = "https://github.com/MachineLearningLifeScience/poli"
 
 [tool.pytest.ini_options]
 markers = [
