@@ -68,21 +68,15 @@ class QEDBlackBox(AbstractBlackBox):
         The number of workers to use for parallel computation, by default None.
     evaluation_budget:  int, optional
         The maximum number of function evaluations. Default is infinity.
-    alphabet : List[str], optional
-        The alphabet to use for the black box. If not provided,
-        the alphabet from the problem setup information will be used.
-        We strongly advice providing an alphabet.
     from_selfies : bool, optional
         Flag indicating whether the input is a SELFIES string, by default False.
 
     Attributes
     ----------
-    alphabet : List[str]
-        The alphabet to use for the black box.
-    string_to_idx : dict
-        The mapping of symbols to their corresponding indices in the alphabet.
-    idx_to_string : dict
-        The mapping of indices to their corresponding symbols in the alphabet.
+    from_selfies : bool
+        Flag indicating whether the input is a SELFIES string.
+    from_smiles : bool
+        Flag indicating whether the input is a SMILES string.
 
     Methods
     -------
@@ -124,19 +118,6 @@ class QEDBlackBox(AbstractBlackBox):
             Flag indicating whether the molecules are encoded using SELFIES, by default False.
         """
         super().__init__(info, batch_size, parallelize, num_workers)
-        if alphabet is None:
-            # TODO: remove this as soon as we have a default alphabet
-            assert info.alphabet is not None, (
-                "We only support for the user to provide an alphabet (List[str]). "
-                "Provide an alphabet in objective_function.create(...)"
-            )
-            alphabet = info.alphabet
-
-        string_to_idx = {symbol: i for i, symbol in enumerate(alphabet)}
-
-        self.alphabet = alphabet
-        self.string_to_idx = string_to_idx
-        self.idx_to_string = {v: k for k, v in string_to_idx.items()}
         self.from_selfies = from_selfies
         self.from_smiles = not from_selfies
 
@@ -168,15 +149,10 @@ class QEDBlackBox(AbstractBlackBox):
         # We check if the user provided an array of strings
         if x.dtype.kind in ["U", "S"]:
             molecule_strings = ["".join([x_ij for x_ij in x_i.flatten()]) for x_i in x]
-        elif x.dtype.kind in ["i", "f"]:
-            molecule_strings = [
-                "".join([self.idx_to_string[x_ij] for x_ij in x_i.flatten()])
-                for x_i in x
-            ]
         else:
             raise ValueError(
                 f"Unsupported dtype: {x.dtype}. "
-                "The input must be an array of strings or integers."
+                "The input must be an array of strings."
             )
 
         # Transforms strings into RDKit molecules.
@@ -232,7 +208,6 @@ class QEDProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
-        alphabet: List[str],
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
         seed: int = None,
         batch_size: int = None,
@@ -244,9 +219,6 @@ class QEDProblemFactory(AbstractProblemFactory):
 
         Parameters
         ----------
-        alphabet : List[str]
-            The alphabet to use for encoding molecules. This alphabet
-            is usually dataset-dependent.
         string_representation : str, optional
             The string representation to use, by default "SMILES".
             It must be either "SMILES" or "SELFIES".
@@ -279,8 +251,6 @@ class QEDProblemFactory(AbstractProblemFactory):
                 "String representation must be either 'SMILES' or 'SELFIES'."
             )
 
-        self.alphabet = alphabet
-
         problem_info = self.get_setup_information()
         f = QEDBlackBox(
             info=problem_info,
@@ -288,7 +258,6 @@ class QEDProblemFactory(AbstractProblemFactory):
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
-            alphabet=self.alphabet,
             from_selfies=string_representation.upper() == "SELFIES",
         )
 
