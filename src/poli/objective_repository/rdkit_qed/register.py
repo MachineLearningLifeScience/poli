@@ -152,7 +152,7 @@ class QEDBlackBox(AbstractBlackBox):
         else:
             raise ValueError(
                 f"Unsupported dtype: {x.dtype}. "
-                "The input must be an array of strings or integers."
+                "The input must be an array of strings."
             )
 
         # Transforms strings into RDKit molecules.
