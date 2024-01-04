@@ -107,10 +107,10 @@ class RFPWrapperFactory(AbstractProblemFactory):
         permutation = np.arange(all_seqs.shape[0])
         base_candidate_idx = np.array([0, 3, 4, 16, 37, 39])
         permutation[base_candidate_idx] = np.arange(base_candidate_idx.shape[0])
-        permutation[:base_candidate_idx.shape[0]] = base_candidate_idx
+        permutation[: base_candidate_idx.shape[0]] = base_candidate_idx
         all_seqs = all_seqs[permutation, ...]
         all_targets = all_targets[permutation, ...]
-        assert np.all(all_targets[:base_targets.shape[0], ...] == base_targets)
+        assert np.all(all_targets[: base_targets.shape[0], ...] == base_targets)
 
         if self.problem_sequence in all_seqs:
             # substitute erroneous sequence "X in position 159" with correct PDB fasta sequence
