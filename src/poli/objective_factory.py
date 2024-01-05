@@ -212,6 +212,7 @@ def __create_as_isolated_process(
     parallelize: bool = False,
     num_workers: int = None,
     evaluation_budget: int = float("inf"),
+    quiet: bool = False,
     **kwargs_for_factory,
 ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
     """Creates the objective function as an isolated process.
@@ -236,6 +237,9 @@ def __create_as_isolated_process(
         By default, it uses half the number of available CPUs (rounded down).
     evaluation_budget : int, optional
         The maximum number of evaluations allowed. By default, it is infinity.
+    quiet : bool, optional
+        If True, we squelch the messages giving feedback about the creation process.
+        By default, it is False.
     **kwargs_for_factory : dict, optional
         Additional keyword arguments for the factory.
     """
@@ -249,6 +253,10 @@ def __create_as_isolated_process(
     kwargs_for_factory["parallelize"] = parallelize
     kwargs_for_factory["num_workers"] = num_workers
     kwargs_for_factory["evaluation_budget"] = evaluation_budget
+
+    if not quiet:
+        print(f"poli 🧪: starting the isolated objective process.")
+
     process_wrapper = ProcessWrapper(
         config[name][_RUN_SCRIPT_LOCATION], **kwargs_for_factory
     )
@@ -277,7 +285,9 @@ def __create_as_isolated_process(
     return f, x0, y0
 
 
-def __register_objective_if_available(name: str, force_register: bool = False):
+def __register_objective_if_available(
+    name: str, force_register: bool = True, quiet: bool = False
+):
     """Registers the objective function if it is available in the repository.
 
     If the objective function is not available in the repository,
@@ -291,7 +301,11 @@ def __register_objective_if_available(name: str, force_register: bool = False):
         The name of the objective function.
     force_register : bool, optional
         If True, then the objective function is registered without asking
-        for confirmation, overwriting any previous registration.
+        for confirmation, overwriting any previous registration. By default,
+        it is True.
+    quiet : bool, optional
+        If True, we squelch the messages giving feedback about the creation process.
+        By default, it is False.
     """
     config = load_config()
     if name not in config:
@@ -316,8 +330,8 @@ def __register_objective_if_available(name: str, force_register: bool = False):
 
         if answer == "y":
             # Register problem
-            register_problem_from_repository(name)
-            logging.debug(f"POLI: Registered the objective from the repository.")
+            logging.debug(f"poli 🧪: Registered the objective from the repository.")
+            register_problem_from_repository(name, quiet=quiet)
             # Refresh the config
             config = load_config()
         else:
@@ -332,12 +346,13 @@ def create(
     seed: int = None,
     caller_info: dict = None,
     observer: AbstractObserver = None,
-    force_register: bool = False,
+    force_register: bool = True,
     force_isolation: bool = False,
     batch_size: int = None,
     parallelize: bool = False,
     num_workers: int = None,
     evaluation_budget: int = float("inf"),
+    quiet: bool = False,
     **kwargs_for_factory,
 ) -> Tuple[ProblemSetupInformation, AbstractBlackBox, np.ndarray, np.ndarray, object]:
     """
@@ -355,7 +370,8 @@ def create(
         The observer to use.
     force_register : bool, optional
         If True, then the objective function is registered without asking
-        for confirmation, overwriting any previous registration.
+        for confirmation, overwriting any previous registration. By default,
+        it is True.
     force_isolation : bool, optional
         If True, then the objective function is instantiated as an isolated
         process.
@@ -369,6 +385,9 @@ def create(
         By default, it uses half the number of available CPUs (rounded down).
     evaluation_budget : int, optional
         The maximum number of evaluations allowed. By default, it is infinity.
+    quiet : bool, optional
+        If True, we squelch the messages giving feedback about the creation process.
+        By default, it is False.
     **kwargs_for_factory : dict, optional
         Additional keyword arguments for the factory.
 
@@ -388,6 +407,9 @@ def create(
     # If the user can run it with the envionment they currently
     # have, then we do not need to install it.
     if name in AVAILABLE_PROBLEM_FACTORIES and not force_isolation:
+        if not quiet:
+            print(f"poli 🧪: Creating the objective from the repository.")
+
         f, x0, y0 = __create_from_repository(
             name,
             seed=seed,
@@ -401,6 +423,8 @@ def create(
 
         observer_info = None
         if observer is not None:
+            if not quiet:
+                print(f"poli 🧪: initializing the observer.")
             observer_info = observer.initialize_observer(
                 problem_info, caller_info, x0, y0, seed
             )
@@ -410,10 +434,12 @@ def create(
 
     # Check if the name is indeed registered, or
     # available in the objective repository
-    __register_objective_if_available(name, force_register=force_register)
+    __register_objective_if_available(name, force_register=force_register, quiet=quiet)
 
     # At this point, we know the name is registered.
     # Thus, we should be able to start it as an isolated process
+    if not quiet:
+        print(f"poli 🧪: creating an isolated black box function.")
     f, x0, y0 = __create_as_isolated_process(
         name,
         seed=seed,
@@ -421,6 +447,7 @@ def create(
         parallelize=parallelize,
         num_workers=num_workers,
         evaluation_budget=evaluation_budget,
+        quiet=quiet,
         **kwargs_for_factory,
     )
     problem_information = f.info
