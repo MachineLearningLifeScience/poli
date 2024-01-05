@@ -177,7 +177,7 @@ def register_problem(
     _write_config()
 
 
-def register_problem_from_repository(name: str):
+def register_problem_from_repository(name: str, quiet: bool = False):
     """Registers a problem from the repository.
 
     This function takes a problem name, and registers it. The problem name
@@ -192,6 +192,9 @@ def register_problem_from_repository(name: str):
     ----------
     name : str
         The name of the problem to be registered.
+    quiet : bool, optional
+        If True, we squelch the feedback about environment creation and
+        problem registration, by default False.
     """
     # the name is actually the folder inside
     # poli/objective_repository, so we need
@@ -222,12 +225,14 @@ def register_problem_from_repository(name: str):
 
     # Moreover, we should only be doing this
     # if the problem is not already registered.
-
+    # TODO: do we?
     if name in config.sections():
         warnings.warn(f"Problem {name} already registered. Skipping")
         return
 
     # 1. create the environment from the yaml file
+    if not quiet:
+        print(f"poli 🧪: creating environment {env_name} from {name}/environment.yml")
     try:
         subprocess.run(
             " ".join(
@@ -245,6 +250,10 @@ def register_problem_from_repository(name: str):
         )
     except subprocess.CalledProcessError as e:
         if "already exists" in e.stderr.decode():
+            if not quiet:
+                print(
+                    f"poli 🧪: creating environment {env_name} from {name}/environment.yml"
+                )
             warnings.warn(f"Environment {env_name} already exists. Will not create it.")
         else:
             raise e
@@ -257,6 +266,9 @@ def register_problem_from_repository(name: str):
     file_to_run = PATH_TO_REPOSITORY / name / "register.py"
     command = " ".join(["conda", "run", "-n", env_name, "python", str(file_to_run)])
     warnings.warn("Running the following command: %s. " % command)
+
+    if not quiet:
+        print(f"poli 🧪: running registration of {name} from environment {env_name}")
     try:
         subprocess.run(command, check=True, shell=True, capture_output=True)
     except subprocess.CalledProcessError as e:
