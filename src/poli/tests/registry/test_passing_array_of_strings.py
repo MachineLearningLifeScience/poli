@@ -50,18 +50,20 @@ from poli.objective_repository import AVAILABLE_OBJECTIVES
         #     {},
         # ],
         # TODO: add foldx-related black boxes
-        [
-            "penalized_logp_lambo",
-            [
-                ["C", ""],
-                ["C", "C"],
-            ],
-            [
-                "C",
-                "CC",
-            ],
-            {},
-        ],
+        # TODO: Once we can add lambo automatically, we can
+        # uncomment this test:
+        # [
+        #     "penalized_logp_lambo",
+        #     [
+        #         ["C", ""],
+        #         ["C", "C"],
+        #     ],
+        #     [
+        #         "C",
+        #         "CC",
+        #     ],
+        #     {},
+        # ],
         # TODO: add rasp
         [
             "rdkit_logp",
