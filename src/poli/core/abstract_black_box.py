@@ -9,6 +9,7 @@ from poli.core.problem_setup_information import ProblemSetupInformation
 
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.batch import batched
+from poli.core.util.alignment import is_aligned_input
 from poli.core.exceptions import BudgetExhaustedException
 
 
@@ -19,15 +20,19 @@ class AbstractBlackBox:
     Parameters
     ----------
     info : ProblemSetupInformation
-        The problem setup information object that provides details about the problem.
+        The problem setup information object that provides details about the
+        problem.
     batch_size : int, optional
         The batch size for evaluating the black box function. Default is None.
     parallelize : bool, optional
-        Flag indicating whether to evaluate the black box function in parallel. Default is False.
+        Flag indicating whether to evaluate the black box function in parallel.
+        Default is False.
     num_workers : int, optional
-        The number of workers to use for parallel evaluation. Default is None, which uses half of the available CPU cores.
+        The number of workers to use for parallel evaluation. Default is None,
+        which uses half of the available CPU cores.
     evaluation_budget : int, optional
-        The maximum number of evaluations allowed for the black box function. Default is float("inf").
+        The maximum number of evaluations allowed for the black box function.
+        Default is float("inf").
 
     Attributes
     ----------
@@ -47,7 +52,8 @@ class AbstractBlackBox:
     set_observer(observer)
         Set the observer object for recording observations during evaluation.
     reset_evaluation_budget()
-        Reset the evaluation budget by setting the number of evaluations made to 0.
+        Reset the evaluation budget by setting the number of evaluations made
+        to 0.
     __call__(x, context=None)
         Evaluate the black box function for the given input.
     _black_box(x, context=None)
@@ -61,7 +67,8 @@ class AbstractBlackBox:
     __del__()
         Destructor for the black box optimization problem.
     __neg__()
-        Create a new black box with the objective function as the negative of the original one.
+        Create a new black box with the objective function as the negative
+        of the original one.
     """
 
     def __init__(
@@ -119,10 +126,11 @@ class AbstractBlackBox:
     def __call__(self, x: np.array, context=None):
         """Calls the black box function.
 
-        The purpose of this function is to enforce that inputs are equal across problems.
-        The inputs are usually assumed to be strings, and all objective functions in our
-        repository will assume that the inputs are strings. Some also allow for integers
-        (i.e. token ids) to be passed as inputs. Some problems have continuous inputs, too.
+        The purpose of this function is to enforce that inputs are equal across
+        problems. The inputs are usually assumed to be strings, and all
+        objective functions in our repository will assume that the inputs are
+        strings. Some also allow for integers (i.e. token ids) to be passed as
+        inputs. Some problems have continuous inputs, too.
 
         Parameters
         ----------
@@ -139,7 +147,7 @@ class AbstractBlackBox:
         Raises
         ------
         AssertionError
-            If the input is not a 2D array.
+            If the input is not a 2D array (when the sequences were supposed to be aligned).
         AssertionError
             If the length of the input does not match the maximum sequence length of the problem.
         AssertionError
@@ -147,14 +155,36 @@ class AbstractBlackBox:
         AssertionError
             If the length of the output does not match the length of the input.
         """
-        # We will always assume that the inputs is a 2D array.
-        # The first dimension is the batch size, and the second
-        # dimension should match the maximum sequence length of
-        # the problem. One can opt out of this by setting L=np.inf
-        # or L=None.
-        if self.info.sequences_are_aligned():
-            assert len(x.shape) == 2
+        # Maximum sequence length: This can be an integer L, or np.inf, or None.
         maximum_sequence_length = self.info.get_max_sequence_length()
+
+        # We assume that the input is either a 2D array of shape [b, L],
+        # or a 1D array of shape [b,]. If the input is a 1D array, then
+        # we inflate the input to be [b, 1] (allowing for variable-length
+        # inputs)
+        if self.info.sequences_are_aligned():
+            # If the user passed an array of shape [b,],
+            # then we need to make sure that the sequences
+            # are aligned. Otherwise, we will raise an error.
+            assert is_aligned_input(
+                x, maximum_sequence_length=maximum_sequence_length
+            ), (
+                "The input given is not suitable for aligned problems. "
+                "This may happen because the input is not an array of "
+                "strings, the input is not of shape [b, L], or the input "
+                "is of shape [b, ], but the lengths of the strings are "
+                "not the same. "
+                " Aligned problems, by definition, have as input arrays"
+                " of the same length."
+            )
+        else:
+            # At this point, we know that the sequences are not aligned.
+            # Which means that the user is likely to pass an array [b,]
+            # instead of an array [b, L].
+            # We will reshape the input to be [b, 1] if it is not already.
+            # This is necessary for batching.
+            if len(x.shape) == 1:
+                x = x.reshape(-1, 1)
 
         # We assert that the length matches L if the maximum sequence length
         # specified in the problem is different from np.inf or None.
@@ -162,11 +192,20 @@ class AbstractBlackBox:
             maximum_sequence_length not in [np.inf, None]
             and self.info.sequences_are_aligned()
         ):
-            assert x.shape[1] == maximum_sequence_length, (
-                "The length of the input is not the same as the length of the input of the problem. "
-                f"(L={maximum_sequence_length}, x.shape[1]={x.shape[1]}). "
-                "If you want to allow for variable-length inputs, set L=np.inf or L=None."
-            )
+            if len(x.shape) == 1:
+                assert len(set([len(s) for s in x])) == 1, (
+                    "The sequences are not aligned. "
+                    "If you want to allow for variable-length inputs, set "
+                    "the maximum length of the problem to be L=np.inf or L=None. "
+                    "(and the aligned flag to False)."
+                )
+                x = x.reshape(-1, 1)
+            else:
+                assert x.shape[1] == maximum_sequence_length, (
+                    "The length of the input is not the same as the length of the input of the problem. "
+                    f"(L={maximum_sequence_length}, x.shape[1]={x.shape[1]}). "
+                    "If you want to allow for variable-length inputs, set L=np.inf or L=None."
+                )
 
         # Evaluate f by batches. If batch_size is None, then we evaluate
         # the whole input at once.
@@ -176,7 +215,8 @@ class AbstractBlackBox:
             batch_size = self.batch_size
         f_evals = []
 
-        # Check whether we have enough budget to evaluate the black box function.
+        # Check whether we have enough budget to evaluate the black box function
+        # in the current batch.
         if self._num_evaluations + batch_size > self.evaluation_budget:
             raise BudgetExhaustedException(
                 f"Exhausted the evaluation budget of {self.evaluation_budget} evaluations."

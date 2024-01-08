@@ -114,6 +114,12 @@ class AlohaBlackBox(AbstractBlackBox):
             inverse_alphabet = {v: k for k, v in self.alphabet.items()}
             x = np.array([[inverse_alphabet[i] for i in x[0]]])
 
+        if x.shape[1] == 1:
+            assert (
+                len(set([len(x_i) for x_i in x])) == 1
+            ), "All strings must have the same length."
+            x = np.array([list(x_i[0]) for x_i in x])
+
         matches = x == np.array(["A", "L", "O", "H", "A"])
         values = np.sum(matches.reshape(x.shape[0], 5), axis=1, keepdims=True).reshape(
             x.shape[0], 1
