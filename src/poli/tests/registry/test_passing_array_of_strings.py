@@ -34,18 +34,21 @@ from poli.objective_repository import AVAILABLE_OBJECTIVES
                 "target_name": "ABL1",
             },
         ],
-        [
-            "drd3_docking",
-            [
-                ["C", ""],
-                ["C", "C"],
-            ],
-            [
-                "C",
-                "CC",
-            ],
-            {},
-        ],
+        # We remove drd3 docking from this check, because
+        # it doesn't register out-of-the-box. It needs the user
+        # to download a couple of files before using it.
+        # [
+        #     "drd3_docking",
+        #     [
+        #         ["C", ""],
+        #         ["C", "C"],
+        #     ],
+        #     [
+        #         "C",
+        #         "CC",
+        #     ],
+        #     {},
+        # ],
         # TODO: add foldx-related black boxes
         [
             "penalized_logp_lambo",
