@@ -202,7 +202,7 @@ class QEDProblemFactory(AbstractProblemFactory):
         return ProblemSetupInformation(
             name="rdkit_qed",
             max_sequence_length=np.inf,
-            aligned=True,
+            aligned=False,
             alphabet=None,
         )
 
