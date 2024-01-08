@@ -9,6 +9,7 @@ from poli.core.problem_setup_information import ProblemSetupInformation
 
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.batch import batched
+from poli.core.util.alignment import is_aligned_input
 from poli.core.exceptions import BudgetExhaustedException
 
 
@@ -154,36 +155,36 @@ class AbstractBlackBox:
         AssertionError
             If the length of the output does not match the length of the input.
         """
-        # We will always assume that the inputs is a 2D array.
-        # The first dimension is the batch size, and the second
-        # dimension should match the maximum sequence length of
-        # the problem. One can opt out of this by setting L=np.inf
-        # or L=None.
+        # Maximum sequence length: This can be an integer L, or np.inf, or None.
+        maximum_sequence_length = self.info.get_max_sequence_length()
+
+        # We assume that the input is either a 2D array of shape [b, L],
+        # or a 1D array of shape [b,]. If the input is a 1D array, then
+        # we inflate the input to be [b, 1] (allowing for variable-length
+        # inputs)
         if self.info.sequences_are_aligned():
             # If the user passed an array of shape [b,],
             # then we need to make sure that the sequences
             # are aligned. Otherwise, we will raise an error.
-            if len(x.shape) == 1:
-                assert len(set([len(s) for s in x])) == 1, (
-                    "The sequences are not aligned. "
-                    "If you want to allow for variable-length inputs, set "
-                    "the maximum length of the problem to be L=np.inf or L=None. "
-                    "(and the aligned flag to False)."
-                )
-            else:
-                assert len(x.shape) == 2, (
-                    "Since the problem is aligned, we expected an array of shape (batch_size, L)."
-                    f" Instead, we got an array of shape {x.shape}."
-                )
+            assert is_aligned_input(
+                x, maximum_sequence_length=maximum_sequence_length
+            ), (
+                "The input given is not suitable for aligned problems. "
+                "This may happen because the input is not an array of "
+                "strings, the input is not of shape [b, L], or the input "
+                "is of shape [b, ], but the lengths of the strings are "
+                "not the same. "
+                " Aligned problems, by definition, have as input arrays"
+                " of the same length."
+            )
         else:
             # At this point, we know that the sequences are not aligned.
             # Which means that the user is likely to pass an array [b,]
-            # instead of an array [b, L]. We will reshape the input to
-            # be [b, 1] if it is not already.
+            # instead of an array [b, L].
+            # We will reshape the input to be [b, 1] if it is not already.
+            # This is necessary for batching.
             if len(x.shape) == 1:
                 x = x.reshape(-1, 1)
-
-        maximum_sequence_length = self.info.get_max_sequence_length()
 
         # We assert that the length matches L if the maximum sequence length
         # specified in the problem is different from np.inf or None.

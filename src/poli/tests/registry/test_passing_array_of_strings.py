@@ -118,4 +118,21 @@ def test_passing_array_of_strings(
     x_flat = np.array(example_flat_input)
     x_non_flat = np.array(example_non_flat_input)
 
-    assert (f(x_flat) == f(x_non_flat)).all()
+    assert np.array_equal(f(x_flat), f(x_non_flat), equal_nan=True)
+
+
+if __name__ == "__main__":
+    test_passing_array_of_strings(
+        "dockstring",
+        [
+            ["C", ""],
+            ["C", "C"],
+        ],
+        [
+            "C",
+            "CC",
+        ],
+        {
+            "target_name": "ABL1",
+        },
+    )
