@@ -79,6 +79,11 @@ class FoldXStabilityBlackBox(FoldxBlackBox):
     _black_box(x, context)
         Runs the given input x and pdb files provided in the context through FoldX and returns the total stability score.
 
+    Notes
+    -----
+    We expect the user to have FoldX v5.0 installed and compiled.
+    More specifically, we expect a binary file called foldx to be
+    in the path ~/foldx/foldx.
     """
 
     def __init__(

@@ -486,6 +486,18 @@ class FoldxInterface:
         pdb_file : Path
             The path to the PDB file of the protein structure.
         """
+        if (PATH_TO_FOLDX_FILES / "rotabase.txt").exists():
+            # If rotabase exists, it's likely that the user is
+            # using foldx v4. We should copy it if it's not
+            # already in the working directory.
+            try:
+                os.symlink(
+                    str(PATH_TO_FOLDX_FILES / "rotabase.txt"),
+                    str(self.working_dir / "rotabase.txt"),
+                )
+            except FileExistsError:
+                pass
+
         destination_path_for_pdb = self.working_dir / f"{pdb_file.stem}.pdb"
         if not destination_path_for_pdb.exists():
             shutil.copy(pdb_file, destination_path_for_pdb)
