@@ -44,6 +44,8 @@ class ExternalObserver(AbstractObserver):
         if observer_name is None:
             observer_name = _DEFAULT
 
+        self.observer_name = observer_name
+
         self.observer_script = config[observer_name][_OBSERVER]
         self.process_wrapper = None
         self.kwargs_for_observer = kwargs_for_observer
@@ -161,3 +163,9 @@ class ExternalObserver(AbstractObserver):
             assert msg_type == "ATTRIBUTE"
             attribute = msg[0]
             return attribute
+
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}(name={self.observer_name})"
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}(name={self.observer_name}, script_location={self.observer_script})>"
