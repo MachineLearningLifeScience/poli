@@ -111,3 +111,9 @@ class ProblemSetupInformation:
             "alphabet": self.alphabet,
             "log_transform_recommended": self.log_transform_recommended,
         }
+
+    def __str__(self) -> str:
+        return f"ProblemSetupInformation(name={self.name})"
+
+    def __repr__(self) -> str:
+        return f"<ProblemSetupInformation(name={self.name}, max_sequence_length={self.max_sequence_length}, aligned={self.aligned}, alphabet={self.alphabet}, log_transform_recommended={self.log_transform_recommended})>"

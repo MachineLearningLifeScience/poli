@@ -22,7 +22,7 @@ def test_num_evaluation_tracks_correctly():
         evaluation_budget=10,
     )
 
-    assert f._num_evaluations == 1
+    assert f.num_evaluations == 1
 
     f.reset_evaluation_budget()
 
@@ -30,7 +30,7 @@ def test_num_evaluation_tracks_correctly():
 
     f(x0)
 
-    assert f._num_evaluations == 9
+    assert f.num_evaluations == 9
 
 
 def test_budget_exhausts():

@@ -101,3 +101,9 @@ class MultiObjectiveBlackBox(AbstractBlackBox):
             res.append(obj_function(x, context))
 
         return np.concatenate(res, axis=1)
+
+    def __str__(self) -> str:
+        return f"MultiObjectiveBlackBox(black_boxes={self.objective_functions})"
+
+    def __repr__(self) -> str:
+        return f"<MultiObjectiveBlackBox(black_boxes={self.objective_functions}, batch_size={self.batch_size})>"
