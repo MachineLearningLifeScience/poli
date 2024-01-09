@@ -101,3 +101,9 @@ class AbstractObserver:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.finish()
+
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}"
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}>"

@@ -115,6 +115,7 @@ class ProcessWrapper:
             elif value is None:
                 string_for_kwargs += f"--{key}=none:None "
 
+        self.run_script = run_script
         self.proc = subprocess.Popen(
             [run_script, str(self.port), self.password, string_for_kwargs],
             stdout=None,
@@ -158,6 +159,12 @@ class ProcessWrapper:
         # TODO: potentially dangerous to wait here!
         self.proc.wait()  # wait for objective function process to finish
         self.listener.close()
+
+    def __str__(self) -> str:
+        return f"ProcessWrapper(port={self.port}, script_location={self.run_script})"
+
+    def __repr__(self) -> str:
+        return f"<{self.__str__()}>"
 
 
 def _generate_password() -> str:
