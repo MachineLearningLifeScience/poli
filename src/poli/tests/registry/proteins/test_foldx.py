@@ -15,9 +15,6 @@ if not PATH_TO_FOLDX_FILES.exists():
 if not (PATH_TO_FOLDX_FILES / "foldx").exists():
     pytest.skip("FoldX is not compiled. ", allow_module_level=True)
 
-if not (PATH_TO_FOLDX_FILES / "rotabase.txt").exists():
-    pytest.skip("rotabase.txt is not in the foldx directory. ", allow_module_level=True)
-
 
 def test_foldx_stability_is_available():
     """
@@ -33,9 +30,6 @@ def test_foldx_stability_is_available():
 
     if not (PATH_TO_FOLDX_FILES / "foldx").exists():
         pytest.skip("FoldX is not compiled. ")
-
-    if not (PATH_TO_FOLDX_FILES / "rotabase.txt").exists():
-        pytest.skip("rotabase.txt is not in the foldx directory. ")
 
     _ = pytest.importorskip("Bio")
     _ = pytest.importorskip("Levenshtein")
@@ -58,9 +52,6 @@ def test_force_registering_foldx_stability():
 
     if not (PATH_TO_FOLDX_FILES / "foldx").exists():
         pytest.skip("FoldX is not compiled. ")
-
-    if not (PATH_TO_FOLDX_FILES / "rotabase.txt").exists():
-        pytest.skip("rotabase.txt is not in the foldx directory. ")
 
     _, f, _, y0, _ = objective_factory.create(
         name="foldx_stability",
@@ -85,9 +76,6 @@ def test_force_registering_foldx_sasa():
     if not (PATH_TO_FOLDX_FILES / "foldx").exists():
         pytest.skip("FoldX is not compiled. ")
 
-    if not (PATH_TO_FOLDX_FILES / "rotabase.txt").exists():
-        pytest.skip("rotabase.txt is not in the foldx directory. ")
-
     _, f, _, y0, _ = objective_factory.create(
         name="foldx_sasa",
         wildtype_pdb_path=THIS_DIR / "101m_Repair.pdb",
@@ -110,9 +98,6 @@ def test_registering_foldx_stability():
 
     if not (PATH_TO_FOLDX_FILES / "foldx").exists():
         pytest.skip("FoldX is not compiled. ")
-
-    if not (PATH_TO_FOLDX_FILES / "rotabase.txt").exists():
-        pytest.skip("rotabase.txt is not in the foldx directory. ")
 
     if not (THIS_DIR / "101m_Repair.pdb").exists():
         pytest.skip("Could not find wildtype 101m_Repair.pdb in test folder.")
@@ -140,9 +125,6 @@ def test_registering_foldx_sasa():
 
     if not (PATH_TO_FOLDX_FILES / "foldx").exists():
         pytest.skip("FoldX is not compiled. ")
-
-    if not (PATH_TO_FOLDX_FILES / "rotabase.txt").exists():
-        pytest.skip("rotabase.txt is not in the foldx directory. ")
 
     _ = pytest.importorskip("Bio")
     _ = pytest.importorskip("Levenshtein")

@@ -64,6 +64,12 @@ class FoldXSASABlackBox(FoldxBlackBox):
         The number of workers for parallel processing. Default is None.
     evaluation_budget : int, optional
         The maximum number of function evaluations. Default is infinity.
+
+    Notes
+    -----
+    We expect the user to have FoldX v5.0 installed and compiled.
+    More specifically, we expect a binary file called foldx to be
+    in the path ~/foldx/foldx.
     """
 
     def __init__(

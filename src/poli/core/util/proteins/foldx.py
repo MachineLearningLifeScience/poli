@@ -43,7 +43,6 @@ if not PATH_TO_FOLDX_FILES.exists():
         "Please download FoldX and place it in your home directory. \n"
         "We expect it to find the following files: \n"
         "   - the binary at: ~/foldx/foldx  \n"
-        "   - the rotabase file at: ~/foldx/rotabase.txt \n"
     )
 
 if not (PATH_TO_FOLDX_FILES / "foldx").exists():
@@ -51,15 +50,6 @@ if not (PATH_TO_FOLDX_FILES / "foldx").exists():
         "Please compile FoldX and place it in your home directory as 'foldx'. \n"
         "We expect it to find the following files: \n"
         "   - the binary at: ~/foldx/foldx  \n"
-        "   - the rotabase file at: ~/foldx/rotabase.txt \n"
-    )
-
-if not (PATH_TO_FOLDX_FILES / "rotabase.txt").exists():
-    raise FileNotFoundError(
-        "Please place the rotabase.txt file in your foldx directory. "
-        "We expect it to find the following paths: \n"
-        "   - the binary at: ~/foldx/foldx  \n"
-        "   - the rotabase file at: ~/foldx/rotabase.txt \n"
     )
 
 
@@ -99,6 +89,12 @@ class FoldxInterface:
     ----------
     working_dir : Union[Path, str]
         The working directory for FoldX.
+
+    Notes
+    -----
+    This class expects you to use the binary for FoldX v.5.
+    Previous versions relied on a "rotabase.txt" file, which
+    is no longer used.
     """
 
     def __init__(self, working_dir: Union[Path, str]):
@@ -483,18 +479,25 @@ class FoldxInterface:
         return stability, sasa_score
 
     def copy_foldx_files(self, pdb_file: Path):
-        """Copies the rotabase and pdb file to the working directory.
+        """Copies the pdb file to the working directory.
 
         Parameters
         ----------
         pdb_file : Path
             The path to the PDB file of the protein structure.
         """
-        if not (self.working_dir / "rotabase.txt").exists():
-            os.symlink(
-                str(PATH_TO_FOLDX_FILES / "rotabase.txt"),
-                str(self.working_dir / "rotabase.txt"),
-            )
+        if (PATH_TO_FOLDX_FILES / "rotabase.txt").exists():
+            # If rotabase exists, it's likely that the user is
+            # using foldx v4. We should copy it if it's not
+            # already in the working directory.
+            try:
+                os.symlink(
+                    str(PATH_TO_FOLDX_FILES / "rotabase.txt"),
+                    str(self.working_dir / "rotabase.txt"),
+                )
+            except FileExistsError:
+                pass
+
         destination_path_for_pdb = self.working_dir / f"{pdb_file.stem}.pdb"
         if not destination_path_for_pdb.exists():
             shutil.copy(pdb_file, destination_path_for_pdb)
