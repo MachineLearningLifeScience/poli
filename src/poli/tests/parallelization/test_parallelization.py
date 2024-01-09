@@ -59,9 +59,6 @@ def test_parallelization_in_foldx_stability_and_sasa():
     if not (PATH_TO_FOLDX_FILES / "foldx").exists():
         pytest.skip("FoldX is not compiled. ")
 
-    # if not (PATH_TO_FOLDX_FILES / "rotabase.txt").exists():
-    #     pytest.skip("rotabase.txt is not in the foldx directory. ")
-
     wildtype_pdb_path = Path(__file__).parent / "101m_Repair.pdb"
     problem_info, f, x0, y0, _ = objective_factory.create(
         name="foldx_stability_and_sasa",
