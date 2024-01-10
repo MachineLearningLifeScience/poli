@@ -9,7 +9,7 @@ def test_foldx_rfp_lambo_runs():
     # For now, we don't have automatic installation of lambo.
     # TODO: add automatic installation of lambo, and remove this
     # check.
-    # _ = pytest.importorskip("lambo")
+    _ = pytest.importorskip("lambo")
 
     _, f, _, _, _ = create(name="foldx_rfp_lambo", seed=1)
 
