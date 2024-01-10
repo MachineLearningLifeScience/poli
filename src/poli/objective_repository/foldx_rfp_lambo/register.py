@@ -53,11 +53,17 @@ class RFPWrapper(AbstractBlackBox):
     def _black_box(self, x, context=None):
         best_b_cand = None
         min_hd = np.infty  # Hamming distance of best_b_cand to x
-        seq = x[0]  # take out the string from the np array
+
+        # TODO: this assumes a batch_size of 1. Is that clear in the docs?
+        seq = "".join(x[0])  # take out the string from the np array
         for b_cand in self.base_candidates:
             b_seq = b_cand.mutant_residue_seq
             if b_seq is None:
-                raise ValueError("Base Cand. FoldCandidates empty.\nYour FoldX might have failed!")
+                raise ValueError(
+                    "Base candidates (from lambo's FoldedCandidates) is empty."
+                    "\nThis usually happens when the internal foldx process fails."
+                    "Verify your foldx installation and try again."
+                )
             if len(b_seq) != len(seq):
                 continue
             hd = np.sum([seq[i] != b_seq[i] for i in range(len(seq))])
@@ -92,6 +98,15 @@ class RFPWrapperFactory(AbstractProblemFactory):
         evaluation_budget: int = float("inf"),
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         config = get_config()
+
+        # TODO: allow for bigger batch_sizes
+        # For now (and because of the way the black box is implemented)
+        # we only allow for batch_size=1
+        if batch_size is None:
+            batch_size = 1
+        else:
+            assert batch_size == 1
+
         # make problem reproducible
         random.seed(seed)
         torch.manual_seed(seed)
@@ -115,8 +130,11 @@ class RFPWrapperFactory(AbstractProblemFactory):
         all_targets = all_targets[permutation, ...]
         assert np.all(all_targets[: base_targets.shape[0], ...] == base_targets)
 
-        # TODO: standardize all_seqs such that array of shape [B, L] 
-        # TODO: requires padding across self.problem_sequence, to ensure same length, and stacking
+        # all_seqs should be of shape [b, L], adding empty padding
+        max_seq_length = max([len(seq) for seq in all_seqs])
+        all_seqs = np.array(
+            [list(seq) + [""] * (max_seq_length - len(seq)) for seq in all_seqs]
+        )
         if self.problem_sequence in all_seqs:
             # substitute erroneous sequence "X in position 159" with correct PDB fasta sequence
             all_seqs[
