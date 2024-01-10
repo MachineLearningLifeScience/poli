@@ -56,6 +56,8 @@ class RFPWrapper(AbstractBlackBox):
         seq = x[0]  # take out the string from the np array
         for b_cand in self.base_candidates:
             b_seq = b_cand.mutant_residue_seq
+            if b_seq is None:
+                raise ValueError("Base Cand. FoldCandidates empty.\nYour FoldX might have failed!")
             if len(b_seq) != len(seq):
                 continue
             hd = np.sum([seq[i] != b_seq[i] for i in range(len(seq))])
@@ -113,6 +115,8 @@ class RFPWrapperFactory(AbstractProblemFactory):
         all_targets = all_targets[permutation, ...]
         assert np.all(all_targets[: base_targets.shape[0], ...] == base_targets)
 
+        # TODO: standardize all_seqs such that array of shape [B, L] 
+        # TODO: requires padding across self.problem_sequence, to ensure same length, and stacking
         if self.problem_sequence in all_seqs:
             # substitute erroneous sequence "X in position 159" with correct PDB fasta sequence
             all_seqs[
