@@ -17,6 +17,7 @@ protein.
 """
 from pathlib import Path
 from typing import List, Tuple, Union
+import warnings
 
 import numpy as np
 
@@ -204,6 +205,8 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
+        n_starting_points: int = None,
+        strict: bool = False,
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         """
         Create a FoldXSASABlackBox object and compute the initial values of wildtypes.
@@ -232,7 +235,11 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
             Number of worker processes for parallel computation.
         evaluation_budget:  int, optional
             The maximum number of function evaluations. Default is infinity.
-
+        n_starting_points: int, optional
+            Size of D_0. Default is all available data.
+            The minimum number of sequence is given by the Pareto front of the RFP problem, ie. you cannot have less sequences than that.
+        strict: bool, optional
+            Enable RuntimeErrors if number of starting sequences different to requested number of sequences.
         Returns
         -------
         Tuple[AbstractBlackBox, np.ndarray, np.ndarray]
@@ -273,10 +280,53 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
         if alphabet is None:
             alphabet = self.get_setup_information().get_alphabet()
 
+        # For a comparable RFP definition we require the sequences of the Pareto front:
+        pareto_sequences_name_pdb_dict = {
+            "DsRed.M1": "2VAD",
+            "DsRed.T4": "2VAE",
+            "mScarlet": "5LK4",
+            "AdRed": "6AA7",
+            "mRouge": "3NED",
+            "RFP630": "3E5V",
+        }
+
+        if strict and n_starting_points < len(pareto_sequences_name_pdb_dict):
+            raise RuntimeError(
+                f"Initial number of sequences too low!\nMinimum size {len(pareto_sequences_name_pdb_dict)} , requested {n_starting_points}"
+            )
+
+        remaining_n_starting_points = max(
+            n_starting_points - len(pareto_sequences_name_pdb_dict.values()), 0
+        )
+        # filter minimal required Pareto sequences
+        pareto_pdb_files = [
+            p
+            for p in wildtype_pdb_path
+            if any(
+                [
+                    bool(_pdb.lower() in str(p).lower())
+                    for _pdb in pareto_sequences_name_pdb_dict.values()
+                ]
+            )
+        ]
+        if len(pareto_pdb_files) != len(pareto_sequences_name_pdb_dict):
+            raise RuntimeError(
+                f"The provided PDB files list is incomplete!\n Required={','.join(list(pareto_sequences_name_pdb_dict.values()))} provided files={pareto_pdb_files}"
+            )
+
+        remaining_wildtype_pdb_files = list(
+            set(wildtype_pdb_path) - set(pareto_pdb_files)
+        )
+        np.random.shuffle(remaining_wildtype_pdb_files)
+        remaining_wildtype_pdb_files = remaining_wildtype_pdb_files[
+            :remaining_n_starting_points
+        ]  # subselect w.r.t. requested number of sequences
+        pdb_files_for_black_box: List = pareto_pdb_files + remaining_wildtype_pdb_files
+
         problem_info = self.get_setup_information()
         f = FoldXStabilityAndSASABlackBox(
             info=problem_info,
-            wildtype_pdb_path=wildtype_pdb_path,
+            wildtype_pdb_path=pdb_files_for_black_box,
             alphabet=alphabet,
             experiment_id=experiment_id,
             tmp_folder=tmp_folder,
@@ -292,7 +342,8 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
         # a vector of wildtype sequences. These are padded to
         # match the maximum length with empty strings.
         wildtype_amino_acids_ = []
-        for pdb_file in wildtype_pdb_path:
+        for pdb_file in pdb_files_for_black_box:
+            # NOTE: we require the elements of the pareto front for this problem to be well-defined
             wildtype_residues = parse_pdb_as_residues(pdb_file)
             wildtype_amino_acids_.append(
                 [
@@ -309,8 +360,18 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
         ]
 
         x0 = np.array(wildtype_amino_acids).reshape(
-            len(wildtype_pdb_path), longest_wildtype_length
+            len(pdb_files_for_black_box), longest_wildtype_length
         )
+
+        if n_starting_points is not None and x0.shape[0] != n_starting_points:
+            if strict:
+                raise RuntimeError(
+                    f"Requested number of starting sequences different to loaded!\nRequested n={n_starting_points}, loaded n={x0.shape[0]}"
+                )
+            else:
+                warnings.warn(
+                    f"Requested number of starting sequences different to loaded!\nRequested n={n_starting_points}, loaded n={x0.shape[0]}"
+                )
 
         f_0 = f(x0)
 
