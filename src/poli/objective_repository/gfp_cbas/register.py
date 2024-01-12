@@ -162,6 +162,11 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
         """
         Seed value required to shuffle the data, otherwise CSV asset data index unchanged.
         """
+        if problem_type.lower() not in ["gp", "vae", "elbo"]:
+            raise NotImplementedError(
+                f"Specified problem type: {problem_type} does not exist!"
+            )
+        self.problem_type = problem_type  # required in class scope for setup info
         seed_numpy(seed)
         seed_python(seed)
         problem_info = self.get_setup_information()
