@@ -157,7 +157,7 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = 100000,
-        x0_size: int = 128,  # TODO: this should go into problem info instead?
+        n_starting_points: int = 128,
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         """
         Seed value required to shuffle the data, otherwise CSV asset data index unchanged.
@@ -172,7 +172,7 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
             num_workers=num_workers,
             seed=seed,
         )
-        x0 = np.array([list(s) for s in f.data_df.iloc[:x0_size].aaSequence])
+        x0 = np.array([list(s) for s in f.data_df.iloc[:n_starting_points].aaSequence])
         f_0 = f(x0)
 
         return f, x0, f_0
