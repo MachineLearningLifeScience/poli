@@ -88,6 +88,61 @@ LAMBO_FOLDX_ASSETS_PDBS = [
 ]
 
 
+def _download_assets_from_lambo():
+    # Downloading the config file into ~/.poli_objectives/lambo
+    if not (LAMBO_IN_POLI_OBJECTIVES_PATH / "proxy_rfp.yaml").exists():
+        download_file_from_github_repository(
+            "samuelstanton/lambo",
+            "hydra_config/task/proxy_rfp.yaml",
+            str(Path.home() / ".poli_objectives" / "lambo" / "proxy_rfp.yaml"),
+            commit_sha="431b052ad0e54a1ba4519272725310127c6377f1",
+            parent_folders_exist_ok=True,
+        )
+
+    if not (
+        LAMBO_PACKAGE_ROOT / "assets" / "fpbase" / "rfp_known_structures.csv"
+    ).exists():
+        download_file_from_github_repository(
+            "samuelstanton/lambo",
+            "lambo/assets/fpbase/rfp_known_structures.csv",
+            str(LAMBO_PACKAGE_ROOT / "assets" / "fpbase" / "rfp_known_structures.csv"),
+            commit_sha="431b052ad0e54a1ba4519272725310127c6377f1",
+            parent_folders_exist_ok=True,
+            verbose=True,
+        )
+
+    #     - proxy_rfp_seed_data.csv
+    if not (
+        LAMBO_PACKAGE_ROOT / "assets" / "fpbase" / "proxy_rfp_seed_data.csv"
+    ).exists():
+        download_file_from_github_repository(
+            "samuelstanton/lambo",
+            "lambo/assets/fpbase/proxy_rfp_seed_data.csv",
+            str(LAMBO_PACKAGE_ROOT / "assets" / "fpbase" / "proxy_rfp_seed_data.csv"),
+            commit_sha="431b052ad0e54a1ba4519272725310127c6377f1",
+            parent_folders_exist_ok=True,
+            verbose=True,
+        )
+
+    # - the sequences in the foldx folder.
+    for folder_name in LAMBO_FOLDX_ASSETS_PDBS:
+        if not (
+            LAMBO_PACKAGE_ROOT
+            / "assets"
+            / "foldx"
+            / folder_name
+            / "wt_input_Repair.pdb"
+        ).exists():
+            download_file_from_github_repository(
+                "samuelstanton/lambo",
+                f"lambo/assets/foldx/{folder_name}",
+                str(LAMBO_PACKAGE_ROOT / "assets" / "foldx" / folder_name),
+                commit_sha="431b052ad0e54a1ba4519272725310127c6377f1",
+                parent_folders_exist_ok=True,
+                verbose=True,
+            )
+
+
 class RFPWrapper(AbstractBlackBox):
     def __init__(
         self,
@@ -158,15 +213,7 @@ class RFPWrapperFactory(AbstractProblemFactory):
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
-        # Downloading the config file into ~/.poli_objectives/lambo
-        if not (LAMBO_IN_POLI_OBJECTIVES_PATH / "proxy_rfp.yaml").exists():
-            download_file_from_github_repository(
-                "samuelstanton/lambo",
-                "hydra_config/task/proxy_rfp.yaml",
-                str(Path.home() / ".poli_objectives" / "lambo" / "proxy_rfp.yaml"),
-                commit_sha="431b052ad0e54a1ba4519272725310127c6377f1",
-                parent_folders_exist_ok=True,
-            )
+        _download_assets_from_lambo()
         config = get_config()
 
         # TODO: allow for bigger batch_sizes
@@ -185,48 +232,6 @@ class RFPWrapperFactory(AbstractProblemFactory):
 
         # - the two csv files from the fpbase folder.
         #     - rfp_known_structures.csv
-        if not (
-            LAMBO_PACKAGE_ROOT / "assets" / "fpbase" / "rfp_known_structures.csv"
-        ).exists():
-            download_file_from_github_repository(
-                "samuelstanton/lambo",
-                "lambo/assets/fpbase/rfp_known_structures.csv",
-                str(
-                    LAMBO_PACKAGE_ROOT
-                    / "assets"
-                    / "fpbase"
-                    / "rfp_known_structures.csv"
-                ),
-                commit_sha="431b052ad0e54a1ba4519272725310127c6377f1",
-                parent_folders_exist_ok=True,
-                verbose=True,
-            )
-
-        #     - proxy_rfp_seed_data.csv
-        if not (
-            LAMBO_PACKAGE_ROOT / "assets" / "fpbase" / "proxy_rfp_seed_data.csv"
-        ).exists():
-            download_file_from_github_repository(
-                "samuelstanton/lambo",
-                "lambo/assets/fpbase/proxy_rfp_seed_data.csv",
-                str(
-                    LAMBO_PACKAGE_ROOT / "assets" / "fpbase" / "proxy_rfp_seed_data.csv"
-                ),
-                commit_sha="431b052ad0e54a1ba4519272725310127c6377f1",
-                parent_folders_exist_ok=True,
-                verbose=True,
-            )
-
-        # - the sequences in the foldx folder.
-        for folder_name in LAMBO_FOLDX_ASSETS_PDBS:
-            if not (LAMBO_PACKAGE_ROOT / "assets" / "foldx" / folder_name).exists():
-                download_file_from_github_repository(
-                    "samuelstanton/lambo",
-                    f"lambo/assets/foldx/{folder_name}",
-                    str(LAMBO_PACKAGE_ROOT / "assets" / "foldx" / folder_name),
-                    commit_sha="431b052ad0e54a1ba4519272725310127c6377f1",
-                    parent_folders_exist_ok=True,
-                )
 
         tokenizer = hydra.utils.instantiate(config.tokenizer)
         # NOTE: the task at this point is the original proxy rfp task
