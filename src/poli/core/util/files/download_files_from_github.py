@@ -66,6 +66,7 @@ def download_file_from_github_repository(
     tag: str = "master",
     commit_sha: str = None,
     exist_ok: bool = False,
+    parent_folders_exist_ok: bool = True,
     verbose: bool = False,
     strict: bool = True,
 ) -> None:
@@ -86,6 +87,8 @@ def download_file_from_github_repository(
         sha of commit to download, overwrites tag if specified
     exists_ok: bool, optional
         whether to overwrite existing files
+    parent_folders_exist_ok: bool, optional
+        whether to create parent folders if they do not exist
     verbose: bool, optional
         whether to print progress
     strict: bool, optional
@@ -98,6 +101,9 @@ def download_file_from_github_repository(
     GITHUB_TOKEN_FOR_POLI if it exists. If it does not exist,
     it will try to download without it. Note that the rate limit
     is 60 requests per hour for anonymous requests.
+
+    To create a GitHub token like this, follow the instructions here:
+    https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token
     """
     github = Github(login_or_token=os.environ.get("GITHUB_TOKEN_FOR_POLI"))
     repository = github.get_repo(repository_name)
@@ -111,6 +117,7 @@ def download_file_from_github_repository(
         file_path_in_repository=file_path_in_repository,
         download_path_for_file=download_path_for_file,
         exist_ok=exist_ok,
+        parent_folders_exist_ok=parent_folders_exist_ok,
         verbose=verbose,
         strict=strict,
     )
@@ -122,6 +129,7 @@ def _download_file_from_github_repo(
     file_path_in_repository: str,
     download_path_for_file: str,
     exist_ok: bool = False,
+    parent_folders_exist_ok: bool = True,
     verbose: bool = False,
     strict: bool = True,
 ) -> None:
@@ -143,6 +151,9 @@ def _download_file_from_github_repo(
         FileExistsError will be raised.
         If True, the download will proceed even if the path
         already exists. (default is False)
+    parent_folders : bool, optional
+        If True, create the parent folders for the download path
+        if they do not exist. (default is True)
     verbose : bool, optional
         If True, print the progress of the download. (default is False)
     strict : bool, optional
@@ -156,14 +167,38 @@ def _download_file_from_github_repo(
     if not isinstance(download_path_for_file, Path):
         download_path_for_file = Path(download_path_for_file)
 
-    download_path_for_file.parent.mkdir(parents=True, exist_ok=exist_ok)
+    download_path_for_file.parent.mkdir(parents=True, exist_ok=parent_folders_exist_ok)
 
     file_content = repository.get_contents(file_path_in_repository, ref=commit_sha)
-    assert isinstance(file_content, ContentFile)
 
+    if isinstance(file_content, ContentFile):
+        _save_file_content_from_github(
+            file_content, download_path_for_file, strict=strict, verbose=verbose
+        )
+    elif isinstance(file_content, list):
+        for file_ in file_content:
+            _download_file_from_github_repo(
+                repository=repository,
+                commit_sha=commit_sha,
+                file_path_in_repository=file_.path,
+                download_path_for_file=download_path_for_file / file_.name,
+                exist_ok=exist_ok,
+                parent_folders_exist_ok=parent_folders_exist_ok,
+                verbose=verbose,
+                strict=strict,
+            )
+    else:
+        raise ValueError("Expected ContentFile or list of ContentFile")
+
+
+def _save_file_content_from_github(
+    file_content: ContentFile,
+    download_path_for_file: Path,
+    strict: bool = True,
+    verbose: bool = False,
+) -> None:
     if verbose:
-        print(f"Downloading {file_content.path} from {repository.name}")
-
+        print(f"Downloading {file_content.path}")
     try:
         if not isinstance(file_content, ContentFile):
             raise ValueError("Expected ContentFile")

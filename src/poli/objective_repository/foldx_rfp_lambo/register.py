@@ -17,6 +17,10 @@ from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.objective_repository.foldx_rfp_lambo import PROBLEM_SEQ, CORRECT_SEQ
 
+from poli.core.util.files.download_files_from_github import (
+    download_file_from_github_repository,
+)
+
 import lambo
 from lambo.tasks.proxy_rfp.proxy_rfp import ProxyRFPTask
 from lambo.utils import AMINO_ACIDS
@@ -25,6 +29,10 @@ from lambo import __file__ as project_root_file
 
 
 project_root = os.path.dirname(os.path.dirname(project_root_file))
+LAMBO_IN_POLI_OBJECTIVES_PATH = Path.home() / ".poli_objectives" / "lambo"
+LAMBO_IN_POLI_OBJECTIVES_PATH.mkdir(parents=True, exist_ok=True)
+
+LAMBO_PACKAGE_ROOT = Path(lambo.__file__).parent.resolve()
 
 
 class RFPWrapper(AbstractBlackBox):
@@ -97,6 +105,15 @@ class RFPWrapperFactory(AbstractProblemFactory):
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+        # Downloading the config file into ~/.poli_objectives/lambo
+        if not (LAMBO_IN_POLI_OBJECTIVES_PATH / "proxy_rfp.yaml").exists():
+            download_file_from_github_repository(
+                "samuelstanton/lambo",
+                "hydra_config/task/proxy_rfp.yaml",
+                str(Path.home() / ".poli_objectives" / "lambo" / "proxy_rfp.yaml"),
+                commit_sha="431b052ad0e54a1ba4519272725310127c6377f1",
+                parent_folders_exist_ok=True,
+            )
         config = get_config()
 
         # TODO: allow for bigger batch_sizes
@@ -108,9 +125,52 @@ class RFPWrapperFactory(AbstractProblemFactory):
             assert batch_size == 1
 
         # make problem reproducible
-        random.seed(seed)
-        torch.manual_seed(seed)
-        np.random.seed(seed)
+        if seed is not None:
+            random.seed(seed)
+            torch.manual_seed(seed)
+            np.random.seed(seed)
+
+        # - the two csv files from the fpbase folder.
+        #     - rfp_known_structures.csv
+        if not (
+            LAMBO_PACKAGE_ROOT / "assets" / "fpbase" / "rfp_known_structures.csv"
+        ).exists():
+            download_file_from_github_repository(
+                "samuelstanton/lambo",
+                "lambo/assets/fpbase/rfp_known_structures.csv",
+                str(
+                    LAMBO_PACKAGE_ROOT
+                    / "assets"
+                    / "fpbase"
+                    / "rfp_known_structures.csv"
+                ),
+                commit_sha="431b052ad0e54a1ba4519272725310127c6377f1",
+                parent_folders_exist_ok=True,
+            )
+
+        #     - proxy_rfp_seed_data.csv
+        if not (
+            LAMBO_PACKAGE_ROOT / "assets" / "fpbase" / "proxy_rfp_seed_data.csv"
+        ).exists():
+            download_file_from_github_repository(
+                "samuelstanton/lambo",
+                "lambo/assets/fpbase/proxy_rfp_seed_data.csv",
+                str(
+                    LAMBO_PACKAGE_ROOT / "assets" / "fpbase" / "proxy_rfp_seed_data.csv"
+                ),
+                commit_sha="431b052ad0e54a1ba4519272725310127c6377f1",
+                parent_folders_exist_ok=True,
+            )
+
+        # - the sequences in the foldx folder.
+        download_file_from_github_repository(
+            "samuelstanton/lambo",
+            "lambo/assets/foldx",
+            str(LAMBO_PACKAGE_ROOT / "assets" / "foldx"),
+            commit_sha="431b052ad0e54a1ba4519272725310127c6377f1",
+            parent_folders_exist_ok=True,
+            exist_ok=True,
+        )
 
         tokenizer = hydra.utils.instantiate(config.tokenizer)
         # NOTE: the task at this point is the original proxy rfp task
@@ -163,15 +223,16 @@ def get_config() -> Config:
     Utility function with lambo specifc config to RFP task.
     """
     task = yaml.safe_load(
-        Path(
-            str(Path(lambo.__file__).parent.resolve().parent.resolve())
-            + os.path.sep
-            + "hydra_config"
-            + os.path.sep
-            + "task"
-            + os.path.sep
-            + "proxy_rfp.yaml"
-        ).read_text()
+        (LAMBO_IN_POLI_OBJECTIVES_PATH / "proxy_rfp.yaml").read_text()
+        # Path(
+        #     str(Path(lambo.__file__).parent.resolve().parent.resolve())
+        #     + os.path.sep
+        #     + "hydra_config"
+        #     + os.path.sep
+        #     + "task"
+        #     + os.path.sep
+        #     + "proxy_rfp.yaml"
+        # ).read_text()
     )
     config = Config(
         task,

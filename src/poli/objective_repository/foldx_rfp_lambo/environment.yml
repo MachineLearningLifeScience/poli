@@ -30,4 +30,5 @@ dependencies:
     - h5py
     - tqdm
     - scikit-learn
+    - PyGithub
     - "git+https://github.com/samuelstanton/lambo.git@431b052ad0e54a1ba4519272725310127c6377f1"
