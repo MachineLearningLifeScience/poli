@@ -9,16 +9,12 @@ def test_foldx_rfp_lambo_runs():
     # For now, we don't have automatic installation of lambo.
     # TODO: add automatic installation of lambo, and remove this
     # check.
-<<<<<<< HEAD
-    # _ = pytest.importorskip("lambo")
-=======
     _ = pytest.importorskip("lambo")
->>>>>>> dev
 
     _, f, _, _, _ = create(name="foldx_rfp_lambo", seed=1)
 
     # Evaluating on the first base candidate
-    first_base_candidate = np.array(
+    first_base_candidate_and_mutation = np.array(
         [
             "AVIKEFMRFKVHMEG"
             "SMNGHEFEIEGEGEGR"
@@ -33,11 +29,26 @@ def test_foldx_rfp_lambo_runs():
             "KMALRLKDGGRYLADF"
             "KTTYKAKKPVQMPGAYN"
             "VDRKLDITSHNEDYTVV"
-            "EQYERSEGRHSTG"
+            "EQYERSEGRHSTG",
+            "IVIKEFMRFKVHMEG"
+            "SMNGHEFEIEGEGEGR"
+            "PYEGTQTAKLKVTKGG"
+            "PLPFSWDILSPQFS"
+            "RAFTKHPADIPDYYKQ"
+            "SFPEGFKWERVMNFED"
+            "GGAVTVTQDTSLED"
+            "GTLIYKVKLRGTNFPP"
+            "DGPVMQKKTMGWEAST"
+            "ERLYPEDGVLKGDI"
+            "KMALRLKDGGRYLADF"
+            "KTTYKAKKPVQMPGAYN"
+            "VDRKLDITSHNEDYTVV"
+            "EQYERSEGRHSTG",
         ]
     )
     assert np.isclose(
-        f(first_base_candidate), np.array([[-10591.87684184, -61.8757]])
+        f(first_base_candidate_and_mutation),
+        np.array([[-10591.87684184, -61.8757], [-10634.23150497, -61.5511]]),
     ).all()
 
 

@@ -198,7 +198,7 @@ def _save_file_content_from_github(
     verbose: bool = False,
 ) -> None:
     if verbose:
-        print(f"Downloading {file_content.path}")
+        print(f"poli 🧪: Downloading {file_content.path}")
     try:
         if not isinstance(file_content, ContentFile):
             raise ValueError("Expected ContentFile")
