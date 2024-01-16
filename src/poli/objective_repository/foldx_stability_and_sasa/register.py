@@ -280,6 +280,9 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
         if alphabet is None:
             alphabet = self.get_setup_information().get_alphabet()
 
+        if n_starting_points is None:
+            n_starting_points = len(wildtype_pdb_path)
+
         # For a comparable RFP definition we require the sequences of the Pareto front:
         pareto_sequences_name_pdb_dict = {
             "DsRed.M1": "2VAD",
