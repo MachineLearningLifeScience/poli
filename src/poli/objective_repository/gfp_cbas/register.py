@@ -158,6 +158,7 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
         num_workers: int = None,
         evaluation_budget: int = 100000,
         n_starting_points: int = 128,
+        problem_type: str = "vae",
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         """
         Seed value required to shuffle the data, otherwise CSV asset data index unchanged.
