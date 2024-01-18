@@ -1,4 +1,4 @@
-name: poli
+name: poli-base
 channels:
   - defaults
 dependencies:
@@ -9,4 +9,3 @@ dependencies:
     - rdkit
     - biopython
     - selfies
-    - dockstring

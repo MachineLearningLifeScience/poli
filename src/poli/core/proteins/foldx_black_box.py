@@ -132,9 +132,18 @@ class FoldxBlackBox(AbstractBlackBox):
         )
 
         # In the specific case of FoldX black boxes,
-        # the default batch size is 1.
+        # the default batch size is 1. However, if
+        # the user passed parallelize=True, then
+        # the batch size is set to the number of
+        # workers.
         if batch_size is None:
-            batch_size = 1
+            if parallelize:
+                if num_workers is None:
+                    num_workers = cpu_count() // 2
+                else:
+                    batch_size = num_workers
+            else:
+                batch_size = 1
 
         super().__init__(
             info=info,

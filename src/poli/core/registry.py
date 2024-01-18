@@ -292,13 +292,13 @@ def delete_problem(problem_name: str):
     _write_config()
 
 
-def get_problems(include_repository: bool = True) -> List[str]:
+def get_problems(only_available: bool = False) -> List[str]:
     """Returns a list of registered problems.
 
     Parameters
     ----------
-    include_repository : bool
-        Whether to include the problems from the repository.
+    only_available : bool
+        Whether to only include the problems that can be imported directly.
 
     Returns
     -------
@@ -307,8 +307,8 @@ def get_problems(include_repository: bool = True) -> List[str]:
 
     Notes
     -----
-    If include_repository is True, the problems from the repository will be
-    included in the list. Otherwise, only the problems registered by the user
+    If only_available is False, the problems from the repository will be
+    included in the list. Otherwise, only the problems registered by the user/readily available
     will be included.
     """
     problems = config.sections()
@@ -320,7 +320,7 @@ def get_problems(include_repository: bool = True) -> List[str]:
     # objective_repository
     available_problems = list(AVAILABLE_PROBLEM_FACTORIES.keys())
 
-    if include_repository:
+    if not only_available:
         # We include the problems that the user _could_
         # install from the repo. These are available in the
         # AVAILABLE_OBJECTIVES list.
