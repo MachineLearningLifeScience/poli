@@ -4,7 +4,7 @@ There are several requirements for running this objective function. We expect yo
 
 - have AutoDock Vina installed in the path,
 - have the `prepare_receptor` binary from the ADFR suite installed and in the path,
-- have the `poli__lambo` environment created.
+- have the `poli__tdc` environment created.
 
 The rest of this readme shows you how to do all this:
 
@@ -44,7 +44,7 @@ Thus, we recommend creating a symlink. Write this in your `~/.bashrc` or `~/.zsh
 ln -sf /path/to/ADFR/bin/prepare_receptor /path/to/AutoDock_vina/bin
 ```
 
-## Create the `poli__lambo` environment
+## Create the `poli__tdc` environment
 
 ### Create the environment from the yml file
 
@@ -52,23 +52,5 @@ This can easily be done by running
 
 ```bash
 # From the base of the poli repo
-conda env create --file src/poli/objective_repository/ddr3_docking/environment.yml
+conda env create --file src/poli/objective_repository/drd3_docking/environment.yml
 ```
-
-You will need to install the `lambo` repository manually.
-
-### Cloning lambo
-
-We also need `lambo`'s tasks to be available in Python's path for `poli__lambo`:
-
-```bash
-git clone https://github.com/samuelstanton/lambo    # For reference, we use 431b052
-cd lambo
-pip install -e .  
-```
-
-In particular, we need
-- `lambo.tasks.proxy_rfp.proxy_rfp.ProxyRFPTask`
-- the rfp data: see `~/lambo/assets/fpbase`
-
-And now you should be set! Running `register.py` and `query_example.py` should work.
