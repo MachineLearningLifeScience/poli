@@ -30,6 +30,7 @@ class GFPCBasBlackBox(AbstractBlackBox):
         seed: int = None,
         functional_only: bool = False,
         ignore_stops: bool = True,
+        unique=True,
     ):
         gfp_df_path = Path(__file__).parent.resolve() / "assets" / "gfp_data.csv"
         self.info = info
@@ -37,6 +38,8 @@ class GFPCBasBlackBox(AbstractBlackBox):
         self.batch_size = batch_size
         self.seed = seed
         data_df = pd.read_csv(gfp_df_path)[["medianBrightness", "std", "aaSequence"]]
+        if unique:
+            data_df = data_df.drop_duplicates(subset="aaSequence")
         if self.seed:  # if random seed is provided, shuffle the data
             data_df = data_df.sample(frac=1, random_state=seed)
         if (
@@ -178,7 +181,7 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
             num_workers=num_workers,
             seed=seed,
         )
-        x0 = np.array([list(s) for s in f.data_df.iloc[:n_starting_points].aaSequence])
+        x0 = np.array([list(s) for s in f.data_df.aaSequence[:n_starting_points]])
         f_0 = f(x0)
 
         return f, x0, f_0
