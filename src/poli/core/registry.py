@@ -311,7 +311,10 @@ def get_problems(include_repository: bool = True) -> List[str]:
     included in the list. Otherwise, only the problems registered by the user
     will be included.
     """
-    problems = config.sections()
+    problems = [
+        name for name in config.sections() if "run_script_location" in config[name]
+    ]
+
     # problems.remove(_DEFAULT)  # no need to remove default section
 
     # We also pad the get_problems() with the problems
@@ -346,3 +349,7 @@ def get_problem_factories() -> Dict[str, AbstractProblemFactory]:
 def _write_config():
     with open(config_file, "w+") as configfile:
         config.write(configfile)
+
+
+if __name__ == "__main__":
+    get_problems()

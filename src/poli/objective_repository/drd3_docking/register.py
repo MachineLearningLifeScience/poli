@@ -178,6 +178,6 @@ if __name__ == "__main__":
 
     register_problem(
         DRD3ProblemFactory(),
-        conda_environment_name="poli__lambo",
+        conda_environment_name="poli__tdc",
         force=True,
     )
