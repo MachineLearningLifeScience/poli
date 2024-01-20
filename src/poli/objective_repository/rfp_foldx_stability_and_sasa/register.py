@@ -38,6 +38,7 @@ from poli.core.proteins.foldx_black_box import FoldxBlackBox
 
 from poli.core.util.seeding import seed_numpy, seed_python
 
+
 # TODO: import from other module?
 class RFPFoldXStabilityAndSASABlackBox(FoldxBlackBox):
     """
