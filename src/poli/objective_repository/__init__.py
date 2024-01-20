@@ -82,6 +82,18 @@ except (ImportError, FileNotFoundError):
 
 
 try:
+    from .rfp_foldx_stability_and_sasa.register import (
+        RFPFoldXStabilityAndSASAProblemFactory,
+    )
+
+    AVAILABLE_PROBLEM_FACTORIES[
+        "rfp_foldx_stability_and_sasa"
+    ] = RFPFoldXStabilityAndSASAProblemFactory
+except (ImportError, FileNotFoundError):
+    pass
+
+
+try:
     from .penalized_logp_lambo.register import PenalizedLogPLamboProblemFactory
 
     AVAILABLE_PROBLEM_FACTORIES[
