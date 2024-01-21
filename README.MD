@@ -27,8 +27,8 @@ The bleeding-edge is contained in the `dev` branch, so if you want to install th
 To make sure everything went well, you can test your `poli` installation by running
 
 ```bash
-$ python -c "from poli.core.registry import get_problems ; print(get_problems())"
-['aloha', 'white_noise']
+$ python -c "from poli.core.registry import get_problems ; print(get_problems(only_available=True))"
+['aloha', ..., 'white_noise']
 ```
 
 If the installation isn't fresh/isn't the only one in your system, you might actually get some more names inside that list.
@@ -54,19 +54,19 @@ If you have enough dependencies to run an objective function, it will become ava
 
 ```bash
 $ pip install rdkit selfies
-$ python -c "from poli.core.registry import get_problems ; print(get_problems())"
-['aloha', 'rdkit_logp', 'rdkit_qed', 'white_noise']
+$ python -c "from poli.core.registry import get_problems ; print(get_problems(only_available=True))"
+['aloha', ..., 'rdkit_logp', 'rdkit_qed', ..., 'white_noise']
 ```
 
 Now that both `rdkit` and `selfies` are in the current environment, problems like computing `logp` and `qed` of SELFIES or SMILES strings become available.
 
 ### Calling objective functions in isolated enviroments
 
-To get a list of all avilable objective functions, you can pass the `include_repository=True` flag to `get_problems`:
+To get a list of all avilable objective functions, you can pass the `only_available=False` flag to `get_problems`:
 
 ```bash
-$ python -c "from poli.core.registry import get_problems ; print(get_problems(include_repository=True))"
-['aloha', 'drd3_docking', 'foldx_sasa', 'foldx_stability', ..., 'white_noise']
+$ python -c "from poli.core.registry import get_problems ; print(get_problems(only_available=False))"
+['aloha', 'dockstring', 'drd3_docking', 'foldx_sasa', 'foldx_stability', ..., 'white_noise']
 ```
 
 **Most of these objective functions can be run out-of-the-box** in isolated enviroments. For example, consider computing the synthetic accessibility of a molecule using `pytdc`. This problem is called `sa_tdc` in `poli`, and can easily be run without having the right dependencies installed:
