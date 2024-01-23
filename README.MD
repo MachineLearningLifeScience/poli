@@ -77,7 +77,7 @@ If you use certain black boxes, we also recommend citing the original work:
 |`rasp`|[(Blaabjerg et al. 2022)](https://github.com/KULL-Centre/_2022_ML-ddG-Blaabjerg)|
 |`rdkit_*`|[(rdkit)](https://github.com/rdkit/rdkit)|
 |`rfp_foldx_*`|[(Schymkowitz et al. 2005)](https://academic.oup.com/nar/article/33/suppl_2/W382/2505499), [(Stanton et al. 2022)](https://github.com/samuelstanton/lambo)|
-|`sa_tdc`|[(Huang et al. 2022)](https://www.nature.com/articles/s41589-022-01131-2), [(rdkit)](https://github.com/rdkit/rdkit), [(Ertl and Schuffenhauer)](https://link.springer.com/article/10.1186/1758-2946-1-8)|
+|`sa_tdc`|[(Huang et al. 2022)](https://www.nature.com/articles/s41589-022-01131-2), [(rdkit)](https://github.com/rdkit/rdkit), [(Ertl and Schuffenhauer 2009)](https://link.springer.com/article/10.1186/1758-2946-1-8)|
 |`super_mario_bros`|[(Volz et al. 2018)](https://github.com/CIGbalance/DagstuhlGAN), [(González-Duque 2023)](https://github.com/miguelgondu/minimal_VAE_on_Mario) |
 |`toy_continuous_problem`|[(Al-Roomi 2015)](https://www.al-roomi.org/benchmarks/unconstrained), [(Surjanovic and Bingham 2013)](https://www.sfu.ca/~ssurjano/optimization.html) |
 
