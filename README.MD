@@ -1,12 +1,17 @@
-# `poli` 🧪, a library for discrete objective functions
+# poli 🧪, a library for discrete objective functions
 
 [![Testing (conda, python 3.9)](https://github.com/MachineLearningLifeScience/poli/actions/workflows/python-tox-testing-including-conda.yml/badge.svg)](https://github.com/MachineLearningLifeScience/poli/actions/workflows/python-tox-testing-including-conda.yml)
 
-`poli` is an easy-to-use, plug-and-play library to query black-box functions in biology and cheminformatics. Examples include:
-- Computing the **stability** of mutations from a wildtype protein (using `foldx`).
-- Computing the **docking scores** of ligands to proteins (using [`pyscreener`](https://github.com/coleygroup/pyscreener) and [`pytdc`](https://tdcommons.ai/functions/oracles/)).
+`poli` is a library of discrete objective functions for benchmarking optimization algorithms. Examples include:
+- 🔬 **stability** of mutations from a wildtype protein (using [`foldx`](https://foldxsuite.crg.eu/) or [`rasp`](https://github.com/KULL-Centre/_2022_ML-ddG-Blaabjerg)).
+- 🧪 **docking scores** of ligands to proteins (using [`dockstring`](https://github.com/dockstring/dockstring), [`pyscreener`](https://github.com/coleygroup/pyscreener) and [`pytdc`](https://tdcommons.ai/functions/oracles/)).
+- 💊 **druglikeness** or **synthetic acccesibility** of small molecules (using [`rdkit`](https://github.com/rdkit/rdkit) and [`pytdc`](https://tdcommons.ai/functions/oracles/)).
 
-When dependencies get tough, this library provides a way to encapsulate objective functions into isolated `conda` environments. The main benefit is that this allows to develop optimization algorithms that use (say) tensorflow without having to worry about the specific dependencies of the objective function. Moreover, `poli` provides a way to inject logging into the objective function evaluations using observers.
+Some of `poli`'s features:
+- 🔲 **isolation** of black box function calls inside conda environments. Don't worry about clashes w. black box requirements.
+- 🗒️ **logging** logic at the black box `__call__` level using observers.
+-  A `numpy` interface. Inputs are `np.array` of strings, outputs are `np.array` of floats.
+- `SMILES` and `SELFIES` support for small molecule manipulation.
 
 ## Getting started
 
@@ -21,7 +26,7 @@ pip install git+https://github.com/MachineLearningLifeScience/poli.git@dev
 To check if everything went well, you can run
 
 ```bash
-$ python -c "from poli.core.registry import get_problems ; print(get_problems(only_available=True))"
+$ python -c "from poli import get_problems ; print(get_problems())"
 ['aloha', ..., 'white_noise']
 ```
 
@@ -41,7 +46,7 @@ for _ in range(5):
 
 ```
 
-## Cite us and other relevan work
+## Cite us and other relevant work
 
 If you use `poli`, we encourage you to cite us
 
