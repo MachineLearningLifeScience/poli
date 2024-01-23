@@ -46,11 +46,12 @@ for _ in range(5):
 If you use `poli`, we encourage you to cite us
 
 ```
-@misc{GonzalezDuqueBartelsMichael:poli:2024,
+@software{GonzalezDuqueBartelsMichael:poli:2024,
 author = {González-Duque, Miguel and Bartels, Simon and Michael, Richard},
-month = {1},
-title = {poli: a libary of discrete sequence objectives},
+month = jan,
+title = {{poli: a libary of discrete sequence objectives}},
 url = {https://github.com/MachineLearningLifeScience/poli},
+version = {0.0.1},
 year = {2024}
 }
 ```
