@@ -44,7 +44,7 @@ problem_info, f, x0, y0, run_info = objective_factory.create(
     target_name="drd2"
 )
 
-# x0: risperidone's SMILES
+# x0: [['C' 'C' '1' '=' 'C' '(' 'C', ...]] (i.e. Risperidone's SMILES)
 # y0: 11.9
 print(x0, y0)
 ```
