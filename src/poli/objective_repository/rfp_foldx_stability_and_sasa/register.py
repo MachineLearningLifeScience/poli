@@ -58,6 +58,8 @@ class RFPFoldXStabilityAndSASABlackBox(FoldxBlackBox):
         The path to the temporary folder. Default is None.
     eager_repair : bool, optional
         Whether to perform eager repair. Default is False.
+    verbose: bool, optional
+        Whether we print the output of FoldX. Default is False.
     batch_size : int, optional
         The batch size for parallel processing. Default is None.
     parallelize : bool, optional
@@ -78,14 +80,15 @@ class RFPFoldXStabilityAndSASABlackBox(FoldxBlackBox):
         self,
         info: ProblemSetupInformation,
         wildtype_pdb_path: Union[Path, List[Path]],
-        batch_size: int = None,
-        parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = float("inf"),
         alphabet: List[str] = None,
         experiment_id: str = None,
         tmp_folder: Path = None,
         eager_repair: bool = False,
+        verbose: bool = False,
+        batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
+        evaluation_budget: int = float("inf"),
     ):
         super().__init__(
             info=info,
@@ -150,7 +153,7 @@ class RFPFoldXStabilityAndSASABlackBox(FoldxBlackBox):
             self.wildtype_pdb_paths, mutations_as_strings[0]
         )
 
-        foldx_interface = FoldxInterface(working_dir)
+        foldx_interface = FoldxInterface(working_dir, verbose=self.verbose)
         stability, sasa_score = foldx_interface.compute_stability_and_sasa(
             pdb_file=wildtype_pdb_file,
             mutations=mutations_as_strings,
@@ -201,6 +204,7 @@ class RFPFoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
         experiment_id: str = None,
         tmp_folder: Path = None,
         eager_repair: bool = False,
+        verbose: bool = False,
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
@@ -225,6 +229,8 @@ class RFPFoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
             Path to the temporary folder for intermediate files.
         eager_repair : bool, optional
             Flag indicating whether to perform eager repair.
+        verbose : bool, optional
+            Flag indicating whether to print the output of FoldX.
         seed : int, optional
             Seed for random number generators. If None is passed,
             the seeding doesn't take place.
@@ -335,6 +341,7 @@ class RFPFoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
             experiment_id=experiment_id,
             tmp_folder=tmp_folder,
             eager_repair=eager_repair,
+            verbose=verbose,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,

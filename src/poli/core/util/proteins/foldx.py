@@ -1,7 +1,8 @@
 """FoldX interface for measuring stability and SASA.
 
 This module implements a `FoldxInterface` for querying
-foldx's repairing and simulating models [1].
+foldx's repairing and simulating models [1]. This implementation
+is heavily inspired by the way LaMBO uses FoldX [2].
 
 If this module is imported from a script, it will
 automatically check that the foldx files are in the
@@ -13,6 +14,14 @@ References
     Schymkowitz, J., Borg, J., Stricher, F., Nys, R.,
     Rousseau, F., & Serrano, L. (2005).  Nucleic acids research,
     33(suppl_2), W382-W388.
+
+[2] “Accelerating Bayesian Optimization for Biological Sequence
+    Design withDenoising Autoencoders.” Stanton, Samuel, Wesley Maddox,
+    Nate Gruver, Phillip Maffettone, Emily Delaney, Peyton Greenside,
+    and Andrew Gordon Wilson.  arXiv, July 12, 2022.
+    http://arxiv.org/abs/2203.12742.
+    https://github.com/samuelstanton/lambo
+
 """
 from typing import List, Union
 from pathlib import Path
@@ -89,6 +98,8 @@ class FoldxInterface:
     ----------
     working_dir : Union[Path, str]
         The working directory for FoldX.
+    verbose : bool
+        If True, the FoldX output will be printed to stdout.
 
     Notes
     -----
@@ -97,7 +108,7 @@ class FoldxInterface:
     is no longer used.
     """
 
-    def __init__(self, working_dir: Union[Path, str]):
+    def __init__(self, working_dir: Union[Path, str], verbose: bool = False):
         """
         Initialize the FoldX object.
 
@@ -105,11 +116,19 @@ class FoldxInterface:
         ----------
         working_dir : Union[Path, str]
             The working directory for FoldX.
+        verbose : bool, optional
+            If True, the FoldX output will be printed to stdout. Default is False.
         """
         if isinstance(working_dir, str):
             working_dir = Path(working_dir)
 
         self.working_dir = working_dir
+        self.verbose = verbose
+
+        if not verbose:
+            self.output = subprocess.DEVNULL
+        else:
+            self.output = None
 
     def repair(
         self,
@@ -166,7 +185,13 @@ class FoldxInterface:
 
         # Running it in the working directory
         try:
-            subprocess.run(command, cwd=self.working_dir, check=True)
+            subprocess.run(
+                command,
+                cwd=self.working_dir,
+                check=True,
+                stdout=self.output,
+                stderr=self.output,
+            )
         except subprocess.CalledProcessError as e:
             raise RuntimeError(
                 f"FoldX failed to repair the pdb file {pdb_file}. "
@@ -316,7 +341,19 @@ class FoldxInterface:
             "--pH",
             "7.0",
         ]
-        subprocess.run(foldx_command, cwd=self.working_dir)
+        try:
+            subprocess.run(
+                foldx_command,
+                cwd=self.working_dir,
+                check=True,
+                stdout=self.output,
+                stderr=self.output,
+            )
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError(
+                f"FoldX failed to simulate the mutations on the pdb file {pdb_file}. "
+                f"Please check the working directory: {self.working_dir}. "
+            ) from e
 
         results_dir = self.working_dir / f"Raw_{pdb_file.stem}.fxout"
         mutated_structure_dir = self.working_dir / f"{pdb_file.stem}_1.pdb"

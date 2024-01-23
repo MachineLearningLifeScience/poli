@@ -144,10 +144,41 @@ def test_registering_foldx_stability_and_sasa():
     """
     _ = pytest.importorskip("Bio")
     _ = pytest.importorskip("Levenshtein")
+    HOME_DIR = Path().home().resolve()
+    PATH_TO_FOLDX_FILES = HOME_DIR / "foldx"
+    if not PATH_TO_FOLDX_FILES.exists():
+        pytest.skip("FoldX is not installed. ")
+
+    if not (PATH_TO_FOLDX_FILES / "foldx").exists():
+        pytest.skip("FoldX is not compiled. ")
 
     _, f, _, y0, _ = objective_factory.create(
         name="foldx_stability_and_sasa",
         wildtype_pdb_path=THIS_DIR / "101m_Repair.pdb",
+    )
+
+    assert np.isclose(y0[:, 0], 32.4896).all()
+    assert np.isclose(y0[:, 1], 8411.45578009).all()
+
+
+def test_registering_foldx_stability_and_sasa_with_verbose_output():
+    """
+    Testing whether the foldx output is printed.
+    """
+    _ = pytest.importorskip("Bio")
+    _ = pytest.importorskip("Levenshtein")
+    HOME_DIR = Path().home().resolve()
+    PATH_TO_FOLDX_FILES = HOME_DIR / "foldx"
+    if not PATH_TO_FOLDX_FILES.exists():
+        pytest.skip("FoldX is not installed. ")
+
+    if not (PATH_TO_FOLDX_FILES / "foldx").exists():
+        pytest.skip("FoldX is not compiled. ")
+
+    _, f, _, y0, _ = objective_factory.create(
+        name="foldx_stability_and_sasa",
+        wildtype_pdb_path=THIS_DIR / "101m_Repair.pdb",
+        verbose=True,
     )
 
     assert np.isclose(y0[:, 0], 32.4896).all()
@@ -190,4 +221,5 @@ def test_foldx_from_repaired_file():
 
 if __name__ == "__main__":
     # test_foldx_stability_is_available()
-    test_force_registering_foldx_sasa()
+    test_registering_foldx_stability_and_sasa()
+    test_registering_foldx_stability_and_sasa_with_verbose_output()
