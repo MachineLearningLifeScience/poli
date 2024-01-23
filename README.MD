@@ -2,15 +2,15 @@
 
 [![Testing (conda, python 3.9)](https://github.com/MachineLearningLifeScience/poli/actions/workflows/python-tox-testing-including-conda.yml/badge.svg)](https://github.com/MachineLearningLifeScience/poli/actions/workflows/python-tox-testing-including-conda.yml)
 
-`poli` is a library of discrete objective functions for benchmarking optimization algorithms. Examples include:
-- 🔬 **stability** of mutations from a wildtype protein (using [`foldx`](https://foldxsuite.crg.eu/) or [`rasp`](https://github.com/KULL-Centre/_2022_ML-ddG-Blaabjerg)).
-- 🧪 **docking scores** of ligands to proteins (using [`dockstring`](https://github.com/dockstring/dockstring), [`pyscreener`](https://github.com/coleygroup/pyscreener) and [`pytdc`](https://tdcommons.ai/functions/oracles/)).
-- 💊 **druglikeness** or **synthetic acccesibility** of small molecules (using [`rdkit`](https://github.com/rdkit/rdkit) and [`pytdc`](https://tdcommons.ai/functions/oracles/)).
+poli is a library of discrete objective functions for benchmarking optimization algorithms. Examples include:
+- 🔬 **stability** of mutations from a wildtype protein (using [foldx](https://foldxsuite.crg.eu/) or [rasp](https://github.com/KULL-Centre/_2022_ML-ddG-Blaabjerg)).
+- 🧪 **docking scores** of ligands to proteins (using [dockstring](https://github.com/dockstring/dockstring), [pyscreener](https://github.com/coleygroup/pyscreener) and [pytdc](https://tdcommons.ai/functions/oracles/)).
+- 💊 **druglikeness** or **synthetic acccesibility** of small molecules (using [rdkit](https://github.com/rdkit/rdkit) and [pytdc](https://tdcommons.ai/functions/oracles/)).
 
 Some of `poli`'s features:
 - 🔲 **isolation** of black box function calls inside conda environments. Don't worry about clashes w. black box requirements.
 - 🗒️ **logging** logic at the black box `__call__` level using observers.
--  A `numpy` interface. Inputs are `np.array` of strings, outputs are `np.array` of floats.
+-  A numpy interface. Inputs are `np.array`s of strings, outputs are `np.array`s of floats.
 - `SMILES` and `SELFIES` support for small molecule manipulation.
 
 ## Getting started
@@ -32,18 +32,22 @@ $ python -c "from poli import get_problems ; print(get_problems())"
 
 ### Minimal working example
 
-Defining an objective function that just returns a draw from a standard normal.
+[![Open the minimal example in Colab](https://colab.research.google.com/assets/colab-badge.svg/)](https://colab.research.google.com/drive/1-IISCebWYfu0QhuCJ11wOag8aKOiPtls?usp=sharing)
+
+In this next example, we estimate the docking score of the example provided in `dockstring`:
 ```python
 # Check examples/minimal_working_example.py
 import numpy as np
 from poli import objective_factory
 
-problem_info, f, x0, y0, run_info = objective_factory.create(name="white_noise")
+problem_info, f, x0, y0, run_info = objective_factory.create(
+    name="dockstring",
+    target_name="drd2"
+)
 
-x = np.array([["1", "2", "3"]])  # must be of shape [b, L], in this case [1, 3].
-for _ in range(5):
-    print(f"f(x) = {f(x)}")
-
+# x0: risperidone's SMILES
+# y0: 11.9
+print(x0, y0)
 ```
 
 ## Cite us and other relevant work
