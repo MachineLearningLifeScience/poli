@@ -30,7 +30,7 @@ $ python -c "from poli import get_problems ; print(get_problems())"
 ['aloha', ..., 'white_noise']
 ```
 
-### Minimal working example
+### An example: dockstring
 
 [![Open the minimal example in Colab](https://colab.research.google.com/assets/colab-badge.svg/)](https://colab.research.google.com/drive/1-IISCebWYfu0QhuCJ11wOag8aKOiPtls?usp=sharing)
 
