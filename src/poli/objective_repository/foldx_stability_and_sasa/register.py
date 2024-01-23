@@ -203,6 +203,7 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
         experiment_id: str = None,
         tmp_folder: Path = None,
         eager_repair: bool = False,
+        verbose: bool = False,
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
@@ -225,6 +226,8 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
             Path to the temporary folder for intermediate files.
         eager_repair : bool, optional
             Flag indicating whether to perform eager repair.
+        verbose : bool, optional
+            Flag indicating whether to print the output from FoldX.
         seed : int, optional
             Seed for random number generators. If None is passed,
             the seeding doesn't take place.
@@ -247,8 +250,9 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
         ValueError
             If wildtype_pdb_path is missing or has an invalid type.
         """
-        seed_numpy(seed)
-        seed_python(seed)
+        if seed is not None:
+            seed_numpy(seed)
+            seed_python(seed)
 
         if wildtype_pdb_path is None:
             raise ValueError(
@@ -285,6 +289,7 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
             experiment_id=experiment_id,
             tmp_folder=tmp_folder,
             eager_repair=eager_repair,
+            verbose=verbose,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,

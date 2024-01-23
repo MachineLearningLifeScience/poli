@@ -205,6 +205,7 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
         experiment_id: str = None,
         tmp_folder: Path = None,
         eager_repair: bool = False,
+        verbose: bool = False,
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
@@ -226,6 +227,8 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
             Path to the temporary folder for storing intermediate files.
         eager_repair : bool, optional
             Whether to eagerly repair the protein structures.
+        verbose : bool, optional
+            Whether to print the output from FoldX.
         seed : int, optional
             Seed for random number generation.
         batch_size : int, optional
@@ -287,6 +290,7 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
             experiment_id=experiment_id,
             tmp_folder=tmp_folder,
             eager_repair=eager_repair,
+            verbose=verbose,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
