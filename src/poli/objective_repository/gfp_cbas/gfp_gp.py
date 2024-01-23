@@ -48,9 +48,9 @@ class SequenceGP(object):
         beta = self.params_[1]
         c = self.params_[2]
         d = self.params_[3]
-        kij = np.prod(BLOSUM[[Xi, Xj]] ** beta)
-        kii = np.prod(BLOSUM[[Xi, Xi]] ** beta)
-        kjj = np.prod(BLOSUM[[Xj, Xj]] ** beta)
+        kij = np.prod(BLOSUM[Xi, Xj] ** beta)
+        kii = np.prod(BLOSUM[Xi, Xi] ** beta)
+        kjj = np.prod(BLOSUM[Xj, Xj] ** beta)
         k = kij / (np.sqrt(kii * kjj))
         k = np.exp(c * k)
         return k
