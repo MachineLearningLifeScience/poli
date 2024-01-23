@@ -8,7 +8,7 @@ poli is a library of discrete objective functions for benchmarking optimization 
 - 💊 **druglikeness** or **synthetic acccesibility** of small molecules (using [rdkit](https://github.com/rdkit/rdkit) and [pytdc](https://tdcommons.ai/functions/oracles/)).
 
 Some of `poli`'s features:
-- 🔲 **isolation** of black box function calls inside conda environments. Don't worry about clashes w. black box requirements.
+- 🔲 **isolation** of black box function calls inside conda environments. Don't worry about clashes w. black box requirements, poli will create the relevant conda environments for you.
 - 🗒️ **logging** logic at the black box `__call__` level using observers.
 -  A numpy interface. Inputs are `np.array`s of strings, outputs are `np.array`s of floats.
 - `SMILES` and `SELFIES` support for small molecule manipulation.
@@ -36,7 +36,6 @@ $ python -c "from poli import get_problems ; print(get_problems())"
 
 In this next example, we estimate the docking score of the example provided in `dockstring`:
 ```python
-# Check examples/minimal_working_example.py
 import numpy as np
 from poli import objective_factory
 
