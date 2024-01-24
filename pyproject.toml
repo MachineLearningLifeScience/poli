@@ -25,7 +25,6 @@ dependencies = [
     "numpy",
     "rdkit",
     "selfies",
-    "dockstring"
 ]
 
 [project.optional-dependencies]

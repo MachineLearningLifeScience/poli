@@ -65,6 +65,8 @@ class FoldXStabilityBlackBox(FoldxBlackBox):
         The path to the temporary folder (default is None).
     eager_repair : bool, optional
         Whether to eagerly repair the protein structures (default is False).
+    verbose : bool, optional
+        Whether to print the output from FoldX (default is False).
     batch_size : int, optional
         The batch size for parallel processing (default is None).
     parallelize : bool, optional
@@ -89,15 +91,16 @@ class FoldXStabilityBlackBox(FoldxBlackBox):
     def __init__(
         self,
         info: ProblemSetupInformation = None,
-        batch_size: int = None,
-        parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = float("inf"),
         wildtype_pdb_path: Union[Path, List[Path]] = None,
         alphabet: List[str] = None,
         experiment_id: str = None,
         tmp_folder: Path = None,
         eager_repair: bool = False,
+        verbose: bool = False,
+        batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
+        evaluation_budget: int = float("inf"),
     ):
         super().__init__(
             info=info,
@@ -110,6 +113,7 @@ class FoldXStabilityBlackBox(FoldxBlackBox):
             experiment_id=experiment_id,
             tmp_folder=tmp_folder,
             eager_repair=eager_repair,
+            verbose=verbose,
         )
 
     def _black_box(self, x: np.ndarray, context: None) -> np.ndarray:
@@ -162,7 +166,7 @@ class FoldXStabilityBlackBox(FoldxBlackBox):
             wildtype_pdb_paths, mutations_as_strings[0]
         )
 
-        foldx_interface = FoldxInterface(working_dir)
+        foldx_interface = FoldxInterface(working_dir, self.verbose)
         stability = foldx_interface.compute_stability(
             pdb_file=wildtype_pdb_path, mutations=mutations_as_strings
         )
@@ -201,6 +205,7 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
         experiment_id: str = None,
         tmp_folder: Path = None,
         eager_repair: bool = False,
+        verbose: bool = False,
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
@@ -222,6 +227,8 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
             Path to the temporary folder for storing intermediate files.
         eager_repair : bool, optional
             Whether to eagerly repair the protein structures.
+        verbose : bool, optional
+            Whether to print the output from FoldX.
         seed : int, optional
             Seed for random number generation.
         batch_size : int, optional
@@ -283,6 +290,7 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
             experiment_id=experiment_id,
             tmp_folder=tmp_folder,
             eager_repair=eager_repair,
+            verbose=verbose,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,

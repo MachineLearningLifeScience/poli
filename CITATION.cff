@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below. Make sure you also cite the relevant software used in the black-boxes."
+authors:
+- family-names: "González-Duque"
+  given-names: "Miguel"
+- family-names: "Bartels"
+  given-names: "Simon"
+- family-names: "Michael"
+  given-names: "Richard"
+title: "poli: a libary of discrete sequence objectives"
+version: 0.0.1
+date-released: 2024-01-23
+url: "https://github.com/MachineLearningLifeScience/poli"

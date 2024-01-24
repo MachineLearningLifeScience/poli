@@ -15,6 +15,7 @@ from typing import Union, List
 from pathlib import Path
 from time import time
 from uuid import uuid4
+from multiprocessing import cpu_count
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.problem_setup_information import ProblemSetupInformation
@@ -58,6 +59,8 @@ class FoldxBlackBox(AbstractBlackBox):
         The temporary folder path. (default: None)
     eager_repair : bool, optional
         Flag indicating whether to eagerly repair the PDB files. (default: False)
+    verbose : bool, optional
+        Flag indicating whether we print the output from FoldX. (default: False)
 
     Attributes
     ----------
@@ -93,6 +96,7 @@ class FoldxBlackBox(AbstractBlackBox):
         experiment_id: str = None,
         tmp_folder: Path = None,
         eager_repair: bool = False,
+        verbose: bool = False,
     ):
         """
         Initialize the FoldxBlackBox.
@@ -119,6 +123,8 @@ class FoldxBlackBox(AbstractBlackBox):
             The temporary folder path. (default: None)
         eager_repair : bool, optional
             Flag indicating whether to eagerly repair the PDB files. (default: False)
+        verbose : bool, optional
+            Flag indicating whether we print the output from FoldX. (default: False)
         """
         # WARNING: notice how the batch-size is set to 1.
         # This is because we only support simulating one
@@ -132,9 +138,18 @@ class FoldxBlackBox(AbstractBlackBox):
         )
 
         # In the specific case of FoldX black boxes,
-        # the default batch size is 1.
+        # the default batch size is 1. However, if
+        # the user passed parallelize=True, then
+        # the batch size is set to the number of
+        # workers.
         if batch_size is None:
-            batch_size = 1
+            if parallelize:
+                if num_workers is None:
+                    num_workers = cpu_count() // 2
+                else:
+                    batch_size = num_workers
+            else:
+                batch_size = 1
 
         super().__init__(
             info=info,
@@ -143,6 +158,7 @@ class FoldxBlackBox(AbstractBlackBox):
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
         )
+        self.verbose = verbose
 
         # Defining the experiment id
         if experiment_id is None:
@@ -179,7 +195,9 @@ class FoldxBlackBox(AbstractBlackBox):
         if eager_repair:
             path_for_repairing_pdbs = self.tmp_folder / "foldx_tmp_files_for_repair"
             path_for_repairing_pdbs.mkdir(exist_ok=True, parents=True)
-            foldx_interface_for_repairing = FoldxInterface(path_for_repairing_pdbs)
+            foldx_interface_for_repairing = FoldxInterface(
+                path_for_repairing_pdbs, verbose=self.verbose
+            )
 
             # Re-writing wildtype_pdb_path to be the list of repaired pdb files.
             repaired_wildtype_pdb_files = [
