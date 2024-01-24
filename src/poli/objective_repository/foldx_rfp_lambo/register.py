@@ -89,6 +89,16 @@ LAMBO_FOLDX_ASSETS_PDBS = [
 
 
 def _download_assets_from_lambo():
+    if os.environ.get("GITHUB_TOKEN_FOR_POLI") is None:
+        logging.warning(
+            "This black box objective function require downloading files "
+            "from GitHub. Since the API rate limit is 60 requests per hour, "
+            "we recommend creating a GitHub token and setting it as an "
+            "environment variable called GITHUB_TOKEN_FOR_POLI. "
+            "To create a GitHub token like this, follow the instructions here: "
+            "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token"
+        )
+
     # Downloading the config file into ~/.poli_objectives/lambo
     if not (LAMBO_IN_POLI_OBJECTIVES_PATH / "proxy_rfp.yaml").exists():
         download_file_from_github_repository(
@@ -126,13 +136,7 @@ def _download_assets_from_lambo():
 
     # - the sequences in the foldx folder.
     for folder_name in LAMBO_FOLDX_ASSETS_PDBS:
-        if not (
-            LAMBO_PACKAGE_ROOT
-            / "assets"
-            / "foldx"
-            / folder_name
-            / "wt_input_Repair.pdb"
-        ).exists():
+        if not (LAMBO_PACKAGE_ROOT / "assets" / "foldx" / folder_name).exists():
             download_file_from_github_repository(
                 "samuelstanton/lambo",
                 f"lambo/assets/foldx/{folder_name}",
