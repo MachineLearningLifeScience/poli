@@ -245,6 +245,16 @@ class RaspInterface:
         models we download don't match the expected MD5 checksums.
         Otherwise, we will just log a warning.
         """
+        if os.environ.get("GITHUB_TOKEN_FOR_POLI") is None:
+            logging.warning(
+                "This black box objective function require downloading files "
+                "from GitHub. Since the API rate limit is 60 requests per hour, "
+                "we recommend creating a GitHub token and setting it as an "
+                "environment variable called GITHUB_TOKEN_FOR_POLI. "
+                "To create a GitHub token like this, follow the instructions here: "
+                "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token"
+            )
+
         cavity_model_path = RASP_DIR / "cavity_model_15.pt"
         ds_models_paths = [
             RASP_DIR / "ds_models" / f"ds_model_{i}" / "model.pt" for i in range(10)
@@ -271,14 +281,14 @@ class RaspInterface:
         }
 
         if verbose:
-            print("Downloading the cavity and downstream models")
+            print("poli 🧪: Downloading the cavity and downstream models")
             print(f"Repository: {repository_name}")
             print(f"Commit: {commit_sha}")
 
         # Downloading the cavity model.
         if not cavity_model_path.exists():
             if verbose:
-                print("Downloading the cavity model")
+                print("poli 🧪: Downloading the cavity model")
 
             download_file_from_github_repository(
                 repository_name=repository_name,
@@ -307,13 +317,13 @@ class RaspInterface:
                         "This could be due to a corrupted download, or a malicious attack. "
                     )
         elif verbose:
-            print("Cavity model already exists. Skipping.")
+            print("poli 🧪: Cavity model already exists. Skipping.")
 
         # Downloading the downstream models
         for path_ in ds_models_paths:
             if not path_.exists():
                 if verbose:
-                    print(f"Downloading the downstream model {path_.parent}")
+                    print(f"poli 🧪: Downloading the downstream model {path_.parent}")
 
                 local_path_in_directory = path_.relative_to(RASP_DIR)
                 download_file_from_github_repository(
@@ -342,7 +352,9 @@ class RaspInterface:
                             "This could be due to a corrupted download, or a malicious attack. "
                         )
             elif verbose:
-                print(f"Downstream model {path_.parent.name} already exists. Skipping.")
+                print(
+                    f"poli 🧪: Downstream model {path_.parent.name} already exists. Skipping."
+                )
 
     def raw_pdb_to_unique_chain(self, wildtype_pdb_path: Path, chain: str = "A"):
         """
