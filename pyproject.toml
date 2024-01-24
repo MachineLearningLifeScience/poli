@@ -24,7 +24,7 @@ keywords = ["optimization", "molecular", "discrete", "proteins"]
 dependencies = [
     "numpy",
     "rdkit",
-    "selfies",
+    "selfies"
 ]
 
 [project.optional-dependencies]

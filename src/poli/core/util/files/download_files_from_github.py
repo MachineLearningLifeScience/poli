@@ -10,6 +10,7 @@ https://gist.github.com/pdashford/2e4bcd4fc2343e2fd03efe4da17f577d?permalink_com
 import base64
 import os
 from pathlib import Path
+import warnings
 
 from github import Github, GithubException
 from github.ContentFile import ContentFile
@@ -105,6 +106,17 @@ def download_file_from_github_repository(
     To create a GitHub token like this, follow the instructions here:
     https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token
     """
+    if os.environ.get("GITHUB_TOKEN_FOR_POLI") is None:
+        warnings.warn(
+            "Some black box objective function require downloading files "
+            "from GitHub. Since the API rate limit is 60 requests per hour, "
+            "we recommend creating a GitHub token and setting it as an "
+            "environment variable called GITHUB_TOKEN_FOR_POLI. "
+            "\n"
+            "To create a GitHub token like this, follow the instructions here: "
+            "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token",
+            UserWarning,
+        )
     github = Github(login_or_token=os.environ.get("GITHUB_TOKEN_FOR_POLI"))
     repository = github.get_repo(repository_name)
 
