@@ -1,4 +1,4 @@
-name: Test (dev, conda, python 3.9)
+name: Tests on poli (dev, conda, python 3.9)
 
 on: [push]
 
