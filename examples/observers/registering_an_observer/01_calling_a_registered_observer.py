@@ -4,6 +4,7 @@ To showcase isolation, we run this script in a _different_
 environment to the one used to register and run the observer,
 one that doesn't have e.g. wandb installed.
 """
+
 import numpy as np
 
 from poli import objective_factory

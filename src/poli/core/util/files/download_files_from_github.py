@@ -7,6 +7,7 @@ This module requires the PyGithub package, install it with:
 Most of this code was taken and adapted from:
 https://gist.github.com/pdashford/2e4bcd4fc2343e2fd03efe4da17f577d?permalink_comment_id=4274705#gistcomment-4274705
 """
+
 import base64
 import os
 from pathlib import Path

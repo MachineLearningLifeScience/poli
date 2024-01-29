@@ -1,4 +1,5 @@
 """External observer, which can be run in an isolated process."""
+
 from typing import Any
 import numpy as np
 

@@ -12,6 +12,7 @@ foldx expects mutations in a certain format:
 See the "Individual List Mode" of https://foldxsuite.crg.eu/parameter/mutant-file
 for more details.
 """
+
 from pathlib import Path
 from typing import List, Tuple, Union
 

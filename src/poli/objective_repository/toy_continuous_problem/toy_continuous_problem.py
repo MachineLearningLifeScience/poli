@@ -4,6 +4,7 @@ A series of testbed functions for optimization.
 See for more examples:
 https://en.wikipedia.org/wiki/Test_functions_for_optimization
 """
+
 from typing import Literal
 
 import numpy as np

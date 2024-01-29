@@ -8,6 +8,7 @@ Stanton, Samuel, Wesley Maddox, Nate Gruver, Phillip Maffettone,
 Emily Delaney, Peyton Greenside, and Andrew Gordon Wilson.
 arXiv, July 12, 2022. http://arxiv.org/abs/2203.12742.
 """
+
 # AUTHOR: Simon Bartels
 # This sequence is problematic due to an X in position 159
 # according to PDB this sequence has the most (98%) similarity: SKGEELIKENMHMKLYMEGTVNNHHFKCTTEGEGKPYEGTQTQRIKVVEGGPLPFAFDILATCFMYGSKTFINHTQGIPDFFKQSFPEGFTWERVTTYEDGGVLTVTQDTSLQDGCLIYNVKLRGVNFPSNGPVMQKKTLGWEATTETLYPADGGLEGRCDMALKLVGGGHLHCNLKTTYRSKKPAKNLKMPGVYFVDRRLERIKEADNETYVEQHEVAVARYCDLPSKL

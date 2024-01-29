@@ -1,4 +1,5 @@
 """Utilities for transforming levels to arrays and back."""
+
 from typing import List
 from itertools import product
 

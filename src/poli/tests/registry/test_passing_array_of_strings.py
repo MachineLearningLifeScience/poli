@@ -1,5 +1,6 @@
 """This module tests whether giving black boxes an array of b strings
 is equivalent to giving them an array of [b, L] tokens."""
+
 from typing import List
 
 import pytest

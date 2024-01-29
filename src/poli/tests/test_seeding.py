@@ -2,6 +2,7 @@
 This test module tests whether the seeding works
 in the white noise example.
 """
+
 import numpy as np
 
 from poli import objective_factory

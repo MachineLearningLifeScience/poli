@@ -13,6 +13,7 @@ minimizations.
 [2] Surjanovic, S. and Bingham, D. Virtual Library of Simulation Experiments:
     Test Functions and Datasets. [https://www.sfu.ca/~ssurjano/optimization.html]
 """
+
 import numpy as np
 
 

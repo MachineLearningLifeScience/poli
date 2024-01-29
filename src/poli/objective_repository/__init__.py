@@ -1,5 +1,6 @@
 """All objective factories and black boxes inside poli.
 """
+
 from pathlib import Path
 
 # These can be imported from the base environment.
@@ -74,9 +75,9 @@ except (ImportError, FileNotFoundError):
 try:
     from .foldx_stability_and_sasa.register import FoldXStabilityAndSASAProblemFactory
 
-    AVAILABLE_PROBLEM_FACTORIES[
-        "foldx_stability_and_sasa"
-    ] = FoldXStabilityAndSASAProblemFactory
+    AVAILABLE_PROBLEM_FACTORIES["foldx_stability_and_sasa"] = (
+        FoldXStabilityAndSASAProblemFactory
+    )
 except (ImportError, FileNotFoundError):
     pass
 
@@ -86,9 +87,9 @@ try:
         RFPFoldXStabilityAndSASAProblemFactory,
     )
 
-    AVAILABLE_PROBLEM_FACTORIES[
-        "rfp_foldx_stability_and_sasa"
-    ] = RFPFoldXStabilityAndSASAProblemFactory
+    AVAILABLE_PROBLEM_FACTORIES["rfp_foldx_stability_and_sasa"] = (
+        RFPFoldXStabilityAndSASAProblemFactory
+    )
 except (ImportError, FileNotFoundError):
     pass
 
@@ -96,9 +97,9 @@ except (ImportError, FileNotFoundError):
 try:
     from .penalized_logp_lambo.register import PenalizedLogPLamboProblemFactory
 
-    AVAILABLE_PROBLEM_FACTORIES[
-        "penalized_logp_lambo"
-    ] = PenalizedLogPLamboProblemFactory
+    AVAILABLE_PROBLEM_FACTORIES["penalized_logp_lambo"] = (
+        PenalizedLogPLamboProblemFactory
+    )
 except (ImportError, FileNotFoundError):
     pass
 

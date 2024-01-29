@@ -1,4 +1,5 @@
 """Executable script used for isolation of objective factories and functions."""
+
 import logging
 import os
 import sys

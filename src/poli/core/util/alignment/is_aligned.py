@@ -1,6 +1,7 @@
 """Utility model to check if the input to an "aligned"
 problem is indeed aligned.
 """
+
 import numpy as np
 
 

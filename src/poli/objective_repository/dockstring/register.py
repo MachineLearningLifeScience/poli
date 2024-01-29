@@ -12,6 +12,7 @@ References
     Journal of Chemical Information and Modeling 62, no. 15 (August 8, 2022): 3486-3502.
     https://doi.org/10.1021/acs.jcim.1c01334.
 """
+
 from typing import Tuple, Literal
 
 import numpy as np

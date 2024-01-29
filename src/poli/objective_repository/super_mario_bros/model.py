@@ -1,6 +1,7 @@
 """
 A categorical VAE that can train on Mario.
 """
+
 from typing import Tuple
 from pathlib import Path
 

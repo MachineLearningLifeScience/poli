@@ -1,6 +1,7 @@
 """Utilities for transforming string representations of
 molecules into molecules in RDKit.
 """
+
 from typing import List
 
 from rdkit import Chem
