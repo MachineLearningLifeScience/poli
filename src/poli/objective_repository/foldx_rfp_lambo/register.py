@@ -189,6 +189,7 @@ class RFPWrapper(AbstractBlackBox):
                 continue
             hd = np.sum([seq[i] != b_seq[i] for i in range(len(seq))])
             if hd < min_hd:
+                min_hd = hd
                 best_b_cand = b_cand
         if best_b_cand is None:
             for b_cand in self.base_candidates:
