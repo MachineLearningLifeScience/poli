@@ -174,12 +174,14 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
         num_workers: int = None,
         evaluation_budget: int = 100000,
         n_starting_points: int = 1,
+        problem_type: str = "gp",
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         """
         Seed value required to shuffle the data, otherwise CSV asset data index unchanged.
         We optimize with respect to one GFP WT sequence by default.
         If more starting points are requested the sequences are provided at random.
         """
+        self.problem_type = problem_type
         seed_numpy(seed)
         seed_python(seed)
         problem_info = self.get_setup_information()
