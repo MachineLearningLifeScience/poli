@@ -1,4 +1,5 @@
 """RFP objective factory and black box function."""
+
 __author__ = "Simon Bartels"
 
 import logging
@@ -262,9 +263,9 @@ class RFPWrapperFactory(AbstractProblemFactory):
         )
         if self.problem_sequence in all_seqs:
             # substitute erroneous sequence "X in position 159" with correct PDB fasta sequence
-            all_seqs[
-                np.where(all_seqs == self.problem_sequence)
-            ] = self.correct_sequence
+            all_seqs[np.where(all_seqs == self.problem_sequence)] = (
+                self.correct_sequence
+            )
         return (
             RFPWrapper(
                 bb_task,

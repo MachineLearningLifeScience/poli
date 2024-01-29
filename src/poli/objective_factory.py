@@ -1,6 +1,7 @@
 """
 Creates objective functions by providing a common interface to all factories in the repository.
 """
+
 from typing import Tuple, Any
 import numpy as np
 from pathlib import Path

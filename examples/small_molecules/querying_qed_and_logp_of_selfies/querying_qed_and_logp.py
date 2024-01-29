@@ -8,6 +8,7 @@ you will need to specify the path to the alphabet
 is because the alphabet is not hardcoded in poli, since
 different problems/datasets will have different alphabets.
 """
+
 from pathlib import Path
 
 import numpy as np

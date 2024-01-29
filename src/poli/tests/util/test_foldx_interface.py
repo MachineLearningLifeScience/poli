@@ -6,6 +6,7 @@ Since this code is only intended to run inside the
 poli__protein environment, we add a skip to the
 whole module if the import fails.
 """
+
 import pytest
 
 from pathlib import Path

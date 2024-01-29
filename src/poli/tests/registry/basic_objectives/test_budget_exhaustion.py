@@ -1,4 +1,5 @@
 """Tests for the budget exhaustion inside objective functions."""
+
 import pytest
 
 import numpy as np

@@ -1,4 +1,5 @@
 """Utilities for seeding random number generators."""
+
 import numpy as np
 import random
 

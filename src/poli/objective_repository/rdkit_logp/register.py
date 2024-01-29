@@ -24,6 +24,7 @@ instead of inside an isolated process, run:
 pip install rdkit selfies
 `
 """
+
 from pathlib import Path
 from typing import Tuple, List, Literal
 import json

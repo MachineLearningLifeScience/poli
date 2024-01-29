@@ -3,6 +3,7 @@ This module contains coding for training a Gaussian Process Regression
 model on the Sarkisyan (2016) data set.
 Plus some utility constants.
 """
+
 import warnings
 
 warnings.filterwarnings("ignore")

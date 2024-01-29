@@ -1,6 +1,7 @@
 """
 Implements the problem setup information, which contains the problem information (e.g. alphabet, sequence length...).
 """
+
 from typing import List
 
 

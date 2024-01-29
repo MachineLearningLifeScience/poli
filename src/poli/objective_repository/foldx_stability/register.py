@@ -13,6 +13,7 @@ also use biopython for pre-processing the PDB files [2].
     freely available Python tools for computational molecular biology and 
     bioinformatics. Bioinformatics, 25, 1422-1423
 """
+
 from pathlib import Path
 from typing import List, Tuple, Union
 

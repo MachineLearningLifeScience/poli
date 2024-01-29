@@ -1,4 +1,5 @@
 """This module implements the abstract problem factory."""
+
 from typing import Tuple
 
 import numpy as np

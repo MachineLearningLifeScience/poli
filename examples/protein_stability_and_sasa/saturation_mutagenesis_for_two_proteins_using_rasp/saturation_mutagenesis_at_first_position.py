@@ -7,6 +7,7 @@ install it in your current environment:
 
 pip install pandas
 """
+
 from pathlib import Path
 
 import numpy as np

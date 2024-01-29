@@ -6,6 +6,7 @@ is, of course, maximizing it while keeping the
 level playable.
 
 """
+
 from typing import Tuple
 from pathlib import Path
 

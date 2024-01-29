@@ -7,6 +7,7 @@ higher dimensional Bayesian Optimization algorithms,
 since some of them assume that the intrinsic dimensionality
 of the problem is lower than the actual dimensionality.
 """
+
 import numpy as np
 
 

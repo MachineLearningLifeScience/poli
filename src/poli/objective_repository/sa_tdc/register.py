@@ -6,6 +6,7 @@ References
 [1] Artificial intelligence foundation for therapeutic science.
     Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022). https://doi.org/10.1038/s41589-022-01131-2
 """
+
 from typing import Tuple
 
 import numpy as np

@@ -1,4 +1,5 @@
 """Abstract class for observers in poli."""
+
 import numpy as np
 from poli.core.problem_setup_information import ProblemSetupInformation
 

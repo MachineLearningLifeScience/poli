@@ -3,6 +3,7 @@ Implements a multi_objective version of black box functions,
 by this we mean simply concatenating the results of evaluating individual
 objective functions.
 """
+
 from typing import List
 
 import numpy as np

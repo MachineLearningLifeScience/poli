@@ -1,4 +1,5 @@
 """This module implements a batched input generator."""
+
 from typing import Iterable
 from itertools import islice
 

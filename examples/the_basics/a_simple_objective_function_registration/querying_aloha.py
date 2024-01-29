@@ -3,6 +3,7 @@ Once registered, we can create instances of the black box
 function. This function is evaluated in an isolated process,
 using the conda enviroment we specified at registration.
 """
+
 import numpy as np
 
 from poli import objective_factory

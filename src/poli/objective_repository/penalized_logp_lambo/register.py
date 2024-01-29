@@ -10,6 +10,7 @@ Stanton, Samuel, Wesley Maddox, Nate Gruver, Phillip Maffettone,
 Emily Delaney, Peyton Greenside, and Andrew Gordon Wilson.
 arXiv, July 12, 2022. http://arxiv.org/abs/2203.12742.
 """
+
 from typing import Tuple
 import numpy as np
 

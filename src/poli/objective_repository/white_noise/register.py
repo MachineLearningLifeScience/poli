@@ -8,6 +8,7 @@ The problem is registered as 'white_noise', and it uses
 a conda environment called 'poli__base' (see the
 environment.yml file in this folder).
 """
+
 from typing import Tuple
 
 import numpy as np

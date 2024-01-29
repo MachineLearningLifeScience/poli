@@ -690,16 +690,20 @@ class VariantData(PrismData):
         target_resi = list(np.sort(target_resi))
         if mode == "any":
             bool_mask = [
-                np.any([ti in resi_list for ti in target_resi])
-                if len(resi_list) > 0
-                else False
+                (
+                    np.any([ti in resi_list for ti in target_resi])
+                    if len(resi_list) > 0
+                    else False
+                )
                 for resi_list in self.dataframe["resi"]
             ]
         elif mode == "all":
             bool_mask = [
-                np.all([ti in resi_list for ti in target_resi])
-                if len(resi_list) > 0
-                else False
+                (
+                    np.all([ti in resi_list for ti in target_resi])
+                    if len(resi_list) > 0
+                    else False
+                )
                 for resi_list in self.dataframe["resi"]
             ]
         elif mode == "exact":
@@ -779,9 +783,11 @@ class VariantData(PrismData):
             else 1
         )
         var_list = [
-            seq[resi] + str(resi + first_resn) + var
-            if seq[resi] != var
-            else seq[resi] + str(resi + first_resn) + "="
+            (
+                seq[resi] + str(resi + first_resn) + var
+                if seq[resi] != var
+                else seq[resi] + str(resi + first_resn) + "="
+            )
             for resi in range(len(seq))
             for var in aa_order
         ]
@@ -1619,9 +1625,9 @@ class VariantData(PrismData):
                 + ")"
             )
             for key in data_copy.metadata["columns"].keys():
-                merged_metadata["columns"][
-                    key + "_%02d" % (c + 1)
-                ] = data_copy.metadata["columns"][key]
+                merged_metadata["columns"][key + "_%02d" % (c + 1)] = (
+                    data_copy.metadata["columns"][key]
+                )
             c += 1
 
         # Add the index columns ['n_mut','aa_ref','resi','aa_mut'] again

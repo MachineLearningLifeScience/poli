@@ -7,6 +7,7 @@ This module implements tests for
 - whether we can register observers and run
   them in isolated processes using `set_observer`.
 """
+
 from pathlib import Path
 import json
 
