@@ -1,22 +1,24 @@
-from warnings import warn
 from pathlib import Path
 from typing import List, Tuple
+from warnings import warn
+
 import numpy as np
 import pandas as pd
 import torch
+
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.core.util import batch
 from poli.core.util.proteins.defaults import AMINO_ACIDS
 from poli.core.util.seeding import seed_numpy, seed_python
-from poli.objective_repository.gfp_cbas.cbas_wrapper import CBASVAEWrapper
 from poli.objective_repository.gfp_cbas.cbas_alphabet_preprocessing import (
     AA,
+    convert_aas_to_idx_array,
     get_gfp_X_y_aa,
     one_hot_encode_aa_array,
-    convert_aas_to_idx_array,
 )
+from poli.objective_repository.gfp_cbas.cbas_wrapper import CBASVAEWrapper
 from poli.objective_repository.gfp_cbas.gfp_gp import SequenceGP
 
 
@@ -32,12 +34,23 @@ class GFPCBasBlackBox(AbstractBlackBox):
         ignore_stops: bool = True,
         unique=True,
     ):
-        gfp_df_path = Path(__file__).parent.resolve() / "assets" / "gfp_data.csv"
+        gfp_path = Path(__file__).parent.resolve() / "assets"
         self.info = info
         self.vae = CBASVAEWrapper(AA=len(info.alphabet), L=info.max_sequence_length).vae
         self.batch_size = batch_size
         self.seed = seed
-        data_df = pd.read_csv(gfp_df_path)[["medianBrightness", "std", "aaSequence"]]
+        data_df = pd.read_csv(gfp_path / "gfp_data.csv")[
+            ["medianBrightness", "std", "nucSequence", "aaSequence"]
+        ]
+        gfp_wt_seq = np.atleast_1d(
+            np.loadtxt(gfp_path / "avGFP_reference_sequence.fa", skiprows=1, dtype=str)
+        )[0]
+        self.reference_entry = data_df[
+            data_df.nucSequence.str.lower() == gfp_wt_seq.lower()
+        ]
+        data_df = data_df.drop(
+            self.reference_entry.index
+        )  # take out WT reference sequence
         if unique:
             data_df = data_df.drop_duplicates(subset="aaSequence")
         if self.seed:  # if random seed is provided, shuffle the data
@@ -160,17 +173,13 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = 100000,
-        n_starting_points: int = 128,
-        problem_type: str = "vae",
+        n_starting_points: int = 1,
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         """
         Seed value required to shuffle the data, otherwise CSV asset data index unchanged.
+        We optimize with respect to one GFP WT sequence by default.
+        If more starting points are requested the sequences are provided at random.
         """
-        if problem_type.lower() not in ["gp", "vae", "elbo"]:
-            raise NotImplementedError(
-                f"Specified problem type: {problem_type} does not exist!"
-            )
-        self.problem_type = problem_type  # required in class scope for setup info
         seed_numpy(seed)
         seed_python(seed)
         problem_info = self.get_setup_information()
@@ -181,7 +190,19 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
             num_workers=num_workers,
             seed=seed,
         )
-        x0 = np.array([list(s) for s in f.data_df.aaSequence[:n_starting_points]])
+        if n_starting_points < 1:
+            raise ValueError("Cannot specify less than one sequence!")
+        x0 = np.array(list(f.reference_entry.aaSequence.values[0]))[
+            np.newaxis, :
+        ]  # WT reference sequence
+        if (
+            n_starting_points > 1
+        ):  # take a random subset of available AA sequence at request
+            _x0 = np.array(
+                [list(s) for s in f.data_df.aaSequence[: n_starting_points - 1]]
+            )
+            x0 = np.concatenate([x0, _x0])
+            assert x0.shape[0] == n_starting_points
         f_0 = f(x0)
 
         return f, x0, f_0
@@ -195,6 +216,7 @@ if __name__ == "__main__":
         gfp_problem_factory,
         conda_environment_name="poli__protein_cbas",
     )
+    # NOTE: default problem is GP problem
     gfp_problem_factory.create(seed=12)
     # instantiate different types of CBas problems:
     gfp_problem_factory_vae = GFPCBasProblemFactory(problem_type="vae")
@@ -208,4 +230,4 @@ if __name__ == "__main__":
         gfp_problem_factory_elbo,
         conda_environment_name="poli__protein_cbas",
     )
-    # gfp_problem_factory_elbo.create(seed=12)
+    gfp_problem_factory_elbo.create(seed=12)
