@@ -118,7 +118,7 @@ class GFPCBasBlackBox(AbstractBlackBox):
             ]
         )
         # subselect ELBO as first column:
-        return model_evaluation[:, 0].reshape(-1, 1)
+        return -model_evaluation[:, 0].reshape(-1, 1)  # NOTE: minimize ELBO as target
 
     def _vae_embedding(self, x: np.ndarray) -> np.ndarray:
         """
@@ -226,10 +226,10 @@ if __name__ == "__main__":
         gfp_problem_factory_vae,
         conda_environment_name="poli__protein_cbas",
     )
-    gfp_problem_factory_vae.create(seed=12)
+    gfp_problem_factory_vae.create(seed=12, problem_type="vae")
     gfp_problem_factory_elbo = GFPCBasProblemFactory(problem_type="elbo")
     register_problem(
         gfp_problem_factory_elbo,
         conda_environment_name="poli__protein_cbas",
     )
-    gfp_problem_factory_elbo.create(seed=12)
+    gfp_problem_factory_elbo.create(seed=12, problem_type="elbo")
