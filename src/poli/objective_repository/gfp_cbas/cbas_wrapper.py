@@ -10,15 +10,16 @@ __author__ = "Simon Bartels, Richard Michael"
 
 
 import os
-from pathlib import Path
 import warnings
 from collections import OrderedDict
-import torch
-from torch.nn import functional as F
-import torch.nn as nn
-from scipy.stats.qmc import Sobol
-from scipy.stats import norm as StandardNormal
+from pathlib import Path
+
 import numpy as np
+import torch
+import torch.nn as nn
+from scipy.stats import norm as StandardNormal
+from scipy.stats.qmc import Sobol
+from torch.nn import functional as F
 
 from poli.objective_repository.gfp_cbas.abstract_vae_wrapper import AbstractVAEWrapper
 from poli.objective_repository.gfp_cbas.make_vae import build_vae
