@@ -1,13 +1,12 @@
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.python.keras import backend as K
 from tensorflow.keras.layers import (
-    Input,
-    Lambda,
     Add,
-    Multiply,
     Dense,
     Flatten,
+    Input,
+    Lambda,
+    Multiply,
     Reshape,
 )
 from tensorflow.keras.models import Model
