@@ -39,7 +39,7 @@ In this next example, we estimate the docking score of the example provided in `
 import numpy as np
 from poli import objective_factory
 
-problem_info, f, x0, y0, run_info = objective_factory.create(
+f, x0, y0 = objective_factory.create(
     name="dockstring",
     target_name="drd2"
 )
