@@ -29,7 +29,7 @@ if __name__ == "__main__":
 
     # Initializing a logP objective function.
     alphabet = ["", "[C]", "..."]
-    problem_info, f, x0, y0, run_info = objective_factory.create(
+    f, x0, y0 = objective_factory.create(
         name="rdkit_logp",
         observer=observer,
         alphabet=alphabet,
