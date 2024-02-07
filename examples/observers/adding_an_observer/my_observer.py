@@ -35,7 +35,7 @@ if __name__ == "__main__":
     set_observer(MyObserver(), conda_environment_location="")
 
     problem_info, f, x0, y0, run_info = objective_factory.create(
-        "MY_PROBLEM", caller_info=None
+        "MY_PROBLEM", observer_init_info=None
     )
     # call objective function and observe that observer is called
     print(f"The observer will be called {x0.shape[0]} time(s).")

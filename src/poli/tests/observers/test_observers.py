@@ -84,7 +84,7 @@ def test_simple_observer_logs_properly():
     observer = SimpleObserver(experiment_id="example")
 
     # Creating a black box function
-    _, f, _, _, _ = objective_factory.create(name="aloha", observer=observer)
+    f, _, _ = objective_factory.create(name="aloha", observer=observer)
 
     # Evaluating the black box function
     f(np.array([list("MIGUE")]))
@@ -110,7 +110,7 @@ def test_observer_registration_and_external_instancing():
     ext = ExternalObserver(observer_name="simple__", experiment_id="example")
 
     # Creating a black box function
-    _, f, _, _, _ = objective_factory.create(name="aloha", observer=ext)
+    f, _, _ = objective_factory.create(name="aloha", observer=ext)
 
     # Evaluating the black box function
     f(np.array([list("MIGUE")]))

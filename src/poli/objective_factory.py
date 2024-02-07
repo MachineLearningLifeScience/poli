@@ -345,7 +345,7 @@ def create(
     name: str,
     *,
     seed: int = None,
-    caller_info: dict = None,
+    observer_init_info: dict = None,
     observer: AbstractObserver = None,
     force_register: bool = True,
     force_isolation: bool = False,
@@ -365,7 +365,7 @@ def create(
         The name of the objective function.
     seed : int, optional
         The seed value for random number generation.
-    caller_info : dict, optional
+    observer_init_info : dict, optional
         Optional information about the caller that is forwarded to the logger to initialize the run.
     observer : AbstractObserver, optional
         The observer to use.
@@ -394,16 +394,12 @@ def create(
 
     Returns
     -------
-    problem_information : ProblemSetupInformation
-        The information about the problem.
     f : AbstractBlackBox
         The black-box function.
     x0 : np.ndarray
         The initial x values.
     y0 : np.ndarray
         The initial y values.
-    observer_info : object
-        The information about the observer.
     """
     # If the user can run it with the envionment they currently
     # have, then we do not need to install it.
@@ -420,18 +416,17 @@ def create(
             evaluation_budget=evaluation_budget,
             **kwargs_for_factory,
         )
-        problem_info = f.info
 
-        observer_info = None
         if observer is not None:
             if not quiet:
                 print(f"poli 🧪: initializing the observer.")
             observer_info = observer.initialize_observer(
-                problem_info, caller_info, x0, y0, seed
+                f.info, observer_init_info, x0, y0, seed
             )
             f.set_observer(observer)
+            f.set_observer_info(observer_info)
 
-        return problem_info, f, x0, y0, observer_info
+        return f, x0, y0
 
     # Check if the name is indeed registered, or
     # available in the objective repository
@@ -457,12 +452,12 @@ def create(
     observer_info = None
     if observer is not None:
         observer_info = observer.initialize_observer(
-            problem_information, caller_info, x0, y0, seed
+            problem_information, observer_init_info, x0, y0, seed
         )
+        f.set_observer(observer)
+        f.set_observer_info(observer_info)
 
-    f.set_observer(observer)
-
-    return problem_information, f, x0, y0, observer_info
+    return f, x0, y0
 
 
 def start(

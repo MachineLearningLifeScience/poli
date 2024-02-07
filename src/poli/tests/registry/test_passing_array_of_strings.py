@@ -116,7 +116,7 @@ def test_passing_array_of_strings(
     import numpy as np
     from poli import create
 
-    _, f, _, _, _ = create(
+    f, _, _ = create(
         name=black_box_name,
         **kwargs,
     )

@@ -9,15 +9,15 @@ from poli import objective_factory
 
 
 def test_seeding_in_white_noise():
-    _, _, _, y0, _ = objective_factory.create(
+    _, _, y0 = objective_factory.create(
         "white_noise", seed=42, batch_size=1, parallelize=False
     )
 
-    _, _, _, y1, _ = objective_factory.create(
+    _, _, y1 = objective_factory.create(
         "white_noise", seed=42, batch_size=1, parallelize=False
     )
 
-    _, _, _, y2, _ = objective_factory.create(
+    _, _, y2 = objective_factory.create(
         "white_noise", seed=43, batch_size=1, parallelize=False
     )
 

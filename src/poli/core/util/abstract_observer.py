@@ -69,7 +69,7 @@ class AbstractObserver:
         problem_setup_info : ProblemSetupInformation
             The information about the problem setup.
         caller_info : object
-            The information about the caller.
+            The information that is passed to the observer at init time.
         x0 : np.ndarray
             The initial x values.
         y0 : np.ndarray
@@ -79,8 +79,8 @@ class AbstractObserver:
 
         Returns
         -------
-        object
-            The initialized observer object.
+        observer_info
+            Information about the observer after initialization (e.g. run ids).
 
         Raises
         ------

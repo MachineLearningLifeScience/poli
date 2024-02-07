@@ -27,7 +27,7 @@ if __name__ == "__main__":
         observer=observer,
         alphabet=alphabet,
         string_representation="SELFIES",
-        caller_info={"run_id": None, "experiment_id": None},
+        observer_init_info={"run_id": None, "experiment_id": None},
     )
 
     # Logging some examples

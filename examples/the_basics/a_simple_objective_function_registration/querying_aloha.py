@@ -11,7 +11,7 @@ from poli import objective_factory
 if __name__ == "__main__":
     # Creating an instance of the problem
     problem_info, f, x0, y0, run_info = objective_factory.create(
-        name="our_aloha", caller_info=None, observer=None
+        name="our_aloha", observer_init_info=None, observer=None
     )
     print(x0, y0)
 
