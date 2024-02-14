@@ -13,10 +13,8 @@ will
 
 from poli import objective_factory
 
-problem_info, f, x0, y0, run_info = objective_factory.create(
+f, x0, y0 = objective_factory.create(
     name="aloha",
-    caller_info=None,
-    observer=None,
     seed=0,
 )
 

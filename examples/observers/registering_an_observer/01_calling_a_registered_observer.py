@@ -18,7 +18,7 @@ if __name__ == "__main__":
     observer = ExternalObserver(observer_name="wandb", initial_step=0)
 
     # Instantiate the objective
-    problem_info, f, x0, y0, run_info = objective_factory.create(
+    f, x0, y0 = objective_factory.create(
         name="aloha",
         observer=observer,
     )

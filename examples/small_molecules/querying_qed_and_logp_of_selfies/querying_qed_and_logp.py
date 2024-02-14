@@ -18,16 +18,13 @@ from poli import objective_factory
 THIS_DIR = Path(__file__).parent.resolve()
 
 if __name__ == "__main__":
-    path_to_alphabet = THIS_DIR / "alphabet_selfies.json"
-    problem_info, f_qed, x0, y0, _ = objective_factory.create(
+    f_qed, x0, y0 = objective_factory.create(
         name="rdkit_qed",
-        path_to_alphabet=path_to_alphabet,
         string_representation="SELFIES",
     )
 
-    _, f_logp, x0, y0, _ = objective_factory.create(
+    f_logp, x0, y0 = objective_factory.create(
         name="rdkit_logp",
-        path_to_alphabet=path_to_alphabet,
         string_representation="SELFIES",
     )
 

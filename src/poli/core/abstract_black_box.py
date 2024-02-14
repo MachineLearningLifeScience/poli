@@ -40,6 +40,8 @@ class AbstractBlackBox:
         The problem setup information object.
     observer : AbstractObserver or None
         The observer object for recording observations during evaluation.
+    observer_info : object or None
+        The information given by the observer after initialization.
     parallelize : bool
         Flag indicating whether to evaluate the black box function in parallel.
     num_workers : int
@@ -91,12 +93,13 @@ class AbstractBlackBox:
         parallelize : bool, optional
             Flag indicating whether to parallelize the execution, by default False.
         num_workers : int, optional
-            The number of workers for parallel execution, by default None.
+            The number of workers for parallel execution, by default we use half the available CPUs.
         evaluation_budget : int, optional
             The maximum number of evaluations allowed for the black box function, by default float("inf").
         """
         self.info = info
         self.observer = None
+        self.observer_info = None
         self.parallelize = parallelize
         self.evaluation_budget = evaluation_budget
         self.num_evaluations = 0
@@ -118,6 +121,17 @@ class AbstractBlackBox:
             The observer object.
         """
         self.observer = observer
+
+    def set_observer_info(self, observer_info: object):
+        """
+        Set the observer information after initialization.
+
+        Parameters
+        ----------
+        observer_info : object
+            The information given by the observer after initialization.
+        """
+        self.observer_info = observer_info
 
     def reset_evaluation_budget(self):
         """Resets the evaluation budget by setting the number of evaluations made to 0."""

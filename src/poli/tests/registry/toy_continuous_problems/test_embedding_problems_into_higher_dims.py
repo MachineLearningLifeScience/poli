@@ -17,7 +17,7 @@ def test_embed_camelback_into_high_dimensions():
         ToyContinuousProblem,
     )
 
-    _, f_camelback, _, _, _ = objective_factory.create(
+    f_camelback, _, _ = objective_factory.create(
         name="toy_continuous_problem",
         function_name="camelback_2d",
         n_dimensions=2,

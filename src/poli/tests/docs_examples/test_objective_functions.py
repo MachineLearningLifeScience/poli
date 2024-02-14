@@ -10,7 +10,7 @@ def test_white_noise_example():
     from poli import objective_factory
 
     # How to create
-    problem_info, f, x0, y0, run_info = objective_factory.create(name="white_noise")
+    f, x0, y0 = objective_factory.create(name="white_noise")
 
     # Example input:
     x = np.array([["1", "2", "3"]])  # must be of shape [b, L], in this case [1, 3].
@@ -24,7 +24,7 @@ def test_aloha_example():
     from poli import objective_factory
 
     # How to create
-    problem_info, f, x0, y0, run_info = objective_factory.create(name="aloha")
+    f, x0, y0 = objective_factory.create(name="aloha")
 
     # Example input:
     x = np.array(
@@ -42,7 +42,7 @@ def test_qed_example():
     from poli import objective_factory
 
     # How to create
-    problem_info, f, x0, y0, run_info = objective_factory.create(
+    f, x0, y0 = objective_factory.create(
         name="rdkit_qed",
         string_representation="SMILES",  # it is "SMILES" by default.
         force_register=True,
@@ -62,7 +62,7 @@ def test_logp_example():
     from poli import objective_factory
 
     # How to create
-    problem_info, f, x0, y0, run_info = objective_factory.create(
+    f, x0, y0 = objective_factory.create(
         name="rdkit_logp",
         string_representation="SMILES",  # it is "SMILES" by default.
         force_register=True,

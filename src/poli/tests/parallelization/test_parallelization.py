@@ -11,7 +11,7 @@ NUM_WORKERS = min(cpu_count(), 2)
 
 
 def test_parallelization_in_aloha():
-    _, f, x0, y0, _ = objective_factory.create(
+    f, x0, y0 = objective_factory.create(
         "aloha", parallelize=True, num_workers=NUM_WORKERS
     )
 
@@ -29,7 +29,7 @@ def test_parallelization_in_aloha():
 
 
 def test_parallelization_in_qed():
-    _, f, x0, y0, _ = objective_factory.create(
+    f, x0, y0 = objective_factory.create(
         "rdkit_qed",
         parallelize=True,
         num_workers=NUM_WORKERS,
@@ -60,7 +60,7 @@ def test_parallelization_in_foldx_stability_and_sasa():
         pytest.skip("FoldX is not compiled. ")
 
     wildtype_pdb_path = Path(__file__).parent / "101m_Repair.pdb"
-    problem_info, f, x0, y0, _ = objective_factory.create(
+    f, x0, y0 = objective_factory.create(
         name="foldx_stability_and_sasa",
         wildtype_pdb_path=3 * [wildtype_pdb_path],
         parallelize=True,

@@ -20,7 +20,7 @@ if __name__ == "__main__":
         if "_Repair" not in str(path_.name)
     ]
 
-    _, f_foldx, x0, y0, _ = objective_factory.create(
+    f_foldx, x0, y0 = objective_factory.create(
         name="foldx_stability",
         wildtype_pdb_path=wildtype_pdb_paths_for_foldx,
         batch_size=1,
@@ -30,7 +30,7 @@ if __name__ == "__main__":
 
     f_foldx.terminate()
 
-    _, f_rasp, x0, y0, _ = objective_factory.create(
+    f_rasp, x0, y0 = objective_factory.create(
         name="rasp",
         wildtype_pdb_path=wildtype_pdb_paths_for_rasp,
     )
