@@ -132,3 +132,48 @@ def test_observer_registration_and_external_instancing():
 
     # Cleaning up the observer run script
     delete_observer_run_script(observer_name="simple__")
+
+
+def test_multiple_observer_registration():
+    from poli.core.registry import set_observer, delete_observer_run_script
+    from poli.core.util.external_observer import ExternalObserver
+
+    observer = SimpleObserver(experiment_id="example")
+    set_observer(
+        observer=observer,
+        conda_environment_location="poli__chem",
+        observer_name="simple__",
+    )
+
+    observer_2 = SimpleObserver(experiment_id="example_2")
+    set_observer(
+        observer=observer_2,
+        conda_environment_location="poli__chem",
+        observer_name="simple_2__",
+    )
+
+    ext_1 = ExternalObserver(observer_name="simple__", experiment_id="example")
+    ext_2 = ExternalObserver(observer_name="simple_2__", experiment_id="example_2")
+
+    # Creating a black box function
+    f_1, _, _ = objective_factory.create(name="aloha", observer=ext_1)
+    f_2, _, _ = objective_factory.create(name="aloha", observer=ext_2)
+
+    # Evaluating the black box function
+    f_1(np.array([list("MIGUE")]))
+    f_2(np.array([list("MIGUE")]))
+
+    # Cleaning up (and testing whether we can access attributes
+    # of the external observer)
+    (ext_1.experiment_path / "metadata.json").unlink()
+    (ext_2.experiment_path / "metadata.json").unlink()
+    ext_1.finish()
+    ext_2.finish()
+
+    # Cleaning up the observer run script
+    delete_observer_run_script(observer_name="simple__")
+    delete_observer_run_script(observer_name="simple_2__")
+
+
+if __name__ == "__main__":
+    test_multiple_observer_registration()
