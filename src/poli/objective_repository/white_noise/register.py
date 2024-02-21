@@ -26,8 +26,6 @@ class WhiteNoiseBlackBox(AbstractBlackBox):
 
     Parameters
     ----------
-    info : ProblemSetupInformation
-        The problem setup information.
     batch_size : int, optional
         The batch size for vectorized evaluation.
     parallelize : bool, optional
@@ -46,7 +44,6 @@ class WhiteNoiseBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        info: ProblemSetupInformation,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
@@ -71,7 +68,7 @@ class WhiteNoiseBlackBox(AbstractBlackBox):
             The maximum number of evaluations, by default float("inf").
         """
         super().__init__(
-            info=info,
+            info=WhiteNoiseProblemFactory.get_setup_information(),
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
@@ -97,7 +94,8 @@ class WhiteNoiseBlackBox(AbstractBlackBox):
 
 
 class WhiteNoiseProblemFactory(AbstractProblemFactory):
-    def get_setup_information(self) -> ProblemSetupInformation:
+    @staticmethod
+    def get_setup_information() -> ProblemSetupInformation:
         """
         Returns the setup information for the problem.
 
