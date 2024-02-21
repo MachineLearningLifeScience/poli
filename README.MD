@@ -1,6 +1,7 @@
 # poli 🧪, a library for discrete objective functions
 
 [![Testing (conda, python 3.9)](https://github.com/MachineLearningLifeScience/poli/actions/workflows/python-tox-testing-including-conda.yml/badge.svg)](https://github.com/MachineLearningLifeScience/poli/actions/workflows/python-tox-testing-including-conda.yml)
+[![Link to documentation](https://img.shields.io/badge/docs-poli_docs-blue)](https://machinelearninglifescience.github.io/poli-docs/)
 
 poli is a library of discrete objective functions for benchmarking optimization algorithms. Examples include:
 - 🔬 **stability** of mutations from a wildtype protein (using [foldx](https://foldxsuite.crg.eu/) or [rasp](https://github.com/KULL-Centre/_2022_ML-ddG-Blaabjerg)).
@@ -83,6 +84,8 @@ If you use certain black boxes, we also recommend citing the original work:
 
 
 ## Where can I find the documentation?
+
+The main documentation site is hosted as a GitHub page here: https://machinelearninglifescience.github.io/poli-docs/
 
 ### Building the documentation locally
 
