@@ -12,7 +12,7 @@ environment.yml file in this folder).
 import numpy as np
 
 from poli.core.abstract_problem_factory import AbstractProblemFactory
-from poli.core.abstract_problem import AbstractProblem
+from poli.core.problem import Problem
 from poli.core.abstract_black_box import AbstractBlackBox
 
 from poli.core.problem_setup_information import ProblemSetupInformation
@@ -107,7 +107,7 @@ class WhiteNoiseBlackBox(AbstractBlackBox):
         )
 
 
-class WhiteNoiseProblem(AbstractProblem):
+class WhiteNoiseProblem(Problem):
     def __init__(
         self,
         black_box: WhiteNoiseBlackBox,
@@ -191,15 +191,24 @@ class WhiteNoiseProblemFactory(AbstractProblemFactory):
 
 
 if __name__ == "__main__":
-    from poli.core.registry import register_problem
+    from poli.core.registry import register_problem, register_black_box
 
     # Once we have created a simple conda enviroment
     # (see the environment.yml file in this folder),
     # we can register our problem s.t. it uses
     # said conda environment.
+    white_noise_black_box = WhiteNoiseBlackBox()
+    register_black_box(
+        white_noise_black_box,
+        name="white_noise",
+        conda_environment_name="poli__base",
+        force=True,
+    )
+
     white_noise_problem_factory = WhiteNoiseProblemFactory()
     register_problem(
         white_noise_problem_factory,
+        name="white_noise",
         conda_environment_name="poli__base",
-        # force=True
+        force=True,
     )

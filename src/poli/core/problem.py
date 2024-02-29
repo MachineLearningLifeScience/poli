@@ -23,7 +23,7 @@ from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.problem_setup_information import ProblemSetupInformation
 
 
-class AbstractProblem:
+class Problem:
     def __init__(
         self,
         black_box: AbstractBlackBox,
@@ -48,3 +48,12 @@ class AbstractProblem:
         if not isinstance(self.x0, np.ndarray):
             raise ValueError("x0 must be a numpy array.")
         # TODO: validate whether self.x0 is of the right shape.
+
+    def is_discrete(self):
+        return self.black_box_information.discrete
+
+    def is_deterministic(self):
+        return self.black_box_information.deterministic
+
+    def is_continuous(self):
+        return not self.is_discrete()

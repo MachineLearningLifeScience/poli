@@ -22,7 +22,7 @@ def test_rasp_on_3ned_against_notebooks_results_on_rasp_env():
 
     # If the previous import was successful, we can
     # create a RaSP problem:
-    f, x0, _ = objective_factory.create(
+    f, x0, _ = objective_factory.create_problem(
         name="rasp",
         wildtype_pdb_path=THIS_DIR / "3ned.pdb",
     )
@@ -52,7 +52,7 @@ def test_rasp_on_3ned_against_notebooks_results_isolated():
     """
     We test forceful registration of the RaSP problem.
     """
-    f, x0, _ = objective_factory.create(
+    f, x0, _ = objective_factory.create_problem(
         name="rasp",
         wildtype_pdb_path=THIS_DIR / "3ned.pdb",
         force_register=True,

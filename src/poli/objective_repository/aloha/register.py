@@ -10,7 +10,7 @@ a conda environment called 'poli__base' (see the
 environment.yml file in this folder).
 """
 
-from typing import Tuple
+from typing import Literal, Tuple
 from string import ascii_uppercase
 
 import numpy as np
@@ -18,6 +18,8 @@ import numpy as np
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem_setup_information import ProblemSetupInformation
+from poli.core.black_box_information import BlackBoxInformation
+from poli.core.problem import Problem
 
 from poli.core.util.seeding import seed_python_numpy_and_torch
 
@@ -75,14 +77,25 @@ class AlohaBlackBox(AbstractBlackBox):
         evaluation_budget:  int, optional
             The maximum number of function evaluations. Default is infinity.
         """
-        info = AlohaProblemFactory.get_setup_information()
-        self.alphabet = {symbol: idx for idx, symbol in enumerate(info.alphabet)}
         super().__init__(
-            info=info,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
+        )
+
+    @staticmethod
+    def get_black_box_info() -> BlackBoxInformation:
+        return BlackBoxInformation(
+            name="aloha",
+            max_sequence_length=5,
+            aligned=True,
+            fixed_length=True,
+            deterministic=True,
+            alphabet=list(ascii_uppercase),
+            log_transform_recommended=False,
+            discrete=True,
+            padding_token="",
         )
 
     # The only method you have to define
@@ -103,13 +116,7 @@ class AlohaBlackBox(AbstractBlackBox):
         y: np.ndarray
             Array of shape [b, 1] containing the distances to the sequence "ALOHA".
         """
-        if x.dtype.kind == "i":
-            if self.alphabet is None:
-                raise ValueError(
-                    "The alphabet must be defined if the input is an array of ints."
-                )
-            inverse_alphabet = {v: k for k, v in self.alphabet.items()}
-            x = np.array([[inverse_alphabet[i] for i in x[0]]])
+        assert x.dtype.kind == "U", "The input must be an array of strings."
 
         if x.shape[1] == 1:
             assert (
@@ -122,6 +129,22 @@ class AlohaBlackBox(AbstractBlackBox):
             x.shape[0], 1
         )
         return values
+
+
+class AlohaProblem(Problem):
+    def __init__(
+        self,
+        black_box: AbstractBlackBox,
+        x0: np.ndarray,
+        fidelity: Literal["high", "low"] = "high",
+        evaluation_budget: int = float("inf"),
+    ):
+        super().__init__(
+            black_box=black_box,
+            x0=x0,
+            fidelity=fidelity,
+            evaluation_budget=evaluation_budget,
+        )
 
 
 class AlohaProblemFactory(AbstractProblemFactory):

@@ -9,10 +9,12 @@ from os.path import basename, dirname, join
 import inspect
 import stat
 
-from poli import objective
-from poli.objective import ADDITIONAL_IMPORT_SEARCH_PATHES_KEY
+from poli import external_problem_factory_script
+from poli import external_black_box_script
+from poli.external_problem_factory_script import ADDITIONAL_IMPORT_SEARCH_PATHES_KEY
 from poli.core.util import observer_wrapper
 from poli.core.abstract_problem_factory import AbstractProblemFactory
+from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.util.abstract_observer import AbstractObserver
 
 # By default, we will store the run scripts inside the
@@ -20,6 +22,39 @@ from poli.core.util.abstract_observer import AbstractObserver
 # ~/.poli_objectives
 HOME_DIR = Path.home().resolve()
 RUN_SCRIPTS_FOLDER = HOME_DIR / ".poli_objectives"
+
+
+def make_black_box_script(
+    black_box: AbstractBlackBox,
+    conda_environment_name: Union[str, Path] = None,
+    python_paths: List[str] = None,
+    cwd=None,
+    **kwargs,
+):
+    """
+    Create a script to run the given black box, returning its location.
+
+    Parameters
+    ----------
+    black_box : AbstractBlackBox
+        The black box object to be executed.
+    conda_environment_name : str or Path, optional
+        The conda environment to activate before running the black box.
+    python_paths : List[str], optional
+        Additional Python paths to be added before running the black box.
+    cwd : str or Path, optional
+        The current working directory for the script execution.
+
+    Returns
+    -------
+    run_script: str
+        The path to the generated script.
+
+    """
+    command = inspect.getfile(external_black_box_script)
+    return _make_run_script(
+        command, black_box, conda_environment_name, python_paths, cwd, **kwargs
+    )
 
 
 def make_run_script(
@@ -49,7 +84,7 @@ def make_run_script(
     run_script: str
         The generated run script.
     """
-    command = inspect.getfile(objective)
+    command = inspect.getfile(external_problem_factory_script)
     return _make_run_script(
         command, problem_factory, conda_environment_name, python_paths, cwd, **kwargs
     )
@@ -83,6 +118,17 @@ def make_observer_script(
     """
     command = inspect.getfile(observer_wrapper)
     return _make_run_script(command, observer, conda_environment, python_paths, cwd)
+
+
+def _make_black_box_script(
+    command: str,
+    command_for_instancing_the_black_box: str,
+    conda_environment_name: Union[str, Path],
+    python_paths: List[str],
+    cwd=None,
+):
+    # TODO: implement in such a way that
+    ...
 
 
 def _make_run_script(

@@ -8,7 +8,7 @@ if __name__ == "__main__":
 
     print("Running in parallel")
     stopwatch = time.time()
-    f, x0, y0 = objective_factory.create(
+    f, x0, y0 = objective_factory.create_problem(
         name="foldx_stability_and_sasa",
         wildtype_pdb_path=10 * [wildtype_pdb_path],
         parallelize=True,
@@ -20,7 +20,7 @@ if __name__ == "__main__":
 
     stopwatch = time.time()
     print("Running in serial")
-    f, x0, y0 = objective_factory.create(
+    f, x0, y0 = objective_factory.create_problem(
         name="foldx_stability_and_sasa",
         wildtype_pdb_path=10 * [wildtype_pdb_path],
         parallelize=False,

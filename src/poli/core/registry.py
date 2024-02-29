@@ -7,12 +7,14 @@ from pathlib import Path
 import warnings
 import subprocess
 
+from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.objective_management.make_run_script import (
     make_run_script,
     make_observer_script,
+    make_black_box_script,
 )
 
 from poli.objective_repository import AVAILABLE_PROBLEM_FACTORIES, AVAILABLE_OBJECTIVES
@@ -20,6 +22,7 @@ from poli.objective_repository import AVAILABLE_PROBLEM_FACTORIES, AVAILABLE_OBJ
 _DEFAULT = "DEFAULT"
 _OBSERVER = "observer"
 _RUN_SCRIPT_LOCATION = "run_script_location"
+_BLACK_BOX_SCRIPT_LOCATION = "black_box_script_location"
 
 HOME_DIR = Path.home().resolve()
 (HOME_DIR / ".poli_objectives").mkdir(exist_ok=True)
@@ -127,6 +130,7 @@ def delete_observer_run_script(observer_name: str = None) -> str:
 
 def register_problem(
     problem_factory: Union[AbstractProblemFactory, str],
+    name: str,
     conda_environment_name: Union[str, Path] = None,
     python_paths: List[str] = None,
     force: bool = False,
@@ -175,6 +179,38 @@ def register_problem(
         problem_factory, conda_environment_name, python_paths, **kwargs
     )
     config[problem_name][_RUN_SCRIPT_LOCATION] = run_script_location
+    _write_config()
+
+
+def register_black_box(
+    black_box: Union[AbstractBlackBox, str],
+    name: str,
+    conda_environment_name: Union[str, Path] = None,
+    python_paths: List[str] = None,
+    force: bool = False,
+    **kwargs,
+):
+    if "conda_environment_location" in kwargs:
+        conda_environment_name = kwargs["conda_environment_location"]
+
+    if name not in config.sections():
+        config.add_section(name)
+    elif not force:
+        # If force is false, we warn the user and ask for confirmation
+        user_input = input(
+            f"Black box {name} has already been registered. "
+            f"Do you want to overwrite it? (y/[n]) "
+        )
+        if user_input.lower() != "y":
+            warnings.warn(f"Black box {name} already exists. Not overwriting.")
+            return
+
+        warnings.warn(f"Black box {name} already exists. Overwriting.")
+
+    black_box_script_location = make_black_box_script(
+        black_box, conda_environment_name, python_paths, **kwargs
+    )
+    config[name][_BLACK_BOX_SCRIPT_LOCATION] = black_box_script_location
     _write_config()
 
 

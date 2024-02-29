@@ -53,7 +53,7 @@ def test_force_registering_foldx_stability():
     if not (PATH_TO_FOLDX_FILES / "foldx").exists():
         pytest.skip("FoldX is not compiled. ")
 
-    f, _, y0 = objective_factory.create(
+    f, _, y0 = objective_factory.create_problem(
         name="foldx_stability",
         wildtype_pdb_path=THIS_DIR / "101m_Repair.pdb",
         force_register=True,
@@ -76,7 +76,7 @@ def test_force_registering_foldx_sasa():
     if not (PATH_TO_FOLDX_FILES / "foldx").exists():
         pytest.skip("FoldX is not compiled. ")
 
-    f, _, y0 = objective_factory.create(
+    f, _, y0 = objective_factory.create_problem(
         name="foldx_sasa",
         wildtype_pdb_path=THIS_DIR / "101m_Repair.pdb",
         force_register=True,
@@ -105,7 +105,7 @@ def test_registering_foldx_stability():
     _ = pytest.importorskip("Bio")
     _ = pytest.importorskip("Levenshtein")
 
-    f, _, y0 = objective_factory.create(
+    f, _, y0 = objective_factory.create_problem(
         name="foldx_stability",
         wildtype_pdb_path=THIS_DIR / "101m_Repair.pdb",
     )
@@ -129,7 +129,7 @@ def test_registering_foldx_sasa():
     _ = pytest.importorskip("Bio")
     _ = pytest.importorskip("Levenshtein")
 
-    f, _, y0 = objective_factory.create(
+    f, _, y0 = objective_factory.create_problem(
         name="foldx_sasa",
         wildtype_pdb_path=THIS_DIR / "101m_Repair.pdb",
     )
@@ -152,7 +152,7 @@ def test_registering_foldx_stability_and_sasa():
     if not (PATH_TO_FOLDX_FILES / "foldx").exists():
         pytest.skip("FoldX is not compiled. ")
 
-    f, _, y0 = objective_factory.create(
+    f, _, y0 = objective_factory.create_problem(
         name="foldx_stability_and_sasa",
         wildtype_pdb_path=THIS_DIR / "101m_Repair.pdb",
     )
@@ -175,7 +175,7 @@ def test_registering_foldx_stability_and_sasa_with_verbose_output():
     if not (PATH_TO_FOLDX_FILES / "foldx").exists():
         pytest.skip("FoldX is not compiled. ")
 
-    f, _, y0 = objective_factory.create(
+    f, _, y0 = objective_factory.create_problem(
         name="foldx_stability_and_sasa",
         wildtype_pdb_path=THIS_DIR / "101m_Repair.pdb",
         verbose=True,
@@ -196,7 +196,7 @@ def test_foldx_from_non_repaired_file():
     takes 4min to run.
     """
     wildtype_pdb_path = THIS_DIR / "3ned.pdb"
-    f, _, y0 = objective_factory.create(
+    f, _, y0 = objective_factory.create_problem(
         name="foldx_stability",
         wildtype_pdb_path=wildtype_pdb_path,
         eager_repair=True,
@@ -211,7 +211,7 @@ def test_foldx_from_repaired_file():
     performed if the file already contains _Repair.
     """
     wildtype_pdb_path = THIS_DIR / "101m_Repair.pdb"
-    f, _, y0 = objective_factory.create(
+    f, _, y0 = objective_factory.create_problem(
         name="foldx_stability",
         wildtype_pdb_path=wildtype_pdb_path,
     )

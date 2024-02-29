@@ -10,7 +10,7 @@ from poli import objective_factory
 
 if __name__ == "__main__":
     # Creating an instance of the problem
-    f, x0, y0 = objective_factory.create(
+    f, x0, y0 = objective_factory.create_problem(
         name="our_aloha", observer_init_info=None, observer=None
     )
     print(x0, y0)

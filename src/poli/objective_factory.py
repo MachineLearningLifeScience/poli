@@ -19,7 +19,7 @@ from poli.core.registry import (
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
 from poli.core.util.isolation.external_black_box import ExternalBlackBox
-from poli.core.abstract_problem import AbstractProblem
+from poli.core.problem import Problem
 
 from poli.objective_repository import AVAILABLE_OBJECTIVES, AVAILABLE_PROBLEM_FACTORIES
 
@@ -234,7 +234,7 @@ def __register_objective_if_available(
             )
 
 
-def create(
+def create_problem(
     name: str,
     *,
     seed: int = None,
@@ -248,7 +248,7 @@ def create(
     evaluation_budget: int = float("inf"),
     quiet: bool = False,
     **kwargs_for_factory,
-) -> AbstractProblem:
+) -> Problem:
     """
     Instantiantes a black-box function by calling the `create` method of the associated factory.
 

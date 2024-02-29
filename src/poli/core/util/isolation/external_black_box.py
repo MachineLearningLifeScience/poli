@@ -1,14 +1,13 @@
 from typing import Any
 
 from poli.core.abstract_black_box import AbstractBlackBox
-from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
 
 
 class ExternalBlackBox(AbstractBlackBox):
     """An external version of the black-box function to be instantiated in isolated processes."""
 
-    def __init__(self, info: ProblemSetupInformation, process_wrapper: ProcessWrapper):
+    def __init__(self, process_wrapper: ProcessWrapper):
         """
         Initialize the ExternalBlackBox object.
 
@@ -19,7 +18,10 @@ class ExternalBlackBox(AbstractBlackBox):
         process_wrapper : ProcessWrapper
             The process wrapper to communicate with the objective process.
         """
-        super().__init__(info)
+        # We don't need to pass the kwargs to the parent class,
+        # because we overwrite the __getattr__ method to communicate
+        # with the isolated objective process.
+        super().__init__()
         self.process_wrapper = process_wrapper
 
     def _black_box(self, x, context=None):

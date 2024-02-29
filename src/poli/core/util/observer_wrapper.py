@@ -7,7 +7,10 @@ import traceback
 
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.inter_process_communication.process_wrapper import get_connection
-from poli.objective import dynamically_instantiate, parse_factory_kwargs
+from poli.external_problem_factory_script import (
+    dynamically_instantiate,
+    parse_factory_kwargs,
+)
 
 
 def start_observer_process(observer_name, port: int, password: str):

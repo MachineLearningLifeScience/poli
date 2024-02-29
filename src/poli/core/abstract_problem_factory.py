@@ -6,7 +6,7 @@ import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.problem_setup_information import ProblemSetupInformation
-from poli.core.abstract_problem import AbstractProblem
+from poli.core.problem import Problem
 
 
 class MetaProblemFactory(type):
@@ -64,7 +64,7 @@ class AbstractProblemFactory(metaclass=MetaProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-    ) -> AbstractProblem:
+    ) -> Problem:
         """
         Returns a blackbox function and initial observations.
 
