@@ -42,8 +42,6 @@ class DockstringBlackBox(AbstractBlackBox):
 
     Parameters
     ----------
-    info : ProblemSetupInformation
-        The problem setup information.
     target_name : str
         The name of the target protein.
     string_representation : str, optional
@@ -79,7 +77,6 @@ class DockstringBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        info: ProblemSetupInformation,
         target_name: str,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
         batch_size: int = None,
@@ -92,8 +89,6 @@ class DockstringBlackBox(AbstractBlackBox):
 
         Parameters
         ----------
-        info : ProblemSetupInformation
-            The problem setup information object.
         batch_size : int, optional
             The batch size for processing data, by default None.
         parallelize : bool, optional
@@ -112,6 +107,7 @@ class DockstringBlackBox(AbstractBlackBox):
             target_name is not None
         ), "Missing required keyword argument 'target_name'. "
 
+        info = DockstringProblemFactory.get_setup_information()
         super().__init__(
             info=info,
             batch_size=batch_size,
@@ -195,7 +191,8 @@ class DockstringProblemFactory(AbstractProblemFactory):
         https://doi.org/10.1021/acs.jcim.1c01334.
     """
 
-    def get_setup_information(self) -> ProblemSetupInformation:
+    @staticmethod
+    def get_setup_information() -> ProblemSetupInformation:
         # TODO: We might change this in the future for a
         # default dictionary, depending on whether we
         # are using SMILES or SELFIES.

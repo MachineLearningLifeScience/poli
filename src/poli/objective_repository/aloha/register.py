@@ -32,8 +32,6 @@ class AlohaBlackBox(AbstractBlackBox):
 
     Parameters
     ----------
-    info : ProblemSetupInformation
-        The problem setup information.
     batch_size : int, optional
         The batch size for processing multiple inputs simultaneously, by default None.
     parallelize : bool, optional
@@ -58,7 +56,6 @@ class AlohaBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        info: ProblemSetupInformation,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
@@ -69,8 +66,6 @@ class AlohaBlackBox(AbstractBlackBox):
 
         Parameters
         ----------
-        info : ProblemSetupInformation
-            The problem setup information object.
         batch_size : int, optional
             The batch size for processing data, by default None.
         parallelize : bool, optional
@@ -80,6 +75,7 @@ class AlohaBlackBox(AbstractBlackBox):
         evaluation_budget:  int, optional
             The maximum number of function evaluations. Default is infinity.
         """
+        info = AlohaProblemFactory.get_setup_information()
         self.alphabet = {symbol: idx for idx, symbol in enumerate(info.alphabet)}
         super().__init__(
             info=info,
@@ -145,7 +141,8 @@ class AlohaProblemFactory(AbstractProblemFactory):
         Creates a problem instance with the specified parameters.
     """
 
-    def get_setup_information(self) -> ProblemSetupInformation:
+    @staticmethod
+    def get_setup_information() -> ProblemSetupInformation:
         """
         Returns the setup information for the problem.
 

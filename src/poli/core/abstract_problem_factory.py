@@ -6,6 +6,7 @@ import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.problem_setup_information import ProblemSetupInformation
+from poli.core.abstract_problem import AbstractProblem
 
 
 class MetaProblemFactory(type):
@@ -63,7 +64,7 @@ class AbstractProblemFactory(metaclass=MetaProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-    ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+    ) -> AbstractProblem:
         """
         Returns a blackbox function and initial observations.
 
@@ -82,9 +83,9 @@ class AbstractProblemFactory(metaclass=MetaProblemFactory):
 
         Returns
         --------
-        results: Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
-            A tuple containing the blackbox function, initial observations for
-            input variables, and initial observations for output variables.
+        problem: AbstractProblem
+            A problem class containing, among other things, the black box,
+            initial values x0 and y0, and evaluation budget.
 
         Raises
         -------

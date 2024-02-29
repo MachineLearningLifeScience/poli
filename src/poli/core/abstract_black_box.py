@@ -5,6 +5,7 @@ all objective functions should inherit.
 import numpy as np
 from multiprocessing import Pool, cpu_count
 
+from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem_setup_information import ProblemSetupInformation
 
 from poli.core.util.abstract_observer import AbstractObserver
@@ -19,9 +20,6 @@ class AbstractBlackBox:
 
     Parameters
     ----------
-    info : ProblemSetupInformation
-        The problem setup information object that provides details about the
-        problem.
     batch_size : int, optional
         The batch size for evaluating the black box function. Default is None.
     parallelize : bool, optional
@@ -36,8 +34,6 @@ class AbstractBlackBox:
 
     Attributes
     ----------
-    info : ProblemSetupInformation
-        The problem setup information object.
     observer : AbstractObserver or None
         The observer object for recording observations during evaluation.
     observer_info : object or None
@@ -75,7 +71,6 @@ class AbstractBlackBox:
 
     def __init__(
         self,
-        info: ProblemSetupInformation,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
@@ -86,8 +81,6 @@ class AbstractBlackBox:
 
         Parameters
         ----------
-        info : ProblemSetupInformation
-            The problem setup information object.
         batch_size : int, optional
             The batch size for parallel execution, by default None.
         parallelize : bool, optional
@@ -97,7 +90,6 @@ class AbstractBlackBox:
         evaluation_budget : int, optional
             The maximum number of evaluations allowed for the black box function, by default float("inf").
         """
-        self.info = info
         self.observer = None
         self.observer_info = None
         self.parallelize = parallelize
@@ -110,6 +102,16 @@ class AbstractBlackBox:
         self.num_workers = num_workers
 
         self.batch_size = batch_size
+
+    @staticmethod
+    def get_black_box_info() -> BlackBoxInformation:
+        raise NotImplementedError(
+            "Black box information must be implemented in subclasses."
+        )
+
+    @property
+    def info(self) -> BlackBoxInformation:
+        return self.__class__.get_black_box_info()
 
     def set_observer(self, observer: AbstractObserver):
         """

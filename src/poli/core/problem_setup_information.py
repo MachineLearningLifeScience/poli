@@ -2,17 +2,16 @@
 Implements the problem setup information, which contains the problem information (e.g. alphabet, sequence length...).
 """
 
-from typing import List
+import numpy as np
+
+from poli.core.black_box_information import BlackBoxInformation
 
 
 class ProblemSetupInformation:
     def __init__(
         self,
         name: str,
-        max_sequence_length: int,
-        aligned: bool,
-        alphabet: List[str],
-        log_transform_recommended=False,
+        black_box_information: BlackBoxInformation,
     ):
         """
         Initialize the ProblemSetupInformation object.
@@ -21,21 +20,9 @@ class ProblemSetupInformation:
         ----------
         name : str
             The problem's name.
-        max_sequence_length : int
-            The length of the longest sequence.
-        aligned : bool
-            Whether the sequences have been aligned.
-        alphabet : List[str]
-            List of characters that may appear.
-        log_transform_recommended : bool, optional
-            A recommendation for optimization algorithm whether to log transform the targets.
-            Default is False.
         """
         self.name = name
-        self.max_sequence_length = max_sequence_length
-        self.aligned = aligned
-        self.alphabet = alphabet
-        self.log_transform_recommended = log_transform_recommended
+        self.black_box_information = black_box_information
 
     def get_problem_name(self) -> str:
         """Returns the problem's name.

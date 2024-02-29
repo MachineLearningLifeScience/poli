@@ -9,13 +9,14 @@ a conda environment called 'poli__base' (see the
 environment.yml file in this folder).
 """
 
-from typing import Tuple
-
 import numpy as np
 
-from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
+from poli.core.abstract_problem import AbstractProblem
+from poli.core.abstract_black_box import AbstractBlackBox
+
 from poli.core.problem_setup_information import ProblemSetupInformation
+from poli.core.black_box_information import BlackBoxInformation
 
 from poli.core.util.seeding import seed_python_numpy_and_torch
 
@@ -68,7 +69,6 @@ class WhiteNoiseBlackBox(AbstractBlackBox):
             The maximum number of evaluations, by default float("inf").
         """
         super().__init__(
-            info=WhiteNoiseProblemFactory.get_setup_information(),
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
@@ -92,6 +92,36 @@ class WhiteNoiseBlackBox(AbstractBlackBox):
         """
         return np.random.randn(x.shape[0], 1)
 
+    @staticmethod
+    def get_black_box_info() -> BlackBoxInformation:
+        return BlackBoxInformation(
+            name="white_noise",
+            max_sequence_length=np.inf,
+            aligned=False,
+            fixed_length=False,
+            deterministic=False,
+            alphabet=[str(i) for i in range(10)],
+            log_transform_recommended=False,
+            discrete=True,
+            padding_token="",
+        )
+
+
+class WhiteNoiseProblem(AbstractProblem):
+    def __init__(
+        self,
+        black_box: WhiteNoiseBlackBox,
+        x0: np.ndarray,
+        fidelity: str = "high",
+        evaluation_budget: int = float("inf"),
+    ):
+        super().__init__(
+            black_box=black_box,
+            x0=x0,
+            fidelity=fidelity,
+            evaluation_budget=evaluation_budget,
+        )
+
 
 class WhiteNoiseProblemFactory(AbstractProblemFactory):
     @staticmethod
@@ -104,14 +134,9 @@ class WhiteNoiseProblemFactory(AbstractProblemFactory):
         problem_info : ProblemSetupInformation
             The setup information for the problem.
         """
-        # A mock alphabet made of the 10 digits.
-        alphabet = [str(i) for i in range(10)]
-
         return ProblemSetupInformation(
             name="white_noise",
-            max_sequence_length=np.inf,
-            aligned=False,
-            alphabet=alphabet,
+            black_box_information=WhiteNoiseBlackBox.get_black_box_info(),
         )
 
     def create(
@@ -121,9 +146,9 @@ class WhiteNoiseProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-    ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+    ) -> WhiteNoiseProblem:
         """
-        Create a white noise black box with the specified parameters.
+        Create a white noise problem with the specified parameters.
 
         Parameters:
         ----------
@@ -141,19 +166,14 @@ class WhiteNoiseProblemFactory(AbstractProblemFactory):
 
         Returns:
         -------
-        f : WhiteNoiseBlackBox
-            The white noise black box.
-        x0 : np.ndarray
-            The initial input (an array [["1", "2", "3"]]).
-        y0 : np.ndarray
-            The initial objective function value (an array of shape (1, 1)).
+        problem: WhiteNoiseProblem
+            A white noise problem with the specified parameters.
         """
         if seed is not None:
             seed_python_numpy_and_torch(seed)
 
         problem_info = self.get_setup_information()
         f = WhiteNoiseBlackBox(
-            info=problem_info,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
@@ -161,7 +181,13 @@ class WhiteNoiseProblemFactory(AbstractProblemFactory):
         )
         x0 = np.array([["1", "2", "3"]])
 
-        return f, x0, f(x0)
+        white_noise_problem = WhiteNoiseProblem(
+            black_box=f,
+            x0=x0,
+            evaluation_budget=evaluation_budget,
+        )
+
+        return white_noise_problem
 
 
 if __name__ == "__main__":
