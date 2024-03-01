@@ -32,5 +32,21 @@ def test_creating_a_black_box_as_an_isolated_process():
     f = instance_black_box_as_isolated_process(name="white_noise")
 
 
+def test_instancing_a_black_box_that_requires_isolation():
+    from poli.objective_repository.dockstring.register import DockstringBlackBox
+
+    f = DockstringBlackBox(
+        target_name="drd2",
+        string_representation="SMILES",
+    )
+
+    risperidone_smiles = "CC1=C(C(=O)N2CCCCC2=N1)CCN3CCC(CC3)C4=NOC5=C4C=CC(=C5)F"
+
+    # TODO: replace for proper smiles tokenization.
+    x0 = np.array([list(risperidone_smiles)])
+
+    print(f(x0))
+
+
 if __name__ == "__main__":
-    test_creating_a_black_box_as_an_isolated_process()
+    test_instancing_a_black_box_that_requires_isolation()

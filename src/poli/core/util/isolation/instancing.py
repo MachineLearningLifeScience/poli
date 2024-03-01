@@ -72,6 +72,13 @@ def __register_black_box_from_repository(name: str, quiet: bool = False):
         Path(__file__).parent.parent.parent.parent / "objective_repository"
     ).resolve()
 
+    # Cleaning up the name from the __isolated
+    if name.endswith("__isolated"):
+        file_to_isolate = "isolated_black_box.py"
+        name = name.replace("__isolated", "")
+    else:
+        file_to_isolate = "register.py"
+
     with open(PATH_TO_REPOSITORY / name / "environment.yml", "r") as f:
         # This is a really crude way of doing this,
         # but it works. We should probably use a
@@ -126,7 +133,7 @@ def __register_black_box_from_repository(name: str, quiet: bool = False):
     #    dependencies that are not installed)
 
     # Running the file
-    file_to_run = PATH_TO_REPOSITORY / name / "register.py"
+    file_to_run = PATH_TO_REPOSITORY / name / file_to_isolate
     command = " ".join(["conda", "run", "-n", env_name, "python", str(file_to_run)])
     warnings.warn("Running the following command: %s. " % command)
 
@@ -154,7 +161,11 @@ def register_black_box_if_available(
     Parameters
     ----------
     name : str
-        The name of the objective function.
+        The name of the objective function. This corresponds to
+        the folder name inside the objective repository. If the
+        name contains a `__inner`, then it is assumed
+        that the name refers to an internal file called
+        `inner_register.py`.
     force_register : bool, optional
         If True, then the objective function is registered without asking
         for confirmation, overwriting any previous registration. By default,

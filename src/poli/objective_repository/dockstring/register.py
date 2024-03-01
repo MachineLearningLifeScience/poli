@@ -19,9 +19,9 @@ import numpy as np
 
 import selfies as sf
 
-from dockstring import load_target
 
 from poli.core.abstract_black_box import AbstractBlackBox
+from poli.core.black_box_information import BlackBoxInformation
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem_setup_information import ProblemSetupInformation
 
@@ -31,6 +31,12 @@ from poli.core.util.chemistry.string_to_molecule import (
 )
 
 from poli.core.util.seeding import seed_python_numpy_and_torch
+
+from poli.core.util.isolation.instancing import instance_black_box_as_isolated_process
+
+from poli.objective_repository.dockstring.information import (
+    dockstring_black_box_information,
+)
 
 
 class DockstringBlackBox(AbstractBlackBox):
@@ -89,6 +95,11 @@ class DockstringBlackBox(AbstractBlackBox):
 
         Parameters
         ----------
+        target_name : str
+            The name of the target protein.
+        string_representation : str
+            The string representation of the molecules. Either SMILES or SELFIES.
+            Default is SMILES.
         batch_size : int, optional
             The batch size for processing data, by default None.
         parallelize : bool, optional
@@ -97,19 +108,12 @@ class DockstringBlackBox(AbstractBlackBox):
             The number of workers to use for parallel processing, by default None.
         evaluation_budget:  int, optional
             The maximum number of function evaluations. Default is infinity.
-        target_name : str
-            The name of the target protein.
-        string_representation : str
-            The string representation of the molecules. Either SMILES or SELFIES.
-            Default is SMILES.
         """
         assert (
             target_name is not None
         ), "Missing required keyword argument 'target_name'. "
 
-        info = DockstringProblemFactory.get_setup_information()
         super().__init__(
-            info=info,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
@@ -118,7 +122,29 @@ class DockstringBlackBox(AbstractBlackBox):
         self.target_name = target_name
         self.string_representation = string_representation
 
-        self.target = load_target(target_name)
+        try:
+            from poli.objective_repository.dockstring.isolated_black_box import (
+                InnerDockstringBlackBox,
+            )
+
+            self.inner_black_box = InnerDockstringBlackBox(
+                target_name=target_name,
+                string_representation=string_representation,
+                batch_size=batch_size,
+                parallelize=parallelize,
+                num_workers=num_workers,
+                evaluation_budget=evaluation_budget,
+            )
+        except ImportError:
+            self.inner_black_box = instance_black_box_as_isolated_process(
+                name="dockstring__isolated",
+                target_name=target_name,
+                string_representation=string_representation,
+                batch_size=batch_size,
+                parallelize=parallelize,
+                num_workers=num_workers,
+                evaluation_budget=evaluation_budget,
+            )
 
     def _black_box(self, x: np.ndarray, context=None) -> np.ndarray:
         """Evaluating the black box function.
@@ -145,28 +171,11 @@ class DockstringBlackBox(AbstractBlackBox):
         Exception
             If the docking score cannot be computed.
         """
-        assert len(x.shape) == 2, "Expected a 2D array of strings. "
-        molecules_as_strings = ["".join(x_i) for x_i in x]
+        return self.inner_black_box._black_box(x, context=context)
 
-        if self.string_representation == "SELFIES":
-            molecules_as_smiles = translate_selfies_to_smiles(molecules_as_strings)
-        else:
-            molecules_as_smiles = molecules_as_strings
-
-        # Parallelization is handled by the __call__ method of
-        # the AbstractBlackBox class.
-        scores = []
-        for smiles in molecules_as_smiles:
-            try:
-                score = self.target.dock(smiles)[0]
-            except Exception as e:
-                score = np.nan
-            scores.append(score)
-
-        # Since our goal is maximization, and scores in dockstring
-        # are better if they are lower, we return the negative of
-        # the scores.
-        return -np.array(scores).reshape(-1, 1)
+    @staticmethod
+    def get_black_box_info() -> BlackBoxInformation:
+        return dockstring_black_box_information
 
 
 class DockstringProblemFactory(AbstractProblemFactory):

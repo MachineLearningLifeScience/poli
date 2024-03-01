@@ -16,9 +16,15 @@ THIS_DIR = Path(__file__).parent.resolve()
 
 # The objective repository is made of
 # all the directories that are here:
-AVAILABLE_OBJECTIVES = sorted(
-    [str(d.name) for d in THIS_DIR.glob("*") if d.is_dir() and d.name != "__pycache__"]
-)
+AVAILABLE_OBJECTIVES = []
+for d in THIS_DIR.glob("*"):
+    if d.is_dir() and d.name != "__pycache__":
+        AVAILABLE_OBJECTIVES.append(d.name)
+
+        if (d / "isolated_black_box.py").exists():
+            AVAILABLE_OBJECTIVES.append(f"{d.name}__isolated")
+
+AVAILABLE_OBJECTIVES = sorted(AVAILABLE_OBJECTIVES)
 
 AVAILABLE_PROBLEM_FACTORIES = {
     "white_noise": WhiteNoiseProblemFactory,

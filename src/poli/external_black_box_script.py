@@ -143,7 +143,7 @@ def run(objective_name: str, port: int, password: str) -> None:
         )
 
         # give mother process the signal that we're ready
-        conn.send(["SETUP", f.info])
+        conn.send(["SETUP", None])
     except Exception as e:
         tb = traceback.format_exc()
         conn.send(["EXCEPTION", e, tb])
@@ -178,5 +178,4 @@ if __name__ == "__main__":
     parser.add_argument("--password", required=True, type=str)
 
     args, factory_kwargs = parser.parse_known_args()
-    print(f"factory_kwargs: {factory_kwargs}")
     run(args.objective_name, args.port, args.password)
