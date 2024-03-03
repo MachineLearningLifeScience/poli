@@ -191,14 +191,14 @@ class WhiteNoiseProblemFactory(AbstractProblemFactory):
 
 
 if __name__ == "__main__":
-    from poli.core.registry import register_problem, register_black_box
+    from poli.core.registry import register_problem, register_isolated_function
 
     # Once we have created a simple conda enviroment
     # (see the environment.yml file in this folder),
     # we can register our problem s.t. it uses
     # said conda environment.
     white_noise_black_box = WhiteNoiseBlackBox()
-    register_black_box(
+    register_isolated_function(
         white_noise_black_box,
         name="white_noise",
         conda_environment_name="poli__base",

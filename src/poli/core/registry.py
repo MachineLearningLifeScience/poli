@@ -7,6 +7,7 @@ from pathlib import Path
 import warnings
 import subprocess
 
+from poli.core.abstract_isolated_function import AbstractIsolatedFunction
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 
@@ -22,7 +23,7 @@ from poli.objective_repository import AVAILABLE_PROBLEM_FACTORIES, AVAILABLE_OBJ
 _DEFAULT = "DEFAULT"
 _OBSERVER = "observer"
 _RUN_SCRIPT_LOCATION = "run_script_location"
-_BLACK_BOX_SCRIPT_LOCATION = "black_box_script_location"
+_ISOLATED_FUNCTION_SCRIPT_LOCATION = "isolated_function_script_location"
 
 HOME_DIR = Path.home().resolve()
 (HOME_DIR / ".poli_objectives").mkdir(exist_ok=True)
@@ -182,8 +183,8 @@ def register_problem(
     _write_config()
 
 
-def register_black_box(
-    black_box: Union[AbstractBlackBox, str],
+def register_isolated_function(
+    isolated_function: Union[AbstractBlackBox, AbstractIsolatedFunction],
     name: str,
     conda_environment_name: Union[str, Path] = None,
     python_paths: List[str] = None,
@@ -207,10 +208,10 @@ def register_black_box(
 
         warnings.warn(f"Black box {name} already exists. Overwriting.")
 
-    black_box_script_location = make_black_box_script(
-        black_box, conda_environment_name, python_paths, **kwargs
+    isolated_function_script_location = make_black_box_script(
+        isolated_function, conda_environment_name, python_paths, **kwargs
     )
-    config[name][_BLACK_BOX_SCRIPT_LOCATION] = black_box_script_location
+    config[name][_ISOLATED_FUNCTION_SCRIPT_LOCATION] = isolated_function_script_location
     _write_config()
 
 

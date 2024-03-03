@@ -32,7 +32,7 @@ from poli.core.util.chemistry.string_to_molecule import (
 
 from poli.core.util.seeding import seed_python_numpy_and_torch
 
-from poli.core.util.isolation.instancing import instance_black_box_as_isolated_process
+from poli.core.util.isolation.instancing import instance_function_as_isolated_process
 
 from poli.objective_repository.dockstring.information import (
     dockstring_black_box_information,
@@ -123,27 +123,19 @@ class DockstringBlackBox(AbstractBlackBox):
         self.string_representation = string_representation
 
         try:
-            from poli.objective_repository.dockstring.isolated_black_box import (
-                InnerDockstringBlackBox,
+            from poli.objective_repository.dockstring.isolated_function import (
+                IsolatedDockstringFunction,
             )
 
-            self.inner_black_box = InnerDockstringBlackBox(
+            self.inner_function = IsolatedDockstringFunction(
                 target_name=target_name,
                 string_representation=string_representation,
-                batch_size=batch_size,
-                parallelize=parallelize,
-                num_workers=num_workers,
-                evaluation_budget=evaluation_budget,
             )
         except ImportError:
-            self.inner_black_box = instance_black_box_as_isolated_process(
+            self.inner_function = instance_function_as_isolated_process(
                 name="dockstring__isolated",
                 target_name=target_name,
                 string_representation=string_representation,
-                batch_size=batch_size,
-                parallelize=parallelize,
-                num_workers=num_workers,
-                evaluation_budget=evaluation_budget,
             )
 
     def _black_box(self, x: np.ndarray, context=None) -> np.ndarray:
@@ -171,7 +163,7 @@ class DockstringBlackBox(AbstractBlackBox):
         Exception
             If the docking score cannot be computed.
         """
-        return self.inner_black_box._black_box(x, context=context)
+        return self.inner_function(x, context=context)
 
     @staticmethod
     def get_black_box_info() -> BlackBoxInformation:

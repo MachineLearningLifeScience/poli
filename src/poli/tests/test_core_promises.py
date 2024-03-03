@@ -27,9 +27,9 @@ def test_creating_a_problem():
 
 
 def test_creating_a_black_box_as_an_isolated_process():
-    from poli import instance_black_box_as_isolated_process
+    from poli import instance_function_as_isolated_process
 
-    f = instance_black_box_as_isolated_process(name="white_noise")
+    f = instance_function_as_isolated_process(name="white_noise")
 
 
 def test_instancing_a_black_box_that_requires_isolation():

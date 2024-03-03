@@ -10,7 +10,7 @@ import inspect
 import stat
 
 from poli import external_problem_factory_script
-from poli import external_black_box_script
+from poli import external_isolated_function_script
 from poli.external_problem_factory_script import ADDITIONAL_IMPORT_SEARCH_PATHES_KEY
 from poli.core.util import observer_wrapper
 from poli.core.abstract_problem_factory import AbstractProblemFactory
@@ -51,7 +51,7 @@ def make_black_box_script(
         The path to the generated script.
 
     """
-    command = inspect.getfile(external_black_box_script)
+    command = inspect.getfile(external_isolated_function_script)
     return _make_run_script(
         command, black_box, conda_environment_name, python_paths, cwd, **kwargs
     )

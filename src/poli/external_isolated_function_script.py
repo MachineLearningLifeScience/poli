@@ -9,7 +9,7 @@ import sys
 import argparse
 import traceback
 
-from poli.core.abstract_black_box import AbstractBlackBox
+from poli.core.abstract_isolated_function import AbstractIsolatedFunction
 from poli.core.util.inter_process_communication.process_wrapper import get_connection
 from poli.core.util.seeding import seed_python_numpy_and_torch
 
@@ -128,7 +128,7 @@ def run(objective_name: str, port: int, password: str) -> None:
     conn = get_connection(port, password)
 
     # TODO: We could be receiving the kwargs for the factory here.
-    msg_type, seed, kwargs_for_black_box = conn.recv()
+    msg_type, seed, kwargs_for_function = conn.recv()
 
     if seed is not None:
         seed_python_numpy_and_torch(seed)
@@ -138,8 +138,8 @@ def run(objective_name: str, port: int, password: str) -> None:
     # is exactly the same as the one used in the
     # registration (?).
     try:
-        f: AbstractBlackBox = dynamically_instantiate(
-            objective_name, **kwargs_for_black_box
+        f: AbstractIsolatedFunction = dynamically_instantiate(
+            objective_name, **kwargs_for_function
         )
 
         # give mother process the signal that we're ready

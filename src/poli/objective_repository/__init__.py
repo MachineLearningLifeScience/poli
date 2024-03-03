@@ -21,7 +21,7 @@ for d in THIS_DIR.glob("*"):
     if d.is_dir() and d.name != "__pycache__":
         AVAILABLE_OBJECTIVES.append(d.name)
 
-        if (d / "isolated_black_box.py").exists():
+        if (d / "isolated_function.py").exists():
             AVAILABLE_OBJECTIVES.append(f"{d.name}__isolated")
 
 AVAILABLE_OBJECTIVES = sorted(AVAILABLE_OBJECTIVES)

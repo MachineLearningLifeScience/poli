@@ -8,12 +8,13 @@ from poli.core.registry import (
     _DEFAULT,
     _OBSERVER,
     _RUN_SCRIPT_LOCATION,
-    _BLACK_BOX_SCRIPT_LOCATION,
+    _ISOLATED_FUNCTION_SCRIPT_LOCATION,
 )
 from poli.objective_repository import AVAILABLE_OBJECTIVES
 from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
 
 from .external_black_box import ExternalBlackBox
+from .external_function import ExternalFunction
 
 HOME_DIR = Path.home().resolve()
 (HOME_DIR / ".poli_objectives").mkdir(exist_ok=True)
@@ -40,7 +41,7 @@ def load_config():
     return config
 
 
-def __register_black_box_from_repository(name: str, quiet: bool = False):
+def __register_isolated_function_from_repository(name: str, quiet: bool = False):
     """Registers a problem from the repository.
 
     This function takes a problem name, and registers it. The problem name
@@ -74,7 +75,7 @@ def __register_black_box_from_repository(name: str, quiet: bool = False):
 
     # Cleaning up the name from the __isolated
     if name.endswith("__isolated"):
-        file_to_isolate = "isolated_black_box.py"
+        file_to_isolate = "isolated_function.py"
         name = name.replace("__isolated", "")
     else:
         file_to_isolate = "register.py"
@@ -148,7 +149,7 @@ def __register_black_box_from_repository(name: str, quiet: bool = False):
         )
 
 
-def register_black_box_if_available(
+def register_isolated_function_if_available(
     name: str, force_register: bool = True, quiet: bool = False
 ):
     """Registers the objective function if it is available in the repository.
@@ -198,7 +199,7 @@ def register_black_box_if_available(
         if answer == "y":
             # Register problem
             logging.debug(f"poli 🧪: Registered the black box from the repository.")
-            __register_black_box_from_repository(name, quiet=quiet)
+            __register_isolated_function_from_repository(name, quiet=quiet)
             # Refresh the config
             config = load_config()
         else:
@@ -207,16 +208,12 @@ def register_black_box_if_available(
             )
 
 
-def __create_black_box_as_isolated_process(
+def __create_function_as_isolated_process(
     name: str,
     seed: int = None,
-    batch_size: int = None,
-    parallelize: bool = False,
-    num_workers: int = None,
-    evaluation_budget: int = float("inf"),
     quiet: bool = False,
-    **kwargs_for_black_box,
-) -> ExternalBlackBox:
+    **kwargs_for_isolated_function,
+) -> ExternalFunction:
     """Creates the objective function as an isolated process.
 
     If the problem is registered, we create it as an isolated
@@ -229,16 +226,6 @@ def __create_black_box_as_isolated_process(
         The name of the objective function.
     seed : int, optional
         The seed value for random number generation.
-    batch_size : int, optional
-        The batch size, passed to the black box to run evaluations on batches.
-        If None, it will evaluate all inputs at once.
-    parallelize : bool, optional
-        If True, then the objective function runs in parallel.
-    num_workers : int, optional
-        When parallelize is True, this specifies the number of processes to use.
-        By default, it uses half the number of available CPUs (rounded down).
-    evaluation_budget : int, optional
-        The maximum number of evaluations allowed. By default, it is infinity.
     quiet : bool, optional
         If True, we squelch the messages giving feedback about the creation process.
         By default, it is False.
@@ -249,24 +236,17 @@ def __create_black_box_as_isolated_process(
     if name not in config:
         raise ValueError(f"Objective function '{name}' is not registered. ")
 
-    # start objective process
-    # VERY IMPORTANT: the script MUST accept port and password as arguments
-    kwargs_for_black_box["batch_size"] = batch_size
-    kwargs_for_black_box["parallelize"] = parallelize
-    kwargs_for_black_box["num_workers"] = num_workers
-    kwargs_for_black_box["evaluation_budget"] = evaluation_budget
-
     if not quiet:
         print(f"poli 🧪: starting the isolated objective process.")
 
     process_wrapper = ProcessWrapper(
-        config[name][_BLACK_BOX_SCRIPT_LOCATION], **kwargs_for_black_box
+        config[name][_ISOLATED_FUNCTION_SCRIPT_LOCATION], **kwargs_for_isolated_function
     )
     # TODO: add signal listener that intercepts when proc ends
     # wait for connection from objective process
     # TODO: potential (unlikely) race condition! (process might try to connect before listener is ready!)
     # TODO: We could be sending all the kwargs for the black box here.
-    process_wrapper.send(("SETUP", seed, kwargs_for_black_box))
+    process_wrapper.send(("SETUP", seed, kwargs_for_isolated_function))
 
     msg_type, *msg = process_wrapper.recv()
     if msg_type == "SETUP":
@@ -282,35 +262,27 @@ def __create_black_box_as_isolated_process(
             f"Internal error: received {msg_type} when expecting SETUP or EXCEPTION"
         )
 
-    f = ExternalBlackBox(process_wrapper)
+    f = ExternalFunction(process_wrapper)
 
     return f
 
 
-def instance_black_box_as_isolated_process(
+def instance_function_as_isolated_process(
     name: str,
     seed: int = None,
-    batch_size: int = None,
-    parallelize: bool = False,
-    num_workers: int = None,
-    evaluation_budget: int = float("inf"),
     quiet: bool = False,
     force_register: bool = True,
     **kwargs_for_black_box,
-) -> ExternalBlackBox:
+) -> ExternalFunction:
     # Register the problem
-    register_black_box_if_available(
+    register_isolated_function_if_available(
         name=name, force_register=force_register, quiet=quiet
     )
 
     # Create the external process wrapper
-    f = __create_black_box_as_isolated_process(
+    f = __create_function_as_isolated_process(
         name=name,
         seed=seed,
-        batch_size=batch_size,
-        parallelize=parallelize,
-        num_workers=num_workers,
-        evaluation_budget=evaluation_budget,
         quiet=quiet,
         **kwargs_for_black_box,
     )
