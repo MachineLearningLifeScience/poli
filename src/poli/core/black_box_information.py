@@ -12,6 +12,8 @@ The black box information includes the following information:
 - The alphabet of allowed characters.
 """
 
+from typing import Union, Literal
+
 
 class BlackBoxInformation:
     def __init__(
@@ -24,6 +26,7 @@ class BlackBoxInformation:
         alphabet: list,
         log_transform_recommended: bool = None,
         discrete: bool = True,
+        fidelity: Union[Literal["high", "low"], None] = None,
         padding_token: str = "",
     ):
         self.name = name
@@ -34,6 +37,7 @@ class BlackBoxInformation:
         self.alphabet = alphabet
         self.log_transform_recommended = log_transform_recommended
         self.discrete = discrete
+        self.fidelity = fidelity
         self.padding_token = padding_token
 
     def get_problem_name(self) -> str:
@@ -137,3 +141,17 @@ class BlackBoxInformation:
 
     def __repr__(self):
         return f"<BlackBoxInformation(name={self.name}, max_sequence_length={self.max_sequence_length}, aligned={self.aligned}, fixed_length={self.fixed_length}, discrete={self.discrete}, alphabet={self.alphabet}, log_transform_recommended={self.log_transform_recommended})>"
+
+    def as_dict(self):
+        return {
+            "name": self.name,
+            "max_sequence_length": self.max_sequence_length,
+            "aligned": self.aligned,
+            "fixed_length": self.fixed_length,
+            "deterministic": self.deterministic,
+            "discrete": self.discrete,
+            "fidelity": self.fidelity,
+            "alphabet": self.alphabet,
+            "log_transform_recommended": self.log_transform_recommended,
+            "padding_token": self.padding_token,
+        }

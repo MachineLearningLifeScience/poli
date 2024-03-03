@@ -15,12 +15,9 @@ includes the following information:
   allowed.
 """
 
-from typing import Literal
-
 import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
-from poli.core.problem_setup_information import ProblemSetupInformation
 
 
 class Problem:
@@ -28,21 +25,13 @@ class Problem:
         self,
         black_box: AbstractBlackBox,
         x0: np.ndarray,
-        fidelity: Literal["high", "low"] = "high",
-        evaluation_budget: int = float("inf"),
     ):
         self.black_box = black_box
         self.x0 = x0
-        self.fidelity = fidelity
-        self.evaluation_budget = evaluation_budget
         self.black_box_information = black_box.info
         self._validate()
 
     def _validate(self):
-        if self.evaluation_budget < 0:
-            raise ValueError("Evaluation budget must be non-negative.")
-        if self.fidelity not in ["high", "low"]:
-            raise ValueError("Fidelity must be either 'high' or 'low'.")
         if not isinstance(self.black_box, AbstractBlackBox):
             raise ValueError("Black box must be an instance of AbstractBlackBox.")
         if not isinstance(self.x0, np.ndarray):
@@ -57,3 +46,7 @@ class Problem:
 
     def is_continuous(self):
         return not self.is_discrete()
+
+    @property
+    def info(self):
+        return self.black_box.info

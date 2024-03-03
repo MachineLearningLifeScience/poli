@@ -1,5 +1,6 @@
 """This test suite contains the core promises we make to the user."""
 
+import pytest
 import numpy as np
 
 
@@ -26,12 +27,6 @@ def test_creating_a_problem():
     f.terminate()
 
 
-def test_creating_a_black_box_as_an_isolated_process():
-    from poli import instance_function_as_isolated_process
-
-    f = instance_function_as_isolated_process(name="white_noise")
-
-
 def test_instancing_a_black_box_that_requires_isolation():
     from poli.objective_repository.dockstring.register import DockstringBlackBox
 
@@ -46,7 +41,3 @@ def test_instancing_a_black_box_that_requires_isolation():
     x0 = np.array([list(risperidone_smiles)])
 
     print(f(x0))
-
-
-if __name__ == "__main__":
-    test_instancing_a_black_box_that_requires_isolation()

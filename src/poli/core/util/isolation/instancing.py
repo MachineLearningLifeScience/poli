@@ -10,7 +10,8 @@ from poli.core.registry import (
     _RUN_SCRIPT_LOCATION,
     _ISOLATED_FUNCTION_SCRIPT_LOCATION,
 )
-from poli.objective_repository import AVAILABLE_OBJECTIVES
+
+# from poli.objective_repository import AVAILABLE_OBJECTIVES
 from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
 
 from .external_black_box import ExternalBlackBox
@@ -97,9 +98,10 @@ def __register_isolated_function_from_repository(name: str, quiet: bool = False)
     # Moreover, we should only be doing this
     # if the problem is not already registered.
     # TODO: do we?
-    if name in config.sections():
-        warnings.warn(f"Problem {name} already registered. Skipping")
-        return
+    # if name in config.sections():
+
+    #     warnings.warn(f"Problem {name} already registered. Skipping")
+    #     return
 
     # 1. create the environment from the yaml file
     if not quiet:
@@ -164,9 +166,9 @@ def register_isolated_function_if_available(
     name : str
         The name of the objective function. This corresponds to
         the folder name inside the objective repository. If the
-        name contains a `__inner`, then it is assumed
+        name contains a `__isolated`, then it is assumed
         that the name refers to an internal file called
-        `inner_register.py`.
+        `isolated_function.py`.
     force_register : bool, optional
         If True, then the objective function is registered without asking
         for confirmation, overwriting any previous registration. By default,
@@ -177,11 +179,11 @@ def register_isolated_function_if_available(
     """
     config = load_config()
     if name not in config:
-        if name not in AVAILABLE_OBJECTIVES:
-            raise ValueError(
-                f"Objective function '{name}' is not registered, "
-                "and it is not available in the repository."
-            )
+        # if name not in AVAILABLE_OBJECTIVES:
+        #     raise ValueError(
+        #         f"Objective function '{name}' is not registered, "
+        #         "and it is not available in the repository."
+        #     )
 
         # At this point, we know that the function is available
         # in the repository
@@ -233,8 +235,10 @@ def __create_function_as_isolated_process(
         Additional keyword arguments for the factory.
     """
     config = load_config()
-    if name not in config:
-        raise ValueError(f"Objective function '{name}' is not registered. ")
+    if name.replace("__isolated", "") not in config:
+        raise ValueError(
+            f"Objective function '{name.replace('__isolated', '')}' is not registered. "
+        )
 
     if not quiet:
         print(f"poli 🧪: starting the isolated objective process.")

@@ -135,10 +135,11 @@ def run(factory_kwargs: str, objective_name: str, port: int, password: str) -> N
         objective_factory: AbstractProblemFactory = dynamically_instantiate(
             objective_name
         )
-        f, x0, y0 = objective_factory.create(**kwargs)
+        problem = objective_factory.create(**kwargs)
+        f, x0 = problem.black_box, problem.x0
 
         # give mother process the signal that we're ready
-        conn.send(["SETUP", x0, y0, objective_factory.get_setup_information()])
+        conn.send(["SETUP", x0])
     except Exception as e:
         tb = traceback.format_exc()
         conn.send(["EXCEPTION", e, tb])

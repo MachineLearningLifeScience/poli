@@ -131,22 +131,6 @@ class AlohaBlackBox(AbstractBlackBox):
         return values
 
 
-class AlohaProblem(Problem):
-    def __init__(
-        self,
-        black_box: AbstractBlackBox,
-        x0: np.ndarray,
-        fidelity: Literal["high", "low"] = "high",
-        evaluation_budget: int = float("inf"),
-    ):
-        super().__init__(
-            black_box=black_box,
-            x0=x0,
-            fidelity=fidelity,
-            evaluation_budget=evaluation_budget,
-        )
-
-
 class AlohaProblemFactory(AbstractProblemFactory):
     """
     Factory for the Aloha problem.
@@ -174,14 +158,16 @@ class AlohaProblemFactory(AbstractProblemFactory):
         problem_info: ProblemSetupInformation
             The setup information for the problem.
         """
-        # The alphabet: ["A", "B", "C", ...]
-        alphabet = list(ascii_uppercase)
-
-        return ProblemSetupInformation(
+        return BlackBoxInformation(
             name="aloha",
             max_sequence_length=5,
             aligned=True,
-            alphabet=alphabet,
+            fixed_length=True,
+            deterministic=True,
+            alphabet=list(ascii_uppercase),
+            log_transform_recommended=False,
+            discrete=True,
+            padding_token="",
         )
 
     def create(
@@ -191,7 +177,7 @@ class AlohaProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-    ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+    ) -> Problem:
         """
         Returns an Aloha blackbox function and initial observations.
 
@@ -219,9 +205,7 @@ class AlohaProblemFactory(AbstractProblemFactory):
         if seed is not None:
             seed_python_numpy_and_torch(seed)
 
-        problem_info = self.get_setup_information()
         f = AlohaBlackBox(
-            info=problem_info,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
@@ -229,7 +213,12 @@ class AlohaProblemFactory(AbstractProblemFactory):
         )
         x0 = np.array([["A", "L", "O", "O", "F"]])
 
-        return f, x0, f(x0)
+        aloha_problem = Problem(
+            black_box=f,
+            x0=x0,
+        )
+
+        return aloha_problem
 
 
 if __name__ == "__main__":

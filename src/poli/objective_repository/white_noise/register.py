@@ -125,18 +125,25 @@ class WhiteNoiseProblem(Problem):
 
 class WhiteNoiseProblemFactory(AbstractProblemFactory):
     @staticmethod
-    def get_setup_information() -> ProblemSetupInformation:
+    def get_setup_information() -> BlackBoxInformation:
         """
         Returns the setup information for the problem.
 
         Returns
         -------
-        problem_info : ProblemSetupInformation
+        problem_info : BlackBoxInformation
             The setup information for the problem.
         """
-        return ProblemSetupInformation(
+        return BlackBoxInformation(
             name="white_noise",
-            black_box_information=WhiteNoiseBlackBox.get_black_box_info(),
+            max_sequence_length=np.inf,
+            aligned=False,
+            fixed_length=False,
+            deterministic=False,
+            alphabet=[str(i) for i in range(10)],
+            log_transform_recommended=False,
+            discrete=True,
+            padding_token="",
         )
 
     def create(
@@ -181,11 +188,7 @@ class WhiteNoiseProblemFactory(AbstractProblemFactory):
         )
         x0 = np.array([["1", "2", "3"]])
 
-        white_noise_problem = WhiteNoiseProblem(
-            black_box=f,
-            x0=x0,
-            evaluation_budget=evaluation_budget,
-        )
+        white_noise_problem = WhiteNoiseProblem(black_box=f, x0=x0)
 
         return white_noise_problem
 

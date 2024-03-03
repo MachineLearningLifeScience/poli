@@ -1,6 +1,7 @@
 from typing import Any
 
 from poli.core.abstract_black_box import AbstractBlackBox
+from poli.core.black_box_information import BlackBoxInformation
 from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
 
 
@@ -62,6 +63,20 @@ class ExternalBlackBox(AbstractBlackBox):
                 f"Internal error: received {msg_type} when expecting QUERY or EXCEPTION"
             )
 
+    @property
+    def info(self) -> BlackBoxInformation:
+        """The information about the black-box function."""
+        self.process_wrapper.send(["ATTRIBUTE", "info"])
+        msg_type, *msg = self.process_wrapper.recv()
+        if msg_type == "EXCEPTION":
+            e, traceback_ = msg
+            print(traceback_)
+            raise e
+        else:
+            assert msg_type == "ATTRIBUTE"
+            attribute = msg[0]
+            return attribute
+
     def terminate(self):
         """Terminates the external black box."""
         # terminate objective process
@@ -98,6 +113,8 @@ class ExternalBlackBox(AbstractBlackBox):
         attribute : Any
             The attribute of the underlying black-box function.
         """
+        if __name == "process_wrapper":
+            return self.process_wrapper
         self.process_wrapper.send(["ATTRIBUTE", __name])
         msg_type, *msg = self.process_wrapper.recv()
         if msg_type == "EXCEPTION":

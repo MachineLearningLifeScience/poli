@@ -108,7 +108,7 @@ def __create_problem_as_isolated_process(
     evaluation_budget: int = float("inf"),
     quiet: bool = False,
     **kwargs_for_factory,
-) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+) -> Problem:
     """Creates the objective function as an isolated process.
 
     If the problem is registered, we create it as an isolated
@@ -164,7 +164,7 @@ def __create_problem_as_isolated_process(
     if msg_type == "SETUP":
         # Then the instance of the abstract factory
         # was correctly set-up, and
-        x0, y0, problem_information = msg
+        x0 = msg[0]
     elif msg_type == "EXCEPTION":
         e, tb = msg
         print(tb)
@@ -174,9 +174,13 @@ def __create_problem_as_isolated_process(
             f"Internal error: received {msg_type} when expecting SETUP or EXCEPTION"
         )
 
-    f = ExternalBlackBox(problem_information, process_wrapper)
+    f = ExternalBlackBox(process_wrapper)
+    external_problem = Problem(
+        black_box=f,
+        x0=x0,
+    )
 
-    return f, x0, y0
+    return external_problem
 
 
 def __register_objective_if_available(
@@ -343,6 +347,7 @@ def create_problem(
     observer_info = None
     if observer is not None:
         f, x0 = problem.black_box, problem.x0
+        # TODO: Should we send the y0 to the observer initialization?
         y0 = f(x0)
 
         observer_info = observer.initialize_observer(

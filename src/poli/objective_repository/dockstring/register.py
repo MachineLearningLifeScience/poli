@@ -23,7 +23,7 @@ import selfies as sf
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.abstract_problem_factory import AbstractProblemFactory
-from poli.core.problem_setup_information import ProblemSetupInformation
+from poli.core.problem import Problem
 
 from poli.core.util.chemistry.string_to_molecule import (
     translate_selfies_to_smiles,
@@ -89,6 +89,7 @@ class DockstringBlackBox(AbstractBlackBox):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
+        force_isolation: bool = False,
     ):
         """
         Initialize the dockstring black box object.
@@ -122,16 +123,23 @@ class DockstringBlackBox(AbstractBlackBox):
         self.target_name = target_name
         self.string_representation = string_representation
 
-        try:
-            from poli.objective_repository.dockstring.isolated_function import (
-                IsolatedDockstringFunction,
-            )
+        if not force_isolation:
+            try:
+                from poli.objective_repository.dockstring.isolated_function import (
+                    IsolatedDockstringFunction,
+                )
 
-            self.inner_function = IsolatedDockstringFunction(
-                target_name=target_name,
-                string_representation=string_representation,
-            )
-        except ImportError:
+                self.inner_function = IsolatedDockstringFunction(
+                    target_name=target_name,
+                    string_representation=string_representation,
+                )
+            except ImportError:
+                self.inner_function = instance_function_as_isolated_process(
+                    name="dockstring__isolated",
+                    target_name=target_name,
+                    string_representation=string_representation,
+                )
+        else:
             self.inner_function = instance_function_as_isolated_process(
                 name="dockstring__isolated",
                 target_name=target_name,
@@ -193,18 +201,11 @@ class DockstringProblemFactory(AbstractProblemFactory):
     """
 
     @staticmethod
-    def get_setup_information() -> ProblemSetupInformation:
+    def get_setup_information() -> BlackBoxInformation:
         # TODO: We might change this in the future for a
         # default dictionary, depending on whether we
         # are using SMILES or SELFIES.
-        alphabet = None
-
-        return ProblemSetupInformation(
-            name="dockstring",
-            max_sequence_length=np.inf,
-            aligned=False,
-            alphabet=alphabet,
-        )
+        return dockstring_black_box_information
 
     def create(
         self,
@@ -215,7 +216,7 @@ class DockstringProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-    ) -> Tuple[DockstringBlackBox, np.ndarray, np.ndarray]:
+    ) -> Problem:
         """Creates a dockstring black box function and initial observations.
 
         Parameters
@@ -239,9 +240,8 @@ class DockstringProblemFactory(AbstractProblemFactory):
 
         Returns
         -------
-        results: Tuple[DockstringBlackBox, np.ndarray, np.ndarray]:
-            A tuple containing the blackbox function, initial inputs,
-            and their respective outputs.
+        problem: Problem
+            A problem definition with the dockstring black box function and initial observations.
         """
         assert (
             target_name is not None
@@ -251,13 +251,12 @@ class DockstringProblemFactory(AbstractProblemFactory):
             seed_python_numpy_and_torch(seed)
 
         dockstring_black_box = DockstringBlackBox(
-            info=self.get_setup_information(),
+            target_name=target_name,
+            string_representation=string_representation,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
-            target_name=target_name,
-            string_representation=string_representation,
         )
 
         # Using the initial example they provide in the
@@ -275,7 +274,9 @@ class DockstringProblemFactory(AbstractProblemFactory):
                 f"Invalid string representation. Expected SMILES or SELFIES but received {string_representation}."
             )
 
-        return dockstring_black_box, x0, dockstring_black_box(x0)
+        dockstring_problem = Problem(black_box=dockstring_black_box, x0=x0)
+
+        return dockstring_problem
 
 
 if __name__ == "__main__":

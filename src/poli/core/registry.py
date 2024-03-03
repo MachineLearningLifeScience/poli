@@ -18,7 +18,7 @@ from poli.core.util.objective_management.make_run_script import (
     make_black_box_script,
 )
 
-from poli.objective_repository import AVAILABLE_PROBLEM_FACTORIES, AVAILABLE_OBJECTIVES
+# from poli.objective_repository import AVAILABLE_PROBLEM_FACTORIES, AVAILABLE_OBJECTIVES
 
 _DEFAULT = "DEFAULT"
 _OBSERVER = "observer"
@@ -330,64 +330,60 @@ def delete_problem(problem_name: str):
     _write_config()
 
 
-def get_problems(only_available: bool = False) -> List[str]:
-    """Returns a list of registered problems.
+# def get_problems(only_available: bool = False) -> List[str]:
+#     """Returns a list of registered problems.
 
-    Parameters
-    ----------
-    only_available : bool
-        Whether to only include the problems that can be imported directly.
+#     Parameters
+#     ----------
+#     only_available : bool
+#         Whether to only include the problems that can be imported directly.
 
-    Returns
-    -------
-    problem_list: List[str]
-        A list of registered problems.
+#     Returns
+#     -------
+#     problem_list: List[str]
+#         A list of registered problems.
 
-    Notes
-    -----
-    If only_available is False, the problems from the repository will be
-    included in the list. Otherwise, only the problems registered by the user/readily available
-    will be included.
-    """
-    problems = [
-        name for name in config.sections() if "run_script_location" in config[name]
-    ]
+#     Notes
+#     -----
+#     If only_available is False, the problems from the repository will be
+#     included in the list. Otherwise, only the problems registered by the user/readily available
+#     will be included.
+#     """
+#     problems = [
+#         name for name in config.sections() if "run_script_location" in config[name]
+#     ]
 
-    # problems.remove(_DEFAULT)  # no need to remove default section
+#     # problems.remove(_DEFAULT)  # no need to remove default section
 
-    # We also pad the get_problems() with the problems
-    # the user can import already without any problem,
-    # i.e. the AVAILABLE_PROBLEM_FACTORIES in the
-    # objective_repository
-    available_problems = list(AVAILABLE_PROBLEM_FACTORIES.keys())
+#     # We also pad the get_problems() with the problems
+#     # the user can import already without any problem,
+#     # i.e. the AVAILABLE_PROBLEM_FACTORIES in the
+#     # objective_repository
+#     available_problems = list(AVAILABLE_PROBLEM_FACTORIES.keys())
 
-    if not only_available:
-        # We include the problems that the user _could_
-        # install from the repo. These are available in the
-        # AVAILABLE_OBJECTIVES list.
-        available_problems += AVAILABLE_OBJECTIVES
+#     if not only_available:
+#         # We include the problems that the user _could_
+#         # install from the repo. These are available in the
+#         # AVAILABLE_OBJECTIVES list.
+#         available_problems += AVAILABLE_OBJECTIVES
 
-    problems = sorted(list(set(problems + available_problems)))
+#     problems = sorted(list(set(problems + available_problems)))
 
-    return problems
+#     return problems
 
 
-def get_problem_factories() -> Dict[str, AbstractProblemFactory]:
-    """
-    Returns a dictionary with the problem factories
+# def get_problem_factories() -> Dict[str, AbstractProblemFactory]:
+#     """
+#     Returns a dictionary with the problem factories
 
-    Returns
-    -------
-    problem_factories: Dict[str, AbstractProblemFactory]
-        A dictionary with the problem factories that are available.
-    """
-    return AVAILABLE_PROBLEM_FACTORIES
+#     Returns
+#     -------
+#     problem_factories: Dict[str, AbstractProblemFactory]
+#         A dictionary with the problem factories that are available.
+#     """
+#     return AVAILABLE_PROBLEM_FACTORIES
 
 
 def _write_config():
     with open(config_file, "w+") as configfile:
         config.write(configfile)
-
-
-if __name__ == "__main__":
-    get_problems()

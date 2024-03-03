@@ -10,6 +10,8 @@ from .toy_continuous_problem.register import (
     ToyContinuousProblemFactory,
     ToyContinuousBlackBox,
 )
+from .dockstring.register import DockstringProblemFactory, DockstringBlackBox
+from .drd3_docking.register import DRD3ProblemFactory, DRD3BlackBox
 
 
 THIS_DIR = Path(__file__).parent.resolve()
@@ -27,14 +29,18 @@ for d in THIS_DIR.glob("*"):
 AVAILABLE_OBJECTIVES = sorted(AVAILABLE_OBJECTIVES)
 
 AVAILABLE_PROBLEM_FACTORIES = {
-    "white_noise": WhiteNoiseProblemFactory,
     "aloha": AlohaProblemFactory,
+    "dockstring": DockstringProblemFactory,
+    "drd3_docking": DRD3ProblemFactory,
+    "white_noise": WhiteNoiseProblemFactory,
     "toy_continuous_problem": ToyContinuousProblemFactory,
 }
 
 AVAILABLE_BLACK_BOXES = {
-    "white_noise": WhiteNoiseBlackBox,
     "aloha": AlohaBlackBox,
+    "dockstring": DockstringBlackBox,
+    "drd3_docking": DRD3BlackBox,
+    "white_noise": WhiteNoiseBlackBox,
     "toy_continuous_problem": ToyContinuousBlackBox,
 }
 
@@ -138,9 +144,9 @@ except (ImportError, FileNotFoundError):
     pass
 
 try:
-    from .drd3_docking.register import DDR3ProblemFactory, DRD3BlackBox
+    from .drd3_docking.register import DRD3ProblemFactory, DRD3BlackBox
 
-    AVAILABLE_PROBLEM_FACTORIES["drd3_docking"] = DDR3ProblemFactory
+    AVAILABLE_PROBLEM_FACTORIES["drd3_docking"] = DRD3ProblemFactory
     AVAILABLE_BLACK_BOXES["drd3_docking"] = DRD3BlackBox
 except (ImportError, FileNotFoundError):
     pass

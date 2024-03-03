@@ -13,7 +13,7 @@ import numpy as np
 
 import selfies as sf
 
-from poli.core.chemistry.tdc_black_box import TDCBlackBox
+from poli.core.chemistry.tdc_isolated_function import TDCIsolatedFunction
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem_setup_information import ProblemSetupInformation
 
@@ -22,7 +22,7 @@ from poli.core.util.chemistry.string_to_molecule import translate_smiles_to_self
 from poli.core.util.seeding import seed_numpy, seed_python, seed_python_numpy_and_torch
 
 
-class SABlackBox(TDCBlackBox):
+class SABlackBox(TDCIsolatedFunction):
     """Synthetic-accessibility black box implementation using the TDC oracles [1].
 
     Parameters

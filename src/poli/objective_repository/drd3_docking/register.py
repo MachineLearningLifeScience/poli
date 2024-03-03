@@ -13,23 +13,29 @@ import numpy as np
 
 import selfies as sf
 
-from poli.core.chemistry.tdc_black_box import TDCBlackBox
+
 from poli.core.abstract_problem_factory import AbstractProblemFactory
-from poli.core.problem_setup_information import ProblemSetupInformation
+from poli.core.black_box_information import BlackBoxInformation
+from poli.core.abstract_black_box import AbstractBlackBox
+from poli.core.problem import Problem
+
+from poli.core.util.isolation.instancing import instance_function_as_isolated_process
 
 from poli.core.util.chemistry.string_to_molecule import translate_smiles_to_selfies
 
 from poli.core.util.seeding import seed_numpy, seed_python
 
+from poli.objective_repository.drd3_docking.information import drd3_docking_info
 
-class DRD3BlackBox(TDCBlackBox):
+
+class DRD3BlackBox(AbstractBlackBox):
     """
     DRD3BlackBox is a class that represents a black box for DRD3 docking.
 
     Parameters
     ----------
-    info : ProblemSetupInformation
-        The problem setup information.
+    from_smiles : bool, optional
+        Flag indicating whether to use SMILES strings as input, by default True.
     batch_size : int, optional
         The batch size for simultaneous execution, by default None.
     parallelize : bool, optional
@@ -38,8 +44,8 @@ class DRD3BlackBox(TDCBlackBox):
         The number of workers for parallel execution, by default None.
     evaluation_budget:  int, optional
         The maximum number of function evaluations. Default is infinity.
-    from_smiles : bool, optional
-        Flag indicating whether to use SMILES strings as input, by default True.
+    force_isolation: bool, optional
+        Whether to force the isolation of the black box. Default is False.
 
     Attributes
     ----------
@@ -54,23 +60,48 @@ class DRD3BlackBox(TDCBlackBox):
 
     def __init__(
         self,
-        info: ProblemSetupInformation,
+        string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
+        force_isolation: bool = False,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-        from_smiles: bool = True,
     ):
-        oracle_name = "3pbl_docking"
         super().__init__(
-            oracle_name=oracle_name,
-            info=info,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
-            from_smiles=from_smiles,
         )
+
+        from_smiles = string_representation.upper() == "SMILES"
+        if not force_isolation:
+            try:
+                from poli.objective_repository.drd3_docking.isolated_function import (
+                    TDCIsolatedFunction,
+                )
+
+                self.inner_function = TDCIsolatedFunction(
+                    oracle_name="3pbl_docking",
+                    from_smiles=from_smiles,
+                )
+            except ImportError:
+                self.inner_function = instance_function_as_isolated_process(
+                    name="drd3_docking__isolated",
+                    from_smiles=from_smiles,
+                )
+        else:
+            self.inner_function = instance_function_as_isolated_process(
+                name="drd3_docking__isolated",
+                from_smiles=from_smiles,
+            )
+
+    @staticmethod
+    def get_black_box_info() -> BlackBoxInformation:
+        return drd3_docking_info
+
+    def _black_box(self, x: np.ndarray, context=None) -> np.ndarray:
+        return self.inner_function(x, context)
 
 
 class DRD3ProblemFactory(AbstractProblemFactory):
@@ -87,7 +118,7 @@ class DRD3ProblemFactory(AbstractProblemFactory):
         Creates a DRD3 docking problem.
     """
 
-    def get_setup_information(self) -> ProblemSetupInformation:
+    def get_setup_information(self) -> BlackBoxInformation:
         """
         Retrieves the setup information for the problem.
 
@@ -96,12 +127,7 @@ class DRD3ProblemFactory(AbstractProblemFactory):
         problem_info: ProblemSetupInformation
             The setup information for the problem.
         """
-        return ProblemSetupInformation(
-            name="drd3_docking",
-            max_sequence_length=np.inf,
-            aligned=False,
-            alphabet=None,
-        )
+        return drd3_docking_info
 
     def create(
         self,
@@ -111,7 +137,7 @@ class DRD3ProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-    ) -> Tuple[TDCBlackBox, np.ndarray, np.ndarray]:
+    ) -> Problem:
         """
         Create a TDCBlackBox object for DRD3 docking.
 
@@ -132,8 +158,8 @@ class DRD3ProblemFactory(AbstractProblemFactory):
 
         Returns
         -------
-        Tuple[TDCBlackBox, np.ndarray, np.ndarray]
-            A tuple containing the TDCBlackBox object, the initial input array, and the output array.
+        problem : Problem
+            A problem instance containing the black box, and an initial value x0.
 
         Raises
         ------
@@ -152,14 +178,12 @@ class DRD3ProblemFactory(AbstractProblemFactory):
                 "String representation must be either 'SMILES' or 'SELFIES'."
             )
 
-        problem_info = self.get_setup_information()
         f = DRD3BlackBox(
-            info=problem_info,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
-            from_smiles=string_representation.upper() == "SMILES",
+            string_representation=string_representation,
         )
 
         # Initial example (from the TDC docs)
@@ -171,7 +195,12 @@ class DRD3ProblemFactory(AbstractProblemFactory):
         else:
             x0 = np.array([list(sf.split_selfies(x0_selfies))])
 
-        return f, x0, f(x0)
+        drd3_problem = Problem(
+            black_box=f,
+            x0=x0,
+        )
+
+        return drd3_problem
 
 
 if __name__ == "__main__":
@@ -179,6 +208,7 @@ if __name__ == "__main__":
 
     register_problem(
         DRD3ProblemFactory(),
+        name="drd3_docking",
         conda_environment_name="poli__tdc",
         force=True,
     )

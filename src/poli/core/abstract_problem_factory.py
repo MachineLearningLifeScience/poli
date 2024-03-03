@@ -5,7 +5,7 @@ from typing import Tuple
 import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
-from poli.core.problem_setup_information import ProblemSetupInformation
+from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
 
 
@@ -41,14 +41,14 @@ class AbstractProblemFactory(metaclass=MetaProblemFactory):
         Creates a problem instance with the specified parameters.
     """
 
-    def get_setup_information(self) -> ProblemSetupInformation:
+    def get_setup_information(self) -> BlackBoxInformation:
         """
         Returns the setup information for the problem.
 
         Returns
         --------
-        problem_info: ProblemSetupInformation
-            The setup information for the problem.
+        problem_info: BlackBoxInformation
+            Information for the problem (e.g. whether it is discrete, deterministic...).
 
         Raises
         -------
