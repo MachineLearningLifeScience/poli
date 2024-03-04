@@ -240,7 +240,9 @@ def __create_function_as_isolated_process(
         )
 
     if not quiet:
-        print(f"poli 🧪: starting the function as an isolated objective process.")
+        print(
+            f"poli 🧪: Starting the function {name.replace('__isolated', '')} as an isolated process."
+        )
 
     process_wrapper = ProcessWrapper(
         config[name][_ISOLATED_FUNCTION_SCRIPT_LOCATION], **kwargs_for_isolated_function

@@ -149,7 +149,7 @@ def __create_problem_as_isolated_process(
     kwargs_for_factory["evaluation_budget"] = evaluation_budget
 
     if not quiet:
-        print(f"poli 🧪: Starting the problem as an isolated objective process.")
+        print(f"poli 🧪: Starting the problem {name} as an isolated objective process.")
 
     process_wrapper = ProcessWrapper(
         config[name][_RUN_SCRIPT_LOCATION], **kwargs_for_factory
@@ -298,7 +298,7 @@ def create(
     # have, then we do not need to install it.
     if name in AVAILABLE_PROBLEM_FACTORIES and not force_isolation:
         if not quiet:
-            print(f"poli 🧪: Creating the objective from the repository.")
+            print(f"poli 🧪: Creating the objective {name} from the repository.")
 
         problem = __create_problem_from_repository(
             name,
@@ -309,12 +309,14 @@ def create(
             evaluation_budget=evaluation_budget,
             **kwargs_for_factory,
         )
-        x0 = problem.x0
-        y0 = problem.black_box(x0)
 
         if observer is not None:
             if not quiet:
                 print(f"poli 🧪: initializing the observer.")
+
+            # TODO: Should we be evaluating y0 here?
+            x0 = problem.x0
+            y0 = problem.black_box(x0)
             observer_info = observer.initialize_observer(
                 problem.black_box.info, observer_init_info, x0, y0, seed
             )
@@ -330,7 +332,7 @@ def create(
     # At this point, we know the name is registered.
     # Thus, we should be able to start it as an isolated process
     if not quiet:
-        print(f"poli 🧪: creating an isolated black box function.")
+        print(f"poli 🧪: Creating an isolated problem ({name}).")
     problem = __create_problem_as_isolated_process(
         name,
         seed=seed,
