@@ -32,9 +32,9 @@ test_data = [
 def test_instancing_a_black_box_both_ways_matches(
     black_box_name, black_box_class, kwargs_for_black_box
 ):
-    from poli import create_problem
+    from poli import create
 
-    problem = create_problem(
+    problem = create(
         name=black_box_name,
         seed=42,
         evaluation_budget=100,

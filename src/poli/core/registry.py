@@ -15,7 +15,7 @@ from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.objective_management.make_run_script import (
     make_run_script,
     make_observer_script,
-    make_black_box_script,
+    make_isolated_function_script,
 )
 
 # from poli.objective_repository import AVAILABLE_PROBLEM_FACTORIES, AVAILABLE_OBJECTIVES
@@ -130,11 +130,10 @@ def delete_observer_run_script(observer_name: str = None) -> str:
 
 
 def register_problem(
-    problem_factory: Union[AbstractProblemFactory, str],
-    name: str,
+    problem_factory: AbstractProblemFactory,
     conda_environment_name: Union[str, Path] = None,
     python_paths: List[str] = None,
-    force: bool = False,
+    force: bool = True,
     **kwargs,
 ):
     """Registers a problem.
@@ -208,7 +207,7 @@ def register_isolated_function(
 
         warnings.warn(f"Black box {name} already exists. Overwriting.")
 
-    isolated_function_script_location = make_black_box_script(
+    isolated_function_script_location = make_isolated_function_script(
         isolated_function, conda_environment_name, python_paths, **kwargs
     )
     config[name][_ISOLATED_FUNCTION_SCRIPT_LOCATION] = isolated_function_script_location

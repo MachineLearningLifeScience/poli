@@ -3,13 +3,13 @@ import pytest
 
 @pytest.mark.slow()
 def test_foldx_rfp_lambo_runs():
-    from poli import create_problem
+    from poli import create
     import numpy as np
 
     # For now, we don't have automatic installation of lambo.
     # TODO: add automatic installation of lambo, and remove this
     # check.
-    f, _, _ = create_problem(name="foldx_rfp_lambo", seed=1)
+    f, _, _ = create(name="foldx_rfp_lambo", seed=1)
 
     # Evaluating on the first base candidate
     first_base_candidate_and_mutation = np.array(

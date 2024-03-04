@@ -45,7 +45,7 @@ if __name__ == "__main__":
         THIS_DIR / "two_proteins" / "2vae.pdb",
     ]
 
-    f_rasp, x0, y0 = objective_factory.create_problem(
+    f_rasp, x0, y0 = objective_factory.create(
         name="rasp",
         wildtype_pdb_path=wildtype_pdb_paths_for_rasp,
     )

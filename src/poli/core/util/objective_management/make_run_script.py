@@ -15,6 +15,7 @@ from poli.external_problem_factory_script import ADDITIONAL_IMPORT_SEARCH_PATHES
 from poli.core.util import observer_wrapper
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.abstract_black_box import AbstractBlackBox
+from poli.core.abstract_isolated_function import AbstractIsolatedFunction
 from poli.core.util.abstract_observer import AbstractObserver
 
 # By default, we will store the run scripts inside the
@@ -24,8 +25,8 @@ HOME_DIR = Path.home().resolve()
 RUN_SCRIPTS_FOLDER = HOME_DIR / ".poli_objectives"
 
 
-def make_black_box_script(
-    black_box: AbstractBlackBox,
+def make_isolated_function_script(
+    isolated_function: AbstractIsolatedFunction,
     conda_environment_name: Union[str, Path] = None,
     python_paths: List[str] = None,
     cwd=None,
@@ -53,7 +54,7 @@ def make_black_box_script(
     """
     command = inspect.getfile(external_isolated_function_script)
     return _make_run_script(
-        command, black_box, conda_environment_name, python_paths, cwd, **kwargs
+        command, isolated_function, conda_environment_name, python_paths, cwd, **kwargs
     )
 
 

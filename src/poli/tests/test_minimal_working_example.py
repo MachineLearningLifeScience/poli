@@ -5,7 +5,7 @@ def test_minimal_working_example_of_problem_creation():
     import numpy as np
     from poli import objective_factory
 
-    white_noise_problem = objective_factory.create_problem(name="white_noise")
+    white_noise_problem = objective_factory.create(name="white_noise")
     f = white_noise_problem.black_box
 
     x = np.array([["1", "2", "3"]])  # must be of shape [b, L], in this case [1, 3].

@@ -5,7 +5,7 @@ box objectives indeed spawns an isolated process."""
 def test_force_isolation_on_aloha():
     from poli import objective_factory
 
-    f, _, _ = objective_factory.create_problem(
+    f, _, _ = objective_factory.create(
         name="aloha",
         force_register=True,
         force_isolation=True,

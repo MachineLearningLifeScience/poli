@@ -13,7 +13,7 @@ will
 
 from poli import objective_factory
 
-f, x0, y0 = objective_factory.create_problem(
+f, x0, y0 = objective_factory.create(
     name="aloha",
     seed=0,
 )

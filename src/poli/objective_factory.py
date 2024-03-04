@@ -149,7 +149,7 @@ def __create_problem_as_isolated_process(
     kwargs_for_factory["evaluation_budget"] = evaluation_budget
 
     if not quiet:
-        print(f"poli 🧪: starting the isolated objective process.")
+        print(f"poli 🧪: Starting the problem as an isolated objective process.")
 
     process_wrapper = ProcessWrapper(
         config[name][_RUN_SCRIPT_LOCATION], **kwargs_for_factory
@@ -238,7 +238,7 @@ def __register_objective_if_available(
             )
 
 
-def create_problem(
+def create(
     name: str,
     *,
     seed: int = None,

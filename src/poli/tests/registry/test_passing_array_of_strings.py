@@ -114,9 +114,9 @@ def test_passing_array_of_strings(
     to a black box is equivalent to passing an array of [b, L] tokens.
     """
     import numpy as np
-    from poli import create_problem
+    from poli import create
 
-    f, _, _ = create_problem(
+    f, _, _ = create(
         name=black_box_name,
         **kwargs,
     )

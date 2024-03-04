@@ -68,20 +68,19 @@ def __register_isolated_function_from_repository(name: str, quiet: bool = False)
     # 2. run the file from said enviroment (since
     #    we can't import the factory: it may have
     #    dependencies that are not installed)
+    assert name.endswith(
+        "__isolated"
+    ), "By convention, the names of isolated functions always end with '__isolated'"
 
     # Load up the environment name
     PATH_TO_REPOSITORY = (
         Path(__file__).parent.parent.parent.parent / "objective_repository"
     ).resolve()
 
-    # Cleaning up the name from the __isolated
-    if name.endswith("__isolated"):
-        file_to_isolate = "isolated_function.py"
-        name = name.replace("__isolated", "")
-    else:
-        file_to_isolate = "register.py"
+    file_to_isolate = "isolated_function.py"
+    name_without_isolated = name.replace("__isolated", "")
 
-    with open(PATH_TO_REPOSITORY / name / "environment.yml", "r") as f:
+    with open(PATH_TO_REPOSITORY / name_without_isolated / "environment.yml", "r") as f:
         # This is a really crude way of doing this,
         # but it works. We should probably use a
         # yaml parser instead, but the idea is to keep
@@ -105,7 +104,9 @@ def __register_isolated_function_from_repository(name: str, quiet: bool = False)
 
     # 1. create the environment from the yaml file
     if not quiet:
-        print(f"poli 🧪: creating environment {env_name} from {name}/environment.yml")
+        print(
+            f"poli 🧪: creating environment {env_name} from {name_without_isolated}/environment.yml"
+        )
     try:
         subprocess.run(
             " ".join(
@@ -114,7 +115,7 @@ def __register_isolated_function_from_repository(name: str, quiet: bool = False)
                     "env",
                     "create",
                     "-f",
-                    str(PATH_TO_REPOSITORY / name / "environment.yml"),
+                    str(PATH_TO_REPOSITORY / name_without_isolated / "environment.yml"),
                 ]
             ),
             shell=True,
@@ -124,9 +125,7 @@ def __register_isolated_function_from_repository(name: str, quiet: bool = False)
     except subprocess.CalledProcessError as e:
         if "already exists" in e.stderr.decode():
             if not quiet:
-                print(
-                    f"poli 🧪: creating environment {env_name} from {name}/environment.yml"
-                )
+                print(f"poli 🧪: {env_name} already exists.")
             warnings.warn(f"Environment {env_name} already exists. Will not create it.")
         else:
             raise e
@@ -136,7 +135,7 @@ def __register_isolated_function_from_repository(name: str, quiet: bool = False)
     #    dependencies that are not installed)
 
     # Running the file
-    file_to_run = PATH_TO_REPOSITORY / name / file_to_isolate
+    file_to_run = PATH_TO_REPOSITORY / name_without_isolated / file_to_isolate
     command = " ".join(["conda", "run", "-n", env_name, "python", str(file_to_run)])
     warnings.warn("Running the following command: %s. " % command)
 
@@ -235,13 +234,13 @@ def __create_function_as_isolated_process(
         Additional keyword arguments for the factory.
     """
     config = load_config()
-    if name.replace("__isolated", "") not in config:
+    if name not in config:
         raise ValueError(
             f"Objective function '{name.replace('__isolated', '')}' is not registered. "
         )
 
     if not quiet:
-        print(f"poli 🧪: starting the isolated objective process.")
+        print(f"poli 🧪: starting the function as an isolated objective process.")
 
     process_wrapper = ProcessWrapper(
         config[name][_ISOLATED_FUNCTION_SCRIPT_LOCATION], **kwargs_for_isolated_function

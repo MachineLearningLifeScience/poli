@@ -13,9 +13,9 @@ def test_creating_an_instance_of_a_black_box():
 
 
 def test_creating_a_problem():
-    from poli import create_problem
+    from poli import create
 
-    white_noise_problem = create_problem(
+    white_noise_problem = create(
         name="white_noise",
         seed=42,
         evaluation_budget=100,

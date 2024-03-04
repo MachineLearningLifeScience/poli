@@ -16,7 +16,7 @@ def test_budget_exhaustion_exception():
 def test_num_evaluation_tracks_correctly():
     from poli import objective_factory
 
-    f, _, _ = objective_factory.create_problem(
+    f, _, _ = objective_factory.create(
         name="toy_continuous_problem",
         function_name="ackley_function_01",
         n_dimensions=3,
@@ -37,7 +37,7 @@ def test_num_evaluation_tracks_correctly():
 def test_budget_exhausts():
     from poli import objective_factory
 
-    f, _, _ = objective_factory.create_problem(
+    f, _, _ = objective_factory.create(
         name="toy_continuous_problem",
         function_name="ackley_function_01",
         n_dimensions=3,

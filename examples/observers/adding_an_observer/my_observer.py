@@ -34,7 +34,7 @@ if __name__ == "__main__":
     # (once) we have to register our observer
     set_observer(MyObserver(), conda_environment_location="")
 
-    problem_info, f, x0, y0, run_info = objective_factory.create_problem(
+    problem_info, f, x0, y0, run_info = objective_factory.create(
         "MY_PROBLEM", observer_init_info=None
     )
     # call objective function and observe that observer is called

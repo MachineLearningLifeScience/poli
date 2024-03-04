@@ -37,7 +37,7 @@ def test_force_registering_qed():
     We test whether we can force-register the qed problem
     if rdkit and selfies are not installed.
     """
-    f, _, y0 = objective_factory.create_problem(
+    f, _, y0 = objective_factory.create(
         name="rdkit_qed",
         force_register=True,
     )
@@ -67,7 +67,7 @@ def test_force_registering_logp():
     We test whether we can force-register the logp problem
     if rdkit and selfies are not installed.
     """
-    f, _, y0 = objective_factory.create_problem(
+    f, _, y0 = objective_factory.create(
         name="rdkit_logp",
         force_register=True,
     )
@@ -87,7 +87,7 @@ def test_registering_qed():
     _ = pytest.importorskip("selfies")
     np = pytest.importorskip("numpy")
 
-    f, _, y0 = objective_factory.create_problem(
+    f, _, y0 = objective_factory.create(
         name="rdkit_qed",
     )
     x = np.array([["C"]])
@@ -109,7 +109,7 @@ def test_registering_logp():
     selfies = pytest.importorskip("selfies")
     np = pytest.importorskip("numpy")
 
-    f, _, y0 = objective_factory.create_problem(
+    f, _, y0 = objective_factory.create(
         name="rdkit_logp",
     )
     x = np.array([["C"]])
@@ -132,7 +132,7 @@ def test_penalized_logp_lambo():
     _ = pytest.importorskip("lambo")
 
     # Using create
-    f, x0, y0 = objective_factory.create_problem(
+    f, x0, y0 = objective_factory.create(
         name="penalized_logp_lambo", force_register=True
     )
     print(x0)
@@ -146,7 +146,7 @@ def test_querying_dockstring_using_smiles():
     """
     from poli import objective_factory
 
-    f, x0, y0 = objective_factory.create_problem(
+    f, x0, y0 = objective_factory.create(
         name="dockstring",
         target_name="DRD2",
         string_representation="SMILES",
@@ -167,7 +167,7 @@ def test_querying_dockstring_using_selfies():
     """
     from poli import objective_factory
 
-    f, x0, y0 = objective_factory.create_problem(
+    f, x0, y0 = objective_factory.create(
         name="dockstring",
         target_name="ABL1",
         string_representation="SELFIES",
