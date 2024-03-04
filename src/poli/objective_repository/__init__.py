@@ -12,7 +12,8 @@ from .toy_continuous_problem.register import (
 )
 from .dockstring.register import DockstringProblemFactory, DockstringBlackBox
 from .drd3_docking.register import DRD3ProblemFactory, DRD3BlackBox
-from .foldx_rfp_lambo.register import FoldxRFPLamboBlackBox, FoldxRFPLamboProblemFactory
+from .foldx_rfp_lambo.register import FoldXRFPLamboBlackBox, FoldXRFPLamboProblemFactory
+from .foldx_sasa.register import FoldXSASABlackBox, FoldXSASAProblemFactory
 
 
 THIS_DIR = Path(__file__).parent.resolve()
@@ -33,6 +34,8 @@ AVAILABLE_PROBLEM_FACTORIES = {
     "aloha": AlohaProblemFactory,
     "dockstring": DockstringProblemFactory,
     "drd3_docking": DRD3ProblemFactory,
+    "foldx_rfp_lambo": FoldXRFPLamboProblemFactory,
+    "foldx_sasa": FoldXSASAProblemFactory,
     "white_noise": WhiteNoiseProblemFactory,
     "toy_continuous_problem": ToyContinuousProblemFactory,
 }
@@ -41,6 +44,8 @@ AVAILABLE_BLACK_BOXES = {
     "aloha": AlohaBlackBox,
     "dockstring": DockstringBlackBox,
     "drd3_docking": DRD3BlackBox,
+    "foldx_rfp_lambo": FoldXRFPLamboBlackBox,
+    "foldx_sasa": FoldXSASABlackBox,
     "white_noise": WhiteNoiseBlackBox,
     "toy_continuous_problem": ToyContinuousBlackBox,
 }
@@ -94,12 +99,12 @@ except (ImportError, FileNotFoundError):
 
 try:
     from .foldx_rfp_lambo.register import (
-        FoldxRFPLamboProblemFactory,
-        FoldxRFPLamboBlackBox,
+        FoldXRFPLamboProblemFactory,
+        FoldXRFPLamboBlackBox,
     )
 
-    AVAILABLE_PROBLEM_FACTORIES["foldx_rfp_lambo"] = FoldxRFPLamboProblemFactory
-    AVAILABLE_BLACK_BOXES["foldx_rfp_lambo"] = FoldxRFPLamboBlackBox
+    AVAILABLE_PROBLEM_FACTORIES["foldx_rfp_lambo"] = FoldXRFPLamboProblemFactory
+    AVAILABLE_BLACK_BOXES["foldx_rfp_lambo"] = FoldXRFPLamboBlackBox
 except (ImportError, FileNotFoundError):
     pass
 

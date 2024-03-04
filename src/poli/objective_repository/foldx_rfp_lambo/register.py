@@ -28,7 +28,7 @@ from poli.objective_repository.foldx_rfp_lambo.information import (
 )
 
 
-class FoldxRFPLamboBlackBox(AbstractBlackBox):
+class FoldXRFPLamboBlackBox(AbstractBlackBox):
     def __init__(
         self,
         seed: int = None,
@@ -71,7 +71,7 @@ class FoldxRFPLamboBlackBox(AbstractBlackBox):
         return foldx_rfp_lambo_information
 
 
-class FoldxRFPLamboProblemFactory(AbstractProblemFactory):
+class FoldXRFPLamboProblemFactory(AbstractProblemFactory):
     def __init__(self):
         self.alphabet = AMINO_ACIDS
         self.problem_sequence = PROBLEM_SEQ
@@ -100,7 +100,7 @@ class FoldxRFPLamboProblemFactory(AbstractProblemFactory):
         if seed is not None:
             seed_python_numpy_and_torch(seed)
 
-        black_box = FoldxRFPLamboBlackBox(
+        black_box = FoldXRFPLamboBlackBox(
             seed=seed,
             parallelize=parallelize,
             num_workers=num_workers,
@@ -115,7 +115,7 @@ class FoldxRFPLamboProblemFactory(AbstractProblemFactory):
 if __name__ == "__main__":
     from poli.core.registry import register_problem
 
-    rfp_problem_factory = FoldxRFPLamboProblemFactory()
+    rfp_problem_factory = FoldXRFPLamboProblemFactory()
     register_problem(
         rfp_problem_factory,
         conda_environment_name="poli__lambo",

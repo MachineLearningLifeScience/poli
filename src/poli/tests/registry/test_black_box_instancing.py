@@ -1,3 +1,4 @@
+from pathlib import Path
 import pytest
 
 import numpy as np
@@ -6,9 +7,12 @@ from poli.objective_repository import (
     AlohaBlackBox,
     DockstringBlackBox,
     DRD3BlackBox,
-    FoldxRFPLamboBlackBox,
+    FoldXRFPLamboBlackBox,
+    FoldXSASABlackBox,
     WhiteNoiseBlackBox,
 )
+
+TESTS_FOLDER = Path(__file__).parent.parent.resolve()
 
 SEED = np.random.randint(0, 1000)
 
@@ -26,10 +30,19 @@ test_data = [
     ),
     (
         "foldx_rfp_lambo",
-        FoldxRFPLamboBlackBox,
+        FoldXRFPLamboBlackBox,
         {},
     ),
-    # ("white_noise", WhiteNoiseBlackBox, {}),
+    (
+        "foldx_sasa",
+        FoldXSASABlackBox,
+        {
+            "wildtype_pdb_path": TESTS_FOLDER
+            / "static_files_for_tests"
+            / "101m_Repair.pdb"
+        },
+    ),
+    ("white_noise", WhiteNoiseBlackBox, {}),
 ]
 
 
