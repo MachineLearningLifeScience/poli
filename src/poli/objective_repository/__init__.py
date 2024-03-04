@@ -12,6 +12,7 @@ from .toy_continuous_problem.register import (
 )
 from .dockstring.register import DockstringProblemFactory, DockstringBlackBox
 from .drd3_docking.register import DRD3ProblemFactory, DRD3BlackBox
+from .foldx_rfp_lambo.register import FoldxRFPLamboBlackBox, FoldxRFPLamboProblemFactory
 
 
 THIS_DIR = Path(__file__).parent.resolve()
@@ -92,10 +93,13 @@ except (ImportError, FileNotFoundError):
 
 
 try:
-    from .foldx_rfp_lambo.register import RFPWrapperFactory, RFPWrapper
+    from .foldx_rfp_lambo.register import (
+        FoldxRFPLamboProblemFactory,
+        FoldxRFPLamboBlackBox,
+    )
 
-    AVAILABLE_PROBLEM_FACTORIES["foldx_rfp_lambo"] = RFPWrapperFactory
-    AVAILABLE_BLACK_BOXES["foldx_rfp_lambo"] = RFPWrapper
+    AVAILABLE_PROBLEM_FACTORIES["foldx_rfp_lambo"] = FoldxRFPLamboProblemFactory
+    AVAILABLE_BLACK_BOXES["foldx_rfp_lambo"] = FoldxRFPLamboBlackBox
 except (ImportError, FileNotFoundError):
     pass
 

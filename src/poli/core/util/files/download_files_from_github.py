@@ -12,7 +12,7 @@ import base64
 import os
 from pathlib import Path
 
-from github import Github, GithubException
+from github import Github, GithubException, BadCredentialsException
 from github.ContentFile import ContentFile
 from github.Repository import Repository
 
@@ -107,7 +107,13 @@ def download_file_from_github_repository(
     https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token
     """
     github = Github(login_or_token=os.environ.get("GITHUB_TOKEN_FOR_POLI"))
-    repository = github.get_repo(repository_name)
+
+    try:
+        repository = github.get_repo(repository_name)
+    except BadCredentialsException as e:
+        raise ValueError(
+            "Your token has likely expired. Please set a new token following the instructions here: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token"
+        ) from e
 
     if commit_sha is None:
         commit_sha = get_sha_for_tag(repository, tag)

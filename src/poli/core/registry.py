@@ -187,7 +187,7 @@ def register_isolated_function(
     name: str,
     conda_environment_name: Union[str, Path] = None,
     python_paths: List[str] = None,
-    force: bool = False,
+    force: bool = True,
     **kwargs,
 ):
     if "conda_environment_location" in kwargs:
@@ -327,60 +327,6 @@ def delete_problem(problem_name: str):
     """
     config.remove_section(problem_name)
     _write_config()
-
-
-# def get_problems(only_available: bool = False) -> List[str]:
-#     """Returns a list of registered problems.
-
-#     Parameters
-#     ----------
-#     only_available : bool
-#         Whether to only include the problems that can be imported directly.
-
-#     Returns
-#     -------
-#     problem_list: List[str]
-#         A list of registered problems.
-
-#     Notes
-#     -----
-#     If only_available is False, the problems from the repository will be
-#     included in the list. Otherwise, only the problems registered by the user/readily available
-#     will be included.
-#     """
-#     problems = [
-#         name for name in config.sections() if "run_script_location" in config[name]
-#     ]
-
-#     # problems.remove(_DEFAULT)  # no need to remove default section
-
-#     # We also pad the get_problems() with the problems
-#     # the user can import already without any problem,
-#     # i.e. the AVAILABLE_PROBLEM_FACTORIES in the
-#     # objective_repository
-#     available_problems = list(AVAILABLE_PROBLEM_FACTORIES.keys())
-
-#     if not only_available:
-#         # We include the problems that the user _could_
-#         # install from the repo. These are available in the
-#         # AVAILABLE_OBJECTIVES list.
-#         available_problems += AVAILABLE_OBJECTIVES
-
-#     problems = sorted(list(set(problems + available_problems)))
-
-#     return problems
-
-
-# def get_problem_factories() -> Dict[str, AbstractProblemFactory]:
-#     """
-#     Returns a dictionary with the problem factories
-
-#     Returns
-#     -------
-#     problem_factories: Dict[str, AbstractProblemFactory]
-#         A dictionary with the problem factories that are available.
-#     """
-#     return AVAILABLE_PROBLEM_FACTORIES
 
 
 def _write_config():

@@ -23,4 +23,6 @@ STARTING_N = "n_D0"
 ALGORITHM = "ALGORITHM"
 BATCH_SIZE = "BATCH_SIZE"
 
-from poli.objective_repository.foldx_rfp_lambo.register import RFPWrapperFactory
+from poli.objective_repository.foldx_rfp_lambo.register import (
+    FoldxRFPLamboProblemFactory,
+)

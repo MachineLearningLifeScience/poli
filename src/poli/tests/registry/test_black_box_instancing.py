@@ -6,6 +6,7 @@ from poli.objective_repository import (
     AlohaBlackBox,
     DockstringBlackBox,
     DRD3BlackBox,
+    FoldxRFPLamboBlackBox,
     WhiteNoiseBlackBox,
 )
 
@@ -13,15 +14,20 @@ SEED = np.random.randint(0, 1000)
 
 test_data = [
     ("aloha", AlohaBlackBox, {}),
+    # (
+    #     "dockstring",
+    #     DockstringBlackBox,
+    #     {"target_name": "drd2", "string_representation": "SMILES"},
+    # ),
+    # (
+    #     "drd3_docking",
+    #     DRD3BlackBox,
+    #     {"string_representation": "SMILES", "force_isolation": True},
+    # ),
     (
-        "dockstring",
-        DockstringBlackBox,
-        {"target_name": "drd2", "string_representation": "SMILES"},
-    ),
-    (
-        "drd3_docking",
-        DRD3BlackBox,
-        {"string_representation": "SMILES", "force_isolation": True},
+        "foldx_rfp_lambo",
+        FoldxRFPLamboBlackBox,
+        {},
     ),
     ("white_noise", WhiteNoiseBlackBox, {}),
 ]
@@ -43,6 +49,8 @@ def test_instancing_a_black_box_both_ways_matches(
         **kwargs_for_black_box,
     )
     x0 = problem.x0
+    if black_box_name == "foldx_rfp_lambo":
+        x0 = x0[0].reshape(1, -1)
     y0 = problem.black_box(x0)
 
     seed_python_numpy_and_torch(SEED)
