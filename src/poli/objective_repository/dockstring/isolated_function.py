@@ -141,13 +141,13 @@ class IsolatedDockstringFunction(AbstractIsolatedFunction):
 
 if __name__ == "__main__":
     # One example of loading up this black box:
-    inner_dockstring_black_box = IsolatedDockstringFunction(
-        target_name="abl1",
-        string_representation="SMILES",
-    )
+    # inner_dockstring_black_box = IsolatedDockstringFunction(
+    #     target_name="abl1",
+    #     string_representation="SMILES",
+    # )
 
     register_isolated_function(
-        inner_dockstring_black_box,
+        IsolatedDockstringFunction,
         name="dockstring__isolated",
         conda_environment_name="poli__dockstring",
     )

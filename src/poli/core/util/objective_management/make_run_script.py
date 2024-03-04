@@ -1,7 +1,7 @@
 """This module contains utilities for creating run scripts for problems and observers.
 """
 
-from typing import List, Union
+from typing import List, Union, Type
 from pathlib import Path
 import os
 import sys
@@ -59,7 +59,7 @@ def make_isolated_function_script(
 
 
 def make_run_script(
-    problem_factory: AbstractProblemFactory,
+    problem_factory: Type[AbstractProblemFactory],
     conda_environment_name: Union[str, Path] = None,
     python_paths: List[str] = None,
     cwd=None,
@@ -134,7 +134,7 @@ def _make_black_box_script(
 
 def _make_run_script(
     command: str,
-    instantiated_object,
+    non_instantiated_object,
     conda_environment_name: Union[str, Path],
     python_paths: List[str],
     cwd=None,
@@ -166,10 +166,11 @@ def _make_run_script(
     if cwd is None:
         cwd = str(os.getcwd())
 
-    class_object = instantiated_object.__class__
+    # class_object = instantiated_object.__class__
+    class_object = non_instantiated_object
     problem_factory_name = class_object.__name__  # TODO: potential vulnerability?
     factory_location = inspect.getfile(class_object)
-    package_name = inspect.getmodule(instantiated_object).__name__
+    package_name = inspect.getmodule(non_instantiated_object).__name__
 
     if package_name == "__main__":
         package_name = basename(factory_location)[:-3]

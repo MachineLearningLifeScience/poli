@@ -34,11 +34,8 @@ class DRD3IsolatedFunction(TDCIsolatedFunction):
 
 
 if __name__ == "__main__":
-    # One example of loading up this black box:
-    drd3_isolated_function = DRD3IsolatedFunction(from_smiles=True)
-
     register_isolated_function(
-        drd3_isolated_function,
+        DRD3IsolatedFunction,
         name="drd3_docking__isolated",
         conda_environment_name="poli__tdc",
     )

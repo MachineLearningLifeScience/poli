@@ -176,7 +176,7 @@ def register_problem(
         warnings.warn(f"Problem {problem_name} already exists. Overwriting.")
 
     run_script_location = make_run_script(
-        problem_factory, conda_environment_name, python_paths, **kwargs
+        type(problem_factory), conda_environment_name, python_paths, **kwargs
     )
     config[problem_name][_RUN_SCRIPT_LOCATION] = run_script_location
     _write_config()

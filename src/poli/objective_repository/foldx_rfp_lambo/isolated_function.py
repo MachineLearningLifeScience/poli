@@ -253,10 +253,10 @@ class RFPWrapperIsolatedLogic(AbstractIsolatedFunction):
 
 
 if __name__ == "__main__":
-    inner_function = RFPWrapperIsolatedLogic()
+    # inner_function = RFPWrapperIsolatedLogic()
 
     register_isolated_function(
-        inner_function,
+        RFPWrapperIsolatedLogic,
         name="foldx_rfp_lambo__isolated",
         conda_environment_name="poli__lambo",
     )

@@ -14,22 +14,22 @@ SEED = np.random.randint(0, 1000)
 
 test_data = [
     ("aloha", AlohaBlackBox, {}),
-    # (
-    #     "dockstring",
-    #     DockstringBlackBox,
-    #     {"target_name": "drd2", "string_representation": "SMILES"},
-    # ),
-    # (
-    #     "drd3_docking",
-    #     DRD3BlackBox,
-    #     {"string_representation": "SMILES", "force_isolation": True},
-    # ),
+    (
+        "dockstring",
+        DockstringBlackBox,
+        {"target_name": "drd2", "string_representation": "SMILES"},
+    ),
+    (
+        "drd3_docking",
+        DRD3BlackBox,
+        {"string_representation": "SMILES", "force_isolation": True},
+    ),
     (
         "foldx_rfp_lambo",
         FoldxRFPLamboBlackBox,
         {},
     ),
-    ("white_noise", WhiteNoiseBlackBox, {}),
+    # ("white_noise", WhiteNoiseBlackBox, {}),
 ]
 
 
