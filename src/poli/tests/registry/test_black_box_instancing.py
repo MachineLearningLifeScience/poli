@@ -9,6 +9,7 @@ from poli.objective_repository import (
     DRD3BlackBox,
     FoldXRFPLamboBlackBox,
     FoldXSASABlackBox,
+    FoldXStabilityBlackBox,
     WhiteNoiseBlackBox,
 )
 
@@ -40,6 +41,15 @@ test_data = [
             "wildtype_pdb_path": TESTS_FOLDER
             / "static_files_for_tests"
             / "101m_Repair.pdb"
+        },
+    ),
+    (
+        "foldx_stability",
+        FoldXStabilityBlackBox,
+        {
+            "wildtype_pdb_path": TESTS_FOLDER
+            / "static_files_for_tests"
+            / "101m_Repair.pdb",
         },
     ),
     ("white_noise", WhiteNoiseBlackBox, {}),

@@ -14,6 +14,10 @@ from .dockstring.register import DockstringProblemFactory, DockstringBlackBox
 from .drd3_docking.register import DRD3ProblemFactory, DRD3BlackBox
 from .foldx_rfp_lambo.register import FoldXRFPLamboBlackBox, FoldXRFPLamboProblemFactory
 from .foldx_sasa.register import FoldXSASABlackBox, FoldXSASAProblemFactory
+from .foldx_stability.register import (
+    FoldXStabilityBlackBox,
+    FoldXStabilityProblemFactory,
+)
 
 
 THIS_DIR = Path(__file__).parent.resolve()

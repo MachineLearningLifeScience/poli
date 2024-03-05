@@ -12,9 +12,10 @@ from poli.core.util.proteins.foldx import FoldxInterface
 from poli.core.proteins.foldx_isolated_function import FoldxIsolatedFunction
 
 
-class FoldXSASAIsolatedLogic(FoldxIsolatedFunction):
+class FoldXStabilityIsolatedLogic(FoldxIsolatedFunction):
     """
-    A black box implementation for computing the solvent accessible surface area (SASA) score using FoldX.
+    A black box implementation for computing a mutation's stability
+    (i.e. -dG) using FoldX.
 
     Parameters
     -----------
@@ -55,7 +56,7 @@ class FoldXSASAIsolatedLogic(FoldxIsolatedFunction):
         )
 
     def __call__(self, x: np.ndarray, context: None) -> np.ndarray:
-        """Computes the SASA score for a given mutation x.
+        """Computes the stability for a given mutation x.
 
         Runs the given input x and pdb files provided
         in the context through FoldX and returns the
@@ -71,7 +72,7 @@ class FoldXSASAIsolatedLogic(FoldxIsolatedFunction):
         Returns
         --------
         np.ndarray
-            The computed SASA score(s) as a numpy array.
+            The computed stabilities as a numpy array.
         """
         # TODO: add support for multiple mutations.
         # For now, we assume that the batch size is
@@ -99,17 +100,17 @@ class FoldXSASAIsolatedLogic(FoldxIsolatedFunction):
         )
 
         foldx_interface = FoldxInterface(working_dir, self.verbose)
-        sasa_score = foldx_interface.compute_sasa(
+        stability = foldx_interface.compute_stability(
             pdb_file=wildtype_pdb_file,
             mutations=mutations_as_strings,
         )
 
-        return np.array([sasa_score]).reshape(-1, 1)
+        return np.array([stability]).reshape(-1, 1)
 
 
 if __name__ == "__main__":
     register_isolated_function(
-        FoldXSASAIsolatedLogic,
-        name="foldx_sasa__isolated",
+        FoldXStabilityIsolatedLogic,
+        name="foldx_stability__isolated",
         conda_environment_name="poli__protein",
     )

@@ -15,7 +15,7 @@ protein.
 """
 
 from pathlib import Path
-from typing import List, Tuple, Union
+from typing import List, Union
 
 import numpy as np
 
@@ -25,8 +25,6 @@ from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
 
 from poli.core.util.isolation.instancing import instance_function_as_isolated_process
-
-from poli.core.util.proteins.defaults import AMINO_ACIDS
 
 from poli.core.util.seeding import seed_python_numpy_and_torch
 
@@ -75,7 +73,7 @@ class FoldXSASABlackBox(AbstractBlackBox):
         tmp_folder: Path = None,
         eager_repair: bool = False,
         verbose: bool = False,
-        batch_size: int = None,
+        batch_size: int = 1,
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
@@ -187,10 +185,11 @@ class FoldXSASAProblemFactory(AbstractProblemFactory):
         eager_repair: bool = False,
         verbose: bool = False,
         seed: int = None,
-        batch_size: int = None,
+        batch_size: int = 1,
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
+        force_isolation: bool = False,
     ) -> Problem:
         """
         Create a FoldXSASABlackBox object and compute the initial values of wildtypes.
@@ -276,6 +275,7 @@ class FoldXSASAProblemFactory(AbstractProblemFactory):
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
+            force_isolation=force_isolation,
         )
 
         # We need to compute the initial values of all wildtypes
