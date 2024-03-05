@@ -18,6 +18,10 @@ from .foldx_stability.register import (
     FoldXStabilityBlackBox,
     FoldXStabilityProblemFactory,
 )
+from .foldx_stability_and_sasa.register import (
+    FoldXStabilityAndSASABlackBox,
+    FoldXStabilityAndSASAProblemFactory,
+)
 
 
 THIS_DIR = Path(__file__).parent.resolve()

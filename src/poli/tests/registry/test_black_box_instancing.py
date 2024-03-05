@@ -10,6 +10,7 @@ from poli.objective_repository import (
     FoldXRFPLamboBlackBox,
     FoldXSASABlackBox,
     FoldXStabilityBlackBox,
+    FoldXStabilityAndSASABlackBox,
     WhiteNoiseBlackBox,
 )
 
@@ -40,7 +41,8 @@ test_data = [
         {
             "wildtype_pdb_path": TESTS_FOLDER
             / "static_files_for_tests"
-            / "101m_Repair.pdb"
+            / "101m_Repair.pdb",
+            "force_isolation": True,
         },
     ),
     (
@@ -50,6 +52,18 @@ test_data = [
             "wildtype_pdb_path": TESTS_FOLDER
             / "static_files_for_tests"
             / "101m_Repair.pdb",
+            "force_isolation": True,
+        },
+    ),
+    (
+        "foldx_stability_and_sasa",
+        FoldXStabilityAndSASABlackBox,
+        {
+            "wildtype_pdb_path": TESTS_FOLDER
+            / "static_files_for_tests"
+            / "101m_Repair.pdb",
+            "force_isolation": True,
+            "verbose": True,
         },
     ),
     ("white_noise", WhiteNoiseBlackBox, {}),

@@ -108,7 +108,6 @@ class FoldXStabilityBlackBox(AbstractBlackBox):
                 self.inner_function = instance_function_as_isolated_process(
                     name="foldx_stability__isolated",
                     wildtype_pdb_path=wildtype_pdb_path,
-                    alphabet=alphabet,
                     experiment_id=experiment_id,
                     tmp_folder=tmp_folder,
                     eager_repair=eager_repair,
@@ -118,7 +117,6 @@ class FoldXStabilityBlackBox(AbstractBlackBox):
             self.inner_function = instance_function_as_isolated_process(
                 name="foldx_stability__isolated",
                 wildtype_pdb_path=wildtype_pdb_path,
-                alphabet=alphabet,
                 experiment_id=experiment_id,
                 tmp_folder=tmp_folder,
                 eager_repair=eager_repair,
