@@ -1,54 +1,62 @@
-from pathlib import Path
-from typing import List, Tuple
+from typing import Tuple
 import numpy as np
-import pandas as pd
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
-from poli.core.problem_setup_information import ProblemSetupInformation
-from poli.core.util import batch
-from poli.core.util.proteins.defaults import AMINO_ACIDS
-from poli.core.util.seeding import seed_numpy, seed_python
+from poli.core.black_box_information import BlackBoxInformation
+from poli.core.problem import Problem
+from poli.core.util.seeding import seed_python_numpy_and_torch
+
+from poli.core.util.isolation.instancing import instance_function_as_isolated_process
+
+from poli.objective_repository.gfp_select.information import gfp_select_info
 
 
-class GFPBlackBox(AbstractBlackBox):
+class GFPSelectionBlackBox(AbstractBlackBox):
     def __init__(
         self,
-        info: ProblemSetupInformation,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
         seed: int = None,
+        force_isolation: bool = False,
     ):
-        gfp_df_path = Path(__file__).parent.resolve() / "assets" / "gfp_data.csv"
-        self.batch_size = batch_size
-        self.seed = seed
-        self.gfp_lookup_df = pd.read_csv(gfp_df_path)[
-            ["medianBrightness", "aaSequence"]
-        ]
-        super().__init__(info, batch_size, parallelize, num_workers, evaluation_budget)
+        super().__init__(
+            batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
+        )
+        if not force_isolation:
+            try:
+                from poli.objective_repository.gfp_select.isolated_function import (
+                    GFPSelectIsolatedLogic,
+                )
+
+                self.inner_function = GFPSelectIsolatedLogic(seed=seed)
+            except ImportError:
+                self.inner_function = instance_function_as_isolated_process(
+                    name="gfp_select__isolated", seed=seed
+                )
+        else:
+            self.inner_function = instance_function_as_isolated_process(
+                name="gfp_select__isolated", seed=seed
+            )
 
     def _black_box(self, x: np.array, context=None) -> np.ndarray:
         """
         x is string sequence which we look-up in avilable df, return median Brightness
         """
-        if isinstance(x, np.ndarray):
-            _arr = x.copy()
-            x = ["".join(_seq) for _seq in _arr]
-        ys = []
-        for _x in x:
-            seq_subsets = self.gfp_lookup_df[
-                self.gfp_lookup_df.aaSequence.str.lower() == _x.lower()
-            ]
-            # multiple matches possible, shuffle and return one:
-            candidate = seq_subsets.sample(n=1, random_state=self.seed)
-            ys.append(candidate.medianBrightness)
-        return np.array(ys)
+        return self.inner_function(x, context)
+
+    @staticmethod
+    def get_black_box_info() -> BlackBoxInformation:
+        return gfp_select_info
 
 
 class GFPSelectionProblemFactory(AbstractProblemFactory):
-    def get_setup_information(self) -> ProblemSetupInformation:
+    def get_setup_information(self) -> BlackBoxInformation:
         """
         The problem is set up such that all available sequences
         are provided in x0, however only batch_size amount of observations are known.
@@ -57,13 +65,7 @@ class GFPSelectionProblemFactory(AbstractProblemFactory):
         Given that all X are known it is recommended to use an acquisition function to rank
         and inquire the highest rated sequences with the _black_box.
         """
-        problem_setup_info = ProblemSetupInformation(
-            name="gfp_select",
-            max_sequence_length=237,  # max len of aaSequence
-            alphabet=AMINO_ACIDS,
-            aligned=True,  # TODO: perhaps add the fact that there is a random state here?
-        )
-        return problem_setup_info
+        return gfp_select_info
 
     def create(
         self,
@@ -72,25 +74,24 @@ class GFPSelectionProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-    ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
-        seed_numpy(seed)
-        seed_python(seed)
-        problem_info = self.get_setup_information()
-        f = GFPBlackBox(
-            info=problem_info,
+        force_isolation: bool = False,
+    ) -> Problem:
+        if seed is not None:
+            seed_python_numpy_and_torch(seed)
+
+        f = GFPSelectionBlackBox(
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
             seed=seed,
+            force_isolation=force_isolation,
         )
+        x0 = f.inner_function.x0
 
-        randomized_df = f.gfp_lookup_df.sample(frac=1, random_state=seed).reset_index()
-        # create 2D array for blackbox evaluation
-        x0 = np.array([list(_s) for _s in randomized_df.aaSequence.to_numpy()])
-        f_0 = f(x0[:batch_size])
+        problem = Problem(f, x0)
 
-        return f, x0, f_0
+        return problem
 
 
 if __name__ == "__main__":
@@ -99,5 +100,5 @@ if __name__ == "__main__":
     gfp_problem_factory = GFPSelectionProblemFactory()
     register_problem(
         gfp_problem_factory,
-        conda_environment_name="poli__protein",
+        conda_environment_name="poli__protein_cbas",
     )
