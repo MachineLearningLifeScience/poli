@@ -1,143 +1,91 @@
-from pathlib import Path
-from typing import List, Tuple
+from typing import Tuple, Literal
 from warnings import warn
 
 import numpy as np
-import pandas as pd
-import torch
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
-from poli.core.problem_setup_information import ProblemSetupInformation
-from poli.core.util import batch
-from poli.core.util.proteins.defaults import AMINO_ACIDS
-from poli.core.util.seeding import seed_numpy, seed_python
-from poli.objective_repository.gfp_cbas.cbas_alphabet_preprocessing import (
-    AA,
-    convert_aas_to_idx_array,
-    get_gfp_X_y_aa,
-    one_hot_encode_aa_array,
-)
-from poli.objective_repository.gfp_cbas.cbas_wrapper import CBASVAEWrapper
-from poli.objective_repository.gfp_cbas.gfp_gp import SequenceGP
+from poli.core.black_box_information import BlackBoxInformation
+from poli.core.problem import Problem
+
+from poli.core.util.seeding import seed_python_numpy_and_torch
+
+from poli.objective_repository.gfp_cbas.information import gfp_cbas_info
+
+from poli.core.util.isolation.instancing import instance_function_as_isolated_process
 
 
 class GFPCBasBlackBox(AbstractBlackBox):
     def __init__(
         self,
-        info: ProblemSetupInformation,
+        problem_type: Literal["gp", "vae", "elbo"],
+        functional_only: bool = False,
+        ignore_stops: bool = True,
+        unique=True,
+        n_starting_points: int = 1,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
         seed: int = None,
-        functional_only: bool = False,
-        ignore_stops: bool = True,
-        unique=True,
+        evaluation_budget: int = float("inf"),
+        force_isolation: bool = False,
     ):
-        gfp_path = Path(__file__).parent.resolve() / "assets"
-        self.info = info
-        self.vae = CBASVAEWrapper(AA=len(info.alphabet), L=info.max_sequence_length).vae
-        self.batch_size = batch_size
-        self.seed = seed
-        data_df = pd.read_csv(gfp_path / "gfp_data.csv")[
-            ["medianBrightness", "std", "nucSequence", "aaSequence"]
-        ]
-        gfp_wt_seq = np.atleast_1d(
-            np.loadtxt(gfp_path / "avGFP_reference_sequence.fa", skiprows=1, dtype=str)
-        )[0]
-        self.reference_entry = data_df[
-            data_df.nucSequence.str.lower() == gfp_wt_seq.lower()
-        ]
-        data_df = data_df.drop(
-            self.reference_entry.index
-        )  # take out WT reference sequence
-        if unique:
-            data_df = data_df.drop_duplicates(subset="aaSequence")
-        if self.seed:  # if random seed is provided, shuffle the data
-            data_df = data_df.sample(frac=1, random_state=seed)
-        if (
-            functional_only
-        ):  # if functional only setting, threshold by median Brightness
-            idx = data_df.loc[
-                (data_df["medianBrightness"] > data_df["medianBrightness"].mean())
-            ].index
-        else:
-            idx = data_df.index
-        data_df = data_df.loc[idx]
-        if ignore_stops:  # ignore incorrect encodings
-            idx = data_df.loc[~data_df["aaSequence"].str.contains("!")].index
-        self.model = None
-        # use ProblemSetupInfo name to specify black-box function
-        if "gp" in info.name.lower():
-            gp_file_prefix = (
-                Path(__file__).parent.resolve() / "assets" / "models" / "gp" / "gfp_gp"
-            )
-            self.model = SequenceGP(load=True, load_path_prefix=gp_file_prefix)
-            self.f = self._seq_gp_predict
-        elif "elbo" in info.name.lower():
-            self.model = self.vae.vae_
-            self.f = self._elbo_predict
-        elif "vae" in info.name.lower():
-            self.model = self.vae.encoder_
-            self.f = self._vae_embedding
-        else:
-            raise NotImplementedError(
-                f"Misspecified info: {info.name} does not contain [fluorescence ; elbo ; vae]!"
-            )
-        self.data_df = data_df.loc[idx]
-        super().__init__(info, batch_size, parallelize, num_workers)
-
-    def _seq_gp_predict(self, x: np.ndarray) -> np.ndarray:
-        """
-        Evaluate Listgarten GP on label-encoded sequence input.
-        Return negative pred.mean of GP (minimization problem)
-        """
-        assert self.model and self.model.__class__.__name__ == "SequenceGP"
-        le_x = convert_aas_to_idx_array(x)
-        return -self.model.predict(le_x)  # NOTE: predict negative mu
-
-    def _elbo_predict(self, x: np.ndarray) -> np.ndarray:
-        """
-        One Hot encode and VAE evaluate given reference zero point.
-        Calls Keras engine function evaluation to compute ELBO.
-        """
-        assert self.model and self.model.__class__.__name__ == "Functional"
-        oh_x = one_hot_encode_aa_array(x)
-        # model.evaluate takes two array inputs: input , [decoder_out, KLD ref.]
-        # TODO: batched evaluation not working: returns one value only (not size of batch) -> iterating - fix this for speed-up.
-        kld_reference_prior = np.zeros([1, oh_x.shape[-1]])
-        model_evaluation = np.array(
-            [
-                self.model.evaluate(
-                    _oh_x_seq[np.newaxis, :],
-                    [_oh_x_seq[np.newaxis, :], kld_reference_prior],
-                    batch_size=1,
-                    verbose=0,
-                )
-                for _oh_x_seq in oh_x
-            ]
+        super().__init__(
+            batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
         )
-        # subselect ELBO as first column:
-        return -model_evaluation[:, 0].reshape(-1, 1)  # NOTE: minimize ELBO as target
+        if not force_isolation:
+            try:
+                from poli.objective_repository.gfp_cbas.isolated_function import (
+                    GFPCBasIsolatedLogic,
+                )
 
-    def _vae_embedding(self, x: np.ndarray) -> np.ndarray:
-        """
-        One hot encode sequence and VAE embed
-        """
-        assert self.model and self.model.__class__.__name__ == "Functional"
-        oh_x = one_hot_encode_aa_array(x)
-        return self.model.predict(oh_x)[0]
+                self.inner_function = GFPCBasIsolatedLogic(
+                    problem_type=problem_type,
+                    info=gfp_cbas_info,
+                    n_starting_points=n_starting_points,
+                    seed=seed,
+                    functional_only=functional_only,
+                    ignore_stops=ignore_stops,
+                    unique=unique,
+                )
+            except ImportError:
+                self.inner_function = instance_function_as_isolated_process(
+                    name="gfp_cbas__isolated",
+                    problem_type=problem_type,
+                    info=gfp_cbas_info,
+                    n_starting_points=n_starting_points,
+                    seed=seed,
+                    functional_only=functional_only,
+                    ignore_stops=ignore_stops,
+                    unique=unique,
+                )
+        else:
+            self.inner_function = instance_function_as_isolated_process(
+                name="gfp_cbas__isolated",
+                problem_type=problem_type,
+                info=gfp_cbas_info,
+                n_starting_points=n_starting_points,
+                seed=seed,
+                functional_only=functional_only,
+                ignore_stops=ignore_stops,
+                unique=unique,
+            )
 
     def _black_box(self, x: np.array, context=None) -> np.ndarray:
         """
         x is encoded sequence return function value given problem name
         """
-        with torch.no_grad():
-            cbas_mu = self.f(x)
-        return np.array(cbas_mu)
+        return self.inner_function(x, context=context)
 
     def __iter__(self, *args, **kwargs):
         warn(f"{self.__class__.__name__} iteration invoked. Not implemented!")
+
+    @staticmethod
+    def get_black_box_info() -> BlackBoxInformation:
+        return gfp_cbas_info
 
 
 class GFPCBasProblemFactory(AbstractProblemFactory):
@@ -149,7 +97,7 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
             )
         self.problem_type = problem_type.lower()
 
-    def get_setup_information(self) -> ProblemSetupInformation:
+    def get_setup_information(self) -> BlackBoxInformation:
         """
         The problem is set up such that all available sequences
         are provided in x0, however only batch_size amount of observations are known.
@@ -158,56 +106,45 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
         Given that all X are known it is recommended to use an acquisition function to rank
         and inquire the highest rated sequences with the _black_box.
         """
-        problem_setup_info = ProblemSetupInformation(
-            name=f"gfp_cbas_{self.problem_type}",
-            max_sequence_length=237,  # max len of aaSequence
-            alphabet=AA,
-            aligned=True,  # TODO: perhaps add the fact that there is a random state here?
-        )
-        return problem_setup_info
+        return gfp_cbas_info
 
     def create(
         self,
+        problem_type: Literal["gp", "vae", "elbo"] = "gp",
+        n_starting_points: int = 1,
+        functional_only: bool = False,
+        unique: bool = True,
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = 100000,
-        n_starting_points: int = 1,
-        problem_type: str = "gp",
-    ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+        evaluation_budget: int = float("inf"),
+    ) -> Problem:
         """
         Seed value required to shuffle the data, otherwise CSV asset data index unchanged.
         We optimize with respect to one GFP WT sequence by default.
         If more starting points are requested the sequences are provided at random.
         """
         self.problem_type = problem_type
-        seed_numpy(seed)
-        seed_python(seed)
+        if seed is not None:
+            seed_python_numpy_and_torch(seed)
         problem_info = self.get_setup_information()
         f = GFPCBasBlackBox(
-            info=problem_info,
+            problem_type=problem_type,
+            functional_only=functional_only,
+            unique=unique,
+            n_starting_points=n_starting_points,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
             seed=seed,
+            evaluation_budget=evaluation_budget,
         )
-        if n_starting_points < 1:
-            raise ValueError("Cannot specify less than one sequence!")
-        x0 = np.array(list(f.reference_entry.aaSequence.values[0]))[
-            np.newaxis, :
-        ]  # WT reference sequence
-        if (
-            n_starting_points > 1
-        ):  # take a random subset of available AA sequence at request
-            _x0 = np.array(
-                [list(s) for s in f.data_df.aaSequence[: n_starting_points - 1]]
-            )
-            x0 = np.concatenate([x0, _x0])
-            assert x0.shape[0] == n_starting_points
-        f_0 = f(x0)
+        x0 = f.inner_function.x0
 
-        return f, x0, f_0
+        problem = Problem(f, x0)
+
+        return problem
 
 
 if __name__ == "__main__":

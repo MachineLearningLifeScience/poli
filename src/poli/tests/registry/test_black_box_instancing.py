@@ -11,6 +11,7 @@ from poli.objective_repository import (
     FoldXSASABlackBox,
     FoldXStabilityBlackBox,
     FoldXStabilityAndSASABlackBox,
+    GFPCBasBlackBox,
     WhiteNoiseBlackBox,
 )
 
@@ -64,6 +65,30 @@ test_data = [
             / "101m_Repair.pdb",
             "force_isolation": True,
             "verbose": True,
+        },
+    ),
+    (
+        "gfp_cbas",
+        GFPCBasBlackBox,
+        {
+            "problem_type": "gp",
+            "force_isolation": True,
+        },
+    ),
+    (
+        "gfp_cbas",
+        GFPCBasBlackBox,
+        {
+            "problem_type": "vae",
+            "force_isolation": True,
+        },
+    ),
+    (
+        "gfp_cbas",
+        GFPCBasBlackBox,
+        {
+            "problem_type": "elbo",
+            "force_isolation": True,
         },
     ),
     ("white_noise", WhiteNoiseBlackBox, {}),

@@ -22,6 +22,7 @@ from .foldx_stability_and_sasa.register import (
     FoldXStabilityAndSASABlackBox,
     FoldXStabilityAndSASAProblemFactory,
 )
+from .gfp_cbas.register import GFPCBasBlackBox, GFPCBasProblemFactory
 
 
 THIS_DIR = Path(__file__).parent.resolve()
