@@ -17,6 +17,7 @@ from poli.objective_repository import (
     RaspBlackBox,
     LogPBlackBox,
     QEDBlackBox,
+    SABlackBox,
     WhiteNoiseBlackBox,
 )
 
@@ -146,6 +147,13 @@ test_data = [
             "verbose": True,
             "batch_size": 1,
             "parallelize": True,
+        },
+    ),
+    (
+        "sa_tdc",
+        SABlackBox,
+        {
+            "force_isolation": True,
         },
     ),
     ("white_noise", WhiteNoiseBlackBox, {}),

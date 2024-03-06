@@ -7,7 +7,7 @@ References
     Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022). https://doi.org/10.1038/s41589-022-01131-2
 """
 
-from typing import Tuple, Literal
+from typing import Literal
 
 import numpy as np
 
@@ -34,8 +34,9 @@ class DRD3BlackBox(AbstractBlackBox):
 
     Parameters
     ----------
-    from_smiles : bool, optional
-        Flag indicating whether to use SMILES strings as input, by default True.
+    string_representation : Literal["SMILES", "SELFIES"], optional
+        A string (either "SMILES" or "SELFIES") specifying which
+        molecule representation you plan to use.
     batch_size : int, optional
         The batch size for simultaneous execution, by default None.
     parallelize : bool, optional

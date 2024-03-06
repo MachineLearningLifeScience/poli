@@ -34,6 +34,7 @@ from .rdkit_qed.register import QEDBlackBox, QEDProblemFactory
 from .rfp_foldx_stability_and_sasa.register import (
     RFPFoldXStabilityAndSASAProblemFactory,
 )
+from .sa_tdc.register import SAProblemFactory, SABlackBox
 
 
 THIS_DIR = Path(__file__).parent.resolve()
@@ -65,6 +66,7 @@ AVAILABLE_PROBLEM_FACTORIES = {
     "rdkit_logp": LogPProblemFactory,
     "rdkit_qed": QEDProblemFactory,
     "rfp_foldx_stability_and_sasa": RFPFoldXStabilityAndSASAProblemFactory,
+    "sa_tdc": SAProblemFactory,
     "white_noise": WhiteNoiseProblemFactory,
     "toy_continuous_problem": ToyContinuousProblemFactory,
 }
@@ -84,6 +86,7 @@ AVAILABLE_BLACK_BOXES = {
     "rdkit_logp": LogPBlackBox,
     "rdkit_qed": QEDBlackBox,
     "rfp_foldx_stability_and_sasa": FoldXStabilityAndSASABlackBox,
+    "sa_tdc": SABlackBox,
     "white_noise": WhiteNoiseBlackBox,
     "toy_continuous_problem": ToyContinuousBlackBox,
 }
