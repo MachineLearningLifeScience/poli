@@ -16,6 +16,7 @@ from poli.objective_repository import (
     PenalizedLogPLamboBlackBox,
     RaspBlackBox,
     LogPBlackBox,
+    QEDBlackBox,
     WhiteNoiseBlackBox,
 )
 
@@ -24,102 +25,107 @@ TESTS_FOLDER = Path(__file__).parent.parent.resolve()
 SEED = np.random.randint(0, 1000)
 
 test_data = [
-    # ("aloha", AlohaBlackBox, {}),
-    # (
-    #     "dockstring",
-    #     DockstringBlackBox,
-    #     {"target_name": "drd2", "string_representation": "SMILES"},
-    # ),
-    # (
-    #     "drd3_docking",
-    #     DRD3BlackBox,
-    #     {"string_representation": "SMILES", "force_isolation": True},
-    # ),
-    # (
-    #     "foldx_rfp_lambo",
-    #     FoldXRFPLamboBlackBox,
-    #     {},
-    # ),
-    # (
-    #     "foldx_sasa",
-    #     FoldXSASABlackBox,
-    #     {
-    #         "wildtype_pdb_path": TESTS_FOLDER
-    #         / "static_files_for_tests"
-    #         / "101m_Repair.pdb",
-    #         "force_isolation": True,
-    #     },
-    # ),
-    # (
-    #     "foldx_stability",
-    #     FoldXStabilityBlackBox,
-    #     {
-    #         "wildtype_pdb_path": TESTS_FOLDER
-    #         / "static_files_for_tests"
-    #         / "101m_Repair.pdb",
-    #         "force_isolation": True,
-    #     },
-    # ),
-    # (
-    #     "foldx_stability_and_sasa",
-    #     FoldXStabilityAndSASABlackBox,
-    #     {
-    #         "wildtype_pdb_path": TESTS_FOLDER
-    #         / "static_files_for_tests"
-    #         / "101m_Repair.pdb",
-    #         "force_isolation": True,
-    #         "verbose": True,
-    #     },
-    # ),
-    # (
-    #     "gfp_cbas",
-    #     GFPCBasBlackBox,
-    #     {
-    #         "problem_type": "gp",
-    #         "force_isolation": True,
-    #     },
-    # ),
-    # (
-    #     "gfp_cbas",
-    #     GFPCBasBlackBox,
-    #     {
-    #         "problem_type": "vae",
-    #         "force_isolation": True,
-    #     },
-    # ),
-    # (
-    #     "gfp_cbas",
-    #     GFPCBasBlackBox,
-    #     {
-    #         "problem_type": "elbo",
-    #         "force_isolation": True,
-    #     },
-    # ),
-    # (
-    #     "gfp_select",
-    #     GFPSelectionBlackBox,
-    #     {
-    #         "force_isolation": True,
-    #     },
-    # ),
-    # (
-    #     "penalized_logp_lambo",
-    #     PenalizedLogPLamboBlackBox,
-    #     {
-    #         "force_isolation": False,
-    #     },
-    # ),
-    # (
-    #     "rasp",
-    #     RaspBlackBox,
-    #     {
-    #         "wildtype_pdb_path": TESTS_FOLDER / "static_files_for_tests" / "3ned.pdb",
-    #         "force_isolation": False,
-    #     },
-    # ),
+    ("aloha", AlohaBlackBox, {}),
+    (
+        "dockstring",
+        DockstringBlackBox,
+        {"target_name": "drd2", "string_representation": "SMILES"},
+    ),
+    (
+        "drd3_docking",
+        DRD3BlackBox,
+        {"string_representation": "SMILES", "force_isolation": True},
+    ),
+    (
+        "foldx_rfp_lambo",
+        FoldXRFPLamboBlackBox,
+        {},
+    ),
+    (
+        "foldx_sasa",
+        FoldXSASABlackBox,
+        {
+            "wildtype_pdb_path": TESTS_FOLDER
+            / "static_files_for_tests"
+            / "101m_Repair.pdb",
+            "force_isolation": True,
+        },
+    ),
+    (
+        "foldx_stability",
+        FoldXStabilityBlackBox,
+        {
+            "wildtype_pdb_path": TESTS_FOLDER
+            / "static_files_for_tests"
+            / "101m_Repair.pdb",
+            "force_isolation": True,
+        },
+    ),
+    (
+        "foldx_stability_and_sasa",
+        FoldXStabilityAndSASABlackBox,
+        {
+            "wildtype_pdb_path": TESTS_FOLDER
+            / "static_files_for_tests"
+            / "101m_Repair.pdb",
+            "force_isolation": True,
+            "verbose": True,
+        },
+    ),
+    (
+        "gfp_cbas",
+        GFPCBasBlackBox,
+        {
+            "problem_type": "gp",
+            "force_isolation": True,
+        },
+    ),
+    (
+        "gfp_cbas",
+        GFPCBasBlackBox,
+        {
+            "problem_type": "vae",
+            "force_isolation": True,
+        },
+    ),
+    (
+        "gfp_cbas",
+        GFPCBasBlackBox,
+        {
+            "problem_type": "elbo",
+            "force_isolation": True,
+        },
+    ),
+    (
+        "gfp_select",
+        GFPSelectionBlackBox,
+        {
+            "force_isolation": True,
+        },
+    ),
+    (
+        "penalized_logp_lambo",
+        PenalizedLogPLamboBlackBox,
+        {
+            "force_isolation": False,
+        },
+    ),
+    (
+        "rasp",
+        RaspBlackBox,
+        {
+            "wildtype_pdb_path": TESTS_FOLDER / "static_files_for_tests" / "3ned.pdb",
+            "force_isolation": False,
+        },
+    ),
     (
         "rdkit_logp",
         LogPBlackBox,
+        {},
+    ),
+    (
+        "rdkit_qed",
+        QEDBlackBox,
         {},
     ),
     ("white_noise", WhiteNoiseBlackBox, {}),

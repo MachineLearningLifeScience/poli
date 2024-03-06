@@ -30,6 +30,7 @@ from .penalized_logp_lambo.register import (
 )
 from .rasp.register import RaspBlackBox, RaspProblemFactory
 from .rdkit_logp.register import LogPBlackBox, LogPProblemFactory
+from .rdkit_qed.register import QEDBlackBox, QEDProblemFactory
 
 
 THIS_DIR = Path(__file__).parent.resolve()
@@ -59,6 +60,7 @@ AVAILABLE_PROBLEM_FACTORIES = {
     "penalized_logp_lambo": PenalizedLogPLamboProblemFactory,
     "rasp": RaspProblemFactory,
     "rdkit_logp": LogPProblemFactory,
+    "rdkit_qed": QEDProblemFactory,
     "white_noise": WhiteNoiseProblemFactory,
     "toy_continuous_problem": ToyContinuousProblemFactory,
 }
@@ -76,6 +78,7 @@ AVAILABLE_BLACK_BOXES = {
     "penalized_logp_lambo": PenalizedLogPLamboBlackBox,
     "rasp": RaspBlackBox,
     "rdkit_logp": LogPBlackBox,
+    "rdkit_qed": QEDBlackBox,
     "white_noise": WhiteNoiseBlackBox,
     "toy_continuous_problem": ToyContinuousBlackBox,
 }
