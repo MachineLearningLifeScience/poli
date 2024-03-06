@@ -18,6 +18,7 @@ from poli.objective_repository import (
     LogPBlackBox,
     QEDBlackBox,
     SABlackBox,
+    SuperMarioBrosBlackBox,
     WhiteNoiseBlackBox,
 )
 
@@ -152,6 +153,13 @@ test_data = [
     (
         "sa_tdc",
         SABlackBox,
+        {
+            "force_isolation": True,
+        },
+    ),
+    (
+        "super_mario_bros",
+        SuperMarioBrosBlackBox,
         {
             "force_isolation": True,
         },

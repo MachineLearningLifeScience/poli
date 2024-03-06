@@ -193,6 +193,12 @@ def register_isolated_function(
     if "conda_environment_location" in kwargs:
         conda_environment_name = kwargs["conda_environment_location"]
 
+    if not name.endswith("__isolated"):
+        warnings.warn(
+            "By convention, the name of the isolated function should end with '__isolated'. "
+            "This is to distinguish it from the original function. "
+        )
+
     if name not in config.sections():
         config.add_section(name)
     elif not force:

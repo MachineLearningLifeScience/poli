@@ -10,19 +10,18 @@ level playable.
 from typing import Tuple
 from pathlib import Path
 
-import torch
 import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
-from poli.core.problem_setup_information import ProblemSetupInformation
+from poli.core.black_box_information import BlackBoxInformation
+from poli.core.problem import Problem
 
 from poli.core.util.seeding import seed_python_numpy_and_torch
 
-from model import load_example_model
+from poli.core.util.isolation.instancing import instance_function_as_isolated_process
 
-from simulator import test_level_from_z
-
+from poli.objective_repository.super_mario_bros.information import smb_info
 
 THIS_DIR = Path(__file__).parent.resolve()
 
@@ -32,15 +31,13 @@ THIS_DIR = Path(__file__).parent.resolve()
 # files from the python installation.
 
 
-class SMBBlackBox(AbstractBlackBox):
+class SuperMarioBrosBlackBox(AbstractBlackBox):
     """
     Black box which returns how many jumps were performed
     by Mario in the given level.
 
     Parameters
     ----------
-    info : ProblemSetupInformation
-        The problem setup information.
     batch_size : int, optional
         The batch size for simultaneous execution, by default None.
     parallelize : bool, optional
@@ -49,11 +46,6 @@ class SMBBlackBox(AbstractBlackBox):
         The number of workers for parallel execution, by default None.
     evaluation_budget:  int, optional
         The maximum number of function evaluations. Default is infinity.
-
-    Attributes
-    ----------
-    model : torch.nn.Module
-        The model used for the simulation.
 
     Methods
     -------
@@ -66,19 +58,17 @@ class SMBBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        info: ProblemSetupInformation,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
+        force_isolation: bool = False,
     ):
         """
         Initializes a new instance of the SMBBlackBox class.
 
         Parameters
         ----------
-        info : ProblemSetupInformation
-            The problem setup information.
         batch_size : int, optional
             The batch size for simultaneous execution, by default None.
         parallelize : bool, optional
@@ -89,34 +79,37 @@ class SMBBlackBox(AbstractBlackBox):
             The maximum number of function evaluations. Default is infinity.
         """
         super().__init__(
-            info=info,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
         )
-        self.model = load_example_model(THIS_DIR / "example.pt")
+        if not force_isolation:
+            try:
+                from poli.objective_repository.super_mario_bros.isolated_function import (
+                    SMBIsolatedLogic,
+                )
+
+                self.inner_function = SMBIsolatedLogic()
+            except ImportError:
+                self.inner_function = instance_function_as_isolated_process(
+                    name="super_mario_bros__isolated",
+                )
+        else:
+            self.inner_function = instance_function_as_isolated_process(
+                name="super_mario_bros__isolated",
+            )
 
     def _black_box(self, x: np.ndarray, context=None) -> np.ndarray:
         """Computes number of jumps in a given latent code x."""
-        z = torch.from_numpy(x).float()
-        z = z.unsqueeze(0)
+        return self.inner_function(x, context)
 
-        # Run the model
-        with torch.no_grad():
-            res = test_level_from_z(z, self.model, visualize=True)
-
-        # Return the number of jumps if the level was
-        # solved successfully, else return np.NaN
-        if res["marioStatus"] == 1:
-            jumps = res["jumpActionsPerformed"]
-        else:
-            jumps = np.nan
-
-        return np.array([jumps], dtype=float).reshape(1, 1)
+    @staticmethod
+    def get_black_box_info() -> BlackBoxInformation:
+        return smb_info
 
 
-class SMBProblemFactory(AbstractProblemFactory):
+class SuperMarioBrosProblemFactory(AbstractProblemFactory):
     """
     Problem factory for the Super Mario Bros objective function.
 
@@ -128,17 +121,9 @@ class SMBProblemFactory(AbstractProblemFactory):
         Creates a new instance of the SMBBlackBox class.
     """
 
-    def get_setup_information(self) -> ProblemSetupInformation:
+    def get_setup_information(self) -> BlackBoxInformation:
         """Returns the setup information for the problem."""
-        alphabet_symbols = ["z1", "z2"]
-        alphabet = {symbol: i for i, symbol in enumerate(alphabet_symbols)}
-
-        return ProblemSetupInformation(
-            name="super_mario_bros",
-            max_sequence_length=2,
-            aligned=True,
-            alphabet=alphabet,
-        )
+        return smb_info
 
     def create(
         self,
@@ -147,7 +132,8 @@ class SMBProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-    ) -> Tuple[SMBBlackBox, np.ndarray, np.ndarray]:
+        force_isolation: bool = False,
+    ) -> Tuple[SuperMarioBrosBlackBox, np.ndarray, np.ndarray]:
         """Creates a new instance of the Super Mario Bros problem.
 
         Parameters
@@ -162,37 +148,37 @@ class SMBProblemFactory(AbstractProblemFactory):
             The number of workers for parallel execution, by default None.
         evaluation_budget:  int, optional
             The maximum number of function evaluations. Default is infinity.
+        force_isolation: bool, optional
+            Flag indicating whether to force isolation inside the black box,
+            by default False.
 
         Returns
         -------
-        f: SMBBlackBox
-            The SMBBlackBox instance.
-        x0: np.ndarray
-            The initial latent code.
-        y0: np.ndarray
-            The initial objective function value (i.e. number of jumps).
+        problem : Problem:
+            The problem instance containing the black box and an initial point.
         """
         if seed is not None:
             seed_python_numpy_and_torch(seed)
 
-        info = self.get_setup_information()
-        f = SMBBlackBox(
-            info=info,
+        f = SuperMarioBrosBlackBox(
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
+            force_isolation=force_isolation,
         )
-        x0 = np.ones([1, info.max_sequence_length])
+        x0 = np.ones([1, 2])
 
-        return f, x0, f(x0)
+        problem = Problem(f, x0)
+
+        return problem
 
 
 if __name__ == "__main__":
     from poli.core.registry import register_problem
 
     # (once) we have to register our factory
-    smb_problem_factory = SMBProblemFactory()
+    smb_problem_factory = SuperMarioBrosProblemFactory()
     register_problem(
         smb_problem_factory,
         conda_environment_name="poli__mario",

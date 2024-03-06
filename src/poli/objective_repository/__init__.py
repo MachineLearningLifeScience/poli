@@ -35,6 +35,10 @@ from .rfp_foldx_stability_and_sasa.register import (
     RFPFoldXStabilityAndSASAProblemFactory,
 )
 from .sa_tdc.register import SAProblemFactory, SABlackBox
+from .super_mario_bros.register import (
+    SuperMarioBrosProblemFactory,
+    SuperMarioBrosBlackBox,
+)
 
 
 THIS_DIR = Path(__file__).parent.resolve()
@@ -67,6 +71,7 @@ AVAILABLE_PROBLEM_FACTORIES = {
     "rdkit_qed": QEDProblemFactory,
     "rfp_foldx_stability_and_sasa": RFPFoldXStabilityAndSASAProblemFactory,
     "sa_tdc": SAProblemFactory,
+    "super_mario_bros": SuperMarioBrosProblemFactory,
     "white_noise": WhiteNoiseProblemFactory,
     "toy_continuous_problem": ToyContinuousProblemFactory,
 }
@@ -87,6 +92,7 @@ AVAILABLE_BLACK_BOXES = {
     "rdkit_qed": QEDBlackBox,
     "rfp_foldx_stability_and_sasa": FoldXStabilityAndSASABlackBox,
     "sa_tdc": SABlackBox,
+    "super_mario_bros": SuperMarioBrosBlackBox,
     "white_noise": WhiteNoiseBlackBox,
     "toy_continuous_problem": ToyContinuousBlackBox,
 }
