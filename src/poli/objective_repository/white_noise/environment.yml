@@ -6,4 +6,6 @@ dependencies:
   - pip
   - pip:
     - numpy
+    - selfies
+    - rdkit
     - "git+https://github.com/MachineLearningLifeScience/poli.git@dev"
