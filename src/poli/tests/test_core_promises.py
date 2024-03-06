@@ -31,7 +31,7 @@ def test_instancing_a_black_box_that_requires_isolation():
     from poli.objective_repository.dockstring.register import DockstringBlackBox
 
     f = DockstringBlackBox(
-        target_name="drd2",
+        target_name="DRD2",
         string_representation="SMILES",
     )
 
