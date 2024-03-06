@@ -14,15 +14,18 @@ arXiv, July 12, 2022. http://arxiv.org/abs/2203.12742.
 from typing import Tuple
 import numpy as np
 
-from lambo.tasks.chem.logp import logP
-
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
-from poli.core.problem_setup_information import ProblemSetupInformation
+from poli.core.black_box_information import BlackBoxInformation
+from poli.core.problem import Problem
 
-from poli.core.util.chemistry.string_to_molecule import translate_selfies_to_smiles
+from poli.core.util.isolation.instancing import instance_function_as_isolated_process
 
-from poli.core.util.seeding import seed_numpy, seed_python
+from poli.core.util.seeding import seed_python_numpy_and_torch
+
+from poli.objective_repository.penalized_logp_lambo.information import (
+    penalized_logp_lambo_info,
+)
 
 
 class PenalizedLogPLamboBlackBox(AbstractBlackBox):
@@ -38,26 +41,44 @@ class PenalizedLogPLamboBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        info: ProblemSetupInformation,
+        from_smiles: bool = True,
+        penalized: bool = True,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-        from_smiles: bool = True,
-        penalized: bool = True,
+        force_isolation: bool = False,
     ):
         """
         TODO: document
         """
         super().__init__(
-            info=info,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
         )
-        self.from_smiles = from_smiles
-        self.penalized = penalized
+        if not force_isolation:
+            try:
+                from poli.objective_repository.penalized_logp_lambo.isolated_function import (
+                    PenalizedLogPIsolatedLogic,
+                )
+
+                self.inner_function = PenalizedLogPIsolatedLogic(
+                    from_smiles=from_smiles, penalized=penalized
+                )
+            except ImportError:
+                self.inner_function = instance_function_as_isolated_process(
+                    name="penalized_logp_lambo__isolated",
+                    from_smiles=from_smiles,
+                    penalized=penalized,
+                )
+        else:
+            self.inner_function = instance_function_as_isolated_process(
+                name="penalized_logp_lambo__isolated",
+                from_smiles=from_smiles,
+                penalized=penalized,
+            )
 
     def _black_box(self, x: np.ndarray, context: dict = None):
         """
@@ -69,35 +90,17 @@ class PenalizedLogPLamboBlackBox(AbstractBlackBox):
         and then computes the penalized logP. If the translation
         threw an error, we return NaN instead.
         """
-        if not x.dtype.kind in ["U", "S"]:
-            raise ValueError(
-                f"We expect x to be an array of strings, but we got {x.dtype}"
-            )
+        return self.inner_function(x, context)
 
-        molecule_strings = ["".join([x_ij for x_ij in x_i.flatten()]) for x_i in x]
-
-        if not self.from_smiles:
-            molecule_strings = translate_selfies_to_smiles(molecule_strings)
-
-        logp_scores = []
-        for molecule_string in molecule_strings:
-            if molecule_string is None:
-                logp_scores.append(np.nan)
-            else:
-                logp_scores.append(logP(molecule_string, penalized=self.penalized))
-
-        return np.array(logp_scores).reshape(-1, 1)
+    @staticmethod
+    def get_black_box_info() -> BlackBoxInformation:
+        return penalized_logp_lambo_info
 
 
 class PenalizedLogPLamboProblemFactory(AbstractProblemFactory):
-    def get_setup_information(self) -> ProblemSetupInformation:
+    def get_setup_information(self) -> BlackBoxInformation:
         # TODO: do they have an alphabet?
-        return ProblemSetupInformation(
-            name="penalized_logp_lambo",
-            max_sequence_length=np.inf,
-            aligned=False,
-            alphabet=None,
-        )
+        return penalized_logp_lambo_info
 
     def create(
         self,
@@ -108,9 +111,10 @@ class PenalizedLogPLamboProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
+        force_isolation: bool = False,
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
-        seed_numpy(seed)
-        seed_python(seed)
+        if seed is not None:
+            seed_python_numpy_and_torch(seed)
 
         if string_representation.upper() not in ["SMILES", "SELFIES"]:
             raise ValueError(
@@ -118,15 +122,14 @@ class PenalizedLogPLamboProblemFactory(AbstractProblemFactory):
                 "String representation must be either 'SMILES' or 'SELFIES'."
             )
 
-        problem_info = self.get_setup_information()
         f = PenalizedLogPLamboBlackBox(
-            problem_info,
+            from_smiles=(string_representation.upper() == "SMILES"),
+            penalized=penalized,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
-            from_smiles=(string_representation.upper() == "SMILES"),
-            penalized=penalized,
+            force_isolation=force_isolation,
         )
 
         if string_representation.upper() == "SMILES":
@@ -134,7 +137,9 @@ class PenalizedLogPLamboProblemFactory(AbstractProblemFactory):
         else:
             x0 = np.array([["[C]"]])
 
-        return f, x0, f(x0)
+        problem = Problem(f, x0)
+
+        return problem
 
 
 if __name__ == "__main__":

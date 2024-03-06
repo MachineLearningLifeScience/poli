@@ -214,6 +214,10 @@ def _save_file_content_from_github(
             if file_content.content:
                 file_data = base64.b64decode(file_content.content)
                 file_out.write(file_data)
+            elif file_content.download_url:
+                import requests
+
+                file_out.write(requests.get(file_content.download_url).content)
 
     except (GithubException, IOError, ValueError) as exc:
         if strict:

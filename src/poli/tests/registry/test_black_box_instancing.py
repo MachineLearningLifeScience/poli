@@ -13,6 +13,7 @@ from poli.objective_repository import (
     FoldXStabilityAndSASABlackBox,
     GFPCBasBlackBox,
     GFPSelectionBlackBox,
+    PenalizedLogPLamboBlackBox,
     WhiteNoiseBlackBox,
 )
 
@@ -99,6 +100,13 @@ test_data = [
             "force_isolation": True,
         },
     ),
+    (
+        "penalized_logp_lambo",
+        PenalizedLogPLamboBlackBox,
+        {
+            "force_isolation": False,
+        },
+    ),
     ("white_noise", WhiteNoiseBlackBox, {}),
 ]
 
@@ -107,6 +115,7 @@ test_data = [
     "black_box_name, black_box_class, kwargs_for_black_box",
     test_data,
 )
+@pytest.mark.slow()
 def test_instancing_a_black_box_both_ways_matches(
     black_box_name, black_box_class, kwargs_for_black_box
 ):

@@ -24,6 +24,10 @@ from .foldx_stability_and_sasa.register import (
 )
 from .gfp_cbas.register import GFPCBasBlackBox, GFPCBasProblemFactory
 from .gfp_select.register import GFPSelectionBlackBox, GFPSelectionProblemFactory
+from .penalized_logp_lambo.register import (
+    PenalizedLogPLamboBlackBox,
+    PenalizedLogPLamboProblemFactory,
+)
 
 
 THIS_DIR = Path(__file__).parent.resolve()
@@ -50,6 +54,7 @@ AVAILABLE_PROBLEM_FACTORIES = {
     "foldx_stability_and_sasa": FoldXStabilityAndSASAProblemFactory,
     "gfp_cbas": GFPCBasProblemFactory,
     "gfp_select": GFPSelectionProblemFactory,
+    "penalized_logp_lambo": PenalizedLogPLamboProblemFactory,
     "white_noise": WhiteNoiseProblemFactory,
     "toy_continuous_problem": ToyContinuousProblemFactory,
 }
@@ -64,6 +69,7 @@ AVAILABLE_BLACK_BOXES = {
     "foldx_stability_and_sasa": FoldXStabilityAndSASABlackBox,
     "gfp_cbas": GFPCBasBlackBox,
     "gfp_select": GFPSelectionBlackBox,
+    "penalized_logp_lambo": PenalizedLogPLamboBlackBox,
     "white_noise": WhiteNoiseBlackBox,
     "toy_continuous_problem": ToyContinuousBlackBox,
 }
