@@ -116,10 +116,11 @@ def test_passing_array_of_strings(
     import numpy as np
     from poli import create
 
-    f, _, _ = create(
+    problem = create(
         name=black_box_name,
         **kwargs,
     )
+    f = problem.black_box
 
     x_flat = np.array(example_flat_input)
     x_non_flat = np.array(example_non_flat_input)

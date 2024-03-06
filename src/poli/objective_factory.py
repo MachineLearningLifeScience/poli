@@ -411,7 +411,7 @@ def start(
     """
     # Check if we can import the function immediately
     if name in AVAILABLE_PROBLEM_FACTORIES and not force_isolation:
-        f, _, _ = __create_problem_from_repository(
+        problem = __create_problem_from_repository(
             name, seed=seed, **kwargs_for_factory
         )
     else:
@@ -420,9 +420,11 @@ def start(
         __register_objective_if_available(name, force_register=force_register)
 
         # If not, then we create it as an isolated process
-        f, _, _ = __create_problem_as_isolated_process(
+        problem = __create_problem_as_isolated_process(
             name, seed=seed, **kwargs_for_factory
         )
+
+    f = problem.black_box
 
     # instantiate observer (if desired)
     if observer is not None:

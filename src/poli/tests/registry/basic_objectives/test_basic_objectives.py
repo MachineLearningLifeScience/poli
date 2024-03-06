@@ -15,7 +15,8 @@ def test_registering_white_noise():
 
 
 def test_registering_aloha():
-    f, _, y0 = objective_factory.create(name="aloha")
+    aloha_problem = objective_factory.create(name="aloha")
+    f = aloha_problem.black_box
     x = np.array([list("ALOOF")])
     assert f(x) == 3
     f.terminate()

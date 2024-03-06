@@ -1,7 +1,7 @@
 """This module contains utilities for registering problems and observers.
 """
 
-from typing import List, Union, Dict
+from typing import List, Union, Dict, Type
 import configparser
 from pathlib import Path
 import warnings
@@ -34,7 +34,7 @@ ls = config.read(config_file)
 
 
 def set_observer(
-    observer: AbstractObserver,
+    observer: Union[AbstractObserver, Type[AbstractObserver]],
     conda_environment_location: str = None,
     python_paths: List[str] = None,
     observer_name: str = None,
@@ -64,8 +64,12 @@ def set_observer(
     -----
     The observer script MUST accept port and password as arguments.
     """
+    if isinstance(observer, type):
+        non_instance_observer = observer
+    else:
+        non_instance_observer = observer.__class__
     run_script_location = make_observer_script(
-        observer, conda_environment_location, python_paths
+        non_instance_observer, conda_environment_location, python_paths
     )
     set_observer_run_script(run_script_location, observer_name=observer_name)
 

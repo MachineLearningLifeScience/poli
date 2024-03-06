@@ -5,13 +5,13 @@ box objectives indeed spawns an isolated process."""
 def test_force_isolation_on_aloha():
     from poli import objective_factory
 
-    f, _, _ = objective_factory.create(
+    problem = objective_factory.create(
         name="aloha",
         force_register=True,
         force_isolation=True,
     )
 
-    assert isinstance(f, objective_factory.ExternalBlackBox)
+    assert isinstance(problem.black_box, objective_factory.ExternalBlackBox)
 
 
 if __name__ == "__main__":

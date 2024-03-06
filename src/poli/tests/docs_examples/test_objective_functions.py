@@ -10,7 +10,9 @@ def test_white_noise_example():
     from poli import objective_factory
 
     # How to create
-    f, x0, y0 = objective_factory.create(name="white_noise")
+    problem = objective_factory.create(name="white_noise")
+    f, x0 = problem.black_box, problem.x0
+    y0 = f(x0)
 
     # Example input:
     x = np.array([["1", "2", "3"]])  # must be of shape [b, L], in this case [1, 3].
@@ -24,7 +26,8 @@ def test_aloha_example():
     from poli import objective_factory
 
     # How to create
-    f, x0, y0 = objective_factory.create(name="aloha")
+    problem = objective_factory.create(name="aloha")
+    f, x0 = problem.black_box, problem.x0
 
     # Example input:
     x = np.array(
@@ -42,11 +45,12 @@ def test_qed_example():
     from poli import objective_factory
 
     # How to create
-    f, x0, y0 = objective_factory.create(
+    problem = objective_factory.create(
         name="rdkit_qed",
         string_representation="SMILES",  # it is "SMILES" by default.
         force_register=True,
     )
+    f, x0 = problem.black_box, problem.x0
 
     # Example input: a single carbon
     x = np.array(["C"]).reshape(1, -1)
@@ -62,11 +66,12 @@ def test_logp_example():
     from poli import objective_factory
 
     # How to create
-    f, x0, y0 = objective_factory.create(
+    problem = objective_factory.create(
         name="rdkit_logp",
         string_representation="SMILES",  # it is "SMILES" by default.
         force_register=True,
     )
+    f, x0 = problem.black_box, problem.x0
 
     # Example input: a single carbon
     x = np.array(["C"]).reshape(1, -1)
@@ -75,7 +80,3 @@ def test_logp_example():
     y = f(x)
     print(y)  # Should be close to 0.6361
     assert np.isclose(y, 0.6361).all()
-
-
-if __name__ == "__main__":
-    test_qed_example()

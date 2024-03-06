@@ -92,7 +92,7 @@ def make_run_script(
 
 
 def make_observer_script(
-    observer: AbstractObserver,
+    observer: Type[AbstractObserver],
     conda_environment: Union[str, Path] = None,
     python_paths: List[str] = None,
     cwd=None,
