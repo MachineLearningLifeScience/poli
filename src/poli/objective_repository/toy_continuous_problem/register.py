@@ -12,19 +12,22 @@ and it uses a conda environment called 'poli__base'
 (see the environment.yml file in this folder).
 """
 
-from typing import Tuple
-
 import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
-from poli.core.problem_setup_information import ProblemSetupInformation
+from poli.core.black_box_information import BlackBoxInformation
+from poli.core.problem import Problem
 
 from poli.core.util.seeding import seed_python_numpy_and_torch
 
 from .toy_continuous_problem import (
     POSSIBLE_FUNCTIONS,
     ToyContinuousProblem,
+)
+
+from poli.objective_repository.toy_continuous_problem.information import (
+    toy_continuous_info,
 )
 
 
@@ -34,8 +37,6 @@ class ToyContinuousBlackBox(AbstractBlackBox):
 
     Parameters
     ----------
-    info : ProblemSetupInformation
-        The problem setup information.
     batch_size : int, optional
         The batch size for parallel evaluation, by default None.
     parallelize : bool, optional
@@ -54,8 +55,6 @@ class ToyContinuousBlackBox(AbstractBlackBox):
 
     Attributes
     ----------
-    alphabet : None
-        The alphabet for the toy continuous problem.
     function_name : str
         The name of the toy continuous function.
     n_dimensions : int
@@ -76,7 +75,6 @@ class ToyContinuousBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        info: ProblemSetupInformation,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
@@ -85,7 +83,6 @@ class ToyContinuousBlackBox(AbstractBlackBox):
         n_dimensions: int = 2,
         embed_in: int = None,
     ):
-        self.alphabet = None
 
         assert (
             function_name in POSSIBLE_FUNCTIONS
@@ -102,7 +99,6 @@ class ToyContinuousBlackBox(AbstractBlackBox):
         self.bounds = self.function.limits
 
         super().__init__(
-            info=info,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
@@ -136,9 +132,13 @@ class ToyContinuousBlackBox(AbstractBlackBox):
 
         return self.function(x)
 
+    @staticmethod
+    def get_black_box_info() -> BlackBoxInformation:
+        return toy_continuous_info
+
 
 class ToyContinuousProblemFactory(AbstractProblemFactory):
-    def get_setup_information(self) -> ProblemSetupInformation:
+    def get_setup_information(self) -> BlackBoxInformation:
         """
         Returns the setup information for the problem.
 
@@ -147,12 +147,7 @@ class ToyContinuousProblemFactory(AbstractProblemFactory):
         problem_info : ProblemSetupInformation
             The setup information for the problem.
         """
-        return ProblemSetupInformation(
-            name="toy_continuous_problem",
-            max_sequence_length=np.inf,
-            aligned=True,
-            alphabet=None,
-        )
+        return toy_continuous_info
 
     def create(
         self,
@@ -164,7 +159,7 @@ class ToyContinuousProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-    ) -> Tuple[ToyContinuousBlackBox, np.ndarray, np.ndarray]:
+    ) -> Problem:
         """
         Creates a new instance of the toy continuous problem.
 
@@ -190,12 +185,8 @@ class ToyContinuousProblemFactory(AbstractProblemFactory):
 
         Returns
         -------
-        f : ToyContinuousBlackBox
-            The toy continuous black box instance.
-        x0 : np.ndarray
-            The initial input.
-        y0 : np.ndarray
-            The initial objective function value.
+        problem : Problem
+            The problem instance containing the black box and an initial point.
 
         Raises
         ------
@@ -210,9 +201,7 @@ class ToyContinuousProblemFactory(AbstractProblemFactory):
         if seed is not None:
             seed_python_numpy_and_torch(seed)
 
-        problem_info = self.get_setup_information()
         f = ToyContinuousBlackBox(
-            info=problem_info,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
@@ -221,12 +210,13 @@ class ToyContinuousProblemFactory(AbstractProblemFactory):
             n_dimensions=n_dimensions,
             embed_in=embed_in,
         )
+        # TODO: initial value should maybe vary according to the function.
         if embed_in is None:
             x0 = np.array([[0.0] * n_dimensions])
         else:
             x0 = np.array([[0.0] * embed_in])
 
-        return f, x0, f(x0)
+        return Problem(f, x0)
 
 
 if __name__ == "__main__":

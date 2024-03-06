@@ -19,6 +19,7 @@ from poli.objective_repository import (
     QEDBlackBox,
     SABlackBox,
     SuperMarioBrosBlackBox,
+    ToyContinuousBlackBox,
     WhiteNoiseBlackBox,
 )
 
@@ -163,6 +164,11 @@ test_data = [
         {
             "force_isolation": True,
         },
+    ),
+    (
+        "toy_continuous_problem",
+        ToyContinuousBlackBox,
+        {"function_name": "ackley_function_01"},
     ),
     ("white_noise", WhiteNoiseBlackBox, {}),
 ]
