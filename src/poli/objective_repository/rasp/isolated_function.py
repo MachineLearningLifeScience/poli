@@ -230,6 +230,18 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
         self.rasp_interface = RaspInterface(working_dir=self.working_dir)
         self._clean_wildtype_pdb_files()
 
+        x0_pre_array = []
+        for clean_wildtype_pdb_file in self.clean_wildtype_pdb_files:
+            # Loads up the wildtype pdb files as strings
+            wildtype_string = self.parse_pdb_as_residue_strings(clean_wildtype_pdb_file)
+            x0_pre_array.append(list(wildtype_string))
+
+        # Padding all of them to the longest sequence
+        max_len = max([len(x) for x in x0_pre_array])
+        x0_pre_array = [x + [""] * (max_len - len(x)) for x in x0_pre_array]
+
+        self.x0 = np.array(x0_pre_array)
+
     def _clean_wildtype_pdb_files(self):
         """
         This function cleans the wildtype pdb files
@@ -271,6 +283,9 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
             / f"{wildtype_pdb_path.stem}_query_protein_uniquechain_clean.pdb"
             for wildtype_pdb_path in self.wildtype_pdb_paths
         ]
+
+    def parse_pdb_as_residue_strings(self, pdb_file: Path) -> List[str]:
+        return parse_pdb_as_residue_strings(pdb_file)
 
     def __call__(self, x, context=None):
         """

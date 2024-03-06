@@ -17,21 +17,14 @@ Detlef Weigel, Nir Ben-Tal, and Julian Echave. eLife 12
 
 """
 
-from typing import Union, List, Tuple
+from typing import Union, List
 from pathlib import Path
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
-from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
 
-from poli.core.util.proteins.pdb_parsing import (
-    parse_pdb_as_residue_strings,
-    parse_pdb_as_residues,
-)
-from poli.core.util.proteins.mutations import find_closest_wildtype_pdb_file_to_mutant
-from poli.core.util.proteins.defaults import AMINO_ACIDS
 from poli.core.util.seeding import seed_python_numpy_and_torch
 
 from poli.core.util.isolation.instancing import instance_function_as_isolated_process
@@ -301,18 +294,8 @@ class RaspProblemFactory(AbstractProblemFactory):
         )
 
         # Constructing x0
-        # (from the clean wildtype pdb files inside f)
-        x0_pre_array = []
-        for clean_wildtype_pdb_file in f.inner_function.clean_wildtype_pdb_files:
-            # Loads up the wildtype pdb files as strings
-            wildtype_string = parse_pdb_as_residue_strings(clean_wildtype_pdb_file)
-            x0_pre_array.append(list(wildtype_string))
-
-        # Padding all of them to the longest sequence
-        max_len = max([len(x) for x in x0_pre_array])
-        x0_pre_array = [x + [""] * (max_len - len(x)) for x in x0_pre_array]
-
-        x0 = np.array(x0_pre_array)
+        # (Moved to the isolated logic)
+        x0 = f.inner_function.x0
 
         problem = Problem(f, x0)
 

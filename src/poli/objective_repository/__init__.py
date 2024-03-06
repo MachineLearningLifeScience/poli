@@ -31,6 +31,9 @@ from .penalized_logp_lambo.register import (
 from .rasp.register import RaspBlackBox, RaspProblemFactory
 from .rdkit_logp.register import LogPBlackBox, LogPProblemFactory
 from .rdkit_qed.register import QEDBlackBox, QEDProblemFactory
+from .rfp_foldx_stability_and_sasa.register import (
+    RFPFoldXStabilityAndSASAProblemFactory,
+)
 
 
 THIS_DIR = Path(__file__).parent.resolve()
@@ -61,6 +64,7 @@ AVAILABLE_PROBLEM_FACTORIES = {
     "rasp": RaspProblemFactory,
     "rdkit_logp": LogPProblemFactory,
     "rdkit_qed": QEDProblemFactory,
+    "rfp_foldx_stability_and_sasa": RFPFoldXStabilityAndSASAProblemFactory,
     "white_noise": WhiteNoiseProblemFactory,
     "toy_continuous_problem": ToyContinuousProblemFactory,
 }
@@ -79,6 +83,7 @@ AVAILABLE_BLACK_BOXES = {
     "rasp": RaspBlackBox,
     "rdkit_logp": LogPBlackBox,
     "rdkit_qed": QEDBlackBox,
+    "rfp_foldx_stability_and_sasa": FoldXStabilityAndSASABlackBox,
     "white_noise": WhiteNoiseBlackBox,
     "toy_continuous_problem": ToyContinuousBlackBox,
 }

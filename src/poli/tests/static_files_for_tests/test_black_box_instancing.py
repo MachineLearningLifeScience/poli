@@ -128,26 +128,12 @@ test_data = [
         QEDBlackBox,
         {},
     ),
-    (
-        "rfp_foldx_stability_and_sasa",
-        FoldXStabilityAndSASABlackBox,
-        {
-            "wildtype_pdb_path": [
-                TESTS_FOLDER / "static_files_for_tests" / folder / "wt_input_Repair.pdb"
-                for folder in [
-                    "2vad_A",
-                    "2vae_A",
-                    "3e5v_A",
-                    "3ned_A",
-                    "5lk4_A",
-                    "6aa7_A",
-                ]
-            ],
-            "verbose": True,
-            "batch_size": 1,
-            "parallelize": True,
-        },
-    ),
+    # TODO: to test this, I'd need access to lambo's assets.
+    # (
+    #     "rfp_foldx_stability_and_sasa",
+    #     FoldXStabilityAndSASABlackBox,
+    #     {},
+    # ),
     ("white_noise", WhiteNoiseBlackBox, {}),
 ]
 
@@ -180,13 +166,8 @@ def test_instancing_a_black_box_both_ways_matches(
     y0_ = f(x0)
 
     # if problem.info.deterministic:
-    # TODO: ask Richard about gfp select and rfp_foldx.
-    if black_box_name == "gfp_select":
-        return
-    elif black_box_name == "rfp_foldx_stability_and_sasa":
-        assert np.allclose(y0[:, 0], y0_[:, 0], atol=1.0)
-        assert np.allclose(y0_[:, 1], y0[:, 1], atol=2.0)
-    else:
+    # TODO: ask Richard about gfp select.
+    if black_box_name != "gfp_select":
         assert np.allclose(y0_, y0)
 
 

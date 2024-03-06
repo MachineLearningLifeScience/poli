@@ -78,7 +78,7 @@ class FoldXStabilityAndSASABlackBox(AbstractBlackBox):
         tmp_folder: Path = None,
         eager_repair: bool = False,
         verbose: bool = False,
-        batch_size: int = None,
+        batch_size: int = 1,
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
