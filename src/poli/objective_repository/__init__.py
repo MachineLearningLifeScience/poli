@@ -29,6 +29,7 @@ from .penalized_logp_lambo.register import (
     PenalizedLogPLamboProblemFactory,
 )
 from .rasp.register import RaspBlackBox, RaspProblemFactory
+from .rdkit_logp.register import LogPBlackBox, LogPProblemFactory
 
 
 THIS_DIR = Path(__file__).parent.resolve()
@@ -57,6 +58,7 @@ AVAILABLE_PROBLEM_FACTORIES = {
     "gfp_select": GFPSelectionProblemFactory,
     "penalized_logp_lambo": PenalizedLogPLamboProblemFactory,
     "rasp": RaspProblemFactory,
+    "rdkit_logp": LogPProblemFactory,
     "white_noise": WhiteNoiseProblemFactory,
     "toy_continuous_problem": ToyContinuousProblemFactory,
 }
@@ -73,6 +75,7 @@ AVAILABLE_BLACK_BOXES = {
     "gfp_select": GFPSelectionBlackBox,
     "penalized_logp_lambo": PenalizedLogPLamboBlackBox,
     "rasp": RaspBlackBox,
+    "rdkit_logp": LogPBlackBox,
     "white_noise": WhiteNoiseBlackBox,
     "toy_continuous_problem": ToyContinuousBlackBox,
 }

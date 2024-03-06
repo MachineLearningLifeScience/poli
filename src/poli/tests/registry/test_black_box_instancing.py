@@ -15,6 +15,7 @@ from poli.objective_repository import (
     GFPSelectionBlackBox,
     PenalizedLogPLamboBlackBox,
     RaspBlackBox,
+    LogPBlackBox,
     WhiteNoiseBlackBox,
 )
 
@@ -108,13 +109,18 @@ test_data = [
     #         "force_isolation": False,
     #     },
     # ),
+    # (
+    #     "rasp",
+    #     RaspBlackBox,
+    #     {
+    #         "wildtype_pdb_path": TESTS_FOLDER / "static_files_for_tests" / "3ned.pdb",
+    #         "force_isolation": False,
+    #     },
+    # ),
     (
-        "rasp",
-        RaspBlackBox,
-        {
-            "wildtype_pdb_path": TESTS_FOLDER / "static_files_for_tests" / "3ned.pdb",
-            "force_isolation": False,
-        },
+        "rdkit_logp",
+        LogPBlackBox,
+        {},
     ),
     ("white_noise", WhiteNoiseBlackBox, {}),
 ]

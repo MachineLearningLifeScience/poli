@@ -7,27 +7,9 @@ of solubility (a.k.a. logP).
 This black box is a simple wrapper around RDKit's
 descriptors. We allow for both SMILES and SELFIES
 strings.
-
-The problem is registered as 'rdkit_logp', and it uses
-a conda environment called 'poli__chem' (see the
-environment.yml file in this folder). If you want to
-run it locally without creating a new environemnt,
-these are the extra requirements:
-
-- rdkit
-- selfies
-
-If you are interested in running this directly,
-instead of inside an isolated process, run:
-
-`
-pip install rdkit selfies
-`
 """
 
-from pathlib import Path
-from typing import Tuple, List, Literal
-import json
+from typing import Tuple, Literal
 
 import numpy as np
 
@@ -35,11 +17,14 @@ from rdkit.Chem import Descriptors
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
-from poli.core.problem_setup_information import ProblemSetupInformation
+from poli.core.black_box_information import BlackBoxInformation
+from poli.core.problem import Problem
 
 from poli.core.util.chemistry.string_to_molecule import strings_to_molecules
 
 from poli.core.util.seeding import seed_python_numpy_and_torch
+
+from poli.objective_repository.rdkit_logp.information import rdkit_logp_info
 
 
 class LogPBlackBox(AbstractBlackBox):
@@ -59,8 +44,9 @@ class LogPBlackBox(AbstractBlackBox):
 
     Parameters
     ----------
-    info : ProblemSetupInformation
-        The problem setup information.
+    from_selfies : bool, optional
+        Flag indicating whether the input is a SELFIES string,
+        by default False (i.e. we expect a SMILES string).
     batch_size : int, optional
         The batch size for processing multiple inputs simultaneously, by default None.
     parallelize : bool, optional
@@ -69,9 +55,6 @@ class LogPBlackBox(AbstractBlackBox):
         The number of workers to use for parallel computation, by default None.
     evaluation_budget:  int, optional
         The maximum number of function evaluations. Default is infinity.
-    from_selfies : bool, optional
-        Flag indicating whether the input is a SELFIES string,
-        by default False (i.e. we expect a SMILES string).
 
     Attributes
     ----------
@@ -89,7 +72,6 @@ class LogPBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        info: ProblemSetupInformation,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
@@ -119,7 +101,6 @@ class LogPBlackBox(AbstractBlackBox):
         self.from_smiles = not from_selfies
 
         super().__init__(
-            info=info,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
@@ -168,9 +149,13 @@ class LogPBlackBox(AbstractBlackBox):
 
         return np.array(logp_values).reshape(-1, 1)
 
+    @staticmethod
+    def get_black_box_info() -> BlackBoxInformation:
+        return rdkit_logp_info
+
 
 class LogPProblemFactory(AbstractProblemFactory):
-    def get_setup_information(self) -> ProblemSetupInformation:
+    def get_setup_information(self) -> BlackBoxInformation:
         """
         Returns the setup information for the logP problem.
 
@@ -179,12 +164,7 @@ class LogPProblemFactory(AbstractProblemFactory):
         info : ProblemSetupInformation
             The setup information for the logP problem.
         """
-        return ProblemSetupInformation(
-            name="rdkit_logp",
-            max_sequence_length=np.inf,
-            aligned=False,
-            alphabet=None,
-        )
+        return rdkit_logp_info
 
     def create(
         self,
@@ -194,7 +174,7 @@ class LogPProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-    ) -> Tuple[LogPBlackBox, np.ndarray, np.ndarray]:
+    ) -> Problem:
         """Creates a logP problem instance.
 
         Parameters
@@ -215,12 +195,8 @@ class LogPProblemFactory(AbstractProblemFactory):
 
         Returns
         -------
-        f : LogPBlackBox
-            The logP black box function.
-        x0 : np.ndarray
-            The initial input values (a single carbon).
-        y0 : np.ndarray
-            The initial output values (the logP of a single carbon).
+        problem : Problem
+            The logP problem instance, containing the black box and the initial input.
         """
         if seed is not None:
             seed_python_numpy_and_torch(seed)
@@ -231,9 +207,7 @@ class LogPProblemFactory(AbstractProblemFactory):
                 "String representation must be either 'SMILES' or 'SELFIES'."
             )
 
-        problem_info = self.get_setup_information()
         f = LogPBlackBox(
-            info=problem_info,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
@@ -247,7 +221,9 @@ class LogPProblemFactory(AbstractProblemFactory):
         else:
             x0 = np.array([["[C]"]])
 
-        return f, x0, f(x0)
+        problem = Problem(f, x0)
+
+        return problem
 
 
 if __name__ == "__main__":
