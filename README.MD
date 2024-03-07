@@ -10,7 +10,7 @@ poli is a library of discrete objective functions for benchmarking optimization 
 
 Some of `poli`'s features:
 - 🔲 **isolation** of black box function calls inside conda environments. Don't worry about clashes w. black box requirements, poli will create the relevant conda environments for you.
-- 🗒️ **logging** logic at the black box `__call__` level using observers.
+- 🗒️ **logging** each black box call using observers.
 -  A numpy interface. Inputs are `np.array`s of strings, outputs are `np.array`s of floats.
 - `SMILES` and `SELFIES` support for small molecule manipulation.
 
@@ -40,10 +40,12 @@ In this next example, we estimate the docking score of the example provided in `
 import numpy as np
 from poli import objective_factory
 
-f, x0, y0 = objective_factory.create(
+problem = objective_factory.create(
     name="dockstring",
     target_name="drd2"
 )
+f, x0 = problem.black_box, problem.x0
+y0 = f(x0)
 
 # x0: [['C' 'C' '1' '=' 'C' '(' 'C', ...]] (i.e. Risperidone's SMILES)
 # y0: 11.9
