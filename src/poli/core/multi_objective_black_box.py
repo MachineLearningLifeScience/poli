@@ -10,6 +10,7 @@ import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.problem_setup_information import ProblemSetupInformation
+from poli.core.black_box_information import BlackBoxInformation
 
 
 class MultiObjectiveBlackBox(AbstractBlackBox):
@@ -20,8 +21,6 @@ class MultiObjectiveBlackBox(AbstractBlackBox):
 
     Parameters
     -----------
-    info : ProblemSetupInformation
-        The problem setup information.
     batch_size : int, optional
         The batch size for evaluating the black box function. Defaults to None.
     objective_functions : List[AbstractBlackBox], required
@@ -51,7 +50,6 @@ class MultiObjectiveBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        info: ProblemSetupInformation,
         objective_functions: List[AbstractBlackBox],
         batch_size: int = None,
     ) -> None:
@@ -60,8 +58,6 @@ class MultiObjectiveBlackBox(AbstractBlackBox):
 
         Parameters
         -----------
-        info : ProblemSetupInformation
-            The problem setup information.
         objective_functions : List[AbstractBlackBox]
             The list of objective functions.
         batch_size : int, optional
@@ -77,7 +73,9 @@ class MultiObjectiveBlackBox(AbstractBlackBox):
                 "objective_functions must be provided as a list of AbstractBlackBox instances or inherited classes."
             )
 
-        super().__init__(info=info, batch_size=batch_size)
+        super().__init__(
+            batch_size=batch_size,
+        )
 
         self.objective_functions = objective_functions
 
@@ -108,3 +106,18 @@ class MultiObjectiveBlackBox(AbstractBlackBox):
 
     def __repr__(self) -> str:
         return f"<MultiObjectiveBlackBox(black_boxes={self.objective_functions}, batch_size={self.batch_size})>"
+
+    @property
+    def info(self) -> BlackBoxInformation:
+        """
+        Return the problem setup information for the multi-objective black box.
+
+        Returns
+        -------
+        BlackBoxInformation:
+            Information about the first objective function.
+        """
+        # TODO: what should this return, actually?
+        # I'd say that we expect all objective functions to be able
+        # to take the same input.
+        return self.objective_functions[0].info
