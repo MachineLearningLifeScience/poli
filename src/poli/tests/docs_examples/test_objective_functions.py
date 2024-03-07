@@ -193,5 +193,78 @@ def test_penalized_logp_lambo():
     assert np.isclose(y, -6.22381305).all()
 
 
+def test_sa_tdc_example():
+    import numpy as np
+    from poli.objective_repository import SAProblemFactory, SABlackBox
+
+    # Creating the black box
+    f = SABlackBox()
+
+    # Creating a problem
+    problem = SAProblemFactory().create()
+    f, x0 = problem.black_box, problem.x0
+
+    # Example input: (taken from the TDC)
+    x = np.array(["CCNC(=O)c1ccc(NC(=O)N2CC[C@H](C)[C@H](O)C2)c(C)c1"])
+
+    # Querying:
+    y = f(x)
+    print(y)  # Should be close to 2.85483733
+    assert np.isclose(y, 2.85483733).all()
+
+
+def test_foldx_stability():
+    from pathlib import Path
+
+    if not (Path.home() / "foldx" / "foldx").exists():
+        pytest.skip("FoldX not installed")
+
+    from pathlib import Path
+
+    from poli.objective_repository import (
+        FoldXStabilityProblemFactory,
+        FoldXStabilityBlackBox,
+    )
+
+    wildtype_pdb_path = (
+        Path(__file__).parent.parent / "static_files_for_tests" / "101m_Repair.pdb"
+    )
+
+    # Creating the black box
+    f = FoldXStabilityBlackBox(wildtype_pdb_path=[wildtype_pdb_path])
+
+    # Creating a problem
+    problem = FoldXStabilityProblemFactory().create(
+        wildtype_pdb_path=[wildtype_pdb_path]
+    )
+    f, x0 = problem.black_box, problem.x0
+
+    # Example evaluation: evaluating without mutations
+    print(f(x0))
+
+
+def test_foldx_sasa():
+    from pathlib import Path
+
+    if not (Path.home() / "foldx" / "foldx").exists():
+        pytest.skip("FoldX not installed")
+
+    from poli.objective_repository import FoldXSASAProblemFactory, FoldXSASABlackBox
+
+    wildtype_pdb_path = (
+        Path(__file__).parent.parent / "static_files_for_tests" / "101m_Repair.pdb"
+    )
+
+    # Creating the black box
+    f = FoldXSASABlackBox(wildtype_pdb_path=[wildtype_pdb_path])
+
+    # Creating a problem
+    problem = FoldXSASAProblemFactory().create(wildtype_pdb_path=[wildtype_pdb_path])
+    f, x0 = problem.black_box, problem.x0
+
+    # Example evaluation: evaluating without mutations
+    print(f(x0))
+
+
 if __name__ == "__main__":
-    test_penalized_logp_lambo()
+    test_sa_tdc_example()

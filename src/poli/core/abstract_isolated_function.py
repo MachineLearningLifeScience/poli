@@ -25,3 +25,6 @@ class AbstractIsolatedFunction:
 
     def __call__(self, x: np.ndarray, context=None) -> np.ndarray:
         raise NotImplementedError
+
+    def terminate(self):
+        pass
