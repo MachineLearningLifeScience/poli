@@ -249,6 +249,8 @@ def test_foldx_sasa():
     if not (Path.home() / "foldx" / "foldx").exists():
         pytest.skip("FoldX not installed")
 
+    from pathlib import Path
+
     from poli.objective_repository import FoldXSASAProblemFactory, FoldXSASABlackBox
 
     wildtype_pdb_path = (
@@ -263,6 +265,26 @@ def test_foldx_sasa():
     f, x0 = problem.black_box, problem.x0
 
     # Example evaluation: evaluating without mutations
+    print(f(x0))
+
+
+@pytest.mark.slow()
+def test_rasp_example():
+    from pathlib import Path
+    from poli.objective_repository import RaspBlackBox, RaspProblemFactory
+
+    wildtype_pdb_path = (
+        Path(__file__).parent.parent / "static_files_for_tests" / "3ned.pdb"
+    )
+
+    # Creating the black box
+    f = RaspBlackBox(wildtype_pdb_path=[wildtype_pdb_path])
+
+    # Creating a problem
+    problem = RaspProblemFactory().create(wildtype_pdb_path=[wildtype_pdb_path])
+    f, x0 = problem.black_box, problem.x0
+
+    # Querying:
     print(f(x0))
 
 
