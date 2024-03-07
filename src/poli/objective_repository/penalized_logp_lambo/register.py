@@ -11,7 +11,7 @@ Emily Delaney, Peyton Greenside, and Andrew Gordon Wilson.
 arXiv, July 12, 2022. http://arxiv.org/abs/2203.12742.
 """
 
-from typing import Tuple
+from typing import Tuple, Literal
 import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
@@ -41,7 +41,7 @@ class PenalizedLogPLamboBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        from_smiles: bool = True,
+        string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
         penalized: bool = True,
         batch_size: int = None,
         parallelize: bool = False,
@@ -58,6 +58,7 @@ class PenalizedLogPLamboBlackBox(AbstractBlackBox):
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
         )
+        from_smiles = string_representation.upper() == "SMILES"
         if not force_isolation:
             try:
                 from poli.objective_repository.penalized_logp_lambo.isolated_function import (
@@ -123,7 +124,7 @@ class PenalizedLogPLamboProblemFactory(AbstractProblemFactory):
             )
 
         f = PenalizedLogPLamboBlackBox(
-            from_smiles=(string_representation.upper() == "SMILES"),
+            string_representation=string_representation.upper(),
             penalized=penalized,
             batch_size=batch_size,
             parallelize=parallelize,

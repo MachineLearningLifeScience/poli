@@ -96,3 +96,7 @@ AVAILABLE_BLACK_BOXES = {
     "white_noise": WhiteNoiseBlackBox,
     "toy_continuous_problem": ToyContinuousBlackBox,
 }
+
+
+def get_problems():
+    return list(AVAILABLE_PROBLEM_FACTORIES.keys())

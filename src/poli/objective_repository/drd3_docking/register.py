@@ -138,6 +138,7 @@ class DRD3ProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
+        force_isolation: bool = False,
     ) -> Problem:
         """
         Create a TDCBlackBox object for DRD3 docking.
@@ -156,6 +157,8 @@ class DRD3ProblemFactory(AbstractProblemFactory):
             Number of worker processes to use for parallelization. If None, the number of available CPU cores is used.
         evaluation_budget:  int, optional
             The maximum number of function evaluations. Default is infinity.
+        force_isolation: bool, optional
+            Whether to force the isolation of the black box. Default is False.
 
         Returns
         -------
@@ -180,11 +183,12 @@ class DRD3ProblemFactory(AbstractProblemFactory):
             )
 
         f = DRD3BlackBox(
+            string_representation=string_representation,
+            force_isolation=force_isolation,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
-            string_representation=string_representation,
         )
 
         # Initial example (from the TDC docs)

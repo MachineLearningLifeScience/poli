@@ -126,7 +126,7 @@ def __register_isolated_function_from_repository(name: str, quiet: bool = False)
         if "already exists" in e.stderr.decode():
             if not quiet:
                 print(f"poli 🧪: {env_name} already exists.")
-            warnings.warn(f"Environment {env_name} already exists. Will not create it.")
+            # warnings.warn(f"Environment {env_name} already exists. Will not create it.")
         else:
             raise e
 
@@ -137,7 +137,7 @@ def __register_isolated_function_from_repository(name: str, quiet: bool = False)
     # Running the file
     file_to_run = PATH_TO_REPOSITORY / name_without_isolated / file_to_isolate
     command = " ".join(["conda", "run", "-n", env_name, "python", str(file_to_run)])
-    warnings.warn("Running the following command: %s. " % command)
+    # warnings.warn("Running the following command: %s. " % command)
 
     if not quiet:
         print(f"poli 🧪: running registration of {name} from environment {env_name}")

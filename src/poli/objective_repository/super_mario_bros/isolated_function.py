@@ -7,18 +7,12 @@ level playable.
 
 """
 
-from typing import Tuple
 from pathlib import Path
 
 import torch
 import numpy as np
 
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
-from poli.core.abstract_black_box import AbstractBlackBox
-from poli.core.abstract_problem_factory import AbstractProblemFactory
-from poli.core.problem_setup_information import ProblemSetupInformation
-
-from poli.core.util.seeding import seed_python_numpy_and_torch
 
 from poli.objective_repository.super_mario_bros.model import load_example_model
 

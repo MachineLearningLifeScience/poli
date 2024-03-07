@@ -37,6 +37,13 @@ class ToyContinuousBlackBox(AbstractBlackBox):
 
     Parameters
     ----------
+    function_name : str
+        The name of the toy continuous function to evaluate, by default None.
+    n_dimensions : int
+        The number of dimensions for the toy continuous function, by default 2.
+    embed_in : int, optional
+        If not None, the continuous problem is randomly embedded in this dimension.
+        By default, None.
     batch_size : int, optional
         The batch size for parallel evaluation, by default None.
     parallelize : bool, optional
@@ -45,13 +52,6 @@ class ToyContinuousBlackBox(AbstractBlackBox):
         The number of workers for parallel evaluation, by default None.
     evaluation_budget : int, optional
         The maximum number of evaluations, by default float("inf").
-    function_name : str
-        The name of the toy continuous function to evaluate, by default None.
-    n_dimensions : int
-        The number of dimensions for the toy continuous function, by default 2.
-    embed_in : int, optional
-        If not None, the continuous problem is randomly embedded in this dimension.
-        By default, None.
 
     Attributes
     ----------
@@ -75,13 +75,13 @@ class ToyContinuousBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
+        function_name: str,
+        n_dimensions: int = 2,
+        embed_in: int = None,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-        function_name: str = None,
-        n_dimensions: int = 2,
-        embed_in: int = None,
     ):
 
         assert (
