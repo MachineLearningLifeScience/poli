@@ -6,9 +6,15 @@ benefit of having IDE IntelliSense support.
 """
 
 
-def test_basic_loop():
+def test_basic_loop_without_create():
     from poli.objective_repository import ToyContinuousProblemFactory
 
     problem_factory = ToyContinuousProblemFactory()
 
-    f, x0, y0 = problem_factory.create(function_name="ackley_function_01")
+    problem = problem_factory.create(function_name="ackley_function_01")
+
+
+def test_instancing_black_boxes_alone():
+    from poli.objective_repository import ToyContinuousBlackBox
+
+    f = ToyContinuousBlackBox(function_name="ackley_function_01")

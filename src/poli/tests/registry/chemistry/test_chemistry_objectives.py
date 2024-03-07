@@ -8,39 +8,17 @@ from poli import objective_factory
 THIS_DIR = Path(__file__).parent.resolve()
 
 
-def test_qed_is_available():
-    """
-    We test whether the qed problem is available
-    when rdkit and selfies are installed.
-    """
-    _ = pytest.importorskip("rdkit")
-    _ = pytest.importorskip("selfies")
-    from poli.objective_repository import AVAILABLE_PROBLEM_FACTORIES
-
-    assert "rdkit_qed" in AVAILABLE_PROBLEM_FACTORIES
-
-
-def test_logp_is_available():
-    """
-    We test whether the logp problem is available
-    when rdkit and selfies are installed.
-    """
-    _ = pytest.importorskip("rdkit")
-    _ = pytest.importorskip("selfies")
-    from poli.objective_repository import AVAILABLE_PROBLEM_FACTORIES
-
-    assert "rdkit_logp" in AVAILABLE_PROBLEM_FACTORIES
-
-
 def test_force_registering_qed():
     """
     We test whether we can force-register the qed problem
     if rdkit and selfies are not installed.
     """
-    f, _, y0 = objective_factory.create(
+    problem = objective_factory.create(
         name="rdkit_qed",
         force_register=True,
     )
+    f, x0 = problem.black_box, problem.x0
+    y0 = f(x0)
 
     # Asserting that the QED of a single carbon
     # is close to 0.35978494 (according to RDKit).
@@ -67,58 +45,16 @@ def test_force_registering_logp():
     We test whether we can force-register the logp problem
     if rdkit and selfies are not installed.
     """
-    f, _, y0 = objective_factory.create(
+    problem = objective_factory.create(
         name="rdkit_logp",
         force_register=True,
     )
+    f, x0 = problem.black_box, problem.x0
+    y0 = f(x0)
 
     # Asserting that a single carbon atom has logp close
     # to 0.6361. (according to RDKit)
     assert np.isclose(y0, 0.6361).all()
-    f.terminate()
-
-
-def test_registering_qed():
-    """
-    Testing whether we can register the qed problem
-    if rdkit and selfies are installed.
-    """
-    _ = pytest.importorskip("rdkit")
-    _ = pytest.importorskip("selfies")
-    np = pytest.importorskip("numpy")
-
-    f, _, y0 = objective_factory.create(
-        name="rdkit_qed",
-    )
-    x = np.array([["C"]])
-    y = f(x)
-
-    # Asserting that the QED of a single carbon
-    # is close to 0.35978494 (according to RDKit).
-    assert np.isclose(y, 0.35978494).all()
-
-    f.terminate()
-
-
-def test_registering_logp():
-    """
-    Testing whether we can register the logp problem
-    if rdkit and selfies are installed.
-    """
-    rdkit = pytest.importorskip("rdkit")
-    selfies = pytest.importorskip("selfies")
-    np = pytest.importorskip("numpy")
-
-    f, _, y0 = objective_factory.create(
-        name="rdkit_logp",
-    )
-    x = np.array([["C"]])
-    f(x)
-
-    # Asserting that a single carbon atom has logp close
-    # to 0.6361. (according to RDKit)
-    assert np.isclose(y0, 0.6361).all()
-
     f.terminate()
 
 
@@ -132,12 +68,7 @@ def test_penalized_logp_lambo():
     _ = pytest.importorskip("lambo")
 
     # Using create
-    f, x0, y0 = objective_factory.create(
-        name="penalized_logp_lambo", force_register=True
-    )
-    print(x0)
-    print(y0)
-    f.terminate()
+    problem = objective_factory.create(name="penalized_logp_lambo", force_register=True)
 
 
 def test_querying_dockstring_using_smiles():
@@ -146,12 +77,13 @@ def test_querying_dockstring_using_smiles():
     """
     from poli import objective_factory
 
-    f, x0, y0 = objective_factory.create(
+    problem = objective_factory.create(
         name="dockstring",
         target_name="DRD2",
         string_representation="SMILES",
         force_register=True,
     )
+    f = problem.black_box
 
     # Docking another smiles
     x1 = np.array([list("CC(=O)OC1=CC=CC=C1C(=O)O")])
@@ -167,12 +99,13 @@ def test_querying_dockstring_using_selfies():
     """
     from poli import objective_factory
 
-    f, x0, y0 = objective_factory.create(
+    problem = objective_factory.create(
         name="dockstring",
         target_name="ABL1",
         string_representation="SELFIES",
         force_register=True,
     )
+    f = problem.black_box
 
     # Docking another smiles
     selfies_aspirin = np.array(

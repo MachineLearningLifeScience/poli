@@ -9,13 +9,14 @@ a conda environment called 'poli__base' (see the
 environment.yml file in this folder).
 """
 
-from typing import Tuple
-
 import numpy as np
 
-from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
+from poli.core.problem import Problem
+from poli.core.abstract_black_box import AbstractBlackBox
+
 from poli.core.problem_setup_information import ProblemSetupInformation
+from poli.core.black_box_information import BlackBoxInformation
 
 from poli.core.util.seeding import seed_python_numpy_and_torch
 
@@ -26,8 +27,6 @@ class WhiteNoiseBlackBox(AbstractBlackBox):
 
     Parameters
     ----------
-    info : ProblemSetupInformation
-        The problem setup information.
     batch_size : int, optional
         The batch size for vectorized evaluation.
     parallelize : bool, optional
@@ -46,7 +45,6 @@ class WhiteNoiseBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        info: ProblemSetupInformation,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
@@ -71,7 +69,6 @@ class WhiteNoiseBlackBox(AbstractBlackBox):
             The maximum number of evaluations, by default float("inf").
         """
         super().__init__(
-            info=info,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
@@ -95,25 +92,42 @@ class WhiteNoiseBlackBox(AbstractBlackBox):
         """
         return np.random.randn(x.shape[0], 1)
 
+    @staticmethod
+    def get_black_box_info() -> BlackBoxInformation:
+        return BlackBoxInformation(
+            name="white_noise",
+            max_sequence_length=np.inf,
+            aligned=False,
+            fixed_length=False,
+            deterministic=False,
+            alphabet=[str(i) for i in range(10)],
+            log_transform_recommended=False,
+            discrete=True,
+            padding_token="",
+        )
+
 
 class WhiteNoiseProblemFactory(AbstractProblemFactory):
-    def get_setup_information(self) -> ProblemSetupInformation:
+    @staticmethod
+    def get_setup_information() -> BlackBoxInformation:
         """
         Returns the setup information for the problem.
 
         Returns
         -------
-        problem_info : ProblemSetupInformation
+        problem_info : BlackBoxInformation
             The setup information for the problem.
         """
-        # A mock alphabet made of the 10 digits.
-        alphabet = [str(i) for i in range(10)]
-
-        return ProblemSetupInformation(
+        return BlackBoxInformation(
             name="white_noise",
             max_sequence_length=np.inf,
             aligned=False,
-            alphabet=alphabet,
+            fixed_length=False,
+            deterministic=False,
+            alphabet=[str(i) for i in range(10)],
+            log_transform_recommended=False,
+            discrete=True,
+            padding_token="",
         )
 
     def create(
@@ -123,9 +137,9 @@ class WhiteNoiseProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-    ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+    ) -> Problem:
         """
-        Create a white noise black box with the specified parameters.
+        Create a white noise problem with the specified parameters.
 
         Parameters:
         ----------
@@ -143,19 +157,14 @@ class WhiteNoiseProblemFactory(AbstractProblemFactory):
 
         Returns:
         -------
-        f : WhiteNoiseBlackBox
-            The white noise black box.
-        x0 : np.ndarray
-            The initial input (an array [["1", "2", "3"]]).
-        y0 : np.ndarray
-            The initial objective function value (an array of shape (1, 1)).
+        problem: WhiteNoiseProblem
+            A white noise problem with the specified parameters.
         """
         if seed is not None:
             seed_python_numpy_and_torch(seed)
 
         problem_info = self.get_setup_information()
         f = WhiteNoiseBlackBox(
-            info=problem_info,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
@@ -163,7 +172,9 @@ class WhiteNoiseProblemFactory(AbstractProblemFactory):
         )
         x0 = np.array([["1", "2", "3"]])
 
-        return f, x0, f(x0)
+        white_noise_problem = Problem(black_box=f, x0=x0)
+
+        return white_noise_problem
 
 
 if __name__ == "__main__":
@@ -177,5 +188,5 @@ if __name__ == "__main__":
     register_problem(
         white_noise_problem_factory,
         conda_environment_name="poli__base",
-        # force=True
+        force=True,
     )

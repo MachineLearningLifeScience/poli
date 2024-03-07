@@ -6,10 +6,11 @@ function for dockstring with the drd2 target.
 from poli import objective_factory
 
 if __name__ == "__main__":
-    f_dockstring, x0, y0 = objective_factory.create(
+    problem = objective_factory.create(
         name="dockstring",
         target_name="DRD2",
         string_representation="SMILES",
     )
+    f_dockstring, x0 = problem.black_box, problem.x0
 
     print(f"Score of Risperidone: {f_dockstring(x0)}")

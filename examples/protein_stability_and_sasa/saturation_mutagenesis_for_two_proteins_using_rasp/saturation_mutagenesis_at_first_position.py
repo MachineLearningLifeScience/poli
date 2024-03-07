@@ -45,10 +45,11 @@ if __name__ == "__main__":
         THIS_DIR / "two_proteins" / "2vae.pdb",
     ]
 
-    f_rasp, x0, y0 = objective_factory.create(
+    problem = objective_factory.create(
         name="rasp",
         wildtype_pdb_path=wildtype_pdb_paths_for_rasp,
     )
+    f_rasp, x0 = problem.black_box, problem.x0
 
     # At this point, x0 contains the string
     # representations of the wildtype sequences.
@@ -67,7 +68,7 @@ if __name__ == "__main__":
 
     y = f_rasp(x)
 
-    # Saving the results in a CSV file:
+    # Storing the results in a CSV file:
     df = pd.DataFrame(
         [
             {
@@ -79,3 +80,4 @@ if __name__ == "__main__":
     )
 
     print(df.head(20))
+    f_rasp.terminate()

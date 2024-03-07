@@ -1,6 +1,11 @@
 """
 In this example, we create both a RaSP and a FoldX objective function
 and we compare their predictions of stability.
+
+To run this example, you will need to have FoldX installed. Follow our
+instructions for set-up here:
+
+https://machinelearninglifescience.github.io/poli-docs/understanding_foldx/00-installing-foldx.html
 """
 
 from pathlib import Path
@@ -20,20 +25,22 @@ if __name__ == "__main__":
         if "_Repair" not in str(path_.name)
     ]
 
-    f_foldx, x0, y0 = objective_factory.create(
+    foldx_problem = objective_factory.create(
         name="foldx_stability",
         wildtype_pdb_path=wildtype_pdb_paths_for_foldx,
         batch_size=1,
     )
+    f_foldx, x0 = foldx_problem.black_box, foldx_problem.x0
 
     print(f_foldx(x0))
 
     f_foldx.terminate()
 
-    f_rasp, x0, y0 = objective_factory.create(
+    rasp_problem = objective_factory.create(
         name="rasp",
         wildtype_pdb_path=wildtype_pdb_paths_for_rasp,
     )
+    f_rasp, x0 = rasp_problem.black_box, rasp_problem.x0
 
     print(f_rasp(x0))
 

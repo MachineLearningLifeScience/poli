@@ -8,26 +8,9 @@ of Lipinsky's rule of 5.
 This black box is a simple wrapper around RDKit's
 Chem.QED.qed function, which returns a float between
 0 and 1. We allow for both SMILES and SELFIES strings.
-
-The problem is registered as 'rdkit_qed', and it uses
-a conda environment called 'poli__chem' (see the
-environment.yml file in this folder). If you want to
-run it locally without creating a new environemnt,
-these are the extra requirements:
-
-- rdkit
-- selfies
-
-Run:
-
-`
-pip install rdkit selfies
-`
 """
 
-from pathlib import Path
 from typing import Tuple, List, Literal
-import json
 
 import numpy as np
 
@@ -36,10 +19,14 @@ from rdkit.Chem.QED import qed
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem_setup_information import ProblemSetupInformation
+from poli.core.black_box_information import BlackBoxInformation
+from poli.core.problem import Problem
 
 from poli.core.util.chemistry.string_to_molecule import strings_to_molecules
 
 from poli.core.util.seeding import seed_python_numpy_and_torch
+
+from poli.objective_repository.rdkit_qed.information import rdkit_qed_info
 
 
 class QEDBlackBox(AbstractBlackBox):
@@ -59,8 +46,8 @@ class QEDBlackBox(AbstractBlackBox):
 
     Parameters
     ----------
-    info : ProblemSetupInformation
-        The problem setup information.
+    string_representation : Literal["SMILES", "SELFIES"], optional
+        The string representation to use, by default "SMILES".
     batch_size : int, optional
         The batch size for processing multiple inputs simultaneously, by default None.
     parallelize : bool, optional
@@ -69,8 +56,6 @@ class QEDBlackBox(AbstractBlackBox):
         The number of workers to use for parallel computation, by default None.
     evaluation_budget:  int, optional
         The maximum number of function evaluations. Default is infinity.
-    from_selfies : bool, optional
-        Flag indicating whether the input is a SELFIES string, by default False.
 
     Attributes
     ----------
@@ -88,21 +73,19 @@ class QEDBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        info: ProblemSetupInformation,
+        string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-        alphabet: List[str] = None,
-        from_selfies: bool = False,
     ):
         """
         Initialize the QEDBlackBox.
 
         Parameters
         ----------
-        info : ProblemSetupInformation
-            The problem setup information object.
+        string_representation : Literal["SMILES", "SELFIES"], optional
+            The string representation to use, by default "SMILES".
         batch_size : int, optional
             The batch size for parallel evaluation, by default None.
         parallelize : bool, optional
@@ -111,19 +94,18 @@ class QEDBlackBox(AbstractBlackBox):
             The number of workers for parallel evaluation, by default None.
         evaluation_budget : int, optional
             The maximum number of evaluations, by default float("inf").
-        alphabet : List[str], optional
-            The alphabet for encoding molecules, by default it's
-            the one inside the problem setup information. We strongly
-            advice providing an alphabet.
-        from_selfies : bool, optional
-            Flag indicating whether the molecules are encoded using SELFIES, by default False.
         """
-        super().__init__(info, batch_size, parallelize, num_workers)
-        self.from_selfies = from_selfies
-        self.from_smiles = not from_selfies
+        super().__init__(
+            batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
+        )
+        assert string_representation.upper() in ["SMILES", "SELFIES"]
+        self.from_selfies = string_representation.upper() == "SELFIES"
+        self.from_smiles = string_representation.upper() == "SMILES"
 
         super().__init__(
-            info=info,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
@@ -181,6 +163,17 @@ class QEDBlackBox(AbstractBlackBox):
 
         return np.array(qed_values).reshape(-1, 1)
 
+    @staticmethod
+    def get_black_box_info() -> BlackBoxInformation:
+        """Returns the black box information for the QED problem.
+
+        Returns
+        -------
+        BlackBoxInformation
+            The black box information for the QED problem.
+        """
+        return rdkit_qed_info
+
 
 class QEDProblemFactory(AbstractProblemFactory):
     """Problem factory for the QED problem.
@@ -198,14 +191,8 @@ class QEDProblemFactory(AbstractProblemFactory):
         Creates a problem instance with the specified parameters.
     """
 
-    def get_setup_information(self) -> ProblemSetupInformation:
-        # TODO: Add a default alphabet here.
-        return ProblemSetupInformation(
-            name="rdkit_qed",
-            max_sequence_length=np.inf,
-            aligned=False,
-            alphabet=None,
-        )
+    def get_setup_information(self) -> BlackBoxInformation:
+        return rdkit_qed_info
 
     def create(
         self,
@@ -215,7 +202,7 @@ class QEDProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-    ) -> Tuple[QEDBlackBox, np.ndarray, np.ndarray]:
+    ) -> Problem:
         """Creates a QED black box function and initial observations.
 
         Parameters
@@ -236,12 +223,8 @@ class QEDProblemFactory(AbstractProblemFactory):
 
         Returns
         -------
-        f : QEDBlackBox
-            The QED black box function.
-        x0 : np.ndarray
-            The initial input (a single carbon).
-        y0 : np.ndarray
-            The initial output (the qed of a single carbon).
+        problem : Problem
+            The QED problem instance, containing the black box and the initial input.
         """
         if seed is not None:
             seed_python_numpy_and_torch(seed)
@@ -252,14 +235,12 @@ class QEDProblemFactory(AbstractProblemFactory):
                 "String representation must be either 'SMILES' or 'SELFIES'."
             )
 
-        problem_info = self.get_setup_information()
         f = QEDBlackBox(
-            info=problem_info,
+            string_representation=string_representation.upper(),
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
-            from_selfies=string_representation.upper() == "SELFIES",
         )
 
         # The sequence "C"
@@ -268,7 +249,7 @@ class QEDProblemFactory(AbstractProblemFactory):
         else:
             x0 = np.array([["[C]"]])
 
-        return f, x0, f(x0)
+        return Problem(f, x0)
 
 
 if __name__ == "__main__":

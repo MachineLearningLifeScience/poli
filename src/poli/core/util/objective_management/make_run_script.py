@@ -1,7 +1,7 @@
 """This module contains utilities for creating run scripts for problems and observers.
 """
 
-from typing import List, Union
+from typing import List, Union, Type
 from pathlib import Path
 import os
 import sys
@@ -9,10 +9,13 @@ from os.path import basename, dirname, join
 import inspect
 import stat
 
-from poli import objective
-from poli.objective import ADDITIONAL_IMPORT_SEARCH_PATHES_KEY
+from poli import external_problem_factory_script
+from poli import external_isolated_function_script
+from poli.external_problem_factory_script import ADDITIONAL_IMPORT_SEARCH_PATHES_KEY
 from poli.core.util import observer_wrapper
 from poli.core.abstract_problem_factory import AbstractProblemFactory
+from poli.core.abstract_black_box import AbstractBlackBox
+from poli.core.abstract_isolated_function import AbstractIsolatedFunction
 from poli.core.util.abstract_observer import AbstractObserver
 
 # By default, we will store the run scripts inside the
@@ -22,8 +25,41 @@ HOME_DIR = Path.home().resolve()
 RUN_SCRIPTS_FOLDER = HOME_DIR / ".poli_objectives"
 
 
+def make_isolated_function_script(
+    isolated_function: AbstractIsolatedFunction,
+    conda_environment_name: Union[str, Path] = None,
+    python_paths: List[str] = None,
+    cwd=None,
+    **kwargs,
+):
+    """
+    Create a script to run the given black box, returning its location.
+
+    Parameters
+    ----------
+    black_box : AbstractBlackBox
+        The black box object to be executed.
+    conda_environment_name : str or Path, optional
+        The conda environment to activate before running the black box.
+    python_paths : List[str], optional
+        Additional Python paths to be added before running the black box.
+    cwd : str or Path, optional
+        The current working directory for the script execution.
+
+    Returns
+    -------
+    run_script: str
+        The path to the generated script.
+
+    """
+    command = inspect.getfile(external_isolated_function_script)
+    return _make_run_script(
+        command, isolated_function, conda_environment_name, python_paths, cwd, **kwargs
+    )
+
+
 def make_run_script(
-    problem_factory: AbstractProblemFactory,
+    problem_factory: Type[AbstractProblemFactory],
     conda_environment_name: Union[str, Path] = None,
     python_paths: List[str] = None,
     cwd=None,
@@ -49,14 +85,14 @@ def make_run_script(
     run_script: str
         The generated run script.
     """
-    command = inspect.getfile(objective)
+    command = inspect.getfile(external_problem_factory_script)
     return _make_run_script(
         command, problem_factory, conda_environment_name, python_paths, cwd, **kwargs
     )
 
 
 def make_observer_script(
-    observer: AbstractObserver,
+    observer: Type[AbstractObserver],
     conda_environment: Union[str, Path] = None,
     python_paths: List[str] = None,
     cwd=None,
@@ -85,9 +121,20 @@ def make_observer_script(
     return _make_run_script(command, observer, conda_environment, python_paths, cwd)
 
 
+def _make_black_box_script(
+    command: str,
+    command_for_instancing_the_black_box: str,
+    conda_environment_name: Union[str, Path],
+    python_paths: List[str],
+    cwd=None,
+):
+    # TODO: implement in such a way that
+    ...
+
+
 def _make_run_script(
     command: str,
-    instantiated_object,
+    non_instantiated_object,
     conda_environment_name: Union[str, Path],
     python_paths: List[str],
     cwd=None,
@@ -119,10 +166,11 @@ def _make_run_script(
     if cwd is None:
         cwd = str(os.getcwd())
 
-    class_object = instantiated_object.__class__
+    # class_object = instantiated_object.__class__
+    class_object = non_instantiated_object
     problem_factory_name = class_object.__name__  # TODO: potential vulnerability?
     factory_location = inspect.getfile(class_object)
-    package_name = inspect.getmodule(instantiated_object).__name__
+    package_name = inspect.getmodule(non_instantiated_object).__name__
 
     if package_name == "__main__":
         package_name = basename(factory_location)[:-3]

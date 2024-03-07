@@ -19,11 +19,11 @@ import numpy as np
 
 import selfies as sf
 
-from dockstring import load_target
 
 from poli.core.abstract_black_box import AbstractBlackBox
+from poli.core.black_box_information import BlackBoxInformation
 from poli.core.abstract_problem_factory import AbstractProblemFactory
-from poli.core.problem_setup_information import ProblemSetupInformation
+from poli.core.problem import Problem
 
 from poli.core.util.chemistry.string_to_molecule import (
     translate_selfies_to_smiles,
@@ -31,6 +31,12 @@ from poli.core.util.chemistry.string_to_molecule import (
 )
 
 from poli.core.util.seeding import seed_python_numpy_and_torch
+
+from poli.core.util.isolation.instancing import instance_function_as_isolated_process
+
+from poli.objective_repository.dockstring.information import (
+    dockstring_black_box_information,
+)
 
 
 class DockstringBlackBox(AbstractBlackBox):
@@ -42,8 +48,6 @@ class DockstringBlackBox(AbstractBlackBox):
 
     Parameters
     ----------
-    info : ProblemSetupInformation
-        The problem setup information.
     target_name : str
         The name of the target protein.
     string_representation : str, optional
@@ -79,21 +83,24 @@ class DockstringBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        info: ProblemSetupInformation,
         target_name: str,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
+        force_isolation: bool = False,
     ):
         """
         Initialize the dockstring black box object.
 
         Parameters
         ----------
-        info : ProblemSetupInformation
-            The problem setup information object.
+        target_name : str
+            The name of the target protein.
+        string_representation : str
+            The string representation of the molecules. Either SMILES or SELFIES.
+            Default is SMILES.
         batch_size : int, optional
             The batch size for processing data, by default None.
         parallelize : bool, optional
@@ -102,18 +109,12 @@ class DockstringBlackBox(AbstractBlackBox):
             The number of workers to use for parallel processing, by default None.
         evaluation_budget:  int, optional
             The maximum number of function evaluations. Default is infinity.
-        target_name : str
-            The name of the target protein.
-        string_representation : str
-            The string representation of the molecules. Either SMILES or SELFIES.
-            Default is SMILES.
         """
         assert (
             target_name is not None
         ), "Missing required keyword argument 'target_name'. "
 
         super().__init__(
-            info=info,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
@@ -122,7 +123,28 @@ class DockstringBlackBox(AbstractBlackBox):
         self.target_name = target_name
         self.string_representation = string_representation
 
-        self.target = load_target(target_name)
+        if not force_isolation:
+            try:
+                from poli.objective_repository.dockstring.isolated_function import (
+                    IsolatedDockstringFunction,
+                )
+
+                self.inner_function = IsolatedDockstringFunction(
+                    target_name=target_name,
+                    string_representation=string_representation,
+                )
+            except ImportError:
+                self.inner_function = instance_function_as_isolated_process(
+                    name="dockstring__isolated",
+                    target_name=target_name,
+                    string_representation=string_representation,
+                )
+        else:
+            self.inner_function = instance_function_as_isolated_process(
+                name="dockstring__isolated",
+                target_name=target_name,
+                string_representation=string_representation,
+            )
 
     def _black_box(self, x: np.ndarray, context=None) -> np.ndarray:
         """Evaluating the black box function.
@@ -149,28 +171,11 @@ class DockstringBlackBox(AbstractBlackBox):
         Exception
             If the docking score cannot be computed.
         """
-        assert len(x.shape) == 2, "Expected a 2D array of strings. "
-        molecules_as_strings = ["".join(x_i) for x_i in x]
+        return self.inner_function(x, context=context)
 
-        if self.string_representation == "SELFIES":
-            molecules_as_smiles = translate_selfies_to_smiles(molecules_as_strings)
-        else:
-            molecules_as_smiles = molecules_as_strings
-
-        # Parallelization is handled by the __call__ method of
-        # the AbstractBlackBox class.
-        scores = []
-        for smiles in molecules_as_smiles:
-            try:
-                score = self.target.dock(smiles)[0]
-            except Exception as e:
-                score = np.nan
-            scores.append(score)
-
-        # Since our goal is maximization, and scores in dockstring
-        # are better if they are lower, we return the negative of
-        # the scores.
-        return -np.array(scores).reshape(-1, 1)
+    @staticmethod
+    def get_black_box_info() -> BlackBoxInformation:
+        return dockstring_black_box_information
 
 
 class DockstringProblemFactory(AbstractProblemFactory):
@@ -195,18 +200,12 @@ class DockstringProblemFactory(AbstractProblemFactory):
         https://doi.org/10.1021/acs.jcim.1c01334.
     """
 
-    def get_setup_information(self) -> ProblemSetupInformation:
+    @staticmethod
+    def get_setup_information() -> BlackBoxInformation:
         # TODO: We might change this in the future for a
         # default dictionary, depending on whether we
         # are using SMILES or SELFIES.
-        alphabet = None
-
-        return ProblemSetupInformation(
-            name="dockstring",
-            max_sequence_length=np.inf,
-            aligned=False,
-            alphabet=alphabet,
-        )
+        return dockstring_black_box_information
 
     def create(
         self,
@@ -217,7 +216,7 @@ class DockstringProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-    ) -> Tuple[DockstringBlackBox, np.ndarray, np.ndarray]:
+    ) -> Problem:
         """Creates a dockstring black box function and initial observations.
 
         Parameters
@@ -241,9 +240,8 @@ class DockstringProblemFactory(AbstractProblemFactory):
 
         Returns
         -------
-        results: Tuple[DockstringBlackBox, np.ndarray, np.ndarray]:
-            A tuple containing the blackbox function, initial inputs,
-            and their respective outputs.
+        problem: Problem
+            A problem definition with the dockstring black box function and initial observations.
         """
         assert (
             target_name is not None
@@ -253,13 +251,12 @@ class DockstringProblemFactory(AbstractProblemFactory):
             seed_python_numpy_and_torch(seed)
 
         dockstring_black_box = DockstringBlackBox(
-            info=self.get_setup_information(),
+            target_name=target_name,
+            string_representation=string_representation,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
-            target_name=target_name,
-            string_representation=string_representation,
         )
 
         # Using the initial example they provide in the
@@ -277,7 +274,9 @@ class DockstringProblemFactory(AbstractProblemFactory):
                 f"Invalid string representation. Expected SMILES or SELFIES but received {string_representation}."
             )
 
-        return dockstring_black_box, x0, dockstring_black_box(x0)
+        dockstring_problem = Problem(black_box=dockstring_black_box, x0=x0)
+
+        return dockstring_problem
 
 
 if __name__ == "__main__":

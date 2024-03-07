@@ -12,39 +12,53 @@ import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
-from poli.core.problem_setup_information import ProblemSetupInformation
+from poli.core.black_box_information import BlackBoxInformation
+from poli.core.problem import Problem
+
+our_aloha_information = BlackBoxInformation(
+    name="our_aloha",
+    max_sequence_length=5,
+    aligned=True,
+    fixed_length=True,
+    deterministic=True,
+    alphabet=list(ascii_uppercase),
+    log_transform_recommended=False,
+    discrete=True,
+    fidelity=None,
+    padding_token="",
+)
 
 
 class OurAlohaBlackBox(AbstractBlackBox):
-    def __init__(self, info: ProblemSetupInformation, batch_size: int = None):
-        super().__init__(info, batch_size)
+    def __init__(
+        self,
+        batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
+        evaluation_budget: int = float("inf"),
+    ):
+        super().__init__(batch_size, parallelize, num_workers, evaluation_budget)
 
     # The only method you have to define
     def _black_box(self, x: np.ndarray, context: dict = None) -> np.ndarray:
         matches = x == np.array(["A", "L", "O", "H", "A"])
         return np.sum(matches, axis=1, keepdims=True)
 
+    @staticmethod
+    def get_black_box_info() -> BlackBoxInformation:
+        return our_aloha_information
+
 
 class OurAlohaProblemFactory(AbstractProblemFactory):
-    def get_setup_information(self) -> ProblemSetupInformation:
+    def get_setup_information(self) -> BlackBoxInformation:
         # The alphabet: ["A", "B", "C", ...]
-        alphabet = list(ascii_uppercase)
+        return our_aloha_information
 
-        return ProblemSetupInformation(
-            name="our_aloha",
-            max_sequence_length=5,
-            aligned=True,
-            alphabet=alphabet,
-        )
-
-    def create(
-        self, seed: int = None, **kwargs
-    ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
-        problem_info = self.get_setup_information()
-        f = OurAlohaBlackBox(info=problem_info)
+    def create(self, seed: int = None, **kwargs) -> Problem:
+        f = OurAlohaBlackBox()
         x0 = np.array([["A", "L", "O", "O", "F"]])
 
-        return f, x0, f(x0)
+        return Problem(f, x0)
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-name: poli__protein
+name: poli__protein_cbas
 channels:
   - defaults
 dependencies:

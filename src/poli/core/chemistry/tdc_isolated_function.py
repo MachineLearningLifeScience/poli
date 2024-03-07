@@ -16,12 +16,13 @@ import numpy as np
 from tdc import Oracle
 
 from poli.core.abstract_black_box import AbstractBlackBox
+from poli.core.abstract_isolated_function import AbstractIsolatedFunction
 from poli.core.problem_setup_information import ProblemSetupInformation
 
 from poli.core.util.chemistry.string_to_molecule import translate_selfies_to_smiles
 
 
-class TDCBlackBox(AbstractBlackBox):
+class TDCIsolatedFunction(AbstractIsolatedFunction):
     """
     TDCBlackBox is a class that represents a black box for the
     TDC (Therapeutics Data Commons) problems.
@@ -31,16 +32,6 @@ class TDCBlackBox(AbstractBlackBox):
     -----------
     oracle_name : str
         The name of the oracle used for computing the docking score.
-    info : ProblemSetupInformation
-        An instance of the ProblemSetupInformation class that contains information about the problem setup.
-    batch_size : int, optional
-        The batch size for processing multiple inputs in parallel. Defaults to None.
-    parallelize : bool, optional
-        Flag indicating whether to parallelize the computation. Defaults to False.
-    num_workers : int, optional
-        The number of workers to use for parallel computation. Defaults to None.
-    evaluation_budget : int, optional
-        The evaluation budget. Defaults to infinity.
     from_smiles : bool, optional
         Flag indicating whether the input molecules are in SMILES format. Defaults to True.
 
@@ -55,16 +46,11 @@ class TDCBlackBox(AbstractBlackBox):
     def __init__(
         self,
         oracle_name: str,
-        info: ProblemSetupInformation,
-        batch_size: int = None,
-        parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = float("inf"),
         from_smiles: bool = True,
         **kwargs_for_oracle,
     ):
         """
-        Initialize the TDCBlackBox class.
+        Initialize the TDCIsolatedFunction class.
 
         Parameters
         ----------
@@ -83,11 +69,11 @@ class TDCBlackBox(AbstractBlackBox):
         **kwargs_for_oracle : dict, optional
             Additional keyword arguments for the oracle.
         """
-        super().__init__(info, batch_size, parallelize, num_workers, evaluation_budget)
+        super().__init__()
         self.oracle = Oracle(name=oracle_name, **kwargs_for_oracle)
         self.from_smiles = from_smiles
 
-    def _black_box(self, x, context=None):
+    def __call__(self, x, context=None):
         """
         Assuming x is an array of strings,
         we concatenate them and then

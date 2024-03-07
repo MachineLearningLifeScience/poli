@@ -10,7 +10,7 @@ a conda environment called 'poli__base' (see the
 environment.yml file in this folder).
 """
 
-from typing import Tuple
+from typing import Literal, Tuple
 from string import ascii_uppercase
 
 import numpy as np
@@ -18,6 +18,8 @@ import numpy as np
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem_setup_information import ProblemSetupInformation
+from poli.core.black_box_information import BlackBoxInformation
+from poli.core.problem import Problem
 
 from poli.core.util.seeding import seed_python_numpy_and_torch
 
@@ -32,8 +34,6 @@ class AlohaBlackBox(AbstractBlackBox):
 
     Parameters
     ----------
-    info : ProblemSetupInformation
-        The problem setup information.
     batch_size : int, optional
         The batch size for processing multiple inputs simultaneously, by default None.
     parallelize : bool, optional
@@ -58,7 +58,6 @@ class AlohaBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        info: ProblemSetupInformation,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
@@ -69,8 +68,6 @@ class AlohaBlackBox(AbstractBlackBox):
 
         Parameters
         ----------
-        info : ProblemSetupInformation
-            The problem setup information object.
         batch_size : int, optional
             The batch size for processing data, by default None.
         parallelize : bool, optional
@@ -80,13 +77,25 @@ class AlohaBlackBox(AbstractBlackBox):
         evaluation_budget:  int, optional
             The maximum number of function evaluations. Default is infinity.
         """
-        self.alphabet = {symbol: idx for idx, symbol in enumerate(info.alphabet)}
         super().__init__(
-            info=info,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
+        )
+
+    @staticmethod
+    def get_black_box_info() -> BlackBoxInformation:
+        return BlackBoxInformation(
+            name="aloha",
+            max_sequence_length=5,
+            aligned=True,
+            fixed_length=True,
+            deterministic=True,
+            alphabet=list(ascii_uppercase),
+            log_transform_recommended=False,
+            discrete=True,
+            padding_token="",
         )
 
     # The only method you have to define
@@ -107,13 +116,7 @@ class AlohaBlackBox(AbstractBlackBox):
         y: np.ndarray
             Array of shape [b, 1] containing the distances to the sequence "ALOHA".
         """
-        if x.dtype.kind == "i":
-            if self.alphabet is None:
-                raise ValueError(
-                    "The alphabet must be defined if the input is an array of ints."
-                )
-            inverse_alphabet = {v: k for k, v in self.alphabet.items()}
-            x = np.array([[inverse_alphabet[i] for i in x[0]]])
+        assert x.dtype.kind == "U", "The input must be an array of strings."
 
         if x.shape[1] == 1:
             assert (
@@ -145,7 +148,8 @@ class AlohaProblemFactory(AbstractProblemFactory):
         Creates a problem instance with the specified parameters.
     """
 
-    def get_setup_information(self) -> ProblemSetupInformation:
+    @staticmethod
+    def get_setup_information() -> ProblemSetupInformation:
         """
         Returns the setup information for the problem.
 
@@ -154,14 +158,16 @@ class AlohaProblemFactory(AbstractProblemFactory):
         problem_info: ProblemSetupInformation
             The setup information for the problem.
         """
-        # The alphabet: ["A", "B", "C", ...]
-        alphabet = list(ascii_uppercase)
-
-        return ProblemSetupInformation(
+        return BlackBoxInformation(
             name="aloha",
             max_sequence_length=5,
             aligned=True,
-            alphabet=alphabet,
+            fixed_length=True,
+            deterministic=True,
+            alphabet=list(ascii_uppercase),
+            log_transform_recommended=False,
+            discrete=True,
+            padding_token="",
         )
 
     def create(
@@ -171,7 +177,7 @@ class AlohaProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-    ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+    ) -> Problem:
         """
         Returns an Aloha blackbox function and initial observations.
 
@@ -199,9 +205,7 @@ class AlohaProblemFactory(AbstractProblemFactory):
         if seed is not None:
             seed_python_numpy_and_torch(seed)
 
-        problem_info = self.get_setup_information()
         f = AlohaBlackBox(
-            info=problem_info,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
@@ -209,7 +213,12 @@ class AlohaProblemFactory(AbstractProblemFactory):
         )
         x0 = np.array([["A", "L", "O", "O", "F"]])
 
-        return f, x0, f(x0)
+        aloha_problem = Problem(
+            black_box=f,
+            x0=x0,
+        )
+
+        return aloha_problem
 
 
 if __name__ == "__main__":

@@ -1,4 +1,7 @@
-"""Executable script used for isolation of objective factories and functions."""
+"""Executable script used for isolation of objective factories and functions.
+
+The equivalent of objective, but for isolated black boxes instead of problem factories.
+"""
 
 import logging
 import os
@@ -6,8 +9,9 @@ import sys
 import argparse
 import traceback
 
-from poli.core.abstract_problem_factory import AbstractProblemFactory
+from poli.core.abstract_isolated_function import AbstractIsolatedFunction
 from poli.core.util.inter_process_communication.process_wrapper import get_connection
+from poli.core.util.seeding import seed_python_numpy_and_torch
 
 
 ADDITIONAL_IMPORT_SEARCH_PATHES_KEY = "ADDITIONAL_IMPORT_PATHS"
@@ -103,7 +107,7 @@ def dynamically_instantiate(obj: str, **kwargs):
     return instantiated_object
 
 
-def run(factory_kwargs: str, objective_name: str, port: int, password: str) -> None:
+def run(objective_name: str, port: int, password: str) -> None:
     """Starts an objective function listener loop to wait for requests.
 
     Parameters
@@ -118,27 +122,28 @@ def run(factory_kwargs: str, objective_name: str, port: int, password: str) -> N
     password : str
         The password for the connection with the mother process.
     """
-    kwargs = parse_factory_kwargs(factory_kwargs)
+    # kwargs = parse_factory_kwargs(factory_kwargs)
 
     # make connection with the mother process
     conn = get_connection(port, password)
 
     # TODO: We could be receiving the kwargs for the factory here.
-    msg_type, seed = conn.recv()
-    kwargs["seed"] = seed
+    msg_type, seed, kwargs_for_function = conn.recv()
+
+    if seed is not None:
+        seed_python_numpy_and_torch(seed)
 
     # dynamically load objective function module
     # At this point, the black box objective function
     # is exactly the same as the one used in the
     # registration (?).
     try:
-        objective_factory: AbstractProblemFactory = dynamically_instantiate(
-            objective_name
+        f: AbstractIsolatedFunction = dynamically_instantiate(
+            objective_name, **kwargs_for_function
         )
-        f, x0, y0 = objective_factory.create(**kwargs)
 
         # give mother process the signal that we're ready
-        conn.send(["SETUP", x0, y0, objective_factory.get_setup_information()])
+        conn.send(["SETUP", None])
     except Exception as e:
         tb = traceback.format_exc()
         conn.send(["EXCEPTION", e, tb])
@@ -147,7 +152,7 @@ def run(factory_kwargs: str, objective_name: str, port: int, password: str) -> N
     # now wait for objective function calls
     while True:
         msg_type, *msg = conn.recv()
-        # x, context = msg
+
         if msg_type == "QUIT":
             break
         try:
@@ -173,4 +178,4 @@ if __name__ == "__main__":
     parser.add_argument("--password", required=True, type=str)
 
     args, factory_kwargs = parser.parse_known_args()
-    run(factory_kwargs[0], args.objective_name, args.port, args.password)
+    run(args.objective_name, args.port, args.password)

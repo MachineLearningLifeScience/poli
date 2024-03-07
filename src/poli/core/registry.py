@@ -1,25 +1,29 @@
 """This module contains utilities for registering problems and observers.
 """
 
-from typing import List, Union, Dict
+from typing import List, Union, Dict, Type
 import configparser
 from pathlib import Path
 import warnings
 import subprocess
 
+from poli.core.abstract_isolated_function import AbstractIsolatedFunction
+from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.objective_management.make_run_script import (
     make_run_script,
     make_observer_script,
+    make_isolated_function_script,
 )
 
-from poli.objective_repository import AVAILABLE_PROBLEM_FACTORIES, AVAILABLE_OBJECTIVES
+# from poli.objective_repository import AVAILABLE_PROBLEM_FACTORIES, AVAILABLE_OBJECTIVES
 
 _DEFAULT = "DEFAULT"
 _OBSERVER = "observer"
 _RUN_SCRIPT_LOCATION = "run_script_location"
+_ISOLATED_FUNCTION_SCRIPT_LOCATION = "isolated_function_script_location"
 
 HOME_DIR = Path.home().resolve()
 (HOME_DIR / ".poli_objectives").mkdir(exist_ok=True)
@@ -30,7 +34,7 @@ ls = config.read(config_file)
 
 
 def set_observer(
-    observer: AbstractObserver,
+    observer: Union[AbstractObserver, Type[AbstractObserver]],
     conda_environment_location: str = None,
     python_paths: List[str] = None,
     observer_name: str = None,
@@ -60,8 +64,12 @@ def set_observer(
     -----
     The observer script MUST accept port and password as arguments.
     """
+    if isinstance(observer, type):
+        non_instance_observer = observer
+    else:
+        non_instance_observer = observer.__class__
     run_script_location = make_observer_script(
-        observer, conda_environment_location, python_paths
+        non_instance_observer, conda_environment_location, python_paths
     )
     set_observer_run_script(run_script_location, observer_name=observer_name)
 
@@ -126,10 +134,10 @@ def delete_observer_run_script(observer_name: str = None) -> str:
 
 
 def register_problem(
-    problem_factory: Union[AbstractProblemFactory, str],
+    problem_factory: AbstractProblemFactory,
     conda_environment_name: Union[str, Path] = None,
     python_paths: List[str] = None,
-    force: bool = False,
+    force: bool = True,
     **kwargs,
 ):
     """Registers a problem.
@@ -172,9 +180,47 @@ def register_problem(
         warnings.warn(f"Problem {problem_name} already exists. Overwriting.")
 
     run_script_location = make_run_script(
-        problem_factory, conda_environment_name, python_paths, **kwargs
+        type(problem_factory), conda_environment_name, python_paths, **kwargs
     )
     config[problem_name][_RUN_SCRIPT_LOCATION] = run_script_location
+    _write_config()
+
+
+def register_isolated_function(
+    isolated_function: Union[AbstractBlackBox, AbstractIsolatedFunction],
+    name: str,
+    conda_environment_name: Union[str, Path] = None,
+    python_paths: List[str] = None,
+    force: bool = True,
+    **kwargs,
+):
+    if "conda_environment_location" in kwargs:
+        conda_environment_name = kwargs["conda_environment_location"]
+
+    if not name.endswith("__isolated"):
+        warnings.warn(
+            "By convention, the name of the isolated function should end with '__isolated'. "
+            "This is to distinguish it from the original function. "
+        )
+
+    if name not in config.sections():
+        config.add_section(name)
+    elif not force:
+        # If force is false, we warn the user and ask for confirmation
+        user_input = input(
+            f"Black box {name} has already been registered. "
+            f"Do you want to overwrite it? (y/[n]) "
+        )
+        if user_input.lower() != "y":
+            warnings.warn(f"Black box {name} already exists. Not overwriting.")
+            return
+
+        warnings.warn(f"Black box {name} already exists. Overwriting.")
+
+    isolated_function_script_location = make_isolated_function_script(
+        isolated_function, conda_environment_name, python_paths, **kwargs
+    )
+    config[name][_ISOLATED_FUNCTION_SCRIPT_LOCATION] = isolated_function_script_location
     _write_config()
 
 
@@ -293,64 +339,6 @@ def delete_problem(problem_name: str):
     _write_config()
 
 
-def get_problems(only_available: bool = False) -> List[str]:
-    """Returns a list of registered problems.
-
-    Parameters
-    ----------
-    only_available : bool
-        Whether to only include the problems that can be imported directly.
-
-    Returns
-    -------
-    problem_list: List[str]
-        A list of registered problems.
-
-    Notes
-    -----
-    If only_available is False, the problems from the repository will be
-    included in the list. Otherwise, only the problems registered by the user/readily available
-    will be included.
-    """
-    problems = [
-        name for name in config.sections() if "run_script_location" in config[name]
-    ]
-
-    # problems.remove(_DEFAULT)  # no need to remove default section
-
-    # We also pad the get_problems() with the problems
-    # the user can import already without any problem,
-    # i.e. the AVAILABLE_PROBLEM_FACTORIES in the
-    # objective_repository
-    available_problems = list(AVAILABLE_PROBLEM_FACTORIES.keys())
-
-    if not only_available:
-        # We include the problems that the user _could_
-        # install from the repo. These are available in the
-        # AVAILABLE_OBJECTIVES list.
-        available_problems += AVAILABLE_OBJECTIVES
-
-    problems = sorted(list(set(problems + available_problems)))
-
-    return problems
-
-
-def get_problem_factories() -> Dict[str, AbstractProblemFactory]:
-    """
-    Returns a dictionary with the problem factories
-
-    Returns
-    -------
-    problem_factories: Dict[str, AbstractProblemFactory]
-        A dictionary with the problem factories that are available.
-    """
-    return AVAILABLE_PROBLEM_FACTORIES
-
-
 def _write_config():
     with open(config_file, "w+") as configfile:
         config.write(configfile)
-
-
-if __name__ == "__main__":
-    get_problems()

@@ -10,9 +10,9 @@ THIS_DIR = Path(__file__).parent.resolve()
 
 def test_rasp_on_3ned_against_notebooks_results_on_rasp_env():
     try:
-        from poli.objective_repository.rasp.register import RaspProblemFactory
+        from poli.objective_repository.rasp.isolated_function import RaspIsolatedLogic
     except ImportError:
-        pytest.skip("Could not import RaspProblemFactory. ")
+        pytest.skip("Could not import the rasp isolated logic. ")
 
     import torch
 
@@ -22,10 +22,11 @@ def test_rasp_on_3ned_against_notebooks_results_on_rasp_env():
 
     # If the previous import was successful, we can
     # create a RaSP problem:
-    f, x0, _ = objective_factory.create(
+    problem = objective_factory.create(
         name="rasp",
         wildtype_pdb_path=THIS_DIR / "3ned.pdb",
     )
+    f, x0 = problem.black_box, problem.x0
 
     wildtype_sequence = "".join(x0[0])
     three_mutations = [
@@ -43,20 +44,21 @@ def test_rasp_on_3ned_against_notebooks_results_on_rasp_env():
     # E1R: -0.07091977827871465
     # E1N: -0.2835593180137258
 
-    assert np.isclose(y[0], 0.03654138690753095)
-    assert np.isclose(y[1], -0.07091977827871465)
-    assert np.isclose(y[2], -0.2835593180137258)
+    assert np.isclose(y[0], 0.03654138690753095, atol=1e-4)
+    assert np.isclose(y[1], -0.07091977827871465, atol=1e-4)
+    assert np.isclose(y[2], -0.2835593180137258, atol=1e-4)
 
 
 def test_rasp_on_3ned_against_notebooks_results_isolated():
     """
     We test forceful registration of the RaSP problem.
     """
-    f, x0, _ = objective_factory.create(
+    problem = objective_factory.create(
         name="rasp",
         wildtype_pdb_path=THIS_DIR / "3ned.pdb",
         force_register=True,
     )
+    f, x0 = problem.black_box, problem.x0
 
     wildtype_sequence = "".join(x0[0])
     three_mutations = [

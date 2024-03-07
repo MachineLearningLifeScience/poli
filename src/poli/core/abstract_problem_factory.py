@@ -5,7 +5,8 @@ from typing import Tuple
 import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
-from poli.core.problem_setup_information import ProblemSetupInformation
+from poli.core.black_box_information import BlackBoxInformation
+from poli.core.problem import Problem
 
 
 class MetaProblemFactory(type):
@@ -40,14 +41,14 @@ class AbstractProblemFactory(metaclass=MetaProblemFactory):
         Creates a problem instance with the specified parameters.
     """
 
-    def get_setup_information(self) -> ProblemSetupInformation:
+    def get_setup_information(self) -> BlackBoxInformation:
         """
         Returns the setup information for the problem.
 
         Returns
         --------
-        problem_info: ProblemSetupInformation
-            The setup information for the problem.
+        problem_info: BlackBoxInformation
+            Information for the problem (e.g. whether it is discrete, deterministic...).
 
         Raises
         -------
@@ -63,7 +64,7 @@ class AbstractProblemFactory(metaclass=MetaProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-    ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+    ) -> Problem:
         """
         Returns a blackbox function and initial observations.
 
@@ -82,9 +83,9 @@ class AbstractProblemFactory(metaclass=MetaProblemFactory):
 
         Returns
         --------
-        results: Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
-            A tuple containing the blackbox function, initial observations for
-            input variables, and initial observations for output variables.
+        problem: AbstractProblem
+            A problem class containing, among other things, the black box,
+            initial values x0 and y0, and evaluation budget.
 
         Raises
         -------
