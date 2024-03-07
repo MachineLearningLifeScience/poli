@@ -362,7 +362,12 @@ class NegativeBlackBox(AbstractBlackBox):
 
     def __init__(self, f: AbstractBlackBox):
         self.f = f
-        super().__init__(info=f.info, batch_size=f.batch_size)
+        super().__init__(
+            batch_size=f.batch_size,
+            parallelize=f.parallelize,
+            num_workers=f.num_workers,
+            evaluation_budget=f.evaluation_budget,
+        )
 
     def __call__(self, x, context=None):
         return -self.f.__call__(x, context)
