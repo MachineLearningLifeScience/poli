@@ -152,7 +152,7 @@ def run(objective_name: str, port: int, password: str) -> None:
     # now wait for objective function calls
     while True:
         msg_type, *msg = conn.recv()
-        # x, context = msg
+
         if msg_type == "QUIT":
             break
         try:

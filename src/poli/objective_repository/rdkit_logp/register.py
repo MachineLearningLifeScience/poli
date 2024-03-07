@@ -44,9 +44,8 @@ class LogPBlackBox(AbstractBlackBox):
 
     Parameters
     ----------
-    from_selfies : bool, optional
-        Flag indicating whether the input is a SELFIES string,
-        by default False (i.e. we expect a SMILES string).
+    string_representation : Literal["SMILES", "SELFIES"], optional
+        The string representation to use, by default "SMILES".
     batch_size : int, optional
         The batch size for processing multiple inputs simultaneously, by default None.
     parallelize : bool, optional
@@ -72,19 +71,19 @@ class LogPBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
+        string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
-        from_selfies: bool = False,
     ):
         """
         Initializes the LogP black box.
 
         Parameters
         ----------
-        info : ProblemSetupInformation
-            The problem setup information.
+        string_representation : Literal["SMILES", "SELFIES"], optional
+            The string representation to use, by default "SMILES".
         batch_size : int, optional
             The batch size for processing multiple inputs simultaneously, by default None.
         parallelize : bool, optional
@@ -93,12 +92,10 @@ class LogPBlackBox(AbstractBlackBox):
             The number of workers to use for parallel computation, by default None.
         evaluation_budget:  int, optional
             The maximum number of function evaluations. Default is infinity.
-        from_selfies : bool, optional
-            Flag indicating whether the input is a SELFIES string,
-            by default False (i.e. we expect a SMILES string).
         """
-        self.from_selfies = from_selfies
-        self.from_smiles = not from_selfies
+        assert string_representation.upper() in ["SMILES", "SELFIES"]
+        self.from_selfies = string_representation.upper() == "SELFIES"
+        self.from_smiles = string_representation.upper() == "SMILES"
 
         super().__init__(
             batch_size=batch_size,
@@ -208,11 +205,11 @@ class LogPProblemFactory(AbstractProblemFactory):
             )
 
         f = LogPBlackBox(
+            string_representation=string_representation.upper(),
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
-            from_selfies=string_representation.upper() == "SELFIES",
         )
 
         # The sequence "C"

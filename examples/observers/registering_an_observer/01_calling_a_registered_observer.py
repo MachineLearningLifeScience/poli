@@ -18,10 +18,11 @@ if __name__ == "__main__":
     observer = ExternalObserver(observer_name="wandb", initial_step=0)
 
     # Instantiate the objective
-    f, x0, y0 = objective_factory.create(
+    problem = objective_factory.create(
         name="aloha",
         observer=observer,
     )
+    f = problem.black_box
 
     # Run the objective. Each objective call
     # is registered by the observer (check

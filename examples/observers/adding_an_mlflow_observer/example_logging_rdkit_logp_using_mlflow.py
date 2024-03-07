@@ -28,14 +28,13 @@ if __name__ == "__main__":
     observer = MlFlowObserver(tracking_uri=TRACKING_URI)
 
     # Initializing a logP objective function.
-    alphabet = ["", "[C]", "..."]
-    f, x0, y0 = objective_factory.create(
+    problem = objective_factory.create(
         name="rdkit_logp",
         observer=observer,
-        alphabet=alphabet,
         string_representation="SELFIES",
         observer_init_info={"run_id": None, "experiment_id": None},
     )
+    f, x0 = problem.black_box, problem.x0
 
     # Logging some examples
     # The observer will register each call to f.

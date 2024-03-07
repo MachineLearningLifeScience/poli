@@ -318,6 +318,8 @@ class AbstractBlackBox:
         """
         Terminate the black box optimization problem.
         """
+        if hasattr(self, "inner_function"):
+            self.inner_function.terminate()
         # if self.observer is not None:
         #     # NOTE: terminating a problem should gracefully end the observer process -> write the last state.
         #     self.observer.finish()

@@ -348,9 +348,11 @@ def create(
     # instantiate observer (if desired)
     observer_info = None
     if observer is not None:
-        f, x0 = problem.black_box, problem.x0
         # TODO: Should we send the y0 to the observer initialization?
-        y0 = f(x0)
+        # f, x0 = problem.black_box, problem.x0
+        # y0 = f(x0)
+        f = problem.black_box
+        x0, y0 = None, None
 
         observer_info = observer.initialize_observer(
             black_box_information, observer_init_info, x0, y0, seed

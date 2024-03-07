@@ -13,20 +13,13 @@ from pathlib import Path
 
 import numpy as np
 
-from poli import objective_factory
+from poli.objective_repository import QEDBlackBox, LogPBlackBox
 
 THIS_DIR = Path(__file__).parent.resolve()
 
 if __name__ == "__main__":
-    f_qed, x0, y0 = objective_factory.create(
-        name="rdkit_qed",
-        string_representation="SELFIES",
-    )
-
-    f_logp, x0, y0 = objective_factory.create(
-        name="rdkit_logp",
-        string_representation="SELFIES",
-    )
+    f_qed = QEDBlackBox(string_representation="SELFIES")
+    f_logp = LogPBlackBox(string_representation="SELFIES")
 
     # SELFIES of aspirin
     selfies_aspirin = np.array(

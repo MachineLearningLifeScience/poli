@@ -10,7 +10,8 @@ from pathlib import Path
 
 import numpy as np
 
-from poli import objective_factory
+from poli.core.problem import Problem
+from poli.objective_repository import QEDProblemFactory
 
 from wandb_observer import WandbObserver
 
@@ -18,16 +19,17 @@ THIS_DIR = Path(__file__).parent.resolve()
 
 if __name__ == "__main__":
     # Defining the observer
+    seed = 42
     observer = WandbObserver()
 
     # Initializing a QED objective function.
-    alphabet = ["", "[C]", "..."]
-    f, x0, y0 = objective_factory.create(
-        name="rdkit_qed",
-        observer=observer,
-        alphabet=alphabet,
-        string_representation="SELFIES",
-        observer_init_info={"run_id": None, "experiment_id": None},
+    problem = QEDProblemFactory().create(string_representation="SELFIES")
+    f, x0 = problem.black_box, problem.x0
+    y0 = f(x0)
+
+    f.set_observer(observer)
+    observer.initialize_observer(
+        f.info, {"run_id": None, "experiment_id": None}, x0=x0, y0=y0, seed=seed
     )
 
     # Logging some examples

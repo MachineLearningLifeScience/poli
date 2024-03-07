@@ -46,8 +46,8 @@ class QEDBlackBox(AbstractBlackBox):
 
     Parameters
     ----------
-    from_selfies : bool, optional
-        Flag indicating whether the input is a SELFIES string, by default False.
+    string_representation : Literal["SMILES", "SELFIES"], optional
+        The string representation to use, by default "SMILES".
     batch_size : int, optional
         The batch size for processing multiple inputs simultaneously, by default None.
     parallelize : bool, optional
@@ -73,7 +73,7 @@ class QEDBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        from_selfies: bool = False,
+        string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
@@ -84,8 +84,8 @@ class QEDBlackBox(AbstractBlackBox):
 
         Parameters
         ----------
-        from_selfies : bool, optional
-            Flag indicating whether the molecules are encoded using SELFIES, by default False.
+        string_representation : Literal["SMILES", "SELFIES"], optional
+            The string representation to use, by default "SMILES".
         batch_size : int, optional
             The batch size for parallel evaluation, by default None.
         parallelize : bool, optional
@@ -101,8 +101,9 @@ class QEDBlackBox(AbstractBlackBox):
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
         )
-        self.from_selfies = from_selfies
-        self.from_smiles = not from_selfies
+        assert string_representation.upper() in ["SMILES", "SELFIES"]
+        self.from_selfies = string_representation.upper() == "SELFIES"
+        self.from_smiles = string_representation.upper() == "SMILES"
 
         super().__init__(
             batch_size=batch_size,
@@ -235,7 +236,7 @@ class QEDProblemFactory(AbstractProblemFactory):
             )
 
         f = QEDBlackBox(
-            from_selfies=string_representation.upper() == "SELFIES",
+            string_representation=string_representation.upper(),
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,

@@ -17,16 +17,13 @@ Detlef Weigel, Nir Ben-Tal, and Julian Echave. eLife 12
 
 """
 
-from typing import Union, List, Tuple
+from typing import Union, List
 from pathlib import Path
 from uuid import uuid4
 from time import time
 from collections import defaultdict
 
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
-from poli.core.abstract_black_box import AbstractBlackBox
-from poli.core.abstract_problem_factory import AbstractProblemFactory
-from poli.core.problem_setup_information import ProblemSetupInformation
 
 from poli.core.util.proteins.rasp import (
     RaspInterface,
@@ -38,8 +35,6 @@ from poli.core.util.proteins.pdb_parsing import (
     parse_pdb_as_residues,
 )
 from poli.core.util.proteins.mutations import find_closest_wildtype_pdb_file_to_mutant
-from poli.core.util.proteins.defaults import AMINO_ACIDS
-from poli.core.util.seeding import seed_python_numpy_and_torch
 
 import numpy as np
 
