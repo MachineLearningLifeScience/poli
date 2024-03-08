@@ -23,6 +23,7 @@ from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
+from poli.core.exceptions import FoldXNotFoundException
 
 from poli.core.util.isolation.instancing import instance_function_as_isolated_process
 
@@ -39,8 +40,6 @@ class FoldXSASABlackBox(AbstractBlackBox):
     -----------
     wildtype_pdb_path : Union[Path, List[Path]]
         The path(s) to the wildtype PDB file(s). Default is None.
-    alphabet : List[str], optional
-        The alphabet of amino acids. Default is None.
     experiment_id : str, optional
         The ID of the experiment. Default is None.
     tmp_folder : Path, optional
@@ -68,7 +67,6 @@ class FoldXSASABlackBox(AbstractBlackBox):
     def __init__(
         self,
         wildtype_pdb_path: Union[Path, List[Path]],
-        alphabet: List[str] = None,
         experiment_id: str = None,
         tmp_folder: Path = None,
         eager_repair: bool = False,
@@ -85,6 +83,10 @@ class FoldXSASABlackBox(AbstractBlackBox):
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
         )
+        if not (Path.home() / "foldx" / "foldx").exists():
+            raise FoldXNotFoundException(
+                "FoldX wasn't found in ~/foldx/foldx. Please install it."
+            )
         if not force_isolation:
             try:
                 from poli.objective_repository.foldx_sasa.isolated_function import (
@@ -177,7 +179,6 @@ class FoldXSASAProblemFactory(AbstractProblemFactory):
     def create(
         self,
         wildtype_pdb_path: Union[Path, List[Path]],
-        alphabet: List[str] = None,
         experiment_id: str = None,
         tmp_folder: Path = None,
         eager_repair: bool = False,
@@ -196,9 +197,6 @@ class FoldXSASAProblemFactory(AbstractProblemFactory):
         ----------
         wildtype_pdb_path : Union[Path, List[Path]]
             Path or list of paths to the wildtype PDB files.
-        alphabet : List[str], optional
-            List of amino acid symbols. By defualt, the 20 amino acids
-            shown in poli.core.util.proteins.defaults are used.
         experiment_id : str, optional
             Identifier for the experiment.
         tmp_folder : Path, optional
@@ -259,12 +257,9 @@ class FoldXSASAProblemFactory(AbstractProblemFactory):
 
         # We use the default alphabet if None was provided.
         # See ENCODING in foldx_utils.py
-        if alphabet is None:
-            alphabet = self.get_setup_information().get_alphabet()
 
         f = FoldXSASABlackBox(
             wildtype_pdb_path=wildtype_pdb_path,
-            alphabet=alphabet,
             experiment_id=experiment_id,
             tmp_folder=tmp_folder,
             eager_repair=eager_repair,

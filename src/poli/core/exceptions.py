@@ -11,3 +11,9 @@ class BudgetExhaustedException(PoliException):
     """Exception raised when the budget is exhausted."""
 
     pass
+
+
+class FoldXNotFoundException(PoliException):
+    """Exception raised when FoldX wasn't found in ~/foldx/foldx."""
+
+    pass

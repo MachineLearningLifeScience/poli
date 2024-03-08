@@ -2,22 +2,14 @@
 
 __author__ = "Simon Bartels"
 
-import logging
 from pathlib import Path
-import os
-import random
-from typing import Tuple
 
-import numpy as np
-
-# import hydra
-# import torch
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem import Problem
 from poli.core.black_box_information import BlackBoxInformation
+from poli.core.exceptions import FoldXNotFoundException
 
-from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.objective_repository.foldx_rfp_lambo import PROBLEM_SEQ, CORRECT_SEQ
 from poli.core.util.isolation.instancing import instance_function_as_isolated_process
 from poli.core.util.seeding import seed_python_numpy_and_torch
@@ -47,6 +39,10 @@ class FoldXRFPLamboBlackBox(AbstractBlackBox):
         self.inverse_alphabet = {i + 1: AMINO_ACIDS[i] for i in range(len(AMINO_ACIDS))}
         self.inverse_alphabet[0] = "-"
 
+        if not (Path.home() / "foldx" / "foldx").exists():
+            raise FoldXNotFoundException(
+                "FoldX wasn't found in ~/foldx/foldx. Please install it."
+            )
         if not force_isolation:
             try:
                 from poli.objective_repository.foldx_rfp_lambo.isolated_function import (
