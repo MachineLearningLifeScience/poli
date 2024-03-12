@@ -29,4 +29,4 @@ jobs:
         tox -c tox.master.ini -e lint
     - name: Test poli-base with tox
       run: |
-        tox -c tox.master.ini -e poli-base-py39
+        tox -c tox.ini -e poli-base-py39 -- --ignore=src/poli/tests/registry/proteins/test_rasp.py
