@@ -9,7 +9,8 @@ def test_foldx_rfp_lambo_runs():
     # For now, we don't have automatic installation of lambo.
     # TODO: add automatic installation of lambo, and remove this
     # check.
-    f, _, _ = create(name="foldx_rfp_lambo", seed=1)
+    problem = create(name="foldx_rfp_lambo", seed=1)
+    f = problem.black_box
 
     # Evaluating on the first base candidate
     first_base_candidate_and_mutation = np.array(

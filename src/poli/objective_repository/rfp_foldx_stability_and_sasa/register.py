@@ -70,7 +70,6 @@ class RFPFoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
         wildtype_pdb_path: Union[Path, List[Path]],
         n_starting_points: int = None,
         strict: bool = False,
-        alphabet: List[str] = None,
         experiment_id: str = None,
         tmp_folder: Path = None,
         eager_repair: bool = False,
@@ -93,9 +92,6 @@ class RFPFoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
             The minimum number of sequence is given by the Pareto front of the RFP problem, ie. you cannot have less sequences than that.
         strict: bool, optional
             Enable RuntimeErrors if number of starting sequences different to requested number of sequences.
-        alphabet : List[str], optional
-            List of amino acid symbols. By default, we use the
-            20 amino acids shown in poli.core.util.proteins.defaults.
         experiment_id : str, optional
             Identifier for the experiment.
         tmp_folder : Path, optional
@@ -150,12 +146,6 @@ class RFPFoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
             )
         # By this point, we know that wildtype_pdb_path is a
         # list of Path objects.
-
-        # We use the default alphabet if None was provided.
-        # See ENCODING in foldx_utils.py
-        if alphabet is None:
-            alphabet = self.get_setup_information().get_alphabet()
-
         if n_starting_points is None:
             n_starting_points = len(wildtype_pdb_path)
 
@@ -204,7 +194,6 @@ class RFPFoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
 
         f = FoldXStabilityAndSASABlackBox(
             wildtype_pdb_path=pdb_files_for_black_box,
-            alphabet=alphabet,
             experiment_id=experiment_id,
             tmp_folder=tmp_folder,
             eager_repair=eager_repair,
