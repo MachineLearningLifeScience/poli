@@ -3,6 +3,7 @@ This script will send things to simulator.jar.
 
 When ran, it lets a human play a level.
 """
+
 import subprocess
 import json
 from pathlib import Path

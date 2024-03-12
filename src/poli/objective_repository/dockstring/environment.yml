@@ -1,0 +1,13 @@
+name: poli__dockstring
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - openbabel
+  - pip
+  - pip:
+    - "git+https://github.com/MachineLearningLifeScience/poli.git@dev"
+    - rdkit
+    - selfies
+    - dockstring

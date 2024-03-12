@@ -1,66 +1,173 @@
 """
-In this module, we implement a synthetic-accessibility 
-objective using the TDC oracles [1].
+Implements a synthetic-accessibility objective using the TDC oracles [1].
 
-[1] TODO: add reference.
+References
+----------
+[1] Artificial intelligence foundation for therapeutic science.
+    Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022). https://doi.org/10.1038/s41589-022-01131-2
 """
-from typing import Tuple
+
+from typing import Literal
 
 import numpy as np
 
 import selfies as sf
 
-from poli.core.chemistry.tdc_black_box import TDCBlackBox
+from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
-from poli.core.problem_setup_information import ProblemSetupInformation
+from poli.core.black_box_information import BlackBoxInformation
+from poli.core.problem import Problem
 
 from poli.core.util.chemistry.string_to_molecule import translate_smiles_to_selfies
 
-from poli.core.util.seeding import seed_numpy, seed_python
+from poli.core.util.seeding import seed_python_numpy_and_torch
+
+from poli.core.util.isolation.instancing import instance_function_as_isolated_process
+
+from poli.objective_repository.sa_tdc.information import sa_tdc_info
 
 
-class SABlackBox(TDCBlackBox):
+class SABlackBox(AbstractBlackBox):
+    """Synthetic-accessibility black box implementation using the TDC oracles [1].
+
+    Parameters
+    ----------
+    string_representation : Literal["SMILES", "SELFIES"], optional
+        A string (either "SMILES" or "SELFIES") specifying which
+        molecule representation you plan to use.
+    batch_size : int, optional
+        The batch size for simultaneous execution, by default None.
+    parallelize : bool, optional
+        Flag indicating whether to parallelize execution, by default False.
+    num_workers : int, optional
+        The number of workers for parallel execution, by default None.
+    evaluation_budget:  int, optional
+        The maximum number of function evaluations. Default is infinity.
+    """
+
     def __init__(
         self,
-        info: ProblemSetupInformation,
+        string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        from_smiles: bool = True,
+        evaluation_budget: int = float("inf"),
+        force_isolation: bool = False,
     ):
-        oracle_name = "SA"
+        """
+        Initialize the SABlackBox object.
+
+        Parameters
+        ----------
+        string_representation : Literal["SMILES", "SELFIES"], optional
+            A string (either "SMILES" or "SELFIES") specifying which
+            molecule representation you plan to use.
+        batch_size : int, optional
+            The batch size for parallel evaluation, by default None.
+        parallelize : bool, optional
+            Flag indicating whether to parallelize the evaluation, by default False.
+        num_workers : int, optional
+            The number of workers for parallel evaluation, by default None.
+        evaluation_budget : int, optional
+            The maximum number of evaluations, by default float("inf").
+        """
         super().__init__(
-            oracle_name=oracle_name,
-            info=info,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
-            from_smiles=from_smiles,
+            evaluation_budget=evaluation_budget,
         )
+        from_smiles = string_representation.upper() == "SMILES"
+        if not force_isolation:
+            try:
+                from poli.objective_repository.sa_tdc.isolated_function import (
+                    SAIsolatedLogic,
+                )
+
+                self.inner_function = SAIsolatedLogic(from_smiles=from_smiles)
+            except ImportError:
+                self.inner_function = instance_function_as_isolated_process(
+                    name="sa_tdc__isolated",
+                    from_smiles=from_smiles,
+                )
+        else:
+            self.inner_function = instance_function_as_isolated_process(
+                name="sa_tdc__isolated",
+                from_smiles=from_smiles,
+            )
+
+    def _black_box(self, x: np.ndarray, context=None) -> np.ndarray:
+        return self.inner_function(x, context)
+
+    @staticmethod
+    def get_black_box_info() -> BlackBoxInformation:
+        return sa_tdc_info
 
 
 class SAProblemFactory(AbstractProblemFactory):
-    def get_setup_information(self) -> ProblemSetupInformation:
-        return ProblemSetupInformation(
-            name="sa_tdc",
-            max_sequence_length=np.inf,
-            aligned=False,
-            alphabet=None,
-        )
+    """Problem factory for the synthetic-accessibility problem.
+
+    Methods
+    -------
+    get_setup_information()
+        Returns the setup information for the problem.
+    create(...)
+        Creates a synthetic-accessibility problem instance with the specified parameters.
+    """
+
+    def get_setup_information(self) -> BlackBoxInformation:
+        """
+        Returns the setup information for the problem.
+
+        Returns
+        --------
+        problem_info: BlackBoxInformation
+            The setup information for the problem.
+        """
+        return sa_tdc_info
 
     def create(
         self,
+        string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        string_representation: str = "SMILES",
-    ) -> Tuple[SABlackBox, np.ndarray, np.ndarray]:
+        evaluation_budget: int = float("inf"),
+        force_isolation: bool = False,
+    ) -> Problem:
         """
-        TODO: document.
+        Creates a synthetic-accessibility problem instance with the specified parameters.
+
+        Parameters
+        -----------
+        string_representation : str, optional
+            The string representation of the input molecules. Default is "SMILES".
+        seed:  int, optional
+            The seed for random number generation. Default is None.
+        batch_size:  int, optional
+            The batch size for simultaneous evaluation. Default is None.
+        parallelize : bool, optional
+            Flag indicating whether to parallelize the evaluation. Default is False.
+        num_workers:  int, optional
+            The number of workers for parallel evaluation. Default is None.
+        evaluation_budget:  int, optional
+            The maximum number of function evaluations. Default is infinity.
+        force_isolation: bool, optional
+            Flag indicating whether to force isolation inside the
+            black box. Default is False.
+
+        Returns
+        --------
+        f: SABlackBox
+            The synthetic-accessibility black box function.
+        x0: np.ndarray
+            The initial input (taken from TDC: CCNC(=O)c1ccc(NC(=O)N2CC[C@H](C)[C@H](O)C2)c(C)c1).
+        y0: np.ndarray
+            The initial output (i.e. the corresponding SA).
         """
-        seed_numpy(seed)
-        seed_python(seed)
+        if seed is not None:
+            seed_python_numpy_and_torch(seed)
 
         if string_representation.upper() not in ["SMILES", "SELFIES"]:
             raise ValueError(
@@ -68,13 +175,13 @@ class SAProblemFactory(AbstractProblemFactory):
                 "String representation must be either 'SMILES' or 'SELFIES'."
             )
 
-        problem_info = self.get_setup_information()
         f = SABlackBox(
-            info=problem_info,
+            string_representation=string_representation,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
-            from_smiles=string_representation.upper() == "SMILES",
+            evaluation_budget=evaluation_budget,
+            force_isolation=force_isolation,
         )
 
         # Initial example (from the TDC docs)
@@ -87,7 +194,11 @@ class SAProblemFactory(AbstractProblemFactory):
         else:
             x0 = np.array([list(sf.split_selfies(x0_selfies))])
 
-        return f, x0, f(x0)
+        problem = Problem(
+            black_box=f,
+            x0=x0,
+        )
+        return problem
 
 
 if __name__ == "__main__":

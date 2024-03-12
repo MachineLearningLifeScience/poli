@@ -1,3 +1,5 @@
+"""Utilities for transforming levels to arrays and back."""
+
 from typing import List
 from itertools import product
 
@@ -7,20 +9,26 @@ import torch
 Tensor = torch.Tensor
 
 
-def level_to_list(level_txt):
+def level_to_list(level_txt: str) -> List[List[str]]:
+    """
+    Takes a level as a string and returns
+    a list of lists of individual tokens.
+    """
     # Returns a list by splitting the level text
     # by \n.
     as_list = level_txt.split("\n")
     return [list(row) for row in as_list if row != ""]
 
 
-def level_to_array(level_txt):
+def level_to_array(level_txt: str) -> np.ndarray:
+    """Parses a level from string to numpy array."""
     # Returns a np array by splitting the level text
     # by \n.
     return np.array(level_to_list(level_txt))
 
 
 def levels_to_onehot(levels: np.ndarray, n_sprites: int = 11) -> np.ndarray:
+    """Transforms an array [b, w, h] of integers into a one-hot array [b, n_sprites, w, h]."""
     batch_size, w, h = levels.shape
     y_onehot = np.zeros((batch_size, n_sprites, h, w))
     for b, level in enumerate(levels):
@@ -41,6 +49,9 @@ def vectorized(prob_matrix, items):
 
 
 def onehot_to_levels(levels_onehot: np.ndarray, sampling=False, seed=0) -> np.ndarray:
+    """
+    Transforms a level from probits to integers.
+    """
     if sampling:
         # From log-softmax to softmax.
         levels_onehot = np.exp(levels_onehot)
@@ -109,6 +120,10 @@ def add_padding_to_level(level: np.ndarray, n_padding: int = 1) -> np.ndarray:
 
 
 def clean_level(level: np.ndarray) -> List[List[int]]:
+    """
+    Cleans a level by removing Mario (token id: 11),
+    and replacing it with empty space.
+    """
     # Cleaning up Mario (11), replacing
     # it with empty space (2).
     level[level == 11] = 2

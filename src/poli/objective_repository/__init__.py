@@ -1,108 +1,102 @@
+"""All objective factories and black boxes inside poli.
+"""
+
 from pathlib import Path
 
 # These can be imported from the base environment.
-from .white_noise.register import WhiteNoiseProblemFactory
-from .aloha.register import AlohaProblemFactory
+from .white_noise.register import WhiteNoiseProblemFactory, WhiteNoiseBlackBox
+from .aloha.register import AlohaProblemFactory, AlohaBlackBox
+from .toy_continuous_problem.register import (
+    ToyContinuousProblemFactory,
+    ToyContinuousBlackBox,
+)
+from .dockstring.register import DockstringProblemFactory, DockstringBlackBox
+from .drd3_docking.register import DRD3ProblemFactory, DRD3BlackBox
+from .foldx_rfp_lambo.register import FoldXRFPLamboBlackBox, FoldXRFPLamboProblemFactory
+from .foldx_sasa.register import FoldXSASABlackBox, FoldXSASAProblemFactory
+from .foldx_stability.register import (
+    FoldXStabilityBlackBox,
+    FoldXStabilityProblemFactory,
+)
+from .foldx_stability_and_sasa.register import (
+    FoldXStabilityAndSASABlackBox,
+    FoldXStabilityAndSASAProblemFactory,
+)
+from .gfp_cbas.register import GFPCBasBlackBox, GFPCBasProblemFactory
+from .gfp_select.register import GFPSelectionBlackBox, GFPSelectionProblemFactory
+from .penalized_logp_lambo.register import (
+    PenalizedLogPLamboBlackBox,
+    PenalizedLogPLamboProblemFactory,
+)
+from .rasp.register import RaspBlackBox, RaspProblemFactory
+from .rdkit_logp.register import LogPBlackBox, LogPProblemFactory
+from .rdkit_qed.register import QEDBlackBox, QEDProblemFactory
+from .rfp_foldx_stability_and_sasa.register import (
+    RFPFoldXStabilityAndSASAProblemFactory,
+)
+from .sa_tdc.register import SAProblemFactory, SABlackBox
+from .super_mario_bros.register import (
+    SuperMarioBrosProblemFactory,
+    SuperMarioBrosBlackBox,
+)
 
 
 THIS_DIR = Path(__file__).parent.resolve()
 
 # The objective repository is made of
 # all the directories that are here:
-AVAILABLE_OBJECTIVES = sorted(
-    [str(d.name) for d in THIS_DIR.glob("*") if d.is_dir() and d.name != "__pycache__"]
-)
+AVAILABLE_OBJECTIVES = []
+for d in THIS_DIR.glob("*"):
+    if d.is_dir() and d.name != "__pycache__":
+        AVAILABLE_OBJECTIVES.append(d.name)
+
+        if (d / "isolated_function.py").exists():
+            AVAILABLE_OBJECTIVES.append(f"{d.name}__isolated")
+
+AVAILABLE_OBJECTIVES = sorted(AVAILABLE_OBJECTIVES)
 
 AVAILABLE_PROBLEM_FACTORIES = {
-    "white_noise": WhiteNoiseProblemFactory,
     "aloha": AlohaProblemFactory,
+    "dockstring": DockstringProblemFactory,
+    "drd3_docking": DRD3ProblemFactory,
+    "foldx_rfp_lambo": FoldXRFPLamboProblemFactory,
+    "foldx_sasa": FoldXSASAProblemFactory,
+    "foldx_stability": FoldXStabilityProblemFactory,
+    "foldx_stability_and_sasa": FoldXStabilityAndSASAProblemFactory,
+    "gfp_cbas": GFPCBasProblemFactory,
+    "gfp_select": GFPSelectionProblemFactory,
+    "penalized_logp_lambo": PenalizedLogPLamboProblemFactory,
+    "rasp": RaspProblemFactory,
+    "rdkit_logp": LogPProblemFactory,
+    "rdkit_qed": QEDProblemFactory,
+    "rfp_foldx_stability_and_sasa": RFPFoldXStabilityAndSASAProblemFactory,
+    "sa_tdc": SAProblemFactory,
+    "super_mario_bros": SuperMarioBrosProblemFactory,
+    "white_noise": WhiteNoiseProblemFactory,
+    "toy_continuous_problem": ToyContinuousProblemFactory,
+}
+
+AVAILABLE_BLACK_BOXES = {
+    "aloha": AlohaBlackBox,
+    "dockstring": DockstringBlackBox,
+    "drd3_docking": DRD3BlackBox,
+    "foldx_rfp_lambo": FoldXRFPLamboBlackBox,
+    "foldx_sasa": FoldXSASABlackBox,
+    "foldx_stability": FoldXStabilityBlackBox,
+    "foldx_stability_and_sasa": FoldXStabilityAndSASABlackBox,
+    "gfp_cbas": GFPCBasBlackBox,
+    "gfp_select": GFPSelectionBlackBox,
+    "penalized_logp_lambo": PenalizedLogPLamboBlackBox,
+    "rasp": RaspBlackBox,
+    "rdkit_logp": LogPBlackBox,
+    "rdkit_qed": QEDBlackBox,
+    "rfp_foldx_stability_and_sasa": FoldXStabilityAndSASABlackBox,
+    "sa_tdc": SABlackBox,
+    "super_mario_bros": SuperMarioBrosBlackBox,
+    "white_noise": WhiteNoiseBlackBox,
+    "toy_continuous_problem": ToyContinuousBlackBox,
 }
 
 
-try:
-    # TODO: the case of SMB is a little bit more delicate, since
-    # we actually have dependencies beyond Python.
-    from .super_mario_bros.register import SMBProblemFactory
-
-    AVAILABLE_PROBLEM_FACTORIES["super_mario_bros"] = SMBProblemFactory
-except ImportError:
-    pass
-
-try:
-    from .rdkit_qed.register import QEDProblemFactory
-
-    AVAILABLE_PROBLEM_FACTORIES["rdkit_qed"] = QEDProblemFactory
-except ImportError:
-    pass
-
-try:
-    from .rdkit_logp.register import LogPProblemFactory
-
-    AVAILABLE_PROBLEM_FACTORIES["rdkit_logp"] = LogPProblemFactory
-except ImportError:
-    pass
-
-try:
-    from .foldx_stability.register import FoldXStabilityProblemFactory
-
-    AVAILABLE_PROBLEM_FACTORIES["foldx_stability"] = FoldXStabilityProblemFactory
-except (ImportError, FileNotFoundError):
-    pass
-
-try:
-    from .foldx_sasa.register import FoldXSASAProblemFactory
-
-    AVAILABLE_PROBLEM_FACTORIES["foldx_sasa"] = FoldXSASAProblemFactory
-except (ImportError, FileNotFoundError):
-    pass
-
-
-try:
-    from .foldx_rfp_lambo.register import RFPWrapperFactory
-
-    AVAILABLE_PROBLEM_FACTORIES["foldx_rfp_lambo"] = RFPWrapperFactory
-except (ImportError, FileNotFoundError):
-    pass
-
-
-try:
-    from .foldx_stability_and_sasa.register import FoldXStabilityAndSASAProblemFactory
-
-    AVAILABLE_PROBLEM_FACTORIES[
-        "foldx_stability_and_sasa"
-    ] = FoldXStabilityAndSASAProblemFactory
-except (ImportError, FileNotFoundError):
-    pass
-
-
-try:
-    from .penalized_logp_lambo.register import PenalizedLogPLamboProblemFactory
-
-    AVAILABLE_PROBLEM_FACTORIES[
-        "penalized_logp_lambo"
-    ] = PenalizedLogPLamboProblemFactory
-except (ImportError, FileNotFoundError):
-    pass
-
-try:
-    from .drd3_docking.register import DDR3ProblemFactory
-
-    AVAILABLE_PROBLEM_FACTORIES["drd3_docking"] = DDR3ProblemFactory
-except (ImportError, FileNotFoundError):
-    pass
-
-
-try:
-    from .gfp_select.register import GFPSelectionProblemFactory
-
-    AVAILABLE_PROBLEM_FACTORIES["gfp_select"] = GFPSelectionProblemFactory
-except (ImportError, FileNotFoundError):
-    pass
-
-
-try:
-    from .rasp.register import RaspProblemFactory
-
-    AVAILABLE_PROBLEM_FACTORIES["rasp"] = RaspProblemFactory
-except (ImportError, FileNotFoundError):
-    pass
+def get_problems():
+    return list(AVAILABLE_PROBLEM_FACTORIES.keys())

@@ -11,9 +11,10 @@ NUM_WORKERS = min(cpu_count(), 2)
 
 
 def test_parallelization_in_aloha():
-    _, f, x0, y0, _ = objective_factory.create(
+    problem = objective_factory.create(
         "aloha", parallelize=True, num_workers=NUM_WORKERS
     )
+    f = problem.black_box
 
     x1 = np.array(
         [
@@ -29,17 +30,15 @@ def test_parallelization_in_aloha():
 
 
 def test_parallelization_in_qed():
-    alphabet = ["", "C", "(", ")", "c"]
-
-    _, f, x0, y0, _ = objective_factory.create(
+    problem = objective_factory.create(
         "rdkit_qed",
         parallelize=True,
         num_workers=NUM_WORKERS,
         batch_size=4,
-        alphabet=alphabet,
         string_representation="SMILES",
         force_register=True,
     )
+    f = problem.black_box
 
     x1 = np.array(
         [
@@ -62,11 +61,8 @@ def test_parallelization_in_foldx_stability_and_sasa():
     if not (PATH_TO_FOLDX_FILES / "foldx").exists():
         pytest.skip("FoldX is not compiled. ")
 
-    if not (PATH_TO_FOLDX_FILES / "rotabase.txt").exists():
-        pytest.skip("rotabase.txt is not in the foldx directory. ")
-
     wildtype_pdb_path = Path(__file__).parent / "101m_Repair.pdb"
-    problem_info, f, x0, y0, _ = objective_factory.create(
+    problem = objective_factory.create(
         name="foldx_stability_and_sasa",
         wildtype_pdb_path=3 * [wildtype_pdb_path],
         parallelize=True,

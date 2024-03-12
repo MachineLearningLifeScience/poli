@@ -72,9 +72,9 @@ def extract_atomic_features(pdb_filename):
     # Save features in a dictionary
     features = {}
     features["atom_names"] = []  # Atom names
-    features[
-        "res_indices"
-    ] = []  # Global res indices (no reset across chains and starts from 0)
+    features["res_indices"] = (
+        []
+    )  # Global res indices (no reset across chains and starts from 0)
     features["resids_pdb"] = []  # Resids in the actual odbs
     features["x"] = []
     features["y"] = []

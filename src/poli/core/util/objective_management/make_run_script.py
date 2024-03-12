@@ -1,6 +1,7 @@
-__author__ = "Simon Bartels"
+"""This module contains utilities for creating run scripts for problems and observers.
+"""
 
-from typing import List, Union
+from typing import List, Union, Type
 from pathlib import Path
 import os
 import sys
@@ -8,68 +9,168 @@ from os.path import basename, dirname, join
 import inspect
 import stat
 
-from poli import objective
-from poli.objective import ADDITIONAL_IMPORT_SEARCH_PATHES_KEY
+from poli import external_problem_factory_script
+from poli import external_isolated_function_script
+from poli.external_problem_factory_script import ADDITIONAL_IMPORT_SEARCH_PATHES_KEY
 from poli.core.util import observer_wrapper
 from poli.core.abstract_problem_factory import AbstractProblemFactory
+from poli.core.abstract_black_box import AbstractBlackBox
+from poli.core.abstract_isolated_function import AbstractIsolatedFunction
 from poli.core.util.abstract_observer import AbstractObserver
 
-# from poli.registered_objectives import __file__ as _RUN_SCRIPTS_FOLDER
-
+# By default, we will store the run scripts inside the
+# home folder of the user, on the hidden folder
+# ~/.poli_objectives
 HOME_DIR = Path.home().resolve()
 RUN_SCRIPTS_FOLDER = HOME_DIR / ".poli_objectives"
 
 
+def make_isolated_function_script(
+    isolated_function: AbstractIsolatedFunction,
+    conda_environment_name: Union[str, Path] = None,
+    python_paths: List[str] = None,
+    cwd=None,
+    **kwargs,
+):
+    """
+    Create a script to run the given black box, returning its location.
+
+    Parameters
+    ----------
+    black_box : AbstractBlackBox
+        The black box object to be executed.
+    conda_environment_name : str or Path, optional
+        The conda environment to activate before running the black box.
+    python_paths : List[str], optional
+        Additional Python paths to be added before running the black box.
+    cwd : str or Path, optional
+        The current working directory for the script execution.
+
+    Returns
+    -------
+    run_script: str
+        The path to the generated script.
+
+    """
+    command = inspect.getfile(external_isolated_function_script)
+    return _make_run_script(
+        command, isolated_function, conda_environment_name, python_paths, cwd, **kwargs
+    )
+
+
 def make_run_script(
-    problem_factory: AbstractProblemFactory,
+    problem_factory: Type[AbstractProblemFactory],
     conda_environment_name: Union[str, Path] = None,
     python_paths: List[str] = None,
     cwd=None,
     **kwargs,
 ) -> str:
     """
-    Creates the run script for a given problem factory.
+    Create a run script for a given problem factory.
 
-    Inputs:
-        problem_factory: the problem factory to create the run script for.
-        conda_environment_name: the conda environment to use for the run script.
-        (Either a string containing the name, or a path to the environment)
-        python_paths: a list of paths to append to the python path of the run script.
-        cwd: the working directory of the run script.
+    Parameters
+    ----------
+    problem_factory : AbstractProblemFactory
+        The problem factory to create the run script for.
+    conda_environment_name : str or Path, optional
+        The conda environment to use for the run script.
+        Either a string containing the name, or a path to the environment.
+    python_paths : list of str, optional
+        A list of paths to append to the python path of the run script.
+    cwd : str or Path, optional
+        The working directory of the run script.
+
+    Returns
+    -------
+    run_script: str
+        The generated run script.
     """
-    command = inspect.getfile(objective)
+    command = inspect.getfile(external_problem_factory_script)
     return _make_run_script(
         command, problem_factory, conda_environment_name, python_paths, cwd, **kwargs
     )
 
 
 def make_observer_script(
-    observer: AbstractObserver,
+    observer: Type[AbstractObserver],
     conda_environment: Union[str, Path] = None,
     python_paths: List[str] = None,
     cwd=None,
 ):
+    """
+    Create a script to run the given observer.
+
+    Parameters
+    ----------
+    observer : AbstractObserver
+        The observer object to be executed.
+    conda_environment : str or Path, optional
+        The conda environment to activate before running the observer.
+    python_paths : List[str], optional
+        Additional Python paths to be added before running the observer.
+    cwd : str or Path, optional
+        The current working directory for the script execution.
+
+    Returns
+    -------
+    run_script: str
+        The path to the generated script.
+
+    """
     command = inspect.getfile(observer_wrapper)
     return _make_run_script(command, observer, conda_environment, python_paths, cwd)
 
 
+def _make_black_box_script(
+    command: str,
+    command_for_instancing_the_black_box: str,
+    conda_environment_name: Union[str, Path],
+    python_paths: List[str],
+    cwd=None,
+):
+    # TODO: implement in such a way that
+    ...
+
+
 def _make_run_script(
     command: str,
-    instantiated_object,
+    non_instantiated_object,
     conda_environment_name: Union[str, Path],
     python_paths: List[str],
     cwd=None,
     **kwargs,
 ):
-    """An internal function for creating run scripts; returns the location of the run script."""
+    """
+    An internal function for creating run scripts; returns the location of the run script.
+
+    Parameters
+    ----------
+    command : str
+        The command to be executed in the run script.
+    instantiated_object : object
+        The instantiated object representing the problem factory.
+    conda_environment_name : str or Path
+        The name or path of the conda environment to be used.
+    python_paths : List[str]
+        The list of python paths to be appended to the run script.
+    cwd : str, optional
+        The current working directory for the run script. If not provided, the current working directory is used.
+    **kwargs : dict
+        Additional keyword arguments (currently unused).
+
+    Returns
+    -------
+    run_script: str
+        The location of the generated run script.
+    """
     if cwd is None:
         cwd = str(os.getcwd())
 
-    class_object = instantiated_object.__class__
+    # class_object = instantiated_object.__class__
+    class_object = non_instantiated_object
     problem_factory_name = class_object.__name__  # TODO: potential vulnerability?
     factory_location = inspect.getfile(class_object)
-    # full_problem_factory_name = basename(factory_location)[:-2] + problem_factory_name
-    package_name = inspect.getmodule(instantiated_object).__name__
+    package_name = inspect.getmodule(non_instantiated_object).__name__
 
     if package_name == "__main__":
         package_name = basename(factory_location)[:-3]

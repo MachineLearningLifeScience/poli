@@ -182,7 +182,6 @@ def clean_pdb(pdb_input_filename: str, out_dir: str, reduce_executable: str):
         first_model = _step_1_reduce(
             reduce_executable, pdb_input_filename, pdbid, temp1
         )
-
         # Step 2: NonHetSelector filter
         with tempfile.NamedTemporaryFile(mode="wt", delete=True) as temp2:
             PDBIO.set_structure(first_model)
@@ -192,7 +191,7 @@ def clean_pdb(pdb_input_filename: str, out_dir: str, reduce_executable: str):
 
             # Step 3: Replace altloc chars to " " and use pdbfixer
             with tempfile.NamedTemporaryFile(mode="wt", delete=True) as temp3:
-                temp_3, fixer = _step_3_pdbfixer(first_model, temp3)
+                temp3, fixer = _step_3_pdbfixer(first_model, temp3)
 
                 # Step 4: Correct for pdbfixer not preserving insertion codes
                 with tempfile.NamedTemporaryFile(mode="wt", delete=True) as temp4:

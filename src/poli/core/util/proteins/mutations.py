@@ -1,4 +1,5 @@
-"""
+"""Utilities for defining and manipulating mutations on proteins.
+
 This module contains utilities for defining
 mutations on proteins according to foldx.
 
@@ -7,7 +8,11 @@ foldx expects mutations in a certain format:
     - the second letter is the position of the mutation
     - the third letter is the chain ID,
     - the fourth letter is the mutant residue.
+
+See the "Individual List Mode" of https://foldxsuite.crg.eu/parameter/mutant-file
+for more details.
 """
+
 from pathlib import Path
 from typing import List, Tuple, Union
 
@@ -23,8 +28,37 @@ def edits_between_strings(
     string_1: str, string_2: str, strict: bool = True
 ) -> List[Tuple[str, int, int]]:
     """
-    Overwriting editops to only consider replacements between strings.
-    This returns ("replace", pos_in_string_1, pos_in_string_2).
+    Compute the edit operations between two strings.
+
+    Parameters
+    ----------
+    string_1 : str
+        The first string.
+    string_2 : str
+        The second string.
+    strict : bool, optional
+        If True, check if the lengths of string_1 and string_2 are equal.
+        Defaults to True.
+
+    Returns
+    -------
+    List[Tuple[str, int, int]]
+        A list of tuples representing the edit operations between the two strings.
+        Each tuple contains the operation type ("replace"), the position in string_1,
+        and the position in string_2.
+
+    Raises
+    ------
+    AssertionError
+        If strict is True and the lengths of string_1 and string_2 are different.
+
+    Examples
+    --------
+    >>> edits_between_strings("abc", "abd")
+    [('replace', 2, 2)]
+
+    >>> edits_between_strings("abc", "def")
+    [('replace', 0, 0), ('replace', 1, 1), ('replace', 2, 2)]
     """
     if strict:
         assert len(string_1) == len(string_2), (
@@ -39,24 +73,52 @@ def edits_between_strings(
 def mutations_from_wildtype_residues_and_mutant(
     wildtype_residues: List[Residue], mutated_residue_string: str
 ) -> List[str]:
-    """
+    """Computes the mutations from a wildtype list of residues
+    and a mutated residue string.
+
     Since foldx expects an individual_list.txt file of mutations,
     this function computes the Levenshtein distance between
     the wildtype residue string and the mutated residue string,
     keeping track of the replacements.
 
     This method returns a list of strings which are to be written
-    in a single line of individual_list.txt.
+    in a single line of individual_list.txt. Each string is a
+    mutation in the format foldx expects (e.g. "EA1R", meaning
+    that an E was mutated to an R in position 1 of chain A. The
+    first letter is the original residue, the second letter is
+    the chain, the third letter is the position, and the fourth
+    letter is the mutant residue).
 
     If the mutated residue string is the same as the wildtype residue
     string, we still need to pass a dummy mutation to foldx, so we
     "mutate" the first residue in the wildtype string to itself.
 
-    TODO: add description of inputs and outputs
+    For example:
+        wildtype_residue_string = "ECDE..."
+        mutated_residue_string =  "ACDE..."
+
+    This function would return (assuming that we are mutating the
+    chain "A"):
+        ["EA1A"]
+
+    Parameters
+    ----------
+    wildtype_residues : List[Residue]
+        The list of wildtype residues.
+    mutated_residue_string : str
+        The mutated residue string.
+
+    Returns
+    -------
+    mutations: List[str]
+        The list of mutations in the format foldx expects.
     """
     wildtype_residue_string = "".join(
         [seq1(res.get_resname()) for res in wildtype_residues]
     )
+
+    # Making sure we treat the mutant string as uppercase
+    mutated_residue_string = mutated_residue_string.upper()
 
     assert len(mutated_residue_string) == len(wildtype_residue_string), (
         f"wildtype residue string and mutated residue string "
@@ -67,7 +129,7 @@ def mutations_from_wildtype_residues_and_mutant(
     # If the mutated string is the same as the wildtype string,
     # there are no mutations. Still, FoldX expects us to pass
     # a dummy mutation, so we "mutate" the first residue in the
-    # wildtype string.
+    # wildtype string to itself.
     if mutated_residue_string == wildtype_residue_string:
         first_residue = wildtype_residues[0]
         first_residue_name = seq1(first_residue.get_resname())
@@ -100,6 +162,31 @@ def find_closest_wildtype_pdb_file_to_mutant(
     mutated_residue_string: str,
     return_hamming_distance: bool = False,
 ) -> Union[Path, Tuple[Path, int]]:
+    """
+    Find the closest wildtype PDB file to a given mutant residue string.
+
+    Parameters
+    ----------
+    wildtype_pdb_files : List[Path]
+        A list of paths to wildtype PDB files.
+    mutated_residue_string : str
+        The mutated residue string.
+    return_hamming_distance : bool, optional
+        If True, return the hamming distance along with the best candidate PDB file.
+        Default is False.
+
+    Returns
+    -------
+    Union[Path, Tuple[Path, int]]
+        If return_hamming_distance is True, returns a tuple containing the best candidate PDB file
+        and the hamming distance. Otherwise, returns the best candidate PDB file.
+
+    Raises
+    ------
+    ValueError
+        If no PDB file of the same length as the mutated residue string is found.
+
+    """
     # First, we load up these pdb files as residue strings
     wildtype_residue_strings = {
         pdb_file: "".join(parse_pdb_as_residue_strings(pdb_file))
@@ -117,7 +204,7 @@ def find_closest_wildtype_pdb_file_to_mutant(
 
         hamming_distance = np.sum(
             [
-                wildtype_residue_string[i] != mutated_residue_string[i]
+                wildtype_residue_string.upper()[i] != mutated_residue_string.upper()[i]
                 for i in range(len(wildtype_residue_string))
             ]
         )

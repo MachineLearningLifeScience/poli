@@ -4,10 +4,10 @@ channels:
   - conda-forge
 dependencies:
   - python=3.9
-  - gcc
   - pip
   - pip:
     - biopython
     - python-levenshtein
     - numpy
-    - "git+https://github.com/MachineLearningLifeScience/poli.git@master"
+    - pdb-tools
+    - "git+https://github.com/MachineLearningLifeScience/poli.git@dev"

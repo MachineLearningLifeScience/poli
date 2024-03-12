@@ -1,51 +1,128 @@
 """
-This script registers FoldX stability as an objective function.
+Registers the stability and SASA FoldX black box
+and objective factory.
+
+FoldX [1] is a simulator that allows for computing the difference
+in free energy between a wildtype protein and a mutated protein.
+We pair this with biopython [2] to compute the SASA of the mutated
+protein.
+
+[1] Schymkowitz, J., Borg, J., Stricher, F., Nys, R., Rousseau, F.,
+    & Serrano, L. (2005). The FoldX web server: an online force field.
+    Nucleic acids research, 33(suppl_2), W382-W388.
+[2] Cock PA, Antao T, Chang JT, Chapman BA, Cox CJ, Dalke A, Friedberg I,
+    Hamelryck T, Kauff F, Wilczynski B and de Hoon MJL (2009) Biopython:
+    freely available Python tools for computational molecular biology and 
+    bioinformatics. Bioinformatics, 25, 1422-1423
 """
+
 from pathlib import Path
-from typing import List, Tuple, Union
+from typing import List, Union
 
 import numpy as np
 
-from Bio.SeqUtils import seq1
-
 from poli.core.abstract_black_box import AbstractBlackBox
+from poli.core.black_box_information import BlackBoxInformation
+from poli.core.problem import Problem
 from poli.core.abstract_problem_factory import AbstractProblemFactory
-from poli.core.problem_setup_information import ProblemSetupInformation
+from poli.core.exceptions import FoldXNotFoundException
 
-from poli.core.util.proteins.pdb_parsing import parse_pdb_as_residues
-from poli.core.util.proteins.defaults import AMINO_ACIDS
-from poli.core.util.proteins.mutations import (
-    find_closest_wildtype_pdb_file_to_mutant,
+
+from poli.core.util.seeding import seed_python_numpy_and_torch
+
+from poli.core.util.isolation.instancing import instance_function_as_isolated_process
+
+from poli.objective_repository.foldx_stability_and_sasa.information import (
+    foldx_stability_and_sasa_info,
 )
-from poli.core.util.proteins.foldx import FoldxInterface
-
-from poli.core.proteins.foldx_black_box import FoldxBlackBox
-
-from poli.core.util.seeding import seed_numpy, seed_python
 
 
-class FoldXStabilityAndSASABlackBox(FoldxBlackBox):
+class FoldXStabilityAndSASABlackBox(AbstractBlackBox):
+    """
+    A black box implementation for computing the solvent accessible surface area (SASA) score using FoldX.
+
+    Parameters
+    -----------
+    wildtype_pdb_path : Union[Path, List[Path]]
+        The path(s) to the wildtype PDB file(s).
+    experiment_id : str, optional
+        The ID of the experiment. Default is None.
+    tmp_folder : Path, optional
+        The path to the temporary folder. Default is None.
+    eager_repair : bool, optional
+        Whether to perform eager repair. Default is False.
+    verbose : bool, optional
+        Whether to print the output from FoldX. Default is False.
+    batch_size : int, optional
+        The batch size for parallel processing. Default is None.
+    parallelize : bool, optional
+        Whether to parallelize the computation. Default is False.
+    num_workers : int, optional
+        The number of workers for parallel processing. Default is None.
+    evaluation_budget:  int, optional
+        The maximum number of function evaluations. Default is infinity.
+
+    Notes
+    -----
+    We expect the user to have FoldX v5.0 installed and compiled.
+    More specifically, we expect a binary file called foldx to be
+    in the path ~/foldx/foldx.
+    """
+
     def __init__(
         self,
-        info: ProblemSetupInformation = None,
-        batch_size: int = None,
-        parallelize: bool = False,
-        num_workers: int = None,
-        wildtype_pdb_path: Union[Path, List[Path]] = None,
-        alphabet: List[str] = None,
+        wildtype_pdb_path: Union[Path, List[Path]],
         experiment_id: str = None,
         tmp_folder: Path = None,
+        eager_repair: bool = False,
+        verbose: bool = False,
+        batch_size: int = 1,
+        parallelize: bool = False,
+        num_workers: int = None,
+        evaluation_budget: int = float("inf"),
+        force_isolation: bool = False,
     ):
         super().__init__(
-            info=info,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
-            wildtype_pdb_path=wildtype_pdb_path,
-            alphabet=alphabet,
-            experiment_id=experiment_id,
-            tmp_folder=tmp_folder,
+            evaluation_budget=evaluation_budget,
         )
+        if not (Path.home() / "foldx" / "foldx").exists():
+            raise FoldXNotFoundException(
+                "FoldX wasn't found in ~/foldx/foldx. Please install it."
+            )
+        if not force_isolation:
+            try:
+                from poli.objective_repository.foldx_stability_and_sasa.isolated_function import (
+                    FoldXStabilitityAndSASAIsolatedLogic,
+                )
+
+                self.inner_function = FoldXStabilitityAndSASAIsolatedLogic(
+                    wildtype_pdb_path=wildtype_pdb_path,
+                    experiment_id=experiment_id,
+                    tmp_folder=tmp_folder,
+                    eager_repair=eager_repair,
+                    verbose=verbose,
+                )
+            except ImportError:
+                self.inner_function = instance_function_as_isolated_process(
+                    name="foldx_stability_and_sasa__isolated",
+                    wildtype_pdb_path=wildtype_pdb_path,
+                    experiment_id=experiment_id,
+                    tmp_folder=tmp_folder,
+                    eager_repair=eager_repair,
+                    verbose=verbose,
+                )
+        else:
+            self.inner_function = instance_function_as_isolated_process(
+                name="foldx_stability_and_sasa__isolated",
+                wildtype_pdb_path=wildtype_pdb_path,
+                experiment_id=experiment_id,
+                tmp_folder=tmp_folder,
+                eager_repair=eager_repair,
+                verbose=verbose,
+            )
 
     def _black_box(self, x: np.ndarray, context: None) -> np.ndarray:
         """
@@ -56,74 +133,107 @@ class FoldXStabilityAndSASABlackBox(FoldxBlackBox):
         Since the goal is MINIMIZING the energy,
         we return the negative of the total energy.
 
-        To accomodate for the initial call, if the
-        path_to_mutation_list is not provided (or
-        if it's None), we assume that we're supposed
-        to evaluate the energy of the wildtype sequence.
+        Parameters
+        -----------
+        x : np.ndarray
+            The input array representing the mutations.
+        context : None
+            The context for the black box computation.
+
+        Returns
+        --------
+        y: np.ndarray
+            The computed stability and SASA score(s) as a numpy array.
         """
-        # TODO: add support for multiple mutations.
-        # For now, we assume that the batch size is
-        # always 1.
-        assert x.shape[0] == 1, "We only support single mutations for now. "
+        return self.inner_function(x, context)
 
-        # We create a different folder for each
-        # mutation. This is because FoldX will
-        # create a bunch of files in the working
-        # directory, and we don't want to overwrite
-        # them.
-        working_dir = self.create_working_directory()
-
-        # We only need to provide the mutations as
-        # amino acid sequences. The FoldxInterface
-        # will take care of the rest.
-        mutations_as_strings = [
-            "".join([amino_acid for amino_acid in x_i]) for x_i in x
-        ]
-
-        # We find the associated wildtype to this given
-        # mutation. This is done by minimizing the
-        # Hamming distance between the mutated residue
-        # string and the wildtype residue strings of
-        # all the PDBs we have.
-        # TODO: this assumes a batch size of 1.
-        wildtype_pdb_file = find_closest_wildtype_pdb_file_to_mutant(
-            self.wildtype_pdb_paths, mutations_as_strings[0]
-        )
-
-        foldx_interface = FoldxInterface(working_dir)
-        stability, sasa_score = foldx_interface.compute_stability_and_sasa(
-            pdb_file=wildtype_pdb_file,
-            mutations=mutations_as_strings,
-        )
-
-        return np.array([stability, sasa_score]).reshape(-1, 2)
+    @staticmethod
+    def get_black_box_info() -> BlackBoxInformation:
+        return foldx_stability_and_sasa_info
 
 
 class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
-    def get_setup_information(self) -> ProblemSetupInformation:
-        """
-        TODO: document
-        """
-        alphabet = AMINO_ACIDS
+    """
+    Factory class for creating FoldX SASA (Solvent Accessible Surface Area) problems.
 
-        return ProblemSetupInformation(
-            name="foldx_stability_and_sasa",
-            max_sequence_length=np.inf,
-            alphabet=alphabet,
-            aligned=False,
-        )
+    Methods
+    -------
+    get_setup_information:
+        Returns the setup information for the problem.
+    create:
+        Creates a problem instance with the specified parameters.
+    """
+
+    def get_setup_information(self) -> BlackBoxInformation:
+        """
+        Get the setup information for the foldx_sasa objective.
+
+        Returns
+        -------
+        BlackBoxInformation
+            The setup information for the objective.
+
+        Notes
+        -----
+        By default, the method uses the 20 amino acids shown in
+        poli.core.util.proteins.defaults.
+        """
+        return foldx_stability_and_sasa_info
 
     def create(
         self,
+        wildtype_pdb_path: Union[Path, List[Path]],
+        experiment_id: str = None,
+        tmp_folder: Path = None,
+        eager_repair: bool = False,
+        verbose: bool = False,
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        wildtype_pdb_path: Union[Path, List[Path]] = None,
-        alphabet: List[str] = None,
-    ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
-        seed_numpy(seed)
-        seed_python(seed)
+        evaluation_budget: int = float("inf"),
+        force_isolation: bool = False,
+    ) -> Problem:
+        """
+        Create a FoldXSASABlackBox object and compute the initial values of wildtypes.
+
+        Parameters
+        ----------
+        wildtype_pdb_path : Union[Path, List[Path]]
+            Path or list of paths to the wildtype PDB files.
+        experiment_id : str, optional
+            Identifier for the experiment.
+        tmp_folder : Path, optional
+            Path to the temporary folder for intermediate files.
+        eager_repair : bool, optional
+            Flag indicating whether to perform eager repair.
+        verbose : bool, optional
+            Flag indicating whether to print the output from FoldX.
+        seed : int, optional
+            Seed for random number generators. If None is passed,
+            the seeding doesn't take place.
+        batch_size : int, optional
+            Number of samples per batch for parallel computation.
+        parallelize : bool, optional
+            Flag indicating whether to parallelize the computation.
+        num_workers : int, optional
+            Number of worker processes for parallel computation.
+        evaluation_budget:  int, optional
+            The maximum number of function evaluations. Default is infinity.
+
+        Returns
+        -------
+        problem : Problem
+            A problem instance containing a FoldXStabilityAndSASABlackBox
+            function, and initial wildtypes x0.
+
+        Raises
+        ------
+        ValueError
+            If wildtype_pdb_path is missing or has an invalid type.
+        """
+        if seed is not None:
+            seed_python_numpy_and_torch(seed)
 
         if wildtype_pdb_path is None:
             raise ValueError(
@@ -149,33 +259,24 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
 
         # We use the default alphabet if None was provided.
         # See ENCODING in foldx_utils.py
-        if alphabet is None:
-            alphabet = self.get_setup_information().get_alphabet()
-
-        problem_info = self.get_setup_information()
         f = FoldXStabilityAndSASABlackBox(
-            info=problem_info,
+            wildtype_pdb_path=wildtype_pdb_path,
+            experiment_id=experiment_id,
+            tmp_folder=tmp_folder,
+            eager_repair=eager_repair,
+            verbose=verbose,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
-            wildtype_pdb_path=wildtype_pdb_path,
-            alphabet=alphabet,
+            evaluation_budget=evaluation_budget,
+            force_isolation=force_isolation,
         )
 
         # We need to compute the initial values of all wildtypes
         # in wildtype_pdb_path. For this, we need to specify x0,
         # a vector of wildtype sequences. These are padded to
         # match the maximum length with empty strings.
-        wildtype_amino_acids_ = []
-        for pdb_file in wildtype_pdb_path:
-            wildtype_residues = parse_pdb_as_residues(pdb_file)
-            wildtype_amino_acids_.append(
-                [
-                    seq1(residue.get_resname())
-                    for residue in wildtype_residues
-                    if residue.get_resname() != "NA"
-                ]
-            )
+        wildtype_amino_acids_ = f.inner_function.wildtype_amino_acids
         longest_wildtype_length = max([len(x) for x in wildtype_amino_acids_])
 
         wildtype_amino_acids = [
@@ -187,9 +288,8 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
             len(wildtype_pdb_path), longest_wildtype_length
         )
 
-        f_0 = f(x0)
-
-        return f, x0, f_0
+        problem = Problem(f, x0)
+        return problem
 
 
 if __name__ == "__main__":

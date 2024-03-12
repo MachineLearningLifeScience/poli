@@ -8,4 +8,4 @@ dependencies:
     - numpy
     - rdkit
     - selfies
-    - "git+https://github.com/MachineLearningLifeScience/poli.git@master"
+    - "git+https://github.com/MachineLearningLifeScience/poli.git@dev"

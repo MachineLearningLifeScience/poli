@@ -1,3 +1,6 @@
 black
 tox
+pytest
 setuptools
+sphinx
+furo
