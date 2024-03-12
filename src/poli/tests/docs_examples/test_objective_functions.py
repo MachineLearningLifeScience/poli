@@ -172,6 +172,9 @@ def test_drd3_docking_example():
 
 def test_penalized_logp_lambo():
     import numpy as np
+
+    _ = pytest.importorskip("lambo")
+
     from poli.objective_repository import (
         PenalizedLogPLamboProblemFactory,
         PenalizedLogPLamboBlackBox,
