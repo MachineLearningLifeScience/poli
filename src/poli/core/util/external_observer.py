@@ -47,7 +47,7 @@ class ExternalObserver(AbstractObserver):
 
         self.observer_name = observer_name
 
-        self.observer_script = config[observer_name][_OBSERVER]
+        self.observer_script = config[_OBSERVER][observer_name]
         self.process_wrapper = None
         self.kwargs_for_observer = kwargs_for_observer
 
