@@ -39,7 +39,7 @@ def start_observer_process(observer_name, port: int, password: str):
     conn = get_connection(port, password)
 
     # get setup info from external_observer
-    setup_info, caller_info, x0, y0, seed, observer_kwargs = conn.recv()
+    setup_info, caller_info, seed, observer_kwargs = conn.recv()
 
     # instantiate observer
     observer: AbstractObserver = dynamically_instantiate(
@@ -47,9 +47,7 @@ def start_observer_process(observer_name, port: int, password: str):
     )
 
     try:
-        observer_info = observer.initialize_observer(
-            setup_info, caller_info, x0, y0, seed
-        )
+        observer_info = observer.initialize_observer(setup_info, caller_info, seed)
         # give mother process the signal that we're ready
         conn.send(["SETUP", observer_info])
     except Exception as e:
