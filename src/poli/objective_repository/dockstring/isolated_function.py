@@ -146,6 +146,7 @@ if __name__ == "__main__":
     #     string_representation="SMILES",
     # )
 
+    # TODO: maybe force the user to instanciate.
     register_isolated_function(
         IsolatedDockstringFunction,
         name="dockstring__isolated",

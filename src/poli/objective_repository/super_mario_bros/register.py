@@ -38,6 +38,10 @@ class SuperMarioBrosBlackBox(AbstractBlackBox):
 
     Parameters
     ----------
+    max_time : int, optional
+        The maximum time for the simulation in seconds, by default 30.
+    visualize : bool, optional
+        Flag indicating whether to visualize the simulation, by default False.
     batch_size : int, optional
         The batch size for simultaneous execution, by default None.
     parallelize : bool, optional
@@ -58,6 +62,8 @@ class SuperMarioBrosBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
+        max_time: int = 30,
+        visualize: bool = False,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
@@ -90,14 +96,22 @@ class SuperMarioBrosBlackBox(AbstractBlackBox):
                     SMBIsolatedLogic,
                 )
 
-                self.inner_function = SMBIsolatedLogic()
+                self.inner_function = SMBIsolatedLogic(
+                    alphabet=smb_info.alphabet, max_time=max_time, visualize=visualize
+                )
             except ImportError:
                 self.inner_function = instance_function_as_isolated_process(
                     name="super_mario_bros__isolated",
+                    alphabet=smb_info.alphabet,
+                    max_time=max_time,
+                    visualize=visualize,
                 )
         else:
             self.inner_function = instance_function_as_isolated_process(
                 name="super_mario_bros__isolated",
+                alphabet=smb_info.alphabet,
+                max_time=max_time,
+                visualize=visualize,
             )
 
     def _black_box(self, x: np.ndarray, context=None) -> np.ndarray:
@@ -127,6 +141,8 @@ class SuperMarioBrosProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
+        max_time: int = 30,
+        visualize: bool = False,
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
@@ -138,6 +154,10 @@ class SuperMarioBrosProblemFactory(AbstractProblemFactory):
 
         Parameters
         ----------
+        max_time : int, optional
+            The maximum time for the simulation in seconds, by default 30.
+        visualize : bool, optional
+            Flag indicating whether to visualize the simulation, by default False.
         seed : int, optional
             The seed for the random number generator, by default None.
         batch_size : int, optional
@@ -161,13 +181,17 @@ class SuperMarioBrosProblemFactory(AbstractProblemFactory):
             seed_python_numpy_and_torch(seed)
 
         f = SuperMarioBrosBlackBox(
+            max_time=max_time,
+            visualize=visualize,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
             force_isolation=force_isolation,
         )
-        x0 = np.ones([1, 2])
+        x0 = np.array([["-"] * 14] * 14)
+        x0[-1, :] = "X"
+        x0 = x0.reshape(1, 14 * 14)
 
         problem = Problem(f, x0)
 
