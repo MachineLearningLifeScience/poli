@@ -4,9 +4,6 @@ from typing import List
 from itertools import product
 
 import numpy as np
-import torch
-
-Tensor = torch.Tensor
 
 
 def level_to_list(level_txt: str) -> List[List[str]]:
@@ -78,32 +75,6 @@ def onehot_to_levels(levels_onehot: np.ndarray, sampling=False, seed=0) -> np.nd
         levels = np.argmax(levels_onehot, axis=1)
 
     return levels
-
-
-def tensor_to_sim_level(tensor_levels: Tensor, level_size: int = 14) -> List[List[int]]:
-    """
-    Takes the output of vae.decode and returns
-    a list that could be sent to the MarioGAN.jar
-    simulator
-    """
-    # Computes argmax for each channel.
-    # lvls_numpy = onehot_to_levels(tensor_levels.cpu().detach().numpy())
-    lvls_numpy = tensor_levels.cpu().detach().numpy()
-
-    # Adds a padding with some floor
-    # (to help the A* agent).
-    n_padding = 1
-    padding = 2 * np.ones(
-        (lvls_numpy.shape[0], level_size, n_padding)
-    )  # Starting with emptyness.
-    padding[:, -1, :] = 0  # Adding the ground.
-    lvls_with_padding = np.zeros(
-        (lvls_numpy.shape[0], level_size, level_size + n_padding)
-    )
-    lvls_with_padding[:, :, :n_padding] = padding
-    lvls_with_padding[:, :, n_padding:] = lvls_numpy
-
-    return lvls_with_padding.tolist()
 
 
 def add_padding_to_level(level: np.ndarray, n_padding: int = 1) -> np.ndarray:
