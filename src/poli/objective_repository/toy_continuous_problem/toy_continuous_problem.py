@@ -26,6 +26,7 @@ from .definitions import (
     deflected_corrugated_spring,
     camelback_2d,
     styblinski_tang,
+    hartmann_6d,
 )
 
 # Notice: these will be used by pytest to test the
@@ -47,6 +48,7 @@ POSSIBLE_FUNCTIONS = [
     "cross_in_tray",
     "egg_holder",
     "camelback_2d",
+    "hartmann_6d",
 ]
 TWO_DIMENSIONAL_PROBLEMS = [
     "shifted_sphere",
@@ -55,6 +57,7 @@ TWO_DIMENSIONAL_PROBLEMS = [
     "egg_holder",
     "camelback_2d",
 ]
+SIX_DIMENSIONAL_PROBLEMS = ["hartmann_6d"]
 
 
 class ToyContinuousProblem:
@@ -182,6 +185,13 @@ class ToyContinuousProblem:
             self.limits = [-5, 5]
             self.optima_location = np.array([0.0898, -0.7126])
             self.solution_length = 2
+        elif name == "hartmann_6d":
+            self.function = hartmann_6d
+            self.limits = [0.0, 1.0]
+            self.optima_location = np.array(
+                [0.20169, 0.150011, 0.476874, 0.275332, 0.311652, 0.6573]
+            )
+            self.solution_length = 6
         else:
             raise ValueError(f"Expected {name} to be one of {POSSIBLE_FUNCTIONS}")
 

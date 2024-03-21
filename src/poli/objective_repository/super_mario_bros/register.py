@@ -149,7 +149,7 @@ class SuperMarioBrosProblemFactory(AbstractProblemFactory):
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
         force_isolation: bool = False,
-    ) -> Tuple[SuperMarioBrosBlackBox, np.ndarray, np.ndarray]:
+    ) -> Problem:
         """Creates a new instance of the Super Mario Bros problem.
 
         Parameters
