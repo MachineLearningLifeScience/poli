@@ -24,6 +24,8 @@ from poli.core.util.seeding import seed_python_numpy_and_torch
 from .toy_continuous_problem import (
     POSSIBLE_FUNCTIONS,
     ToyContinuousProblem,
+    TWO_DIMENSIONAL_PROBLEMS,
+    SIX_DIMENSIONAL_PROBLEMS,
 )
 
 from poli.objective_repository.toy_continuous_problem.information import (
