@@ -5,7 +5,7 @@ See for more examples:
 https://en.wikipedia.org/wiki/Test_functions_for_optimization
 """
 
-from typing import Literal
+from typing import Literal, List
 
 import numpy as np
 
@@ -27,6 +27,7 @@ from .definitions import (
     camelback_2d,
     styblinski_tang,
     hartmann_6d,
+    branin_2d,
 )
 
 # Notice: these will be used by pytest to test the
@@ -49,6 +50,7 @@ POSSIBLE_FUNCTIONS = [
     "egg_holder",
     "camelback_2d",
     "hartmann_6d",
+    "branin_2d",
 ]
 TWO_DIMENSIONAL_PROBLEMS = [
     "shifted_sphere",
@@ -56,6 +58,7 @@ TWO_DIMENSIONAL_PROBLEMS = [
     "cross_in_tray",
     "egg_holder",
     "camelback_2d",
+    "branin_2d",
 ]
 SIX_DIMENSIONAL_PROBLEMS = ["hartmann_6d"]
 
@@ -88,13 +91,16 @@ class ToyContinuousProblem:
             "cross_in_tray",
             "egg_holder",
             "camelback_2d",
+            "camelback_2d",
+            "branin_2d",
         ],
         n_dims: int = 2,
         embed_in: int = None,
+        dimensions_to_embed_in: List[int] = None,
     ) -> None:
         self.maximize = True
         self.known_optima = True
-        self.dimensions_to_embed_in = None
+        self.dimensions_to_embed_in = dimensions_to_embed_in
 
         if n_dims != 2 and name in TWO_DIMENSIONAL_PROBLEMS:
             if embed_in is None:
@@ -104,6 +110,16 @@ class ToyContinuousProblem:
                     " embed_in: int to the desired dimension. When doing so, the 2 dimensions will be "
                     "randomly selected among the embed_in."
                 )
+
+        if dimensions_to_embed_in is not None:
+            assert (
+                embed_in is not None
+            ), "Expected dimensions_to_embed_in to be None if embed_in is None."
+            for dim in dimensions_to_embed_in:
+                if dim >= embed_in or dim < 0:
+                    raise ValueError(
+                        f"Dimension to embed in {dim} is higher than the number of dimensions {n_dims} or negative."
+                    )
 
         if name == "ackley_function_01":
             self.function = ackley_function_01
@@ -192,6 +208,11 @@ class ToyContinuousProblem:
                 [0.20169, 0.150011, 0.476874, 0.275332, 0.311652, 0.6573]
             )
             self.solution_length = 6
+        elif name == "branin_2d":
+            self.function = branin_2d
+            self.limits = [-5.0, 15.0]
+            self.optima_location = np.array([9.42478, 2.475])
+            self.solution_length = 2
         else:
             raise ValueError(f"Expected {name} to be one of {POSSIBLE_FUNCTIONS}")
 
@@ -206,9 +227,10 @@ class ToyContinuousProblem:
                 f"dimensionality of the space, but got {self.solution_length} and {n_dims} respectively."
             )
 
-            self.dimensions_to_embed_in = np.random.permutation(embed_in)[:n_dims]
+            if dimensions_to_embed_in is None:
+                self.dimensions_to_embed_in = np.random.permutation(embed_in)[:n_dims]
+
             self.solution_length = embed_in
-            self.limits = [self.limits[0]] * embed_in, [self.limits[1]] * embed_in
             previous_optima_location = self.optima_location.copy()
             self.optima_location = np.zeros(embed_in)
             self.optima_location[self.dimensions_to_embed_in] = previous_optima_location
