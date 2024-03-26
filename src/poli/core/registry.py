@@ -99,7 +99,7 @@ def set_observer_run_script(script_file_name: str, observer_name: str = None) ->
             config.add_section(observer_name)
 
     # VERY IMPORTANT: the observer script MUST accept port and password as arguments
-    config[observer_name][_OBSERVER] = script_file_name
+    config[_OBSERVER][observer_name] = script_file_name
     _write_config()
 
 
@@ -127,8 +127,8 @@ def delete_observer_run_script(observer_name: str = None) -> str:
     if observer_name is None:
         observer_name = _DEFAULT
 
-    location = config[observer_name][_OBSERVER]  # no need to copy
-    config[observer_name][_OBSERVER] = ""
+    location = config[_OBSERVER][observer_name]  # no need to copy
+    config[_OBSERVER][observer_name] = ""
     _write_config()
     return location
 
