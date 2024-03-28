@@ -11,11 +11,10 @@ To check its results, you will need to start a ui:
 """
 
 from pathlib import Path
-
 import mlflow
 import numpy as np
-from poli.core.problem_setup_information import ProblemSetupInformation
 
+from poli.core.black_box_information import BlackBoxInformation
 from poli.core.util.abstract_observer import AbstractObserver
 
 
@@ -29,10 +28,8 @@ class MlFlowObserver(AbstractObserver):
 
     def initialize_observer(
         self,
-        problem_setup_info: ProblemSetupInformation,
+        problem_setup_info: BlackBoxInformation,
         caller_info: object,
-        x0: np.ndarray,
-        y0: np.ndarray,
         seed: int,
     ) -> None:
         if "run_id" in caller_info:

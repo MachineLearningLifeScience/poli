@@ -14,7 +14,7 @@ import shutil
 
 import numpy as np
 
-from poli.core.problem_setup_information import ProblemSetupInformation
+from build.lib.poli.core.black_box_information import BlackBoxInformation
 from poli.core.util.abstract_observer import AbstractObserver
 
 from poli import objective_factory
@@ -38,10 +38,8 @@ class SimpleObserver(AbstractObserver):
 
     def initialize_observer(
         self,
-        problem_setup_info: ProblemSetupInformation,
+        problem_setup_info: BlackBoxInformation,
         caller_info: object,
-        x0: np.ndarray,
-        y0: np.ndarray,
         seed: int,
     ) -> object:
         # Saving the metadata for this experiment
@@ -51,10 +49,6 @@ class SimpleObserver(AbstractObserver):
         # (Recall that this caller info gets forwarded
         # from the objective_factory.create function)
         metadata["caller_info"] = caller_info
-
-        # Saving the initial evaluations and seed
-        metadata["x0"] = x0.tolist()
-        metadata["y0"] = y0.tolist()
         metadata["seed"] = seed
 
         # Saving the metadata

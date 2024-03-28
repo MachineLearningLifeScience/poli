@@ -25,12 +25,14 @@ if __name__ == "__main__":
     # Initializing a QED objective function.
     problem = QEDProblemFactory().create(string_representation="SELFIES")
     f, x0 = problem.black_box, problem.x0
-    y0 = f(x0)
 
     f.set_observer(observer)
     observer.initialize_observer(
-        f.info, {"run_id": None, "experiment_id": None}, x0=x0, y0=y0, seed=seed
+        f.info, {"run_id": None, "experiment_id": None}, seed=seed
     )
+
+    y0 = f(x0)
+
 
     # Logging some examples
     # The observer will register each call to f.
