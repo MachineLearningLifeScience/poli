@@ -12,6 +12,8 @@ and it uses a conda environment called 'poli__base'
 (see the environment.yml file in this folder).
 """
 
+from typing import List
+
 import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
@@ -24,6 +26,8 @@ from poli.core.util.seeding import seed_python_numpy_and_torch
 from .toy_continuous_problem import (
     POSSIBLE_FUNCTIONS,
     ToyContinuousProblem,
+    TWO_DIMENSIONAL_PROBLEMS,
+    SIX_DIMENSIONAL_PROBLEMS,
 )
 
 from poli.objective_repository.toy_continuous_problem.information import (
@@ -44,6 +48,8 @@ class ToyContinuousBlackBox(AbstractBlackBox):
     embed_in : int, optional
         If not None, the continuous problem is randomly embedded in this dimension.
         By default, None.
+    dimensions_to_embed_in: List[int], optional
+        The dimensions in which to embed the problem, by default None. Only has an effect if embed_in is not None.
     batch_size : int, optional
         The batch size for parallel evaluation, by default None.
     parallelize : bool, optional
@@ -78,6 +84,7 @@ class ToyContinuousBlackBox(AbstractBlackBox):
         function_name: str,
         n_dimensions: int = 2,
         embed_in: int = None,
+        dimensions_to_embed_in: List[int] = None,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
@@ -95,6 +102,7 @@ class ToyContinuousBlackBox(AbstractBlackBox):
             function_name,
             n_dims=n_dimensions,
             embed_in=embed_in,
+            dimensions_to_embed_in=dimensions_to_embed_in,
         )
         self.bounds = self.function.limits
 
@@ -154,6 +162,7 @@ class ToyContinuousProblemFactory(AbstractProblemFactory):
         function_name: str,
         n_dimensions: int = 2,
         embed_in: int = None,
+        dimensions_to_embed_in: List[int] = None,
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
@@ -172,6 +181,8 @@ class ToyContinuousProblemFactory(AbstractProblemFactory):
         embed_in : int, optional
             If not None, the continuous problem is randomly embedded in this dimension.
             By default, None.
+        dimensions_to_embed_in: List[int], optional
+            The dimensions in which to embed the problem, by default None. Only has an effect if embed_in is not None.
         seed : int, optional
             The seed for the random number generator, by default None.
         batch_size : int, optional
@@ -202,15 +213,18 @@ class ToyContinuousProblemFactory(AbstractProblemFactory):
             seed_python_numpy_and_torch(seed)
 
         f = ToyContinuousBlackBox(
+            function_name=function_name,
+            n_dimensions=n_dimensions,
+            embed_in=embed_in,
+            dimensions_to_embed_in=dimensions_to_embed_in,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
-            function_name=function_name,
-            n_dimensions=n_dimensions,
-            embed_in=embed_in,
         )
         # TODO: initial value should maybe vary according to the function.
+        # This is something we could be storing inside
+        # the ToyContinuousProblem class.
         if embed_in is None:
             x0 = np.array([[0.0] * n_dimensions])
         else:
