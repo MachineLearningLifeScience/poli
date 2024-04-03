@@ -17,6 +17,7 @@ from poli.core.registry import (
     register_problem_from_repository,
 )
 from poli.core.util.abstract_observer import AbstractObserver
+from poli.core.util.algorithm_observer_wrapper import AlgorithmObserverWrapper
 from poli.core.util.external_observer import ExternalObserver
 from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
 from poli.core.util.isolation.external_black_box import ExternalBlackBox
@@ -336,15 +337,19 @@ def create(
     if observer_name is not None:
         if not quiet:
             print(f"poli 🧪: initializing the observer.")
-
         try:
             observer_script: str = registry.config[_OBSERVER][observer_name]
-            observer_class = observer_script.split(" ")[1]
-            observer = dynamically_instantiate(observer_class, {})
+            f = open(observer_script, "r")
+            observer_class = (
+                f.readlines()[-1].split("--objective-name=")[1].split(" --port")[0]
+            )
+            f.close()
+            observer = dynamically_instantiate(observer_class)
         except:
             if not quiet:
                 print(f"poli 🧪: attempting isolated observer instantiation.")
             observer = ExternalObserver(observer_name=observer_name)
+        problem.set_observer(AlgorithmObserverWrapper(observer))
 
         black_box_information = problem.black_box.info
         # TODO: Should we send the y0 to the observer initialization?

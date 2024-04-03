@@ -88,6 +88,9 @@ class AbstractObserver:
         """
         raise NotImplementedError("abstract method")
 
+    def log(self, algorithm_info: dict):
+        pass
+
     def finish(self) -> None:
         """Finish the observer."""
         pass

@@ -68,6 +68,16 @@ def start_observer_process(observer_name, port: int, password: str):
             except Exception as e:
                 tb = traceback.format_exc()
                 conn.send(["EXCEPTION", e, tb])
+        elif msg_type == "LOG":
+            # How should we inform the external observer
+            # if something fails during observation?
+            # (TODO).
+            try:
+                observer.log(*msg)
+                conn.send(["LOG", None])
+            except Exception as e:
+                tb = traceback.format_exc()
+                conn.send(["EXCEPTION", e, tb])
         elif msg_type == "ATTRIBUTE":
             try:
                 conn.send(["ATTRIBUTE", getattr(observer, msg[0])])

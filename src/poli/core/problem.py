@@ -18,6 +18,7 @@ includes the following information:
 import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
+from poli.core.util.algorithm_observer_wrapper import AlgorithmObserverWrapper
 
 
 class Problem:
@@ -30,6 +31,7 @@ class Problem:
         self.x0: np.ndarray = x0
         self.black_box_information = black_box.info
         self._validate()
+        self.observer: AlgorithmObserverWrapper = None
 
     def _validate(self):
         if not isinstance(self.black_box, AbstractBlackBox):
@@ -46,6 +48,9 @@ class Problem:
 
     def is_continuous(self):
         return not self.is_discrete()
+
+    def set_observer(self, observer: AlgorithmObserverWrapper):
+        self.observer = observer
 
     @property
     def info(self):

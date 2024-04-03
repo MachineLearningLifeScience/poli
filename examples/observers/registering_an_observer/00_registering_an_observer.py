@@ -15,13 +15,14 @@ Check ./using_a_registered_observer.py for an example
 of how to instantiate it after registration.
 """
 
-from poli.core.registry import set_observer
+from poli.core.registry import register_observer
 
-from wandb_observer import WandbObserver
+from print_observer import SimplePrintObserver
 
 if __name__ == "__main__":
-    set_observer(
-        observer=WandbObserver(initial_step=0),
-        conda_environment_location="poli__wandb",
-        observer_name="wandb",
+    register_observer(
+        observer=SimplePrintObserver(),
+        # conda_environment_location="poli",  # when not providing the environment, we use the current one
+        observer_name="simple_print_observer",
+        set_as_default_observer=True,
     )

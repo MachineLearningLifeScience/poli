@@ -33,11 +33,12 @@ config = configparser.ConfigParser(defaults={_OBSERVER: ""})
 ls = config.read(config_file)
 
 
-def set_observer(
+def register_observer(
     observer: Union[AbstractObserver, Type[AbstractObserver]],
     conda_environment_location: str = None,
     python_paths: List[str] = None,
     observer_name: str = None,
+    set_as_default_observer: bool = True,
 ):
     """Defines an external observer to be run in a separate process.
 
@@ -71,10 +72,16 @@ def set_observer(
     run_script_location = make_observer_script(
         non_instance_observer, conda_environment_location, python_paths
     )
-    set_observer_run_script(run_script_location, observer_name=observer_name)
+    set_observer_run_script(
+        run_script_location,
+        observer_name=observer_name,
+        set_as_default_observer=set_as_default_observer,
+    )
 
 
-def set_observer_run_script(script_file_name: str, observer_name: str = None) -> None:
+def set_observer_run_script(
+    script_file_name: str, observer_name: str, set_as_default_observer: bool = True
+) -> None:
     """Sets a run_script to be called on observer instantiation.
 
     This function takes as input the location of a script, and an observer name.
@@ -92,14 +99,12 @@ def set_observer_run_script(script_file_name: str, observer_name: str = None) ->
     -----
     The observer script MUST accept port and password as arguments.
     """
-    if observer_name is None:
-        observer_name = _DEFAULT
-    else:
-        if observer_name not in config.sections():
-            config.add_section(observer_name)
-
+    if _OBSERVER not in config.sections():
+        config.add_section(_OBSERVER)
     # VERY IMPORTANT: the observer script MUST accept port and password as arguments
     config[_OBSERVER][observer_name] = script_file_name
+    if set_as_default_observer:
+        config[_DEFAULT][_OBSERVER] = observer_name
     _write_config()
 
 

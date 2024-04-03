@@ -33,7 +33,6 @@ if __name__ == "__main__":
 
     y0 = f(x0)
 
-
     # Logging some examples
     # The observer will register each call to f.
     f(np.array([["[C]", "[C]"]]))

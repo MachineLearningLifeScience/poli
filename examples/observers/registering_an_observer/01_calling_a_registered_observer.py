@@ -8,19 +8,20 @@ one that doesn't have e.g. wandb installed.
 import numpy as np
 
 from poli import objective_factory
-from poli.core.util.external_observer import ExternalObserver
 
 if __name__ == "__main__":
     # Instantiate the objective
     problem = objective_factory.create(
         name="aloha",
-        observer_name="wandb",    # instantiate the registered observer
+        observer_name="simple_print_observer",  # instantiate the registered observer
     )
     f = problem.black_box
 
     # Run the objective. Each objective call
-    # is registered by the observer (check
-    # ./wandb_observer.py for details).
+    # is registered by the observer.
     f(np.array([list("MIGUE")]))
     f(np.array([list("FLEAS")]))
     f(np.array([list("ALOHA")]))
+
+    # An algorithm may also send information to the observer via the AlgorithmObserverWrapper
+    problem.observer.log({"ALGORITHM": "no_algo", "OTHER_INFO": "nothing"})

@@ -133,6 +133,19 @@ class ExternalObserver(AbstractObserver):
         # forward to objective factory
         return observer_info
 
+    def log(self, algorithm_info: dict):
+        # We send the observation
+        self.process_wrapper.send(["LOG", algorithm_info])
+
+        # And we make sure the process received and logged it correctly
+        msg_type, *msg = self.process_wrapper.recv()
+        if msg_type == "EXCEPTION":
+            e, tb = msg
+            print(tb)
+            raise e
+
+        # else, it was a successful observation
+
     def finish(self) -> None:
         """Finish the external observer process.
 

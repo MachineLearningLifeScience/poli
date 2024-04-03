@@ -77,7 +77,8 @@ def dynamically_instantiate(obj: str, **kwargs):
     # TODO: possible alternative: importlib
     # TODO: another possible alternative: hydra
     # sys.path.append(os.getcwd())
-    sys.path.extend(os.environ[ADDITIONAL_IMPORT_SEARCH_PATHES_KEY].split(":"))
+    if ADDITIONAL_IMPORT_SEARCH_PATHES_KEY in os.environ:
+        sys.path.extend(os.environ[ADDITIONAL_IMPORT_SEARCH_PATHES_KEY].split(":"))
     # sys.path.extend(os.environ['PYTHONPATH'].split(':'))
     last_dot = obj.rfind(".")
 
