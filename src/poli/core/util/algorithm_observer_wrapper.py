@@ -1,3 +1,5 @@
+"""A wrapper around observers that prohibits the use of observer.observe"""
+
 from poli.core.util.abstract_observer import AbstractObserver
 
 

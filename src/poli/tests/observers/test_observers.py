@@ -14,7 +14,7 @@ import shutil
 
 import numpy as np
 
-from build.lib.poli.core.black_box_information import BlackBoxInformation
+from poli.core.black_box_information import BlackBoxInformation
 from poli.core.util.abstract_observer import AbstractObserver
 
 from poli import objective_factory
@@ -23,10 +23,14 @@ THIS_DIR = Path(__file__).parent.resolve()
 
 
 class SimpleObserver(AbstractObserver):
-    def __init__(self, experiment_id: str):
-        # Creating a unique id for this experiment in
-        # particular:
-        experiment_id = experiment_id
+    def initialize_observer(
+        self,
+        problem_setup_info: BlackBoxInformation,
+        caller_info: object,
+        seed: int,
+    ) -> object:
+        experiment_id = caller_info["experiment_id"]
+
         self.experiment_id = experiment_id
 
         # Creating a local directory for the results
@@ -35,13 +39,6 @@ class SimpleObserver(AbstractObserver):
 
         self.experiment_path = experiment_path
         self.results = []
-
-    def initialize_observer(
-        self,
-        problem_setup_info: BlackBoxInformation,
-        caller_info: object,
-        seed: int,
-    ) -> object:
         # Saving the metadata for this experiment
         metadata = problem_setup_info.as_dict()
 
@@ -63,50 +60,60 @@ class SimpleObserver(AbstractObserver):
 def test_simple_observer_can_be_defined():
     """Tests whether we can define a simple observer"""
     # Creating a simple observer
-    observer = SimpleObserver(experiment_id="example")
+    observer = SimpleObserver()
 
     # Checking whether the observer is an instance of
     # AbstractObserver
     assert isinstance(observer, AbstractObserver)
 
-    # Remove the results directory.
-    # (indirectly testing that the __init__ ran)
-    shutil.rmtree(observer.experiment_path)
-
 
 def test_simple_observer_logs_properly():
     """Tests whether the __call__ of a black box function is properly logged"""
-    observer = SimpleObserver(experiment_id="example")
+    from poli.core.registry import register_observer, delete_observer_run_script
+
+    observer = SimpleObserver()
+
+    register_observer(
+        observer=observer,
+        conda_environment_location="poli__chem",
+        observer_name="simple__",
+        set_as_default_observer=False,
+    )
 
     # Creating a black box function
-    problem = objective_factory.create(name="aloha", observer=observer)
+    problem = objective_factory.create(
+        name="aloha",
+        observer_name="simple__",
+        observer_init_info={"experiment_id": "example"},
+    )
     f = problem.black_box
 
     # Evaluating the black box function
     f(np.array([list("MIGUE")]))
 
     # Checking whether the results were properly logged
-    assert observer.results == [{"x": [["M", "I", "G", "U", "E"]], "y": [[0.0]]}]
-    (observer.experiment_path / "metadata.json").unlink()
-    observer.experiment_path.rmdir()
+    assert f.observer.results == [{"x": [["M", "I", "G", "U", "E"]], "y": [[0.0]]}]
+    (f.observer.experiment_path / "metadata.json").unlink()
+    f.observer.experiment_path.rmdir()
 
 
 def test_observer_registration_and_external_instancing():
     """An integration test for the observer registration and external instancing"""
-    from poli.core.registry import set_observer, delete_observer_run_script
-    from poli.core.util.external_observer import ExternalObserver
+    from poli.core.registry import register_observer, delete_observer_run_script
 
-    observer = SimpleObserver(experiment_id="example")
-    set_observer(
+    observer = SimpleObserver()
+    register_observer(
         observer=observer.__class__,
         conda_environment_location="poli__chem",
         observer_name="simple__",
     )
 
-    ext = ExternalObserver(observer_name="simple__", experiment_id="example")
-
     # Creating a black box function
-    problem = objective_factory.create(name="aloha", observer=ext)
+    problem = objective_factory.create(
+        name="aloha",
+        observer_name="simple__",
+        observer_init_info={"experiment_id": "example"},
+    )
     f = problem.black_box
 
     # Evaluating the black box function
@@ -115,46 +122,53 @@ def test_observer_registration_and_external_instancing():
     # Checking whether accessing an unexisting attribute raises an error
     # We do it without pytest to avoid having to install it in
     # the poli__chem environment.
+    f.observer  # The same as problem.observer._observer
     try:
-        ext.unexisting_attribute
-        raise AssertionError("Should have raised an error")
+        f.observer.unexisting_attribute
     except AttributeError:
         pass
 
     # Cleaning up (and testing whether we can access attributes
     # of the external observer)
-    print(ext.experiment_path)
-    (ext.experiment_path / "metadata.json").unlink()
-    ext.finish()
+    print(f.observer.experiment_path)
+    (f.observer.experiment_path / "metadata.json").unlink()
+    f.observer.finish()
 
     # Cleaning up the observer run script
     delete_observer_run_script(observer_name="simple__")
 
 
 def test_multiple_observer_registration():
-    from poli.core.registry import set_observer, delete_observer_run_script
+    from poli.core.registry import register_observer, delete_observer_run_script
     from poli.core.util.external_observer import ExternalObserver
 
-    observer = SimpleObserver(experiment_id="example")
-    set_observer(
+    observer = SimpleObserver()
+    register_observer(
         observer=observer,
         conda_environment_location="poli__chem",
         observer_name="simple__",
+        set_as_default_observer=False,
     )
 
-    observer_2 = SimpleObserver(experiment_id="example_2")
-    set_observer(
+    observer_2 = SimpleObserver()
+    register_observer(
         observer=observer_2,
         conda_environment_location="poli__chem",
         observer_name="simple_2__",
+        set_as_default_observer=False,
     )
 
-    ext_1 = ExternalObserver(observer_name="simple__", experiment_id="example")
-    ext_2 = ExternalObserver(observer_name="simple_2__", experiment_id="example_2")
-
     # Creating a black box function
-    problem_1 = objective_factory.create(name="aloha", observer=ext_1)
-    problem_2 = objective_factory.create(name="aloha", observer=ext_2)
+    problem_1 = objective_factory.create(
+        name="aloha",
+        observer_name="simple__",
+        observer_init_info={"experiment_id": "example"},
+    )
+    problem_2 = objective_factory.create(
+        name="aloha",
+        observer_name="simple_2__",
+        observer_init_info={"experiment_id": "example_2"},
+    )
 
     # Evaluating the black box function
     problem_1.black_box(np.array([list("MIGUE")]))
@@ -162,10 +176,10 @@ def test_multiple_observer_registration():
 
     # Cleaning up (and testing whether we can access attributes
     # of the external observer)
-    (ext_1.experiment_path / "metadata.json").unlink()
-    (ext_2.experiment_path / "metadata.json").unlink()
-    ext_1.finish()
-    ext_2.finish()
+    (problem_1.observer._observer.experiment_path / "metadata.json").unlink()
+    (problem_2.observer._observer.experiment_path / "metadata.json").unlink()
+    problem_1.observer._observer.finish()
+    problem_2.observer._observer.finish()
 
     # Cleaning up the observer run script
     delete_observer_run_script(observer_name="simple__")
@@ -173,4 +187,4 @@ def test_multiple_observer_registration():
 
 
 if __name__ == "__main__":
-    test_multiple_observer_registration()
+    test_observer_registration_and_external_instancing()
