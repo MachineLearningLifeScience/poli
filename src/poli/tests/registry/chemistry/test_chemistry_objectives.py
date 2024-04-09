@@ -4,7 +4,13 @@ from pathlib import Path
 import numpy as np
 
 from poli import objective_factory
-from poli.objective_repository import GSK3BetaBlackBox, DRD2BlackBox, JNK3BlackBox
+from poli.objective_repository import (
+    GSK3BetaBlackBox,
+    DRD2BlackBox,
+    JNK3BlackBox,
+    SABlackBox,
+    CelecoxibRediscoveryBlackBox,
+)
 
 THIS_DIR = Path(__file__).parent.resolve()
 
@@ -144,12 +150,29 @@ def test_querying_dockstring_using_selfies():
 test_data_for_pmo = [
     # Removed until TDC fixes issue #238.
     # ("gsk3_beta", GSK3BetaBlackBox, {"string_representation": "SMILES"}, 0.03)
-    ("gsk3_beta", GSK3BetaBlackBox, {"string_representation": "SMILES"}, None),
+    (
+        "gsk3_beta",
+        GSK3BetaBlackBox,
+        {"string_representation": "SMILES"},
+        None,
+    ),
     (
         "drd2_docking",
         DRD2BlackBox,
         {"string_representation": "SMILES"},
         0.0015465365340340924,
+    ),
+    (
+        "sa_tdc",
+        SABlackBox,
+        {"string_representation": "SMILES"},
+        2.706977149048555,
+    ),
+    (
+        "celecoxib_rediscovery",
+        CelecoxibRediscoveryBlackBox,
+        {"string_representation": "SMILES"},
+        0.14728682170542637,
     ),
     # Removed until TDC fixes issue #238.
     # ("jnk3", JNK3BlackBox, {"string_representation": "SMILES"}, 0.01),

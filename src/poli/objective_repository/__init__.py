@@ -20,6 +20,10 @@ from .rdkit_qed.register import QEDBlackBox, QEDProblemFactory
 from .gsk3_beta.register import GSK3BetaBlackBox, GSK3BetaProblemFactory
 from .drd2_docking.register import DRD2BlackBox, DRD2ProblemFactory
 from .jnk3.register import JNK3BlackBox, JNK3ProblemFactory
+from .celecoxib_rediscovery.register import (
+    CelecoxibRediscoveryBlackBox,
+    CelecoxibRediscoveryProblemFactory,
+)
 
 # Protein black boxes
 from .foldx_rfp_lambo.register import FoldXRFPLamboBlackBox, FoldXRFPLamboProblemFactory
@@ -86,6 +90,7 @@ AVAILABLE_PROBLEM_FACTORIES = {
     "gsk3_beta": GSK3BetaProblemFactory,
     "drd2_docking": DRD2ProblemFactory,
     "jnk3": JNK3ProblemFactory,
+    "celecoxib_rediscovery": CelecoxibRediscoveryProblemFactory,
 }
 
 AVAILABLE_BLACK_BOXES = {
@@ -110,6 +115,7 @@ AVAILABLE_BLACK_BOXES = {
     "gsk3_beta": GSK3BetaBlackBox,
     "drd2_docking": DRD2BlackBox,
     "jnk3": JNK3BlackBox,
+    "celecoxib_rediscovery": CelecoxibRediscoveryBlackBox,
 }
 
 

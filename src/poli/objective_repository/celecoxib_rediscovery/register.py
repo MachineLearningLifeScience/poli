@@ -1,10 +1,16 @@
 """
-Implements the DRD2 docking task using the TDC oracles [1].
+Implements the Celecoxib rediscovery task using the TDC oracles [1].
+
+This task is inherited from the GuacaMol benchmark [2], and consists of
+rediscovering a certain molecule through optimization.
 
 References
 ----------
 [1] Artificial intelligence foundation for therapeutic science.
     Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022). https://doi.org/10.1038/s41589-022-01131-2
+[2] GuacaMol: benchmarking models for de novo molecular design.
+    Brown, N. et al.  J Chem Inf Model 59 (2019).
+    https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
 """
 
 from typing import Literal
@@ -16,6 +22,7 @@ import selfies as sf
 
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
+from poli.core.chemistry.tdc_black_box import TDCBlackBox
 from poli.core.problem import Problem
 
 from poli.core.util.chemistry.string_to_molecule import translate_smiles_to_selfies
@@ -24,13 +31,17 @@ from poli.core.util.seeding import seed_numpy, seed_python
 
 from poli.core.chemistry.tdc_black_box import TDCBlackBox
 
-from poli.objective_repository.drd2_docking.information import drd2_docking_info
+from poli.objective_repository.celecoxib_rediscovery.information import (
+    celecoxib_rediscovery_info,
+)
 
 
-class DRD2BlackBox(TDCBlackBox):
+class CelecoxibRediscoveryBlackBox(TDCBlackBox):
     """
-    Docking to the dopamine type 2 receptor, using TDC [1] (which in
-    turn uses Olivecrona et al.'s classifier [2])
+    Celecoxib rediscovery black box implementation using the TDC oracles [1].
+
+    This task is inherited from the GuacaMol benchmark [2], and consists of
+    rediscovering a certain molecule through optimization.
 
     Parameters
     ----------
@@ -56,15 +67,15 @@ class DRD2BlackBox(TDCBlackBox):
     Methods
     -------
     __init__(self, info, batch_size=None, parallelize=False, num_workers=None, from_smiles=True)
-        Initializes a new instance of the DRD3BlackBox class.
+        Initializes a new instance of the black box.
 
     References
     ----------
     [1] Artificial intelligence foundation for therapeutic science.
         Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022). https://doi.org/10.1038/s41589-022-01131-2
-    [2] Molecular de-novo design through deep reinforcement learning.
-        Olivecrona, M. et al. (2017).
-        Journal of cheminformatics, 9.1, 48.
+    [2] GuacaMol: benchmarking models for de novo molecular design.
+        Brown, N. et al.  J Chem Inf Model 59 (2019).
+        https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
     """
 
     def __init__(
@@ -77,7 +88,7 @@ class DRD2BlackBox(TDCBlackBox):
         evaluation_budget: int = float("inf"),
     ):
         super().__init__(
-            oracle_name="DRD2",
+            oracle_name="Celecoxib_Rediscovery",
             string_representation=string_representation,
             force_isolation=force_isolation,
             batch_size=batch_size,
@@ -88,14 +99,12 @@ class DRD2BlackBox(TDCBlackBox):
 
     @staticmethod
     def get_black_box_info() -> BlackBoxInformation:
-        return drd2_docking_info
+        return celecoxib_rediscovery_info
 
 
-class DRD2ProblemFactory(AbstractProblemFactory):
+class CelecoxibRediscoveryProblemFactory(AbstractProblemFactory):
     """
-    Factory class for creating DRD2 docking problems.
-
-    This class provides methods for creating DRD2 docking problems and retrieving setup information.
+    Factory class for creating Celecoxib rediscovery problems.
 
     Methods
     ------
@@ -114,7 +123,7 @@ class DRD2ProblemFactory(AbstractProblemFactory):
         problem_info: ProblemSetupInformation
             The setup information for the problem.
         """
-        return drd2_docking_info
+        return celecoxib_rediscovery_info
 
     def create(
         self,
@@ -127,7 +136,7 @@ class DRD2ProblemFactory(AbstractProblemFactory):
         force_isolation: bool = False,
     ) -> Problem:
         """
-        Create a TDCBlackBox object for DRD3 docking.
+        Creates a Celecoxib rediscovery problem.
 
         Parameters
         ----------
@@ -168,7 +177,7 @@ class DRD2ProblemFactory(AbstractProblemFactory):
                 "String representation must be either 'SMILES' or 'SELFIES'."
             )
 
-        f = DRD2BlackBox(
+        f = CelecoxibRediscoveryBlackBox(
             string_representation=string_representation,
             force_isolation=force_isolation,
             batch_size=batch_size,
@@ -186,20 +195,20 @@ class DRD2ProblemFactory(AbstractProblemFactory):
         else:
             x0 = np.array([list(sf.split_selfies(x0_selfies))])
 
-        drd2_problem = Problem(
+        celecoxib_rediscovery_problem = Problem(
             black_box=f,
             x0=x0,
         )
 
-        return drd2_problem
+        return celecoxib_rediscovery_problem
 
 
 if __name__ == "__main__":
     from poli.core.registry import register_problem
 
     register_problem(
-        DRD2ProblemFactory(),
-        name="drd2_docking",
+        CelecoxibRediscoveryProblemFactory(),
+        name="celecoxib_rediscovery",
         conda_environment_name="poli__tdc",
         force=True,
     )
