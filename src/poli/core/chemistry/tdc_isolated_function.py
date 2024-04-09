@@ -1,7 +1,7 @@
 """Implement a wrapper around the Therapeutics Data Commons (TDC) oracles [1].
 
-So far, we only support two oracles: `drd3` and `synthetic accessibility`. See
-the documentation on our black-box functions for more details.
+When run, this script registers the TDCIsolatedFunction class as an isolated function
+with the name "tdc__isolated".
 
 References
 ----------
@@ -15,9 +15,7 @@ import numpy as np
 
 from tdc import Oracle
 
-from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
-from poli.core.problem_setup_information import ProblemSetupInformation
 
 from poli.core.util.chemistry.string_to_molecule import translate_selfies_to_smiles
 
@@ -106,3 +104,13 @@ class TDCIsolatedFunction(AbstractIsolatedFunction):
             scores.append(self.oracle(molecule_string))
 
         return np.array(scores).reshape(-1, 1)
+
+
+if __name__ == "__main__":
+    from poli.core.registry import register_isolated_function
+
+    register_isolated_function(
+        TDCIsolatedFunction,
+        name="tdc__isolated",
+        conda_environment_name="poli__tdc",
+    )

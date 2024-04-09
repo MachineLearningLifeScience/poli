@@ -18,6 +18,7 @@ from .sa_tdc.register import SAProblemFactory, SABlackBox
 from .rdkit_logp.register import LogPBlackBox, LogPProblemFactory
 from .rdkit_qed.register import QEDBlackBox, QEDProblemFactory
 from .gsk3_beta.register import GSK3BetaBlackBox, GSK3BetaProblemFactory
+from .drd2_docking.register import DRD2BlackBox, DRD2ProblemFactory
 
 # Protein black boxes
 from .foldx_rfp_lambo.register import FoldXRFPLamboBlackBox, FoldXRFPLamboProblemFactory

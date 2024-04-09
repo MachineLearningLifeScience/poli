@@ -4,9 +4,7 @@ from pathlib import Path
 import numpy as np
 
 from poli import objective_factory
-from poli.objective_repository import (
-    GSK3BetaBlackBox,
-)
+from poli.objective_repository import GSK3BetaBlackBox, DRD2BlackBox
 
 THIS_DIR = Path(__file__).parent.resolve()
 
@@ -144,15 +142,24 @@ def test_querying_dockstring_using_selfies():
 
 
 test_data_for_pmo = [
-    ("gsk3_beta", GSK3BetaBlackBox, {"string_representation": "SMILES"})
+    # ("gsk3_beta", GSK3BetaBlackBox, {"string_representation": "SMILES"}, 0.03)  # Removed until TDC fixes issue #238.
+    ("gsk3_beta", GSK3BetaBlackBox, {"string_representation": "SMILES"}, None),
+    (
+        "drd2_docking",
+        DRD2BlackBox,
+        {"string_representation": "SMILES"},
+        0.0015465365340340924,
+    ),
 ]
 
 
 @pytest.mark.parametrize(
-    "black_box_name, black_box_class, kwargs_for_black_box",
+    "black_box_name, black_box_class, kwargs_for_black_box, value_to_check",
     test_data_for_pmo,
 )
-def test_pmo_black_boxes(black_box_name, black_box_class, kwargs_for_black_box):
+def test_pmo_black_boxes(
+    black_box_name, black_box_class, kwargs_for_black_box, value_to_check
+):
     from poli import create
     from poli.core.util.seeding import seed_python_numpy_and_torch
 
@@ -169,3 +176,9 @@ def test_pmo_black_boxes(black_box_name, black_box_class, kwargs_for_black_box):
     y0_ = f(x0)
 
     assert np.allclose(y0_, y0)
+    if value_to_check is not None:
+        assert (y0_ == value_to_check).all()
+
+
+if __name__ == "__main__":
+    test_pmo_black_boxes(*test_data_for_pmo[-1])
