@@ -19,6 +19,7 @@ from .rdkit_logp.register import LogPBlackBox, LogPProblemFactory
 from .rdkit_qed.register import QEDBlackBox, QEDProblemFactory
 from .gsk3_beta.register import GSK3BetaBlackBox, GSK3BetaProblemFactory
 from .drd2_docking.register import DRD2BlackBox, DRD2ProblemFactory
+from .jnk3.register import JNK3BlackBox, JNK3ProblemFactory
 
 # Protein black boxes
 from .foldx_rfp_lambo.register import FoldXRFPLamboBlackBox, FoldXRFPLamboProblemFactory
@@ -82,6 +83,9 @@ AVAILABLE_PROBLEM_FACTORIES = {
     "super_mario_bros": SuperMarioBrosProblemFactory,
     "white_noise": WhiteNoiseProblemFactory,
     "toy_continuous_problem": ToyContinuousProblemFactory,
+    "gsk3_beta": GSK3BetaProblemFactory,
+    "drd2_docking": DRD2ProblemFactory,
+    "jnk3": JNK3ProblemFactory,
 }
 
 AVAILABLE_BLACK_BOXES = {
@@ -103,6 +107,9 @@ AVAILABLE_BLACK_BOXES = {
     "super_mario_bros": SuperMarioBrosBlackBox,
     "white_noise": WhiteNoiseBlackBox,
     "toy_continuous_problem": ToyContinuousBlackBox,
+    "gsk3_beta": GSK3BetaBlackBox,
+    "drd2_docking": DRD2BlackBox,
+    "jnk3": JNK3BlackBox,
 }
 
 

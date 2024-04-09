@@ -1,5 +1,5 @@
 """
-Implements the DRD2 docking task using the TDC oracles [1].
+Implements the JNK3 task using the TDC oracles [1].
 
 References
 ----------
@@ -25,13 +25,12 @@ from poli.core.util.chemistry.string_to_molecule import translate_smiles_to_self
 
 from poli.core.util.seeding import seed_numpy, seed_python
 
-from poli.objective_repository.drd2_docking.information import drd2_docking_info
+from poli.objective_repository.jnk3.information import jnk3_info
 
 
-class DRD2BlackBox(AbstractBlackBox):
+class JNK3BlackBox(AbstractBlackBox):
     """
-    Docking to the dopamine type 2 receptor, using TDC [1] (which in
-    turn uses Olivecrona et al.'s classifier [2])
+    A black box giving access to the JNK3 task, provided by TDC [1].
 
     Parameters
     ----------
@@ -63,9 +62,6 @@ class DRD2BlackBox(AbstractBlackBox):
     ----------
     [1] Artificial intelligence foundation for therapeutic science.
         Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022). https://doi.org/10.1038/s41589-022-01131-2
-    [2] Molecular de-novo design through deep reinforcement learning.
-        Olivecrona, M. et al. (2017).
-        Journal of cheminformatics, 9.1, 48.
     """
 
     def __init__(
@@ -92,42 +88,42 @@ class DRD2BlackBox(AbstractBlackBox):
                 )
 
                 self.inner_function = TDCIsolatedFunction(
-                    oracle_name="DRD2",
+                    oracle_name="JNK3",
                     from_smiles=from_smiles,
                 )
             except ImportError:
                 self.inner_function = instance_function_as_isolated_process(
                     name="tdc__isolated",
-                    oracle_name="DRD2",
+                    oracle_name="JNK3",
                     from_smiles=from_smiles,
                 )
         else:
             self.inner_function = instance_function_as_isolated_process(
                 name="tdc__isolated",
-                oracle_name="DRD2",
+                oracle_name="JNK3",
                 from_smiles=from_smiles,
             )
 
     @staticmethod
     def get_black_box_info() -> BlackBoxInformation:
-        return drd2_docking_info
+        return jnk3_info
 
     def _black_box(self, x: np.ndarray, context=None) -> np.ndarray:
         return self.inner_function(x, context)
 
 
-class DRD2ProblemFactory(AbstractProblemFactory):
+class JNK3ProblemFactory(AbstractProblemFactory):
     """
-    Factory class for creating DRD2 docking problems.
+    Factory class for creating JNK3 docking problems.
 
-    This class provides methods for creating DRD2 docking problems and retrieving setup information.
+    This class provides methods for creating JNK3 docking problems and retrieving setup information.
 
     Methods
     ------
     get_setup_information:
         Retrieves the setup information for the problem.
     create:
-        Creates a DRD2 docking problem.
+        Creates a JNK3 problem.
     """
 
     def get_setup_information(self) -> BlackBoxInformation:
@@ -139,7 +135,7 @@ class DRD2ProblemFactory(AbstractProblemFactory):
         problem_info: ProblemSetupInformation
             The setup information for the problem.
         """
-        return drd2_docking_info
+        return jnk3_info
 
     def create(
         self,
@@ -152,7 +148,7 @@ class DRD2ProblemFactory(AbstractProblemFactory):
         force_isolation: bool = False,
     ) -> Problem:
         """
-        Create a TDCBlackBox object for DRD3 docking.
+        Create a TDCBlackBox object for JNK3 docking.
 
         Parameters
         ----------
@@ -193,7 +189,7 @@ class DRD2ProblemFactory(AbstractProblemFactory):
                 "String representation must be either 'SMILES' or 'SELFIES'."
             )
 
-        f = DRD2BlackBox(
+        f = JNK3BlackBox(
             string_representation=string_representation,
             force_isolation=force_isolation,
             batch_size=batch_size,
@@ -211,20 +207,20 @@ class DRD2ProblemFactory(AbstractProblemFactory):
         else:
             x0 = np.array([list(sf.split_selfies(x0_selfies))])
 
-        drd2_problem = Problem(
+        jnk3_problem = Problem(
             black_box=f,
             x0=x0,
         )
 
-        return drd2_problem
+        return jnk3_problem
 
 
 if __name__ == "__main__":
     from poli.core.registry import register_problem
 
     register_problem(
-        DRD2ProblemFactory(),
-        name="drd2_docking",
+        JNK3ProblemFactory(),
+        name="jnk3",
         conda_environment_name="poli__tdc",
         force=True,
     )
