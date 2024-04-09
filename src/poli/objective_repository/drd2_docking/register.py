@@ -25,10 +25,12 @@ from poli.core.util.chemistry.string_to_molecule import translate_smiles_to_self
 
 from poli.core.util.seeding import seed_numpy, seed_python
 
+from poli.core.chemistry.tdc_black_box import TDCBlackBox
+
 from poli.objective_repository.drd2_docking.information import drd2_docking_info
 
 
-class DRD2BlackBox(AbstractBlackBox):
+class DRD2BlackBox(TDCBlackBox):
     """
     Docking to the dopamine type 2 receptor, using TDC [1] (which in
     turn uses Olivecrona et al.'s classifier [2])
@@ -78,42 +80,18 @@ class DRD2BlackBox(AbstractBlackBox):
         evaluation_budget: int = float("inf"),
     ):
         super().__init__(
+            oracle_name="DRD2",
+            string_representation=string_representation,
+            force_isolation=force_isolation,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
         )
 
-        from_smiles = string_representation.upper() == "SMILES"
-        if not force_isolation:
-            try:
-                from poli.core.chemistry.tdc_isolated_function import (
-                    TDCIsolatedFunction,
-                )
-
-                self.inner_function = TDCIsolatedFunction(
-                    oracle_name="DRD2",
-                    from_smiles=from_smiles,
-                )
-            except ImportError:
-                self.inner_function = instance_function_as_isolated_process(
-                    name="tdc__isolated",
-                    oracle_name="DRD2",
-                    from_smiles=from_smiles,
-                )
-        else:
-            self.inner_function = instance_function_as_isolated_process(
-                name="tdc__isolated",
-                oracle_name="DRD2",
-                from_smiles=from_smiles,
-            )
-
     @staticmethod
     def get_black_box_info() -> BlackBoxInformation:
         return drd2_docking_info
-
-    def _black_box(self, x: np.ndarray, context=None) -> np.ndarray:
-        return self.inner_function(x, context)
 
 
 class DRD2ProblemFactory(AbstractProblemFactory):

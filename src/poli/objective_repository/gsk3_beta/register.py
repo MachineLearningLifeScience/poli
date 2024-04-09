@@ -17,7 +17,7 @@ import selfies as sf
 
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
-from poli.core.abstract_black_box import AbstractBlackBox
+from poli.core.chemistry.tdc_black_box import TDCBlackBox
 from poli.core.problem import Problem
 
 from poli.core.util.isolation.instancing import instance_function_as_isolated_process
@@ -29,7 +29,7 @@ from poli.core.util.seeding import seed_numpy, seed_python
 from poli.objective_repository.gsk3_beta.information import gsk3_beta_info
 
 
-class GSK3BetaBlackBox(AbstractBlackBox):
+class GSK3BetaBlackBox(TDCBlackBox):
     """
     A black box for the Glycogen Synthase Kinase 3 Beta (GSK3Beta) task,
     using the Therapeutics Data Commons' oracles [1].
@@ -77,38 +77,18 @@ class GSK3BetaBlackBox(AbstractBlackBox):
         evaluation_budget: int = float("inf"),
     ):
         super().__init__(
+            oracle_name="GSK3B",
+            string_representation=string_representation,
+            force_isolation=force_isolation,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
         )
 
-        if not force_isolation:
-            try:
-                from poli.objective_repository.gsk3_beta.isolated_function import (
-                    GSK3BetaIsolatedFunction,
-                )
-
-                self.inner_function = GSK3BetaIsolatedFunction(
-                    string_representation=string_representation
-                )
-            except ImportError:
-                self.inner_function = instance_function_as_isolated_process(
-                    name="gsk3_beta__isolated",
-                    string_representation=string_representation,
-                )
-        else:
-            self.inner_function = instance_function_as_isolated_process(
-                name="gsk3_beta__isolated",
-                string_representation=string_representation,
-            )
-
     @staticmethod
     def get_black_box_info() -> BlackBoxInformation:
         return gsk3_beta_info
-
-    def _black_box(self, x: np.ndarray, context=None) -> np.ndarray:
-        return self.inner_function(x, context)
 
 
 class GSK3BetaProblemFactory(AbstractProblemFactory):
