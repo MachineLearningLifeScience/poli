@@ -4,8 +4,13 @@ from pathlib import Path
 import numpy as np
 
 from poli import objective_factory
+from poli.objective_repository import (
+    GSK3BetaBlackBox,
+)
 
 THIS_DIR = Path(__file__).parent.resolve()
+
+SEED = np.random.randint(0, 1000)
 
 
 def test_force_registering_qed():
@@ -136,3 +141,31 @@ def test_querying_dockstring_using_selfies():
 
     y1 = f(selfies_aspirin)
     f.terminate()
+
+
+test_data_for_pmo = [
+    ("gsk3_beta", GSK3BetaBlackBox, {"string_representation": "SMILES"})
+]
+
+
+@pytest.mark.parametrize(
+    "black_box_name, black_box_class, kwargs_for_black_box",
+    test_data_for_pmo,
+)
+def test_pmo_black_boxes(black_box_name, black_box_class, kwargs_for_black_box):
+    from poli import create
+    from poli.core.util.seeding import seed_python_numpy_and_torch
+
+    problem = create(
+        name=black_box_name,
+        seed=SEED,
+        **kwargs_for_black_box,
+    )
+    x0 = problem.x0
+    y0 = problem.black_box(x0)
+
+    seed_python_numpy_and_torch(seed=SEED)
+    f = black_box_class(**kwargs_for_black_box)
+    y0_ = f(x0)
+
+    assert np.allclose(y0_, y0)

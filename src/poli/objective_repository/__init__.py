@@ -3,15 +3,23 @@
 
 from pathlib import Path
 
-# These can be imported from the base environment.
+# Toy examples
 from .white_noise.register import WhiteNoiseProblemFactory, WhiteNoiseBlackBox
 from .aloha.register import AlohaProblemFactory, AlohaBlackBox
 from .toy_continuous_problem.register import (
     ToyContinuousProblemFactory,
     ToyContinuousBlackBox,
 )
+
+# Chemistry black boxes
 from .dockstring.register import DockstringProblemFactory, DockstringBlackBox
 from .drd3_docking.register import DRD3ProblemFactory, DRD3BlackBox
+from .sa_tdc.register import SAProblemFactory, SABlackBox
+from .rdkit_logp.register import LogPBlackBox, LogPProblemFactory
+from .rdkit_qed.register import QEDBlackBox, QEDProblemFactory
+from .gsk3_beta.register import GSK3BetaBlackBox, GSK3BetaProblemFactory
+
+# Protein black boxes
 from .foldx_rfp_lambo.register import FoldXRFPLamboBlackBox, FoldXRFPLamboProblemFactory
 from .foldx_sasa.register import FoldXSASABlackBox, FoldXSASAProblemFactory
 from .foldx_stability.register import (
@@ -29,12 +37,11 @@ from .penalized_logp_lambo.register import (
     PenalizedLogPLamboProblemFactory,
 )
 from .rasp.register import RaspBlackBox, RaspProblemFactory
-from .rdkit_logp.register import LogPBlackBox, LogPProblemFactory
-from .rdkit_qed.register import QEDBlackBox, QEDProblemFactory
 from .rfp_foldx_stability_and_sasa.register import (
     RFPFoldXStabilityAndSASAProblemFactory,
 )
-from .sa_tdc.register import SAProblemFactory, SABlackBox
+
+# Other
 from .super_mario_bros.register import (
     SuperMarioBrosProblemFactory,
     SuperMarioBrosBlackBox,
