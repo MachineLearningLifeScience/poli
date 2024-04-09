@@ -11,6 +11,7 @@ from poli.objective_repository import (
     SABlackBox,
     CelecoxibRediscoveryBlackBox,
     ThiothixeneRediscoveryBlackBox,
+    TroglitazoneRediscoveryBlackBox,
 )
 
 THIS_DIR = Path(__file__).parent.resolve()
@@ -180,6 +181,12 @@ test_data_for_pmo = [
         ThiothixeneRediscoveryBlackBox,
         {"string_representation": "SMILES"},
         0.17391304347826086,
+    ),
+    (
+        "troglitazone_rediscovery",
+        TroglitazoneRediscoveryBlackBox,
+        {"string_representation": "SMILES"},
+        0.24427480916030533,
     ),
     # Removed until TDC fixes issue #238.
     # ("jnk3", JNK3BlackBox, {"string_representation": "SMILES"}, 0.01),

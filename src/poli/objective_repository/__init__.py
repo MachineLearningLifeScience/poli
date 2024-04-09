@@ -28,6 +28,10 @@ from .thiothixene_rediscovery.register import (
     ThiothixeneRediscoveryBlackBox,
     ThiothixeneRediscoveryProblemFactory,
 )
+from .troglitazone_rediscovery.register import (
+    TroglitazoneRediscoveryBlackBox,
+    TroglitazoneRediscoveryProblemFactory,
+)
 
 # Protein black boxes
 from .foldx_rfp_lambo.register import FoldXRFPLamboBlackBox, FoldXRFPLamboProblemFactory
@@ -96,6 +100,7 @@ AVAILABLE_PROBLEM_FACTORIES = {
     "jnk3": JNK3ProblemFactory,
     "celecoxib_rediscovery": CelecoxibRediscoveryProblemFactory,
     "thiothixene_rediscovery": ThiothixeneRediscoveryProblemFactory,
+    "troglitazone_rediscovery": TroglitazoneRediscoveryProblemFactory,
 }
 
 AVAILABLE_BLACK_BOXES = {
@@ -122,6 +127,7 @@ AVAILABLE_BLACK_BOXES = {
     "jnk3": JNK3BlackBox,
     "celecoxib_rediscovery": CelecoxibRediscoveryBlackBox,
     "thiothixene_rediscovery": ThiothixeneRediscoveryBlackBox,
+    "troglitazone_rediscovery": TroglitazoneRediscoveryBlackBox,
 }
 
 
