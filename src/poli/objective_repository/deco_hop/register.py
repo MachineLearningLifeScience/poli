@@ -3,7 +3,8 @@ Implements the Decorator HOP task using the TDC oracles [1].
 
 This task is inherited from the GuacaMol benchmark [2], and
 consists of maximizing the similarity to a certain SMILES,
-"while excluding specific SMARTS patterns" [1].
+"while excluding specific SMARTS patterns" [1]. We recommend
+you cite both references when using this task.
 
 References
 ----------
@@ -40,7 +41,8 @@ class DecoHopBlackBox(TDCBlackBox):
 
     This task is inherited from the GuacaMol benchmark [2], and
     consists of maximizing the similarity to a certain SMILES,
-    "while excluding specific SMARTS patterns" [1].
+    "while excluding specific SMARTS patterns" [1]. We recommend
+    you cite both references when using this task.
 
     Parameters
     ----------
@@ -71,7 +73,8 @@ class DecoHopBlackBox(TDCBlackBox):
     References
     ----------
     [1] Artificial intelligence foundation for therapeutic science.
-        Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022). https://doi.org/10.1038/s41589-022-01131-2
+        Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022).
+        https://doi.org/10.1038/s41589-022-01131-2
     [2] GuacaMol: benchmarking models for de novo molecular design.
         Brown, N. et al.  J Chem Inf Model 59 (2019).
         https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
@@ -105,6 +108,8 @@ class DecoHopProblemFactory(AbstractProblemFactory):
     """
     Factory class for creating Decorator Hop problems.
 
+    We recommend you cite [1, 2] when using this task.
+
     Methods
     ------
     get_setup_information:
@@ -112,6 +117,15 @@ class DecoHopProblemFactory(AbstractProblemFactory):
     create:
         Creates an Decorator Hop problem, containing a black box
         and an initial value x0 (taken from the documentation of TDC).
+
+    References
+    ----------
+    [1] Artificial intelligence foundation for therapeutic science.
+        Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022).
+        https://doi.org/10.1038/s41589-022-01131-2
+    [2] GuacaMol: benchmarking models for de novo molecular design.
+        Brown, N. et al.  J Chem Inf Model 59 (2019).
+        https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
     """
 
     def get_setup_information(self) -> BlackBoxInformation:

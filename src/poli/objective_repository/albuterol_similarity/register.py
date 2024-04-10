@@ -6,6 +6,8 @@ measuring the similarity of molecules (usually provided as SMILES or SELFIES
 strings) to albuterol, a medicine used to treat breathing difficulty among
 other symptoms.
 
+We recommend you cite both references when using this task.
+
 References
 ----------
 [1] Artificial intelligence foundation for therapeutic science.
@@ -43,7 +45,8 @@ class AlbuterolSimilarityBlackBox(TDCBlackBox):
     albuterol, implementation using the TDC oracles [1].
 
     This task is inherited from the GuacaMol benchmark [2], and consists of
-    rediscovering a certain molecule through optimization.
+    rediscovering a certain molecule through optimization. We recommend you
+    cite both references when using this task.
 
     Parameters
     ----------
@@ -74,7 +77,8 @@ class AlbuterolSimilarityBlackBox(TDCBlackBox):
     References
     ----------
     [1] Artificial intelligence foundation for therapeutic science.
-        Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022). https://doi.org/10.1038/s41589-022-01131-2
+        Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022).
+        https://doi.org/10.1038/s41589-022-01131-2
     [2] GuacaMol: benchmarking models for de novo molecular design.
         Brown, N. et al.  J Chem Inf Model 59 (2019).
         https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
@@ -108,6 +112,8 @@ class AlbuterolSimilarityProblemFactory(AbstractProblemFactory):
     """
     Factory class for creating Albuterol Similarity problems.
 
+    We recommend you cite [1, 2] when using this task.
+
     Methods
     ------
     get_setup_information:
@@ -115,6 +121,15 @@ class AlbuterolSimilarityProblemFactory(AbstractProblemFactory):
     create:
         Creates an Albuterol Similarity problem, containing a black box
         and an initial value x0 (taken from the documentation of TDC).
+
+    References
+    ----------
+    [1] Artificial intelligence foundation for therapeutic science.
+        Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022).
+        https://doi.org/10.1038/s41589-022-01131-2
+    [2] GuacaMol: benchmarking models for de novo molecular design.
+        Brown, N. et al.  J Chem Inf Model 59 (2019).
+        https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
     """
 
     def get_setup_information(self) -> BlackBoxInformation:

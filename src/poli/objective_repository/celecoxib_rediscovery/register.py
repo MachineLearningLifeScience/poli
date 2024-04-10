@@ -2,12 +2,14 @@
 Implements the Celecoxib rediscovery task using the TDC oracles [1].
 
 This task is inherited from the GuacaMol benchmark [2], and consists of
-rediscovering Celecoxib through optimization.
+rediscovering Celecoxib through optimization. We recommend you cite both
+references when using this task.
 
 References
 ----------
 [1] Artificial intelligence foundation for therapeutic science.
-    Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022). https://doi.org/10.1038/s41589-022-01131-2
+    Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022).
+    https://doi.org/10.1038/s41589-022-01131-2
 [2] GuacaMol: benchmarking models for de novo molecular design.
     Brown, N. et al.  J Chem Inf Model 59 (2019).
     https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
@@ -41,7 +43,8 @@ class CelecoxibRediscoveryBlackBox(TDCBlackBox):
     Celecoxib rediscovery black box implementation using the TDC oracles [1].
 
     This task is inherited from the GuacaMol benchmark [2], and consists of
-    rediscovering Celecoxib through optimization.
+    rediscovering Celecoxib through optimization. We recommend you cite both
+    references when using this task.
 
     Parameters
     ----------
@@ -72,7 +75,8 @@ class CelecoxibRediscoveryBlackBox(TDCBlackBox):
     References
     ----------
     [1] Artificial intelligence foundation for therapeutic science.
-        Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022). https://doi.org/10.1038/s41589-022-01131-2
+        Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022).
+        https://doi.org/10.1038/s41589-022-01131-2
     [2] GuacaMol: benchmarking models for de novo molecular design.
         Brown, N. et al.  J Chem Inf Model 59 (2019).
         https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
@@ -107,7 +111,8 @@ class CelecoxibRediscoveryProblemFactory(AbstractProblemFactory):
     Factory class for creating Celecoxib rediscovery problems.
 
     In this task, the optimization algorithm must find a specific
-    molecule (Celecoxib). See [2] for more details
+    molecule (Celecoxib). See [2] for more details. We recommend you cite
+    both references when using this task.
 
     Methods
     ------
@@ -119,7 +124,8 @@ class CelecoxibRediscoveryProblemFactory(AbstractProblemFactory):
     References
     ----------
     [1] Artificial intelligence foundation for therapeutic science.
-        Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022). https://doi.org/10.1038/s41589-022-01131-2
+        Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022).
+        https://doi.org/10.1038/s41589-022-01131-2
     [2] GuacaMol: benchmarking models for de novo molecular design.
         Brown, N. et al.  J Chem Inf Model 59 (2019).
         https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839

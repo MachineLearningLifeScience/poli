@@ -3,7 +3,8 @@ Implements the DRD2 docking task using the TDC oracles [1].
 
 In this task, the classifier of Olivecrona et al. [2] is used
 to predict the "bioactivity" of a molecule to the dopamine
-type 2 receptor.
+type 2 receptor. We recommend you cite both references when
+using this task.
 
 References
 ----------
@@ -38,6 +39,8 @@ class DRD2BlackBox(TDCBlackBox):
     """
     Docking to the dopamine type 2 receptor, using TDC [1] (which in
     turn uses Olivecrona et al.'s classifier [2])
+
+    We recommend you cite both references when using this task.
 
     Parameters
     ----------
@@ -103,12 +106,25 @@ class DRD2ProblemFactory(AbstractProblemFactory):
     """
     Factory class for creating DRD2 docking problems.
 
+    We recommend you cite [1, 2] when using this task.
+
     Methods
     ------
     get_setup_information:
         Retrieves the setup information for the problem.
     create:
         Creates a DRD2 docking problem.
+
+    References
+    ----------
+    [1] Artificial intelligence foundation for therapeutic science.
+        Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022).
+        https://doi.org/10.1038/s41589-022-01131-2
+    [2] Molecular de-novo design through deep reinforcement learning.
+        Olivecrona, M. et al. (2017).
+        Journal of cheminformatics, 9:48.
+        https://jcheminf.biomedcentral.com/articles/10.1186/s13321-017-0235-x
+
     """
 
     def get_setup_information(self) -> BlackBoxInformation:
