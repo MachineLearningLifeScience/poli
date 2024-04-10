@@ -76,6 +76,14 @@ from .scaffold_hop.register import (
     ScaffoldHopProblemFactory,
     ScaffoldHopBlackBox,
 )
+from .isomer_c7h8n2o2.register import (
+    IsomerC7H8N2O2ProblemFactory,
+    IsomerC7H8N2O2BlackBox,
+)
+from .isomer_c9h10n2o2pf2cl.register import (
+    IsomerC9H10N2O2PF2ClProblemFactory,
+    IsomerC9H10N2O2PF2ClBlackBox,
+)
 
 # Protein black boxes
 from .foldx_rfp_lambo.register import FoldXRFPLamboBlackBox, FoldXRFPLamboProblemFactory
@@ -156,6 +164,8 @@ AVAILABLE_PROBLEM_FACTORIES = {
     "zaleplon_mpo": ZaleplonMPOProblemFactory,
     "deco_hop": DecoHopProblemFactory,
     "scaffold_hop": ScaffoldHopProblemFactory,
+    "isomer_c7h8n2o2": IsomerC7H8N2O2ProblemFactory,
+    "isomer_c9h10n2o2pf2cl": IsomerC9H10N2O2PF2ClProblemFactory,
 }
 
 AVAILABLE_BLACK_BOXES = {
@@ -194,6 +204,8 @@ AVAILABLE_BLACK_BOXES = {
     "zaleplon_mpo": ZaleplonMPOBlackBox,
     "deco_hop": DecoHopBlackBox,
     "scaffold_hop": ScaffoldHopBlackBox,
+    "isomer_c7h8n2o2": IsomerC7H8N2O2BlackBox,
+    "isomer_c9h10n2o2pf2cl": IsomerC9H10N2O2PF2ClBlackBox,
 }
 
 

@@ -23,6 +23,8 @@ from poli.objective_repository import (
     ZaleplonMPOBlackBox,
     DecoHopBlackBox,
     ScaffoldHopBlackBox,
+    IsomerC7H8N2O2BlackBox,
+    IsomerC9H10N2O2PF2ClBlackBox,
 )
 
 THIS_DIR = Path(__file__).parent.resolve()
@@ -266,6 +268,20 @@ test_data_for_pmo = [
         ScaffoldHopBlackBox,
         {"string_representation": "SMILES"},
         0.38446411012782694,
+    ),
+    # The following two have a discrepancy with
+    # the TDC docs. An issue has been raised (#244)
+    (
+        "isomer_c7h8n2o2",
+        IsomerC7H8N2O2BlackBox,
+        {"string_representation": "SMILES"},
+        2.1987591132394053e-34,
+    ),
+    (
+        "isomer_c9h10n2o2pf2cl",
+        IsomerC9H10N2O2PF2ClBlackBox,
+        {"string_representation": "SMILES"},
+        1.713908431542013e-15,
     ),
     # Removed until TDC fixes issue #238.
     # ("jnk3", JNK3BlackBox, {"string_representation": "SMILES"}, 0.01),
