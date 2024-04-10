@@ -48,6 +48,22 @@ from .fexofenadine_mpo.register import (
     FexofenadineMPOProblemFactory,
     FexofenadineMPOBlackBox,
 )
+from .osimetrinib_mpo.register import (
+    OsimetrinibMPOProblemFactory,
+    OsimetrinibMPOBlackBox,
+)
+from .perindopril_mpo.register import (
+    PerindoprilMPOProblemFactory,
+    PerindoprilMPOBlackBox,
+)
+from .ranolazine_mpo.register import (
+    RanolazineMPOProblemFactory,
+    RanolazineMPOBlackBox,
+)
+from .sitagliptin_mpo.register import (
+    SitagliptinMPOProblemFactory,
+    SitagliptinMPOBlackBox,
+)
 
 # Protein black boxes
 from .foldx_rfp_lambo.register import FoldXRFPLamboBlackBox, FoldXRFPLamboProblemFactory
@@ -121,6 +137,10 @@ AVAILABLE_PROBLEM_FACTORIES = {
     "mestranol_similarity": MestranolSimilarityProblemFactory,
     "amlodipine_mpo": AmlodipineMPOProblemFactory,
     "fexofenadine_mpo": FexofenadineMPOProblemFactory,
+    "osimetrinib_mpo": OsimetrinibMPOProblemFactory,
+    "perindopril_mpo": PerindoprilMPOProblemFactory,
+    "ranolazine_mpo": RanolazineMPOProblemFactory,
+    "sitagliptin_mpo": SitagliptinMPOProblemFactory,
 }
 
 AVAILABLE_BLACK_BOXES = {
@@ -152,6 +172,10 @@ AVAILABLE_BLACK_BOXES = {
     "mestranol_similarity": MestranolSimilarityBlackBox,
     "amlodipine_mpo": AmlodipineMPOBlackBox,
     "fexofenadine_mpo": FexofenadineMPOBlackBox,
+    "osimetrinib_mpo": OsimetrinibMPOBlackBox,
+    "perindopril_mpo": PerindoprilMPOBlackBox,
+    "ranolazine_mpo": RanolazineMPOBlackBox,
+    "sitagliptin_mpo": SitagliptinMPOBlackBox,
 }
 
 

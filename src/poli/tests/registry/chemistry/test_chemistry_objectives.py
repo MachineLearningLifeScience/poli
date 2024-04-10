@@ -16,6 +16,10 @@ from poli.objective_repository import (
     MestranolSimilarityBlackBox,
     AmlodipineMPOBlackBox,
     FexofenadineMPOBlackBox,
+    OsimetrinibMPOBlackBox,
+    PerindoprilMPOBlackBox,
+    RanolazineMPOBlackBox,
+    SitagliptinMPOBlackBox,
 )
 
 THIS_DIR = Path(__file__).parent.resolve()
@@ -215,6 +219,32 @@ test_data_for_pmo = [
         FexofenadineMPOBlackBox,
         {"string_representation": "SMILES"},
         0.4336446174984538,
+    ),
+    (
+        "osimetrinib_mpo",
+        OsimetrinibMPOBlackBox,
+        {"string_representation": "SMILES"},
+        0.09011742702110873,
+    ),
+    (
+        "perindopril_mpo",
+        PerindoprilMPOBlackBox,
+        {"string_representation": "SMILES"},
+        0.36023741111440966,
+    ),
+    (
+        "ranolazine_mpo",
+        RanolazineMPOBlackBox,
+        {"string_representation": "SMILES"},
+        0.29285467466584664,
+    ),
+    # The following one has a discrepancy with
+    # the TDC docs. An issue has been raised (#244)
+    (
+        "sitagliptin_mpo",
+        SitagliptinMPOBlackBox,
+        {"string_representation": "SMILES"},
+        3.34970667598234e-12,
     ),
     # Removed until TDC fixes issue #238.
     # ("jnk3", JNK3BlackBox, {"string_representation": "SMILES"}, 0.01),
