@@ -25,6 +25,8 @@ from poli.objective_repository import (
     ScaffoldHopBlackBox,
     IsomerC7H8N2O2BlackBox,
     IsomerC9H10N2O2PF2ClBlackBox,
+    Median1BlackBox,
+    Median2BlackBox,
 )
 
 THIS_DIR = Path(__file__).parent.resolve()
@@ -282,6 +284,18 @@ test_data_for_pmo = [
         IsomerC9H10N2O2PF2ClBlackBox,
         {"string_representation": "SMILES"},
         1.713908431542013e-15,
+    ),
+    (
+        "median_1",
+        Median1BlackBox,
+        {"string_representation": "SMILES"},
+        0.09722243533981723,
+    ),
+    (
+        "median_2",
+        Median2BlackBox,
+        {"string_representation": "SMILES"},
+        0.12259690287307903,
     ),
     # Removed until TDC fixes issue #238.
     # ("jnk3", JNK3BlackBox, {"string_representation": "SMILES"}, 0.01),

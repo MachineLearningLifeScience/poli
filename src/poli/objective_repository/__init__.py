@@ -84,6 +84,14 @@ from .isomer_c9h10n2o2pf2cl.register import (
     IsomerC9H10N2O2PF2ClProblemFactory,
     IsomerC9H10N2O2PF2ClBlackBox,
 )
+from .median_1.register import (
+    Median1ProblemFactory,
+    Median1BlackBox,
+)
+from .median_2.register import (
+    Median2ProblemFactory,
+    Median2BlackBox,
+)
 
 # Protein black boxes
 from .foldx_rfp_lambo.register import FoldXRFPLamboBlackBox, FoldXRFPLamboProblemFactory
@@ -166,6 +174,8 @@ AVAILABLE_PROBLEM_FACTORIES = {
     "scaffold_hop": ScaffoldHopProblemFactory,
     "isomer_c7h8n2o2": IsomerC7H8N2O2ProblemFactory,
     "isomer_c9h10n2o2pf2cl": IsomerC9H10N2O2PF2ClProblemFactory,
+    "median_1": Median1ProblemFactory,
+    "median_2": Median2ProblemFactory,
 }
 
 AVAILABLE_BLACK_BOXES = {
@@ -206,6 +216,8 @@ AVAILABLE_BLACK_BOXES = {
     "scaffold_hop": ScaffoldHopBlackBox,
     "isomer_c7h8n2o2": IsomerC7H8N2O2BlackBox,
     "isomer_c9h10n2o2pf2cl": IsomerC9H10N2O2PF2ClBlackBox,
+    "median_1": Median1BlackBox,
+    "median_2": Median2BlackBox,
 }
 
 
