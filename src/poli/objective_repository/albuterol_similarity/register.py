@@ -3,7 +3,8 @@ Implements the albuterol similarity task using the TDC oracles [1].
 
 This task is inherited from the GuacaMol benchmark [2], and consists of
 measuring the similarity of molecules (usually provided as SMILES or SELFIES
-strings) to albuterol.
+strings) to albuterol, a medicine used to treat breathing difficulty among
+other symptoms.
 
 References
 ----------
@@ -67,8 +68,8 @@ class AlbuterolSimilarityBlackBox(TDCBlackBox):
 
     Methods
     -------
-    __init__(self, info, batch_size=None, parallelize=False, num_workers=None, from_smiles=True)
-        Initializes a new instance of the black box.
+    __init__(self, string_representation, force_isolation, batch_size=None, parallelize=False, num_workers=None, evaluation_budget=float("inf"))
+        Initializes an instance of the black box.
 
     References
     ----------
@@ -138,7 +139,7 @@ class AlbuterolSimilarityProblemFactory(AbstractProblemFactory):
         force_isolation: bool = False,
     ) -> Problem:
         """
-        Creates a Troglitazone rediscovery problem.
+        Creates an Albuterol similarity problem.
 
         Parameters
         ----------

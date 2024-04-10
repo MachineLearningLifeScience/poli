@@ -1,11 +1,24 @@
 """
-Implements the GSK3Beta task using the TDC oracles [1].
+Implements the Glycogen Synthase Kinase 3 Beta (GSK3Beta) task
+using the TDC oracles [1].
+
+If you use this black box, we recommend citing [1, 2, 3, 4].
 
 References
 ----------
 [1] Artificial intelligence foundation for therapeutic science.
     Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022).
     https://doi.org/10.1038/s41589-022-01131-2
+[2] Multi-objective de novo drug design with conditional graph generative models.
+    Li, Y., Zhang, L., Liu, Z.
+    Journal of cheminformatics 10.1 (2018).
+[3] Multi-objective molecule generation using interpretable substructures.
+    Jin, Wengong, Regina Barzilay, and Tommi Jaakkola.
+    ICML. 2020.
+    https://people.csail.mit.edu/tommi/papers/JBJ_ICML2020b.pdf
+[4] ExCAPE-DB: an integrated large scale dataset facilitating Big Data analysis in chemogenomics.
+    Jiangming, Sun, et al.
+    Journal of cheminformatics 9.1 (2017).
 """
 
 from typing import Literal
@@ -14,13 +27,10 @@ import numpy as np
 
 import selfies as sf
 
-
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.chemistry.tdc_black_box import TDCBlackBox
 from poli.core.problem import Problem
-
-from poli.core.util.isolation.instancing import instance_function_as_isolated_process
 
 from poli.core.util.chemistry.string_to_molecule import translate_smiles_to_selfies
 
@@ -33,6 +43,8 @@ class GSK3BetaBlackBox(TDCBlackBox):
     """
     A black box for the Glycogen Synthase Kinase 3 Beta (GSK3Beta) task,
     using the Therapeutics Data Commons' oracles [1].
+
+    If you use this black box, we recommend citing [1, 2, 3, 4].
 
     Parameters
     ----------
@@ -65,6 +77,16 @@ class GSK3BetaBlackBox(TDCBlackBox):
     [1] Artificial intelligence foundation for therapeutic science.
         Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022).
         https://doi.org/10.1038/s41589-022-01131-2
+    [2] Multi-objective de novo drug design with conditional graph generative models.
+        Li, Y., Zhang, L., Liu, Z.
+        Journal of cheminformatics 10.1 (2018).
+    [3] Multi-objective molecule generation using interpretable substructures.
+        Jin, Wengong, Regina Barzilay, and Tommi Jaakkola.
+        ICML. 2020.
+        https://people.csail.mit.edu/tommi/papers/JBJ_ICML2020b.pdf
+    [4] ExCAPE-DB: an integrated large scale dataset facilitating Big Data analysis in chemogenomics.
+        Jiangming, Sun, et al.
+        Journal of cheminformatics 9.1 (2017).
     """
 
     def __init__(
@@ -95,12 +117,30 @@ class GSK3BetaProblemFactory(AbstractProblemFactory):
     """
     A factory for creating Glycogen synthase kinase 3 beta problems.
 
+    If you use this problem factory, we recommend you cite [1, 2, 3, 4].
+
     Methods
     ------
     get_setup_information:
         Retrieves the setup information for the problem.
     create:
         Creates a DRD3 docking problem.
+
+    References
+    ----------
+    [1] Artificial intelligence foundation for therapeutic science.
+        Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022).
+        https://doi.org/10.1038/s41589-022-01131-2
+    [2] Multi-objective de novo drug design with conditional graph generative models.
+        Li, Y., Zhang, L., Liu, Z.
+        Journal of cheminformatics 10.1 (2018).
+    [3] Multi-objective molecule generation using interpretable substructures.
+        Jin, Wengong, Regina Barzilay, and Tommi Jaakkola.
+        ICML. 2020.
+        https://people.csail.mit.edu/tommi/papers/JBJ_ICML2020b.pdf
+    [4] ExCAPE-DB: an integrated large scale dataset facilitating Big Data analysis in chemogenomics.
+        Jiangming, Sun, et al.
+        Journal of cheminformatics 9.1 (2017).
     """
 
     def get_setup_information(self) -> BlackBoxInformation:
@@ -125,7 +165,7 @@ class GSK3BetaProblemFactory(AbstractProblemFactory):
         force_isolation: bool = False,
     ) -> Problem:
         """
-        Create a TDCBlackBox object for DRD3 docking.
+        Creates GSK3B problems.
 
         Parameters
         ----------

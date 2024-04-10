@@ -2,6 +2,7 @@
 Implements the ranolazine MPO task using the TDC oracles [1].
 
 This task is inherited from the GuacaMol benchmark [2].
+When using this task, we recommend you cite both references.
 
 References
 ----------
@@ -34,9 +35,10 @@ from poli.objective_repository.ranolazine_mpo.information import ranolazine_mpo_
 
 class RanolazineMPOBlackBox(TDCBlackBox):
     """
-    A black box that TODO: add, implementation using the TDC oracles [1].
+    The TDC oracle for Ranolazine MPO [1].
 
     This task is inherited from the GuacaMol benchmark [2].
+    We recommend you cite both references when using this task.
 
     Parameters
     ----------
@@ -61,13 +63,14 @@ class RanolazineMPOBlackBox(TDCBlackBox):
 
     Methods
     -------
-    __init__(self, info, batch_size=None, parallelize=False, num_workers=None, from_smiles=True)
-        Initializes a new instance of the black box.
+    __init__(self, string_representation, force_isolation, batch_size=None, parallelize=False, num_workers=None, evaluation_budget=float("inf"))
+        Initializes the black box.
 
     References
     ----------
     [1] Artificial intelligence foundation for therapeutic science.
-        Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022). https://doi.org/10.1038/s41589-022-01131-2
+        Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022).
+        https://doi.org/10.1038/s41589-022-01131-2
     [2] GuacaMol: benchmarking models for de novo molecular design.
         Brown, N. et al.  J Chem Inf Model 59 (2019).
         https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
@@ -101,6 +104,8 @@ class RanolazineMPOProblemFactory(AbstractProblemFactory):
     """
     Factory class for creating Ranolazine MPO problems.
 
+    When using this problem factory, we recommend you cite [1, 2].
+
     Methods
     ------
     get_setup_information:
@@ -108,6 +113,15 @@ class RanolazineMPOProblemFactory(AbstractProblemFactory):
     create:
         Creates an Ranolazine MPO problem, containing a black box
         and an initial value x0 (taken from the documentation of TDC).
+
+    References
+    ----------
+    [1] Artificial intelligence foundation for therapeutic science.
+        Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022).
+        https://doi.org/10.1038/s41589-022-01131-2
+    [2] GuacaMol: benchmarking models for de novo molecular design.
+        Brown, N. et al.  J Chem Inf Model 59 (2019).
+        https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
     """
 
     def get_setup_information(self) -> BlackBoxInformation:

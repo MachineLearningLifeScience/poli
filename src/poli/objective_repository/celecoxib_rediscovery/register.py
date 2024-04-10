@@ -2,7 +2,7 @@
 Implements the Celecoxib rediscovery task using the TDC oracles [1].
 
 This task is inherited from the GuacaMol benchmark [2], and consists of
-rediscovering a certain molecule through optimization.
+rediscovering Celecoxib through optimization.
 
 References
 ----------
@@ -41,7 +41,7 @@ class CelecoxibRediscoveryBlackBox(TDCBlackBox):
     Celecoxib rediscovery black box implementation using the TDC oracles [1].
 
     This task is inherited from the GuacaMol benchmark [2], and consists of
-    rediscovering a certain molecule through optimization.
+    rediscovering Celecoxib through optimization.
 
     Parameters
     ----------
@@ -66,8 +66,8 @@ class CelecoxibRediscoveryBlackBox(TDCBlackBox):
 
     Methods
     -------
-    __init__(self, info, batch_size=None, parallelize=False, num_workers=None, from_smiles=True)
-        Initializes a new instance of the black box.
+    __init__(self, string_representation, force_isolation, batch_size=None, parallelize=False, num_workers=None, evaluation_budget=float("inf"))
+        Initializes the black box.
 
     References
     ----------
@@ -106,12 +106,23 @@ class CelecoxibRediscoveryProblemFactory(AbstractProblemFactory):
     """
     Factory class for creating Celecoxib rediscovery problems.
 
+    In this task, the optimization algorithm must find a specific
+    molecule (Celecoxib). See [2] for more details
+
     Methods
     ------
     get_setup_information:
         Retrieves the setup information for the problem.
     create:
-        Creates a DRD2 docking problem.
+        Creates a Celecoxib rediscovery problem.
+
+    References
+    ----------
+    [1] Artificial intelligence foundation for therapeutic science.
+        Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022). https://doi.org/10.1038/s41589-022-01131-2
+    [2] GuacaMol: benchmarking models for de novo molecular design.
+        Brown, N. et al.  J Chem Inf Model 59 (2019).
+        https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
     """
 
     def get_setup_information(self) -> BlackBoxInformation:

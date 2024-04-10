@@ -2,6 +2,7 @@
 Implements the Median 2 task using the TDC oracles [1].
 
 This task is inherited from the GuacaMol benchmark [2].
+We recommend citing both references when using this task.
 
 References
 ----------
@@ -34,9 +35,10 @@ from poli.objective_repository.median_2.information import median_2_info
 
 class Median2BlackBox(TDCBlackBox):
     """
-    A black box that TODO: add, implementation using the TDC oracles [1].
+    A black box that gives access to the "Median 2" oracle of TDC [1].
 
-    This task is inherited from the GuacaMol benchmark [2].
+    This task is inherited from the GuacaMol benchmark [2]. We
+    recommend you cite both references when using this task.
 
     Parameters
     ----------
@@ -61,8 +63,8 @@ class Median2BlackBox(TDCBlackBox):
 
     Methods
     -------
-    __init__(self, info, batch_size=None, parallelize=False, num_workers=None, from_smiles=True)
-        Initializes a new instance of the black box.
+    __init__(self, string_representation, force_isolation, batch_size=None, parallelize=False, num_workers=None, evaluation_budget=float("inf"))
+        Initializes the black box.
 
     References
     ----------
@@ -101,6 +103,8 @@ class Median2ProblemFactory(AbstractProblemFactory):
     """
     Factory class for creating Median 2 problems.
 
+    We recommend citing [1, 2] when using this problem factory.
+
     Methods
     ------
     get_setup_information:
@@ -108,6 +112,15 @@ class Median2ProblemFactory(AbstractProblemFactory):
     create:
         Creates an Median 2 problem, containing a black box
         and an initial value x0 (taken from the documentation of TDC).
+
+    References
+    ----------
+    [1] Artificial intelligence foundation for therapeutic science.
+        Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022).
+        https://doi.org/10.1038/s41589-022-01131-2
+    [2] GuacaMol: benchmarking models for de novo molecular design.
+        Brown, N. et al.  J Chem Inf Model 59 (2019).
+        https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
     """
 
     def get_setup_information(self) -> BlackBoxInformation:

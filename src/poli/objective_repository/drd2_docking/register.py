@@ -1,10 +1,18 @@
 """
 Implements the DRD2 docking task using the TDC oracles [1].
 
+In this task, the classifier of Olivecrona et al. [2] is used
+to predict the "bioactivity" of a molecule to the dopamine
+type 2 receptor.
+
 References
 ----------
 [1] Artificial intelligence foundation for therapeutic science.
     Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022). https://doi.org/10.1038/s41589-022-01131-2
+[2] Molecular de-novo design through deep reinforcement learning.
+    Olivecrona, M. et al. (2017).
+    Journal of cheminformatics, 9:48.
+    https://jcheminf.biomedcentral.com/articles/10.1186/s13321-017-0235-x
 """
 
 from typing import Literal
@@ -12,7 +20,6 @@ from typing import Literal
 import numpy as np
 
 import selfies as sf
-
 
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
@@ -55,8 +62,8 @@ class DRD2BlackBox(TDCBlackBox):
 
     Methods
     -------
-    __init__(self, info, batch_size=None, parallelize=False, num_workers=None, from_smiles=True)
-        Initializes a new instance of the DRD3BlackBox class.
+    __init__(self, string_representation, force_isolation, batch_size=None, parallelize=False, num_workers=None, evaluation_budget=float("inf"))
+        Initializes the black box.
 
     References
     ----------
@@ -64,7 +71,8 @@ class DRD2BlackBox(TDCBlackBox):
         Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022). https://doi.org/10.1038/s41589-022-01131-2
     [2] Molecular de-novo design through deep reinforcement learning.
         Olivecrona, M. et al. (2017).
-        Journal of cheminformatics, 9.1, 48.
+        Journal of cheminformatics, 9:48.
+        https://jcheminf.biomedcentral.com/articles/10.1186/s13321-017-0235-x
     """
 
     def __init__(
@@ -94,8 +102,6 @@ class DRD2BlackBox(TDCBlackBox):
 class DRD2ProblemFactory(AbstractProblemFactory):
     """
     Factory class for creating DRD2 docking problems.
-
-    This class provides methods for creating DRD2 docking problems and retrieving setup information.
 
     Methods
     ------
@@ -127,7 +133,7 @@ class DRD2ProblemFactory(AbstractProblemFactory):
         force_isolation: bool = False,
     ) -> Problem:
         """
-        Create a TDCBlackBox object for DRD3 docking.
+        Creates DRD2 problem instances.
 
         Parameters
         ----------

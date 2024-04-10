@@ -1,12 +1,14 @@
 """
 Implements the Isomer C9H10N2O2PF2Cl task using the TDC oracles [1].
 
-This task is inherited from the GuacaMol benchmark [2].
+This task is inherited from the GuacaMol benchmark [2]. We recommend
+you cite both references when using this task.
 
 References
 ----------
 [1] Artificial intelligence foundation for therapeutic science.
-    Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022). https://doi.org/10.1038/s41589-022-01131-2
+    Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022).
+    https://doi.org/10.1038/s41589-022-01131-2
 [2] GuacaMol: benchmarking models for de novo molecular design.
     Brown, N. et al.  J Chem Inf Model 59 (2019).
     https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
@@ -36,9 +38,12 @@ from poli.objective_repository.isomer_c9h10n2o2pf2cl.information import (
 
 class IsomerC9H10N2O2PF2ClBlackBox(TDCBlackBox):
     """
-    A black box that TODO: add, implementation using the TDC oracles [1].
+    A black box that measures the similarities of a certain
+    SMILES string's Isomer presentation to C9H10N2O2PF2Cl, implemented
+    using the TDC oracles [1].
 
-    This task is inherited from the GuacaMol benchmark [2].
+    This task is inherited from the GuacaMol benchmark [2]. We
+    recommend you cite both references when using this task.
 
     Parameters
     ----------
@@ -63,13 +68,14 @@ class IsomerC9H10N2O2PF2ClBlackBox(TDCBlackBox):
 
     Methods
     -------
-    __init__(self, info, batch_size=None, parallelize=False, num_workers=None, from_smiles=True)
+    __init__(self, string_representation, force_isolation=False, batch_size=None, parallelize=False, num_workers=None, evaluation_budget=float('inf'))
         Initializes a new instance of the black box.
 
     References
     ----------
     [1] Artificial intelligence foundation for therapeutic science.
-        Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022). https://doi.org/10.1038/s41589-022-01131-2
+        Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022).
+        https://doi.org/10.1038/s41589-022-01131-2
     [2] GuacaMol: benchmarking models for de novo molecular design.
         Brown, N. et al.  J Chem Inf Model 59 (2019).
         https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
@@ -103,6 +109,9 @@ class IsomerC9H10N2O2PF2ClProblemFactory(AbstractProblemFactory):
     """
     Factory class for creating Isomer C9H10N2O2PF2Cl problems.
 
+    This task is inherited from the GuacaMol benchmark [2]. We
+    recommend you cite [1, 2] when using this task.
+
     Methods
     ------
     get_setup_information:
@@ -110,6 +119,15 @@ class IsomerC9H10N2O2PF2ClProblemFactory(AbstractProblemFactory):
     create:
         Creates an Isomer C9H10N2O2PF2Cl problem, containing a black box
         and an initial value x0 (taken from the documentation of TDC).
+
+    References
+    ----------
+    [1] Artificial intelligence foundation for therapeutic science.
+        Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022).
+        https://doi.org/10.1038/s41589-022-01131-2
+    [2] GuacaMol: benchmarking models for de novo molecular design.
+        Brown, N. et al.  J Chem Inf Model 59 (2019).
+        https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
     """
 
     def get_setup_information(self) -> BlackBoxInformation:

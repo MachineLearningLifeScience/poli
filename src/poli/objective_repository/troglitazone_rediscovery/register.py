@@ -2,7 +2,8 @@
 Implements the Troglitazone rediscovery task using the TDC oracles [1].
 
 This task is inherited from the GuacaMol benchmark [2], and consists of
-rediscovering a certain molecule through optimization.
+rediscovering a certain molecule through optimization. We recommend you
+cite both references when using this task.
 
 References
 ----------
@@ -40,7 +41,8 @@ class TroglitazoneRediscoveryBlackBox(TDCBlackBox):
     Troglitazone rediscovery black box implementation using the TDC oracles [1].
 
     This task is inherited from the GuacaMol benchmark [2], and consists of
-    rediscovering a certain molecule through optimization.
+    rediscovering a certain molecule through optimization. We recommend you
+    cite both references when using this task.
 
     Parameters
     ----------
@@ -65,13 +67,14 @@ class TroglitazoneRediscoveryBlackBox(TDCBlackBox):
 
     Methods
     -------
-    __init__(self, info, batch_size=None, parallelize=False, num_workers=None, from_smiles=True)
+    __init__(self, string_representation, force_isolation, batch_size=None, parallelize=False, num_workers=None, evaluation_budget=float('inf'))
         Initializes a new instance of the black box.
 
     References
     ----------
     [1] Artificial intelligence foundation for therapeutic science.
-        Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022). https://doi.org/10.1038/s41589-022-01131-2
+        Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022).
+        https://doi.org/10.1038/s41589-022-01131-2
     [2] GuacaMol: benchmarking models for de novo molecular design.
         Brown, N. et al.  J Chem Inf Model 59 (2019).
         https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
@@ -105,12 +108,23 @@ class TroglitazoneRediscoveryProblemFactory(AbstractProblemFactory):
     """
     Factory class for creating Thiothixene rediscovery problems.
 
+    We recommend you cite [1, 2] when using this problem factory.
+
     Methods
     ------
     get_setup_information:
         Retrieves the setup information for the problem.
     create:
         Creates a Troglitazone rediscovery problem.
+
+    References
+    ----------
+    [1] Artificial intelligence foundation for therapeutic science.
+        Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022).
+        https://doi.org/10.1038/s41589-022-01131-2
+    [2] GuacaMol: benchmarking models for de novo molecular design.
+        Brown, N. et al.  J Chem Inf Model 59 (2019).
+        https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
     """
 
     def get_setup_information(self) -> BlackBoxInformation:

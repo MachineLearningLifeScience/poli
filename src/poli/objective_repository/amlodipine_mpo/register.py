@@ -1,5 +1,5 @@
 """
-Implements the amlodipine task using the TDC oracles [1].
+Implements the Amlodipine MPO task using the TDC oracles [1].
 
 This task is inherited from the GuacaMol benchmark [2].
 
@@ -36,9 +36,11 @@ from poli.objective_repository.amlodipine_mpo.information import (
 
 class AmlodipineMPOBlackBox(TDCBlackBox):
     """
-    A black box that TODO: add, implementation using the TDC oracles [1].
+    A black box that computes a molecule's score for Amlodipine MPO,
+    implemented using the TDC oracles [1].
 
-    This task is inherited from the GuacaMol benchmark [2].
+    This task is inherited from the GuacaMol benchmark [2]. Check it
+    for more details on what MPO measures.
 
     Parameters
     ----------
@@ -63,8 +65,8 @@ class AmlodipineMPOBlackBox(TDCBlackBox):
 
     Methods
     -------
-    __init__(self, info, batch_size=None, parallelize=False, num_workers=None, from_smiles=True)
-        Initializes a new instance of the black box.
+    __init__(self, string_representation, force_isolation, batch_size=None, parallelize=False, num_workers=None, evaluation_budget=float("inf"))
+        Initializes the black box.
 
     References
     ----------
@@ -103,6 +105,9 @@ class AmlodipineMPOProblemFactory(AbstractProblemFactory):
     """
     Factory class for creating Amlodipine MPO problems.
 
+    This task is inherited from the GuacaMol benchmark [2]. Check it
+    for more details on what MPO measures.
+
     Methods
     ------
     get_setup_information:
@@ -110,6 +115,12 @@ class AmlodipineMPOProblemFactory(AbstractProblemFactory):
     create:
         Creates an AmlodipineMPO problem, containing a black box
         and an initial value x0 (taken from the documentation of TDC).
+
+    References
+    ----------
+    [2] GuacaMol: benchmarking models for de novo molecular design.
+        Brown, N. et al.  J Chem Inf Model 59 (2019).
+        https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
     """
 
     def get_setup_information(self) -> BlackBoxInformation:

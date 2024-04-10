@@ -1,20 +1,15 @@
 from pathlib import Path
 import configparser
 import subprocess
-import warnings
 
 import logging
 from poli.core.registry import (
-    _DEFAULT,
     _OBSERVER,
-    _RUN_SCRIPT_LOCATION,
     _ISOLATED_FUNCTION_SCRIPT_LOCATION,
 )
 
-# from poli.objective_repository import AVAILABLE_OBJECTIVES
 from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
 
-from .external_black_box import ExternalBlackBox
 from .external_function import ExternalFunction
 
 HOME_DIR = Path.home().resolve()
@@ -42,7 +37,9 @@ def load_config():
     return config
 
 
-def __register_isolated_function_from_repository(name: str, quiet: bool = False):
+def __register_isolated_function_from_repository(
+    name: str, quiet: bool = False
+) -> None:
     """Registers a problem from the repository.
 
     This function takes a problem name, and registers it. The problem name
@@ -61,13 +58,6 @@ def __register_isolated_function_from_repository(name: str, quiet: bool = False)
         If True, we squelch the feedback about environment creation and
         problem registration, by default False.
     """
-    # the name is actually the folder inside
-    # poli/objective_repository, so we need
-    # to
-    # 1. create the environment from the yaml file
-    # 2. run the file from said enviroment (since
-    #    we can't import the factory: it may have
-    #    dependencies that are not installed)
     assert name.endswith(
         "__isolated"
     ), "By convention, the names of isolated functions always end with '__isolated'"
@@ -84,12 +74,27 @@ def __register_isolated_function_from_repository(name: str, quiet: bool = False)
     __register_isolated_function(
         environment_file=environment_file,
         isolated_file=isolated_file,
-        name=name,
+        name_for_show=name,
         quiet=quiet,
     )
 
 
-def __register_isolated_function_from_core(name: str, quiet: bool = False):
+def __register_isolated_function_from_core(name: str, quiet: bool = False) -> None:
+    """
+    Registers an isolated function from the core package.
+
+    At the moment, we only have one isolated function
+    available in the core package, which is the TDCIsolatedFunction.
+
+    Parameters
+    ----------
+    name : str
+        The name of the isolated function to register. At the moment,
+        the only available isolated function is "tdc__isolated".
+    quiet : bool, optional
+        If True, we squelch the feedback about environment creation and
+        problem registration, by default False.
+    """
     ROOT_DIR_OF_POLI_PACKAGE = Path(__file__).parent.parent.parent.parent
     if name == "tdc__isolated":
         environment_file = (
@@ -101,7 +106,7 @@ def __register_isolated_function_from_core(name: str, quiet: bool = False):
         __register_isolated_function(
             environment_file=environment_file,
             isolated_file=isolated_file,
-            name="TDC isolated function",
+            name_for_show="TDC isolated function",
             quiet=quiet,
         )
     else:
@@ -110,13 +115,11 @@ def __register_isolated_function_from_core(name: str, quiet: bool = False):
             "TDCIsolatedFunction (i.e. tdc__isolated)."
         )
 
-        ...
-
 
 def __register_isolated_function(
     environment_file: Path,
     isolated_file: Path,
-    name: str = None,
+    name_for_show: str = None,
     quiet: bool = False,
 ):
     with open(environment_file, "r") as f:
@@ -159,9 +162,9 @@ def __register_isolated_function(
     # warnings.warn("Running the following command: %s. " % command)
 
     if not quiet:
-        if name:
+        if name_for_show:
             print(
-                f"poli 🧪: running registration of {name} from environment {env_name}"
+                f"poli 🧪: running registration of {name_for_show} from environment {env_name}"
             )
         else:
             print(f"poli 🧪: running {isolated_file} from environment {env_name}")

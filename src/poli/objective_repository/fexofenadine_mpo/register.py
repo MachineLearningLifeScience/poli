@@ -1,5 +1,5 @@
 """
-Implements the fexofenadine MPO task using the TDC oracles [1].
+Implements the Fexofenadine MPO task using the TDC oracles [1].
 
 This task is inherited from the GuacaMol benchmark [2].
 
@@ -34,7 +34,8 @@ from poli.objective_repository.fexofenadine_mpo.information import fexofenadine_
 
 class FexofenadineMPOBlackBox(TDCBlackBox):
     """
-    A black box that TODO: add, implementation using the TDC oracles [1].
+    A black box that gives access to the Fexofenadine oracle,
+    implementation using the TDC [1].
 
     This task is inherited from the GuacaMol benchmark [2].
 
@@ -61,8 +62,8 @@ class FexofenadineMPOBlackBox(TDCBlackBox):
 
     Methods
     -------
-    __init__(self, info, batch_size=None, parallelize=False, num_workers=None, from_smiles=True)
-        Initializes a new instance of the black box.
+    __init__(self, string_representation, force_isolation, batch_size=None, parallelize=False, num_workers=None, evaluation_budget=float("inf"))
+        Initializes the black box.
 
     References
     ----------

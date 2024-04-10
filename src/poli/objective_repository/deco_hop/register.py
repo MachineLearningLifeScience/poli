@@ -1,7 +1,9 @@
 """
 Implements the Decorator HOP task using the TDC oracles [1].
 
-This task is inherited from the GuacaMol benchmark [2].
+This task is inherited from the GuacaMol benchmark [2], and
+consists of maximizing the similarity to a certain SMILES,
+"while excluding specific SMARTS patterns" [1].
 
 References
 ----------
@@ -34,9 +36,11 @@ from poli.objective_repository.deco_hop.information import deco_hop_info
 
 class DecoHopBlackBox(TDCBlackBox):
     """
-    A black box that TODO: add, implementation using the TDC oracles [1].
+    The "Deco HOP" oracle from TDC [1].
 
-    This task is inherited from the GuacaMol benchmark [2].
+    This task is inherited from the GuacaMol benchmark [2], and
+    consists of maximizing the similarity to a certain SMILES,
+    "while excluding specific SMARTS patterns" [1].
 
     Parameters
     ----------
@@ -61,8 +65,8 @@ class DecoHopBlackBox(TDCBlackBox):
 
     Methods
     -------
-    __init__(self, info, batch_size=None, parallelize=False, num_workers=None, from_smiles=True)
-        Initializes a new instance of the black box.
+    __init__(self, string_representation, force_isolation, batch_size=None, parallelize=False, num_workers=None, evaluation_budget=float("inf"))
+        Creates a DecoHopBlackBox instance.
 
     References
     ----------

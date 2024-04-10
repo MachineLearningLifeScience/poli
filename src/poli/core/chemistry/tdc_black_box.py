@@ -1,3 +1,21 @@
+"""
+Implements an abstract TDC black box for all the PMO [1, 2] related problems.
+
+PMO stands for Practical Molecular Optimization, a benchmark
+suite for molecular optimization problems that extends GuacaMol [3].
+
+References
+----------
+[1] Artificial intelligence foundation for therapeutic science.
+    Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022). https://doi.org/10.1038/s41589-022-01131-2
+[2] Sample Efficiency Matters: A Benchmark for Practical Molecular Optimization
+    Wenhao Gao, Tianfan Fu, Jimeng Sun, Connor W. Coley
+    https://arxiv.org/abs/2206.12411
+[3] GuacaMol: benchmarking models for de novo molecular design.
+    Brown, N. et al.  J Chem Inf Model 59 (2019).
+    https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
+"""
+
 from typing import Literal
 
 import numpy as np
@@ -6,18 +24,11 @@ from poli.core.abstract_black_box import AbstractBlackBox
 
 from poli.core.util.isolation.instancing import instance_function_as_isolated_process
 
-AVAILABLE_TDC_ORACLES = [
-    "DRD2",
-    "DRD3",
-    "GSK3Beta",
-    "JNK3",
-]
-
 
 class TDCBlackBox(AbstractBlackBox):
     """
     An abstract black box for the TDC (Therapeutics Data
-    Commons) problems.
+    Commons) problems [1].
 
     Parameters
     ----------
@@ -36,6 +47,8 @@ class TDCBlackBox(AbstractBlackBox):
         The maximum number of function evaluations. Default is infinity.
     force_isolation: bool, optional
         Whether to force the isolation of the black box. Default is False.
+    **kwargs_for_oracle: dict
+        Other keyword arguments to be passed to the oracle.
 
     Attributes
     ----------
@@ -44,8 +57,8 @@ class TDCBlackBox(AbstractBlackBox):
 
     Methods
     -------
-    __init__(self, info, batch_size=None, parallelize=False, num_workers=None, from_smiles=True)
-        Initializes a new instance of the DRD3BlackBox class.
+    __init__(self, oracle_name, string_representation="SMILES", force_isolation=False, batch_size=None, parallelize=False, num_workers=None, evaluation_budget=float("inf"), **kwargs_for_oracle
+        Initializes a new instance of the abstract TDC class.
 
     References
     ----------
@@ -55,7 +68,7 @@ class TDCBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        oracle_name: Literal["DRD2", "3pbl_docking", "GSK3B"] = "DRD2",
+        oracle_name: str,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
         force_isolation: bool = False,
         batch_size: int = None,
