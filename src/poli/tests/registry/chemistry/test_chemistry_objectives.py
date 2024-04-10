@@ -21,6 +21,8 @@ from poli.objective_repository import (
     RanolazineMPOBlackBox,
     SitagliptinMPOBlackBox,
     ZaleplonMPOBlackBox,
+    DecoHopBlackBox,
+    ScaffoldHopBlackBox,
 )
 
 THIS_DIR = Path(__file__).parent.resolve()
@@ -252,6 +254,18 @@ test_data_for_pmo = [
         ZaleplonMPOBlackBox,
         {"string_representation": "SMILES"},
         0.0019017991803329235,
+    ),
+    (
+        "deco_hop",
+        DecoHopBlackBox,
+        {"string_representation": "SMILES"},
+        0.5338365434669443,
+    ),
+    (
+        "scaffold_hop",
+        ScaffoldHopBlackBox,
+        {"string_representation": "SMILES"},
+        0.38446411012782694,
     ),
     # Removed until TDC fixes issue #238.
     # ("jnk3", JNK3BlackBox, {"string_representation": "SMILES"}, 0.01),

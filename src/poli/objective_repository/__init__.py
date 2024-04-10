@@ -68,6 +68,14 @@ from .zaleplon_mpo.register import (
     ZaleplonMPOProblemFactory,
     ZaleplonMPOBlackBox,
 )
+from .deco_hop.register import (
+    DecoHopProblemFactory,
+    DecoHopBlackBox,
+)
+from .scaffold_hop.register import (
+    ScaffoldHopProblemFactory,
+    ScaffoldHopBlackBox,
+)
 
 # Protein black boxes
 from .foldx_rfp_lambo.register import FoldXRFPLamboBlackBox, FoldXRFPLamboProblemFactory
@@ -146,6 +154,8 @@ AVAILABLE_PROBLEM_FACTORIES = {
     "ranolazine_mpo": RanolazineMPOProblemFactory,
     "sitagliptin_mpo": SitagliptinMPOProblemFactory,
     "zaleplon_mpo": ZaleplonMPOProblemFactory,
+    "deco_hop": DecoHopProblemFactory,
+    "scaffold_hop": ScaffoldHopProblemFactory,
 }
 
 AVAILABLE_BLACK_BOXES = {
@@ -182,6 +192,8 @@ AVAILABLE_BLACK_BOXES = {
     "ranolazine_mpo": RanolazineMPOBlackBox,
     "sitagliptin_mpo": SitagliptinMPOBlackBox,
     "zaleplon_mpo": ZaleplonMPOBlackBox,
+    "deco_hop": DecoHopBlackBox,
+    "scaffold_hop": ScaffoldHopBlackBox,
 }
 
 
