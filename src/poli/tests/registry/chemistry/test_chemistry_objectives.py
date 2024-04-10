@@ -20,6 +20,7 @@ from poli.objective_repository import (
     PerindoprilMPOBlackBox,
     RanolazineMPOBlackBox,
     SitagliptinMPOBlackBox,
+    ZaleplonMPOBlackBox,
 )
 
 THIS_DIR = Path(__file__).parent.resolve()
@@ -238,13 +239,19 @@ test_data_for_pmo = [
         {"string_representation": "SMILES"},
         0.29285467466584664,
     ),
-    # The following one has a discrepancy with
+    # The following two have a discrepancy with
     # the TDC docs. An issue has been raised (#244)
     (
         "sitagliptin_mpo",
         SitagliptinMPOBlackBox,
         {"string_representation": "SMILES"},
         3.34970667598234e-12,
+    ),
+    (
+        "zaleplon_mpo",
+        ZaleplonMPOBlackBox,
+        {"string_representation": "SMILES"},
+        0.0019017991803329235,
     ),
     # Removed until TDC fixes issue #238.
     # ("jnk3", JNK3BlackBox, {"string_representation": "SMILES"}, 0.01),

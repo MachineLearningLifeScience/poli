@@ -62,6 +62,7 @@ class TDCBlackBox(AbstractBlackBox):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
+        **kwargs_for_oracle,
     ):
         super().__init__(
             batch_size=batch_size,
@@ -81,18 +82,21 @@ class TDCBlackBox(AbstractBlackBox):
                 self.inner_function = TDCIsolatedFunction(
                     oracle_name=oracle_name,
                     from_smiles=from_smiles,
+                    **kwargs_for_oracle,
                 )
             except ImportError:
                 self.inner_function = instance_function_as_isolated_process(
                     name="tdc__isolated",
                     oracle_name=oracle_name,
                     from_smiles=from_smiles,
+                    **kwargs_for_oracle,
                 )
         else:
             self.inner_function = instance_function_as_isolated_process(
                 name="tdc__isolated",
                 oracle_name=oracle_name,
                 from_smiles=from_smiles,
+                **kwargs_for_oracle,
             )
 
     def _black_box(self, x: np.ndarray, context=None) -> np.ndarray:

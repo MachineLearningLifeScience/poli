@@ -64,6 +64,10 @@ from .sitagliptin_mpo.register import (
     SitagliptinMPOProblemFactory,
     SitagliptinMPOBlackBox,
 )
+from .zaleplon_mpo.register import (
+    ZaleplonMPOProblemFactory,
+    ZaleplonMPOBlackBox,
+)
 
 # Protein black boxes
 from .foldx_rfp_lambo.register import FoldXRFPLamboBlackBox, FoldXRFPLamboProblemFactory
@@ -141,6 +145,7 @@ AVAILABLE_PROBLEM_FACTORIES = {
     "perindopril_mpo": PerindoprilMPOProblemFactory,
     "ranolazine_mpo": RanolazineMPOProblemFactory,
     "sitagliptin_mpo": SitagliptinMPOProblemFactory,
+    "zaleplon_mpo": ZaleplonMPOProblemFactory,
 }
 
 AVAILABLE_BLACK_BOXES = {
@@ -176,6 +181,7 @@ AVAILABLE_BLACK_BOXES = {
     "perindopril_mpo": PerindoprilMPOBlackBox,
     "ranolazine_mpo": RanolazineMPOBlackBox,
     "sitagliptin_mpo": SitagliptinMPOBlackBox,
+    "zaleplon_mpo": ZaleplonMPOBlackBox,
 }
 
 
