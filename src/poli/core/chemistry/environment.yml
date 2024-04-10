@@ -12,10 +12,10 @@ dependencies:
   - openmm
   - pip:
     - "git+https://github.com/MachineLearningLifeScience/poli.git@dev"
-    - biopython==1.81
-    - python-levenshtein==0.12.2
-    - pandas==2.0.3
-    - cachetools==5.3.1
+    - biopython
+    - python-levenshtein
+    - pandas
+    - cachetools
     - rdkit
     - selfies
     - pytdc==0.4.7
