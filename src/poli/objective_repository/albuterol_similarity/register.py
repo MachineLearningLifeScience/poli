@@ -1,8 +1,9 @@
 """
-Implements the Troglitazone rediscovery task using the TDC oracles [1].
+Implements the albuterol similarity task using the TDC oracles [1].
 
 This task is inherited from the GuacaMol benchmark [2], and consists of
-rediscovering a certain molecule through optimization.
+measuring the similarity of molecules (usually provided as SMILES or SELFIES
+strings) to albuterol.
 
 References
 ----------
@@ -30,14 +31,15 @@ from poli.core.util.seeding import seed_numpy, seed_python
 
 from poli.core.chemistry.tdc_black_box import TDCBlackBox
 
-from poli.objective_repository.troglitazone_rediscovery.information import (
-    troglitazone_rediscovery_info,
+from poli.objective_repository.albuterol_similarity.information import (
+    albuterol_similarity_info,
 )
 
 
-class TroglitazoneRediscoveryBlackBox(TDCBlackBox):
+class AlbuterolSimilarityBlackBox(TDCBlackBox):
     """
-    Troglitazone rediscovery black box implementation using the TDC oracles [1].
+    A black box that measures the similarities of molecules to
+    albuterol, implementation using the TDC oracles [1].
 
     This task is inherited from the GuacaMol benchmark [2], and consists of
     rediscovering a certain molecule through optimization.
@@ -87,7 +89,7 @@ class TroglitazoneRediscoveryBlackBox(TDCBlackBox):
         evaluation_budget: int = float("inf"),
     ):
         super().__init__(
-            oracle_name="Troglitazone_Rediscovery",
+            oracle_name="Albuterol_Similarity",
             string_representation=string_representation,
             force_isolation=force_isolation,
             batch_size=batch_size,
@@ -98,19 +100,20 @@ class TroglitazoneRediscoveryBlackBox(TDCBlackBox):
 
     @staticmethod
     def get_black_box_info() -> BlackBoxInformation:
-        return troglitazone_rediscovery_info
+        return albuterol_similarity_info
 
 
-class TroglitazoneRediscoveryProblemFactory(AbstractProblemFactory):
+class AlbuterolSimilarityProblemFactory(AbstractProblemFactory):
     """
-    Factory class for creating Thiothixene rediscovery problems.
+    Factory class for creating Albuterol Similarity problems.
 
     Methods
     ------
     get_setup_information:
         Retrieves the setup information for the problem.
     create:
-        Creates a Troglitazone rediscovery problem.
+        Creates an Albuterol Similarity problem, containing a black box
+        and an initial value x0 (taken from the documentation of TDC).
     """
 
     def get_setup_information(self) -> BlackBoxInformation:
@@ -122,7 +125,7 @@ class TroglitazoneRediscoveryProblemFactory(AbstractProblemFactory):
         problem_info: ProblemSetupInformation
             The setup information for the problem.
         """
-        return troglitazone_rediscovery_info
+        return albuterol_similarity_info
 
     def create(
         self,
@@ -176,7 +179,7 @@ class TroglitazoneRediscoveryProblemFactory(AbstractProblemFactory):
                 "String representation must be either 'SMILES' or 'SELFIES'."
             )
 
-        f = TroglitazoneRediscoveryBlackBox(
+        f = AlbuterolSimilarityBlackBox(
             string_representation=string_representation,
             force_isolation=force_isolation,
             batch_size=batch_size,
@@ -194,20 +197,20 @@ class TroglitazoneRediscoveryProblemFactory(AbstractProblemFactory):
         else:
             x0 = np.array([list(sf.split_selfies(x0_selfies))])
 
-        troglitazone_rediscovery_problem = Problem(
+        albuterol_similarity_problem = Problem(
             black_box=f,
             x0=x0,
         )
 
-        return troglitazone_rediscovery_problem
+        return albuterol_similarity_problem
 
 
 if __name__ == "__main__":
     from poli.core.registry import register_problem
 
     register_problem(
-        TroglitazoneRediscoveryProblemFactory(),
-        name="troglitazone_rediscovery",
+        AlbuterolSimilarityProblemFactory(),
+        name="albuterol_similarity",
         conda_environment_name="poli__tdc",
         force=True,
     )

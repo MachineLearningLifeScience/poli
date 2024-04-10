@@ -32,6 +32,10 @@ from .troglitazone_rediscovery.register import (
     TroglitazoneRediscoveryBlackBox,
     TroglitazoneRediscoveryProblemFactory,
 )
+from .albuterol_similarity.register import (
+    AlbuterolSimilarityBlackBox,
+    AlbuterolSimilarityProblemFactory,
+)
 
 # Protein black boxes
 from .foldx_rfp_lambo.register import FoldXRFPLamboBlackBox, FoldXRFPLamboProblemFactory
@@ -101,6 +105,7 @@ AVAILABLE_PROBLEM_FACTORIES = {
     "celecoxib_rediscovery": CelecoxibRediscoveryProblemFactory,
     "thiothixene_rediscovery": ThiothixeneRediscoveryProblemFactory,
     "troglitazone_rediscovery": TroglitazoneRediscoveryProblemFactory,
+    "albuterol_similarity": AlbuterolSimilarityProblemFactory,
 }
 
 AVAILABLE_BLACK_BOXES = {
@@ -128,6 +133,7 @@ AVAILABLE_BLACK_BOXES = {
     "celecoxib_rediscovery": CelecoxibRediscoveryBlackBox,
     "thiothixene_rediscovery": ThiothixeneRediscoveryBlackBox,
     "troglitazone_rediscovery": TroglitazoneRediscoveryBlackBox,
+    "albuterol_similarity": AlbuterolSimilarityBlackBox,
 }
 
 
