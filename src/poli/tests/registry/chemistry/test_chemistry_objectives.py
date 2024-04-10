@@ -13,6 +13,7 @@ from poli.objective_repository import (
     ThiothixeneRediscoveryBlackBox,
     TroglitazoneRediscoveryBlackBox,
     AlbuterolSimilarityBlackBox,
+    MestranolSimilarityBlackBox,
 )
 
 THIS_DIR = Path(__file__).parent.resolve()
@@ -194,6 +195,12 @@ test_data_for_pmo = [
         AlbuterolSimilarityBlackBox,
         {"string_representation": "SMILES"},
         0.2772277227722772,
+    ),
+    (
+        "mestranol_similarity",
+        MestranolSimilarityBlackBox,
+        {"string_representation": "SMILES"},
+        0.19460880999342536,
     ),
     # Removed until TDC fixes issue #238.
     # ("jnk3", JNK3BlackBox, {"string_representation": "SMILES"}, 0.01),

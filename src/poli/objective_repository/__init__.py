@@ -36,6 +36,10 @@ from .albuterol_similarity.register import (
     AlbuterolSimilarityBlackBox,
     AlbuterolSimilarityProblemFactory,
 )
+from .mestranol_similarity.register import (
+    MestranolSimilarityBlackBox,
+    MestranolSimilarityProblemFactory,
+)
 
 # Protein black boxes
 from .foldx_rfp_lambo.register import FoldXRFPLamboBlackBox, FoldXRFPLamboProblemFactory
@@ -106,6 +110,7 @@ AVAILABLE_PROBLEM_FACTORIES = {
     "thiothixene_rediscovery": ThiothixeneRediscoveryProblemFactory,
     "troglitazone_rediscovery": TroglitazoneRediscoveryProblemFactory,
     "albuterol_similarity": AlbuterolSimilarityProblemFactory,
+    "mestranol_similarity": MestranolSimilarityProblemFactory,
 }
 
 AVAILABLE_BLACK_BOXES = {
@@ -134,6 +139,7 @@ AVAILABLE_BLACK_BOXES = {
     "thiothixene_rediscovery": ThiothixeneRediscoveryBlackBox,
     "troglitazone_rediscovery": TroglitazoneRediscoveryBlackBox,
     "albuterol_similarity": AlbuterolSimilarityBlackBox,
+    "mestranol_similarity": MestranolSimilarityBlackBox,
 }
 
 
