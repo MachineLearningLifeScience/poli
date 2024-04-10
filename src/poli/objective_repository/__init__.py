@@ -40,6 +40,7 @@ from .mestranol_similarity.register import (
     MestranolSimilarityBlackBox,
     MestranolSimilarityProblemFactory,
 )
+from .amlodipine_mpo.register import AmlodipineMPOProblemFactory, AmlodipineMPOBlackBox
 
 # Protein black boxes
 from .foldx_rfp_lambo.register import FoldXRFPLamboBlackBox, FoldXRFPLamboProblemFactory
@@ -111,6 +112,7 @@ AVAILABLE_PROBLEM_FACTORIES = {
     "troglitazone_rediscovery": TroglitazoneRediscoveryProblemFactory,
     "albuterol_similarity": AlbuterolSimilarityProblemFactory,
     "mestranol_similarity": MestranolSimilarityProblemFactory,
+    "amlodipine_mpo": AmlodipineMPOProblemFactory,
 }
 
 AVAILABLE_BLACK_BOXES = {
@@ -140,6 +142,7 @@ AVAILABLE_BLACK_BOXES = {
     "troglitazone_rediscovery": TroglitazoneRediscoveryBlackBox,
     "albuterol_similarity": AlbuterolSimilarityBlackBox,
     "mestranol_similarity": MestranolSimilarityBlackBox,
+    "amlodipine_mpo": AmlodipineMPOBlackBox,
 }
 
 
