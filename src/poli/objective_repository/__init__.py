@@ -92,6 +92,10 @@ from .median_2.register import (
     Median2ProblemFactory,
     Median2BlackBox,
 )
+from .valsartan_smarts.register import (
+    ValsartanSMARTSProblemFactory,
+    ValsartanSMARTSBlackBox,
+)
 
 # Protein black boxes
 from .foldx_rfp_lambo.register import FoldXRFPLamboBlackBox, FoldXRFPLamboProblemFactory
@@ -176,6 +180,7 @@ AVAILABLE_PROBLEM_FACTORIES = {
     "isomer_c9h10n2o2pf2cl": IsomerC9H10N2O2PF2ClProblemFactory,
     "median_1": Median1ProblemFactory,
     "median_2": Median2ProblemFactory,
+    "valsartan_smarts": ValsartanSMARTSProblemFactory,
 }
 
 AVAILABLE_BLACK_BOXES = {
@@ -218,6 +223,7 @@ AVAILABLE_BLACK_BOXES = {
     "isomer_c9h10n2o2pf2cl": IsomerC9H10N2O2PF2ClBlackBox,
     "median_1": Median1BlackBox,
     "median_2": Median2BlackBox,
+    "valsartan_smarts": ValsartanSMARTSBlackBox,
 }
 
 

@@ -27,6 +27,7 @@ from poli.objective_repository import (
     IsomerC9H10N2O2PF2ClBlackBox,
     Median1BlackBox,
     Median2BlackBox,
+    ValsartanSMARTSBlackBox,
 )
 
 THIS_DIR = Path(__file__).parent.resolve()
@@ -296,6 +297,12 @@ test_data_for_pmo = [
         Median2BlackBox,
         {"string_representation": "SMILES"},
         0.12259690287307903,
+    ),
+    (
+        "valsartan_smarts",
+        ValsartanSMARTSBlackBox,
+        {"string_representation": "SMILES"},
+        0.0,
     ),
     # Removed until TDC fixes issue #238.
     # ("jnk3", JNK3BlackBox, {"string_representation": "SMILES"}, 0.01),
