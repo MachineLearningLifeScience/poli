@@ -1,10 +1,24 @@
 """
-Implements the DRD3 docking task using the TDC oracles [1].
+Implements the Glycogen Synthase Kinase 3 Beta (GSK3Beta) task
+using the TDC oracles [1].
+
+If you use this black box, we recommend citing [1, 2, 3, 4].
 
 References
 ----------
 [1] Artificial intelligence foundation for therapeutic science.
-    Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022). https://doi.org/10.1038/s41589-022-01131-2
+    Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022).
+    https://doi.org/10.1038/s41589-022-01131-2
+[2] Multi-objective de novo drug design with conditional graph generative models.
+    Li, Y., Zhang, L., Liu, Z.
+    Journal of cheminformatics 10.1 (2018).
+[3] Multi-objective molecule generation using interpretable substructures.
+    Jin, Wengong, Regina Barzilay, and Tommi Jaakkola.
+    ICML. 2020.
+    https://people.csail.mit.edu/tommi/papers/JBJ_ICML2020b.pdf
+[4] ExCAPE-DB: an integrated large scale dataset facilitating Big Data analysis in chemogenomics.
+    Jiangming, Sun, et al.
+    Journal of cheminformatics 9.1 (2017).
 """
 
 from typing import Literal
@@ -13,24 +27,24 @@ import numpy as np
 
 import selfies as sf
 
-
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.chemistry.tdc_black_box import TDCBlackBox
 from poli.core.problem import Problem
 
-from poli.core.util.isolation.instancing import instance_function_as_isolated_process
-
 from poli.core.util.chemistry.string_to_molecule import translate_smiles_to_selfies
 
 from poli.core.util.seeding import seed_numpy, seed_python
 
-from poli.objective_repository.drd3_docking.information import drd3_docking_info
+from poli.objective_repository.gsk3_beta.information import gsk3_beta_info
 
 
-class DRD3BlackBox(TDCBlackBox):
+class GSK3BetaBlackBox(TDCBlackBox):
     """
-    DRD3BlackBox is a class that represents a black box for DRD3 docking.
+    A black box for the Glycogen Synthase Kinase 3 Beta (GSK3Beta) task,
+    using the Therapeutics Data Commons' oracles [1].
+
+    If you use this black box, we recommend citing [1, 2, 3, 4].
 
     Parameters
     ----------
@@ -57,6 +71,22 @@ class DRD3BlackBox(TDCBlackBox):
     -------
     __init__(self, info, batch_size=None, parallelize=False, num_workers=None, from_smiles=True)
         Initializes a new instance of the DRD3BlackBox class.
+
+    References
+    ----------
+    [1] Artificial intelligence foundation for therapeutic science.
+        Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022).
+        https://doi.org/10.1038/s41589-022-01131-2
+    [2] Multi-objective de novo drug design with conditional graph generative models.
+        Li, Y., Zhang, L., Liu, Z.
+        Journal of cheminformatics 10.1 (2018).
+    [3] Multi-objective molecule generation using interpretable substructures.
+        Jin, Wengong, Regina Barzilay, and Tommi Jaakkola.
+        ICML. 2020.
+        https://people.csail.mit.edu/tommi/papers/JBJ_ICML2020b.pdf
+    [4] ExCAPE-DB: an integrated large scale dataset facilitating Big Data analysis in chemogenomics.
+        Jiangming, Sun, et al.
+        Journal of cheminformatics 9.1 (2017).
     """
 
     def __init__(
@@ -69,7 +99,7 @@ class DRD3BlackBox(TDCBlackBox):
         evaluation_budget: int = float("inf"),
     ):
         super().__init__(
-            oracle_name="3pbl_docking",
+            oracle_name="GSK3B",
             string_representation=string_representation,
             force_isolation=force_isolation,
             batch_size=batch_size,
@@ -80,14 +110,14 @@ class DRD3BlackBox(TDCBlackBox):
 
     @staticmethod
     def get_black_box_info() -> BlackBoxInformation:
-        return drd3_docking_info
+        return gsk3_beta_info
 
 
-class DRD3ProblemFactory(AbstractProblemFactory):
+class GSK3BetaProblemFactory(AbstractProblemFactory):
     """
-    Factory class for creating DRD3 docking problems.
+    A factory for creating Glycogen synthase kinase 3 beta problems.
 
-    This class provides methods for creating DRD3 docking problems and retrieving setup information.
+    If you use this problem factory, we recommend you cite [1, 2, 3, 4].
 
     Methods
     ------
@@ -95,6 +125,22 @@ class DRD3ProblemFactory(AbstractProblemFactory):
         Retrieves the setup information for the problem.
     create:
         Creates a DRD3 docking problem.
+
+    References
+    ----------
+    [1] Artificial intelligence foundation for therapeutic science.
+        Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022).
+        https://doi.org/10.1038/s41589-022-01131-2
+    [2] Multi-objective de novo drug design with conditional graph generative models.
+        Li, Y., Zhang, L., Liu, Z.
+        Journal of cheminformatics 10.1 (2018).
+    [3] Multi-objective molecule generation using interpretable substructures.
+        Jin, Wengong, Regina Barzilay, and Tommi Jaakkola.
+        ICML. 2020.
+        https://people.csail.mit.edu/tommi/papers/JBJ_ICML2020b.pdf
+    [4] ExCAPE-DB: an integrated large scale dataset facilitating Big Data analysis in chemogenomics.
+        Jiangming, Sun, et al.
+        Journal of cheminformatics 9.1 (2017).
     """
 
     def get_setup_information(self) -> BlackBoxInformation:
@@ -106,7 +152,7 @@ class DRD3ProblemFactory(AbstractProblemFactory):
         problem_info: ProblemSetupInformation
             The setup information for the problem.
         """
-        return drd3_docking_info
+        return gsk3_beta_info
 
     def create(
         self,
@@ -119,7 +165,7 @@ class DRD3ProblemFactory(AbstractProblemFactory):
         force_isolation: bool = False,
     ) -> Problem:
         """
-        Create a TDCBlackBox object for DRD3 docking.
+        Creates GSK3B problems.
 
         Parameters
         ----------
@@ -160,7 +206,7 @@ class DRD3ProblemFactory(AbstractProblemFactory):
                 "String representation must be either 'SMILES' or 'SELFIES'."
             )
 
-        f = DRD3BlackBox(
+        f = GSK3BetaBlackBox(
             string_representation=string_representation,
             force_isolation=force_isolation,
             batch_size=batch_size,
@@ -170,7 +216,7 @@ class DRD3ProblemFactory(AbstractProblemFactory):
         )
 
         # Initial example (from the TDC docs)
-        x0_smiles = "c1ccccc1"
+        x0_smiles = "CC(C)(C)[C@H]1CCc2c(sc(NC(=O)COc3ccc(Cl)cc3)c2C(N)=O)C1"
         x0_selfies = translate_smiles_to_selfies([x0_smiles])[0]
 
         if string_representation.upper() == "SMILES":
@@ -178,20 +224,20 @@ class DRD3ProblemFactory(AbstractProblemFactory):
         else:
             x0 = np.array([list(sf.split_selfies(x0_selfies))])
 
-        drd3_problem = Problem(
+        gsk3_beta_problem = Problem(
             black_box=f,
             x0=x0,
         )
 
-        return drd3_problem
+        return gsk3_beta_problem
 
 
 if __name__ == "__main__":
     from poli.core.registry import register_problem
 
     register_problem(
-        DRD3ProblemFactory(),
-        name="drd3_docking",
+        GSK3BetaProblemFactory(),
+        name="gs3_beta",
         conda_environment_name="poli__tdc",
         force=True,
     )

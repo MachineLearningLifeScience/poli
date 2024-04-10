@@ -3,8 +3,7 @@
 There are several requirements for running this objective function. We expect you to
 
 - have AutoDock Vina installed in the path,
-- have the `prepare_receptor` binary from the ADFR suite installed and in the path,
-- have the `poli__tdc` environment created.
+- have the `prepare_receptor` binary from the ADFR suite installed and in the path.
 
 The rest of this readme shows you how to do all this:
 
@@ -44,13 +43,11 @@ Thus, we recommend creating a symlink. Write this in your `~/.bashrc` or `~/.zsh
 ln -sf /path/to/ADFR/bin/prepare_receptor /path/to/AutoDock_vina/bin
 ```
 
-## Create the `poli__tdc` environment
+## Where is the `poli__tdc` environment?
 
-### Create the environment from the yml file
-
-This can easily be done by running
+If you want to manually create the `poli__tdc` environment, you can run
 
 ```bash
 # From the base of the poli repo
-conda env create --file src/poli/objective_repository/drd3_docking/environment.yml
+conda env create --file src/poli/core/chemistry/environment.yml
 ```

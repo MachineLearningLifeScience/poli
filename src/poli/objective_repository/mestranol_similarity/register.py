@@ -1,10 +1,20 @@
 """
-Implements the DRD3 docking task using the TDC oracles [1].
+Implements the mestranol similarity task using the TDC oracles [1].
+
+This task is inherited from the GuacaMol benchmark [2], and consists of
+measuring the similarity of molecules (usually provided as SMILES or SELFIES
+strings) to mestranol.
+
+We recommend citing both references when using this task.
 
 References
 ----------
 [1] Artificial intelligence foundation for therapeutic science.
-    Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022). https://doi.org/10.1038/s41589-022-01131-2
+    Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022).
+    https://doi.org/10.1038/s41589-022-01131-2
+[2] GuacaMol: benchmarking models for de novo molecular design.
+    Brown, N. et al.  J Chem Inf Model 59 (2019).
+    https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
 """
 
 from typing import Literal
@@ -13,24 +23,29 @@ import numpy as np
 
 import selfies as sf
 
-
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.chemistry.tdc_black_box import TDCBlackBox
 from poli.core.problem import Problem
 
-from poli.core.util.isolation.instancing import instance_function_as_isolated_process
-
 from poli.core.util.chemistry.string_to_molecule import translate_smiles_to_selfies
 
 from poli.core.util.seeding import seed_numpy, seed_python
 
-from poli.objective_repository.drd3_docking.information import drd3_docking_info
+from poli.core.chemistry.tdc_black_box import TDCBlackBox
+
+from poli.objective_repository.mestranol_similarity.information import (
+    mestranol_similarity_info,
+)
 
 
-class DRD3BlackBox(TDCBlackBox):
+class MestranolSimilarityBlackBox(TDCBlackBox):
     """
-    DRD3BlackBox is a class that represents a black box for DRD3 docking.
+    A black box that measures the similarities of molecules to
+    mestranol, implementation using the TDC oracles [1].
+
+    This task is inherited from the GuacaMol benchmark [2].
+    We recommend you cite both references when using this task.
 
     Parameters
     ----------
@@ -55,8 +70,16 @@ class DRD3BlackBox(TDCBlackBox):
 
     Methods
     -------
-    __init__(self, info, batch_size=None, parallelize=False, num_workers=None, from_smiles=True)
-        Initializes a new instance of the DRD3BlackBox class.
+    __init__(self, string_representation, force_isolation, batch_size=None, parallelize=False, num_workers=None, evaluation_budget=float("inf"))
+        Initializes the black box.
+
+    References
+    ----------
+    [1] Artificial intelligence foundation for therapeutic science.
+        Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022). https://doi.org/10.1038/s41589-022-01131-2
+    [2] GuacaMol: benchmarking models for de novo molecular design.
+        Brown, N. et al.  J Chem Inf Model 59 (2019).
+        https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
     """
 
     def __init__(
@@ -69,7 +92,7 @@ class DRD3BlackBox(TDCBlackBox):
         evaluation_budget: int = float("inf"),
     ):
         super().__init__(
-            oracle_name="3pbl_docking",
+            oracle_name="Mestranol_Similarity",
             string_representation=string_representation,
             force_isolation=force_isolation,
             batch_size=batch_size,
@@ -80,21 +103,31 @@ class DRD3BlackBox(TDCBlackBox):
 
     @staticmethod
     def get_black_box_info() -> BlackBoxInformation:
-        return drd3_docking_info
+        return mestranol_similarity_info
 
 
-class DRD3ProblemFactory(AbstractProblemFactory):
+class MestranolSimilarityProblemFactory(AbstractProblemFactory):
     """
-    Factory class for creating DRD3 docking problems.
+    Factory class for creating Albuterol Similarity problems.
 
-    This class provides methods for creating DRD3 docking problems and retrieving setup information.
+    We recommend you cite [1, 2] when using this problem factory.
 
     Methods
     ------
     get_setup_information:
         Retrieves the setup information for the problem.
     create:
-        Creates a DRD3 docking problem.
+        Creates a Mestranol Similarity problem, containing a black box
+        and an initial value x0 (taken from the documentation of TDC).
+
+    References
+    ----------
+    [1] Artificial intelligence foundation for therapeutic science.
+        Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022).
+        https://doi.org/10.1038/s41589-022-01131-2
+    [2] GuacaMol: benchmarking models for de novo molecular design.
+        Brown, N. et al.  J Chem Inf Model 59 (2019).
+        https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
     """
 
     def get_setup_information(self) -> BlackBoxInformation:
@@ -106,7 +139,7 @@ class DRD3ProblemFactory(AbstractProblemFactory):
         problem_info: ProblemSetupInformation
             The setup information for the problem.
         """
-        return drd3_docking_info
+        return mestranol_similarity_info
 
     def create(
         self,
@@ -119,7 +152,7 @@ class DRD3ProblemFactory(AbstractProblemFactory):
         force_isolation: bool = False,
     ) -> Problem:
         """
-        Create a TDCBlackBox object for DRD3 docking.
+        Creates a Mestranol similarity problem.
 
         Parameters
         ----------
@@ -160,7 +193,7 @@ class DRD3ProblemFactory(AbstractProblemFactory):
                 "String representation must be either 'SMILES' or 'SELFIES'."
             )
 
-        f = DRD3BlackBox(
+        f = MestranolSimilarityBlackBox(
             string_representation=string_representation,
             force_isolation=force_isolation,
             batch_size=batch_size,
@@ -170,7 +203,7 @@ class DRD3ProblemFactory(AbstractProblemFactory):
         )
 
         # Initial example (from the TDC docs)
-        x0_smiles = "c1ccccc1"
+        x0_smiles = "CC(C)(C)[C@H]1CCc2c(sc(NC(=O)COc3ccc(Cl)cc3)c2C(N)=O)C1"
         x0_selfies = translate_smiles_to_selfies([x0_smiles])[0]
 
         if string_representation.upper() == "SMILES":
@@ -178,20 +211,20 @@ class DRD3ProblemFactory(AbstractProblemFactory):
         else:
             x0 = np.array([list(sf.split_selfies(x0_selfies))])
 
-        drd3_problem = Problem(
+        mestranol_similarity_problem = Problem(
             black_box=f,
             x0=x0,
         )
 
-        return drd3_problem
+        return mestranol_similarity_problem
 
 
 if __name__ == "__main__":
     from poli.core.registry import register_problem
 
     register_problem(
-        DRD3ProblemFactory(),
-        name="drd3_docking",
+        MestranolSimilarityProblemFactory(),
+        name="mestranol_similarity",
         conda_environment_name="poli__tdc",
         force=True,
     )
