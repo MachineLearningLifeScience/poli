@@ -14,10 +14,12 @@ from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.registry import (
     _RUN_SCRIPT_LOCATION,
     _OBSERVER,
-    register_problem_from_repository,
+    _DEFAULT,
+    register_problem_from_repository, _DEFAULT_OBSERVER_RUN_SCRIPT,
 )
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.algorithm_observer_wrapper import AlgorithmObserverWrapper
+from poli.core.util.default_observer import DefaultObserver
 from poli.core.util.external_observer import ExternalObserver
 from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
 from poli.core.util.isolation.external_black_box import ExternalBlackBox
@@ -334,34 +336,18 @@ def create(
             **kwargs_for_factory,
         )
     # instantiate observer (if desired)
-    if observer_name is not None:
-        if not quiet:
-            print(f"poli 🧪: initializing the observer.")
-        try:
-            observer_script: str = registry.config[_OBSERVER][observer_name]
-            f = open(observer_script, "r")
-            observer_class = (
-                f.readlines()[-1].split("--objective-name=")[1].split(" --port")[0]
-            )
-            f.close()
-            observer = dynamically_instantiate(observer_class)
-        except:
-            if not quiet:
-                print(f"poli 🧪: attempting isolated observer instantiation.")
-            observer = ExternalObserver(observer_name=observer_name)
-        problem.set_observer(AlgorithmObserverWrapper(observer))
+    observer = _instantiate_observer(observer_name, quiet)
+    observer_info = observer.initialize_observer(
+        problem.black_box.info, observer_init_info, seed
+    )
 
-        black_box_information = problem.black_box.info
-        # TODO: Should we send the y0 to the observer initialization?
-        # f, x0 = problem.black_box, problem.x0
-        # y0 = f(x0)
-        f = problem.black_box
-        observer_info = observer.initialize_observer(
-            black_box_information, observer_init_info, seed
-        )
-
-        f.set_observer(observer)
-        f.set_observer_info(observer_info)
+    # TODO: Should we send the y0 to the observer initialization?
+    # f, x0 = problem.black_box, problem.x0
+    # y0 = f(x0)
+    f = problem.black_box
+    f.set_observer(observer)
+    f.set_observer_info(observer_info)
+    problem.set_observer(AlgorithmObserverWrapper(observer), observer_info)
 
     return problem
 
@@ -428,3 +414,27 @@ def start(
     f.reset_evaluation_budget()
 
     return f
+
+
+def _instantiate_observer(observer_name, quiet):
+    observer_script: str = registry.config[_DEFAULT][_OBSERVER]
+    if observer_name is not None:
+        observer_script = registry.config[_OBSERVER][observer_name]
+
+    if observer_script == _DEFAULT_OBSERVER_RUN_SCRIPT:
+        observer = DefaultObserver()
+    else:
+        if not quiet:
+            print(f"poli 🧪: initializing the observer.")
+        try:
+            f = open(observer_script, "r")
+            observer_class = (
+                f.readlines()[-1].split("--objective-name=")[1].split(" --port")[0]
+            )
+            f.close()
+            observer = dynamically_instantiate(observer_class)
+        except:
+            if not quiet:
+                print(f"poli 🧪: attempting isolated observer instantiation.")
+            observer = ExternalObserver(observer_name=observer_name)
+    return observer

@@ -24,12 +24,13 @@ _DEFAULT = "DEFAULT"
 _OBSERVER = "observer"
 _RUN_SCRIPT_LOCATION = "run_script_location"
 _ISOLATED_FUNCTION_SCRIPT_LOCATION = "isolated_function_script_location"
+_DEFAULT_OBSERVER_RUN_SCRIPT = ""
 
 HOME_DIR = Path.home().resolve()
 (HOME_DIR / ".poli_objectives").mkdir(exist_ok=True)
 
 config_file = str(HOME_DIR / ".poli_objectives" / "config.rc")
-config = configparser.ConfigParser(defaults={_OBSERVER: ""})
+config = configparser.ConfigParser(defaults={_OBSERVER: _DEFAULT_OBSERVER_RUN_SCRIPT})
 ls = config.read(config_file)
 
 
@@ -129,9 +130,6 @@ def delete_observer_run_script(observer_name: str = None) -> str:
     -----
     The observer script MUST accept port and password as arguments.
     """
-    if observer_name is None:
-        observer_name = _DEFAULT
-
     location = config[_OBSERVER][observer_name]  # no need to copy
     config[_OBSERVER][observer_name] = ""
     _write_config()
