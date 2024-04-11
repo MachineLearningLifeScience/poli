@@ -32,7 +32,9 @@ class Problem:
         self.x0: np.ndarray = x0
         self.black_box_information = black_box.info
         self._validate()
-        self.observer: AlgorithmObserverWrapper = AlgorithmObserverWrapper(DefaultObserver())
+        self.observer: AlgorithmObserverWrapper = AlgorithmObserverWrapper(
+            DefaultObserver()
+        )
         self.observer_info = None
 
     def _validate(self):

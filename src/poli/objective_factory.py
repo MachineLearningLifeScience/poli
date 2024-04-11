@@ -15,7 +15,8 @@ from poli.core.registry import (
     _RUN_SCRIPT_LOCATION,
     _OBSERVER,
     _DEFAULT,
-    register_problem_from_repository, _DEFAULT_OBSERVER_RUN_SCRIPT,
+    register_problem_from_repository,
+    _DEFAULT_OBSERVER_RUN_SCRIPT,
 )
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.algorithm_observer_wrapper import AlgorithmObserverWrapper
