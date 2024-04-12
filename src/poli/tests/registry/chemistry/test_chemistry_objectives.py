@@ -166,14 +166,7 @@ def test_querying_dockstring_using_selfies():
 
 
 test_data_for_pmo = [
-    # Removed until TDC fixes issue #238.
     ("gsk3_beta", GSK3BetaBlackBox, {"string_representation": "SMILES"}, 0.03),
-    # (
-    #     "gsk3_beta",
-    #     GSK3BetaBlackBox,
-    #     {"string_representation": "SMILES"},
-    #     None,
-    # ),
     (
         "drd2_docking",
         DRD2BlackBox,
@@ -266,7 +259,7 @@ test_data_for_pmo = [
         "deco_hop",
         DecoHopBlackBox,
         {"string_representation": "SMILES"},
-        None,
+        0.5338365434669443,
     ),
     (
         "scaffold_hop",
@@ -306,9 +299,7 @@ test_data_for_pmo = [
         {"string_representation": "SMILES"},
         0.0,
     ),
-    # Removed until TDC fixes issue #238.
     ("jnk3", JNK3BlackBox, {"string_representation": "SMILES"}, 0.01),
-    # ("jnk3", JNK3BlackBox, {"string_representation": "SMILES"}, None),
 ]
 
 
