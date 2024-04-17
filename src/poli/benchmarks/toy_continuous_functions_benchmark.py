@@ -59,3 +59,85 @@ class ToyContinuousFunctionsBenchmark(AbstractBenchmark):
         )
 
         return problem
+
+
+class EmbeddedBranin2D(AbstractBenchmark):
+    def __init__(
+        self,
+        seed: Union[int, None] = None,
+        batch_size: Union[int, None] = None,
+        parallelize: bool = False,
+        num_workers: Union[int, None] = None,
+        evaluation_budget: Union[int, List[int]] = float("inf"),
+    ) -> None:
+        super().__init__(
+            seed,
+            batch_size,
+            parallelize,
+            num_workers,
+            evaluation_budget,
+        )
+        self.embed_in = [5, 10, 25, 50, 100]
+        self.problem_factories = [ToyContinuousProblemFactory()] * len(self.embed_in)
+
+    def _initialize_problem(self, index: int) -> Problem:
+        problem_factory: ToyContinuousProblemFactory = self.problem_factories[index]
+
+        problem = problem_factory.create(
+            function_name="branin_2d",
+            embed_in=self.embed_in[index],
+            seed=self.seed,
+            batch_size=self.batch_size,
+            parallelize=self.parallelize,
+            num_workers=self.num_workers,
+            evaluation_budget=self.evaluation_budget,
+        )
+
+        return problem
+
+
+class EmbeddedHartmann6D(AbstractBenchmark):
+    def __init__(
+        self,
+        seed: Union[int, None] = None,
+        batch_size: Union[int, None] = None,
+        parallelize: bool = False,
+        num_workers: Union[int, None] = None,
+        evaluation_budget: Union[int, List[int]] = float("inf"),
+    ) -> None:
+        super().__init__(
+            seed,
+            batch_size,
+            parallelize,
+            num_workers,
+            evaluation_budget,
+        )
+        self.embed_in = [None, 10, 25, 50, 100]
+        self.problem_factories = [ToyContinuousProblemFactory()] * len(self.embed_in)
+
+    def _initialize_problem(self, index: int) -> Problem:
+        problem_factory: ToyContinuousProblemFactory = self.problem_factories[index]
+
+        if index == 0:
+            problem = problem_factory.create(
+                function_name="hartmann_6d",
+                n_dimensions=6,
+                # embed_in=self.embed_in[index],
+                seed=self.seed,
+                batch_size=self.batch_size,
+                parallelize=self.parallelize,
+                num_workers=self.num_workers,
+                evaluation_budget=self.evaluation_budget,
+            )
+        else:
+            problem = problem_factory.create(
+                function_name="hartmann_6d",
+                embed_in=self.embed_in[index],
+                seed=self.seed,
+                batch_size=self.batch_size,
+                parallelize=self.parallelize,
+                num_workers=self.num_workers,
+                evaluation_budget=self.evaluation_budget,
+            )
+
+        return problem

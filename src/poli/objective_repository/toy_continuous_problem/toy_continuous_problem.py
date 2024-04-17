@@ -221,15 +221,20 @@ class ToyContinuousProblem:
         # If embed_in is not None, then we will embed the
         # function in embed_in dimensions. This is useful for testing
         # algorithms that leverage low intrinsic dimensionality.
+        # At this point, solution length is the intrinsic dimensionality
+        # of the problem.
         if embed_in is not None:
-            assert n_dims < embed_in, (
+            assert self.solution_length < embed_in, (
                 f"Expected the intrinsic dimensionality of the problem to be lower than the "
-                f"dimensionality of the space, but got {self.solution_length} and {n_dims} respectively."
+                f"dimensionality of the space, but got {self.solution_length} and {embed_in} respectively."
             )
 
             if dimensions_to_embed_in is None:
-                self.dimensions_to_embed_in = np.random.permutation(embed_in)[:n_dims]
+                self.dimensions_to_embed_in = np.random.permutation(embed_in)[
+                    : self.solution_length
+                ]
 
+            # We update the solution length to the embedded dimensionality.
             self.solution_length = embed_in
             previous_optima_location = self.optima_location.copy()
             self.optima_location = np.zeros(embed_in)

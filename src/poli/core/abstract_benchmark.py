@@ -1,4 +1,4 @@
-from typing import Iterable, List, Union
+from typing import List, Union
 
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem import Problem
