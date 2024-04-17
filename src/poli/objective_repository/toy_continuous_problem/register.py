@@ -208,7 +208,6 @@ class ToyContinuousProblemFactory(AbstractProblemFactory):
             function_name in POSSIBLE_FUNCTIONS
         ), f"'{function_name}' is not a valid function name. Expected it to be one of {POSSIBLE_FUNCTIONS}."
 
-        # We set the seed for numpy and python
         if seed is not None:
             seed_python_numpy_and_torch(seed)
 
@@ -222,13 +221,7 @@ class ToyContinuousProblemFactory(AbstractProblemFactory):
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
         )
-        # TODO: initial value should maybe vary according to the function.
-        # This is something we could be storing inside
-        # the ToyContinuousProblem class.
-        if embed_in is None:
-            x0 = np.array([[0.0] * n_dimensions])
-        else:
-            x0 = np.array([[0.0] * embed_in])
+        x0 = f.function.x0
 
         return Problem(f, x0)
 
