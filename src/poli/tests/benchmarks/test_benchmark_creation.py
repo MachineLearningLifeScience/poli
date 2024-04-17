@@ -28,9 +28,9 @@ def test_creating_embedded_toy_continuous_functions_benchmark():
 
 
 def test_creating_guacamol_benchmark():
-    from poli.benchmarks import GuacamolGoalOrientedBenchmark
+    from poli.benchmarks import GuacaMolGoalDirectedBenchmark
 
-    benchmark = GuacamolGoalOrientedBenchmark(string_representation="SELFIES")
+    benchmark = GuacaMolGoalDirectedBenchmark(string_representation="SELFIES")
 
     for problem in benchmark:
         f, x0 = problem.black_box, problem.x0

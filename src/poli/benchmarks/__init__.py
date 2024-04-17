@@ -3,5 +3,5 @@ from .toy_continuous_functions_benchmark import (
     EmbeddedBranin2D,
     EmbeddedHartmann6D,
 )
-from .guacamol import GuacamolGoalOrientedBenchmark
+from .guacamol import GuacaMolGoalDirectedBenchmark
 from .pmo import PMOBenchmark

@@ -1,4 +1,21 @@
-from typing import Any, Union, List
+"""Benchmarks for toy continuous objective functions
+
+These benchmarks contain the usual toy continuous functions [1, 2].
+
+References
+----------
+
+[1] Al-Roomi, A. R. (2015).
+    Unconstrained Single-Objective Benchmark Functions Repository.
+    Dalhousie University, Electrical and Computer Engineering. Halifax, Nova Scotia, Canada.
+    Available at: https://www.al-roomi.org/benchmarks/unconstrained
+
+[2] Surjanovic, S., Bingham, D., “Optimization Test Functions and Datasets.”
+    Accessed April 12, 2024.
+    https://www.sfu.ca/~ssurjano/optimization.html.
+"""
+
+from typing import Union, List
 from poli.core.abstract_benchmark import AbstractBenchmark
 from poli.core.problem import Problem
 
@@ -11,6 +28,23 @@ from poli.objective_repository.toy_continuous_problem.toy_continuous_problem imp
 
 
 class ToyContinuousFunctionsBenchmark(AbstractBenchmark):
+    """
+    A benchmark with several toy continuous functions.
+
+    References
+    ----------
+
+    [1] Al-Roomi, A. R. (2015).
+       Unconstrained Single-Objective Benchmark Functions Repository.
+       Dalhousie University, Electrical and Computer Engineering. Halifax, Nova Scotia, Canada.
+       Available at: https://www.al-roomi.org/benchmarks/unconstrained
+
+    [2] Surjanovic, S., Bingham, D.,
+        “Optimization Test Functions and Datasets.”
+        Accessed April 12, 2024.
+        https://www.sfu.ca/~ssurjano/optimization.html.
+    """
+
     def __init__(
         self,
         n_dimensions: int = 2,
@@ -62,6 +96,25 @@ class ToyContinuousFunctionsBenchmark(AbstractBenchmark):
 
 
 class EmbeddedBranin2D(AbstractBenchmark):
+    """
+    A benchmark with the Branin 2D function embedded in different dimensions
+
+    In this benchmark, we provide the Branin 2D function embedded in
+    5, 10, 25, 50, and 100 dimensions.
+
+    References
+    ----------
+
+    [1] Al-Roomi, A. R. (2015).
+       Unconstrained Single-Objective Benchmark Functions Repository.
+       Dalhousie University, Electrical and Computer Engineering. Halifax, Nova Scotia, Canada.
+       Available at: https://www.al-roomi.org/benchmarks/unconstrained
+    [2] Surjanovic, S., Bingham, D.,
+        “Optimization Test Functions and Datasets.”
+        Accessed April 12, 2024.
+        https://www.sfu.ca/~ssurjano/optimization.html.
+    """
+
     def __init__(
         self,
         seed: Union[int, None] = None,
@@ -97,6 +150,24 @@ class EmbeddedBranin2D(AbstractBenchmark):
 
 
 class EmbeddedHartmann6D(AbstractBenchmark):
+    """Benchmark with the Hartmann 6D function embedded in different dimensions
+
+    In this benchmark, we provide the original Hartmann 6D function, plus
+    its embedding into 10, 25, 50, and 100 dimensions.
+
+    References
+    ----------
+
+    [1] Al-Roomi, A. R. (2015).
+       Unconstrained Single-Objective Benchmark Functions Repository.
+       Dalhousie University, Electrical and Computer Engineering. Halifax, Nova Scotia, Canada.
+       Available at: https://www.al-roomi.org/benchmarks/unconstrained
+    [2] Surjanovic, S., Bingham, D.,
+        “Optimization Test Functions and Datasets.”
+        Accessed April 12, 2024.
+        https://www.sfu.ca/~ssurjano/optimization.html.
+    """
+
     def __init__(
         self,
         seed: Union[int, None] = None,

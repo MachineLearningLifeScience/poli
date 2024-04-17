@@ -1,3 +1,28 @@
+"""
+Implementation of the GuacaMol benchmark.
+
+GuacaMol [1] is a benchmark for small molecule optimization. It was
+developed in the context of generative models for molecular design.
+Originally, it had two components: distirbution-learning and goal-directed
+benchmarks. This implementation focuses on goal-directed benchmarks.
+
+Our implementation heavily relies on Therapeutics Data Commons [2].
+
+Check the details in the original paper [1].
+
+References
+----------
+[1] Brown, Nathan, Marco Fiscato, Marwin H.S. Segler, and Alain C. Vaucher.
+    “GuacaMol: Benchmarking Models for de Novo Molecular Design.”
+    Journal of Chemical Information and Modeling 59, no. 3 (March 25, 2019):
+    1096-1108. https://doi.org/10.1021/acs.jcim.8b00839.
+
+[2] Huang, Kexin, Tianfan Fu, Wenhao Gao, Yue Zhao, Yusuf Roohani, Jure Leskovec,
+    Connor W Coley, Cao Xiao, Jimeng Sun, and Marinka Zitnik.
+    “Therapeutics Data Commons: Machine Learning Datasets and Tasks for Drug Discovery and Development.”
+    Proceedings of Neural Information Processing Systems, NeurIPS Datasets and Benchmarks, 2021. 
+"""
+
 from typing import Literal, Union
 
 from poli.core.problem import Problem
@@ -29,7 +54,31 @@ from poli.objective_repository import (
 )
 
 
-class GuacamolGoalOrientedBenchmark(AbstractBenchmark):
+class GuacaMolGoalDirectedBenchmark(AbstractBenchmark):
+    """GuacaMol benchmark for goal-directed tasks
+
+    GuacaMol [1] is a benchmark for small molecule optimization. It was
+    developed in the context of generative models for molecular design.
+    Originally, it had two components: distirbution-learning and goal-directed
+    benchmarks. This implementation focuses on goal-directed benchmarks.
+
+    Our implementation heavily relies on Therapeutics Data Commons [2].
+
+    Check the details in the original paper [1].
+
+    References
+    ----------
+    [1] Brown, Nathan, Marco Fiscato, Marwin H.S. Segler, and Alain C. Vaucher.
+        “GuacaMol: Benchmarking Models for de Novo Molecular Design.”
+        Journal of Chemical Information and Modeling 59, no. 3 (March 25, 2019):
+        1096-1108. https://doi.org/10.1021/acs.jcim.8b00839.
+
+    [2] Huang, Kexin, Tianfan Fu, Wenhao Gao, Yue Zhao, Yusuf Roohani, Jure Leskovec,
+        Connor W Coley, Cao Xiao, Jimeng Sun, and Marinka Zitnik.
+        “Therapeutics Data Commons: Machine Learning Datasets and Tasks for Drug Discovery and Development.”
+        Proceedings of Neural Information Processing Systems, NeurIPS Datasets and Benchmarks, 2021.
+    """
+
     def __init__(
         self,
         string_representation: Literal["SMILES", "SELFIES"],
