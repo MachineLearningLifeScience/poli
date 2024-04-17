@@ -1,0 +1,3 @@
+from .toy_continuous_functions_benchmark import ToyContinuousFunctionsBenchmark
+from .guacamol import GuacamolGoalOrientedBenchmark
+from .pmo import PMOBenchmark
