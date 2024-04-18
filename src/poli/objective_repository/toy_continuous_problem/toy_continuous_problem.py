@@ -57,7 +57,6 @@ POSSIBLE_FUNCTIONS = [
     "levy",
 ]
 TWO_DIMENSIONAL_PROBLEMS = [
-    "shifted_sphere",
     "easom",
     "cross_in_tray",
     "egg_holder",
