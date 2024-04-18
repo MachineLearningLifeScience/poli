@@ -394,7 +394,9 @@ def rosenbrock(x: np.ndarray, a: float = 1.0, b: float = 100.0):
     d = x.shape[1]
     assert d > 1, "Dimensionality must be greater than 1."
 
-    return np.sum((a - x[:, :-1]) ** 2 + b * (x[:, 1:] - x[:, :-1] ** 2) ** 2, axis=1)
+    return -(
+        np.sum((a - x[:, :-1]) ** 2 + b * (x[:, 1:] - x[:, :-1] ** 2) ** 2, axis=1)
+    )
 
 
 def levy(x: np.ndarray):
@@ -425,7 +427,7 @@ def levy(x: np.ndarray):
     wi = w[:, :-1]
     term2 = np.sum((wi - 1) ** 2 * (1 + 10 * (np.sin(np.pi * wi + 1)) ** 2), axis=1)
 
-    return term1 + term2 + term3
+    return -(term1 + term2 + term3)
 
 
 if __name__ == "__main__":
