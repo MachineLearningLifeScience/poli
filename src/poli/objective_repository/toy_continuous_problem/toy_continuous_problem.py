@@ -201,19 +201,19 @@ class ToyContinuousProblem:
             self.x0 = np.array([[0.0] * self.solution_length])
         elif name == "cross_in_tray":
             self.function = cross_in_tray
-            self.limits = [-10, 10]
+            self.limits = [-10.0, 10.0]
             self.optima_location = np.array([1.34941, 1.34941])
             self.solution_length = 2
             self.x0 = np.array([[-7.0] * self.solution_length])
         elif name == "egg_holder":
             self.function = egg_holder
-            self.limits = [-700, 700]
+            self.limits = [-700.0, 700.0]
             self.optima_location = np.array([512, 404.2319])
             self.solution_length = 2
             self.x0 = np.array([[-600.0] * self.solution_length])
         elif name == "camelback_2d":
             self.function = camelback_2d
-            self.limits = [-5, 5]
+            self.limits = [-5.0, 5.0]
             self.optima_location = np.array([0.0898, -0.7126])
             self.solution_length = 2
             self.x0 = np.array([[-3.0] * self.solution_length])
