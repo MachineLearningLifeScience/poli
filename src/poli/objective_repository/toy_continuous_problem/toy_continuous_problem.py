@@ -195,8 +195,8 @@ class ToyContinuousProblem:
         elif name == "shifted_sphere":
             self.function = shifted_sphere
             self.limits = [-4.0, 4.0]
-            self.optima_location = np.array([1.0, 1.0])
-            self.solution_length = 2
+            self.optima_location = np.array([1.0] * n_dims)
+            self.solution_length = n_dims
             self.x0 = np.array([[-3.0] * self.solution_length])
         elif name == "easom":
             self.function = easom
