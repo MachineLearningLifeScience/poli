@@ -376,6 +376,58 @@ def branin_2d(x: np.ndarray) -> np.ndarray:
     return -y
 
 
+def rosenbrock(x: np.ndarray, a: float = 1.0, b: float = 100.0):
+    """
+    Compute the Rosenbrock function.
+
+    Parameters
+    ----------
+    x (np.ndarray): A 2D numpy array of shape [b, d] where 'b' is the batch size and 'd' is the dimensionality.
+    a (float): The 'a' parameter for the Rosenbrock function. Default is 1.
+    b (float): The 'b' parameter for the Rosenbrock function. Default is 100.
+
+    Returns
+    -------
+    np.ndarray: The value of the Rosenbrock function at each point in 'x'. Shape is [b,].
+    """
+    assert len(x.shape) == 2, "Input x must be a 2D array."
+    d = x.shape[1]
+    assert d > 1, "Dimensionality must be greater than 1."
+
+    return np.sum((a - x[:, :-1]) ** 2 + b * (x[:, 1:] - x[:, :-1] ** 2) ** 2, axis=1)
+
+
+def levy(x: np.ndarray):
+    """
+    Compute the Levy function.
+
+    Parameters
+    ----------
+    x (np.ndarray): A 2D numpy array of shape [b, d] where 'b' is the batch size and 'd' is the dimensionality.
+
+    Returns
+    -------
+    np.ndarray: The value of the Levy function at each point in 'x'. Shape is [b,].
+
+    References
+    ----------
+    [1] Surjanovic, S. and Bingham, D. Virtual Library of Simulation Experiments:
+    Test Functions and Datasets. [https://www.sfu.ca/~ssurjano/optimization.html]
+    """
+    assert len(x.shape) == 2, "Input x must be a 2D array."
+    d = x.shape[1]
+    assert d > 0, "Dimensionality must be greater than 0."
+
+    w = 1 + (x - 1) / 4
+    term1 = (np.sin(np.pi * w[:, 0])) ** 2
+    term3 = (w[:, -1] - 1) ** 2 * (1 + (np.sin(2 * np.pi * w[:, -1])) ** 2)
+
+    wi = w[:, :-1]
+    term2 = np.sum((wi - 1) ** 2 * (1 + 10 * (np.sin(np.pi * wi + 1)) ** 2), axis=1)
+
+    return term1 + term2 + term3
+
+
 if __name__ == "__main__":
     b = branin_2d
     maximal_b = b(np.array([[-np.pi, 12.275], [np.pi, 2.275], [9.42478, 2.475]]))
