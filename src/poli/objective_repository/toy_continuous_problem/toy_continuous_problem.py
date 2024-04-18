@@ -28,6 +28,8 @@ from .definitions import (
     styblinski_tang,
     hartmann_6d,
     branin_2d,
+    rosenbrock,
+    levy,
 )
 
 # Notice: these will be used by pytest to test the
@@ -51,6 +53,8 @@ POSSIBLE_FUNCTIONS = [
     "camelback_2d",
     "hartmann_6d",
     "branin_2d",
+    "rosenbrock",
+    "levy",
 ]
 TWO_DIMENSIONAL_PROBLEMS = [
     "shifted_sphere",
@@ -93,6 +97,8 @@ class ToyContinuousProblem:
             "camelback_2d",
             "branin_2d",
             "hartmann_6d",
+            "rosenbrock",
+            "levy",
         ],
         n_dims: int = 2,
         embed_in: int = None,
@@ -231,6 +237,18 @@ class ToyContinuousProblem:
             self.optima_location = np.array([9.42478, 2.475])
             self.solution_length = 2
             self.x0 = np.array([0.0] * n_dims).reshape(1, n_dims)
+        elif name == "rosenbrock":
+            self.function = rosenbrock
+            self.limits = [-5.0, 10.0]
+            self.optima_location = np.array([1.0] * n_dims)
+            self.solution_length = n_dims
+            self.x0 = np.array([[0.0] * self.solution_length])
+        elif name == "levy":
+            self.function = levy
+            self.limits = [-10.0, 10.0]
+            self.optima_location = np.array([1.0] * n_dims)
+            self.solution_length = n_dims
+            self.x0 = np.array([[0.0] * self.solution_length])
         else:
             raise ValueError(f"Expected {name} to be one of {POSSIBLE_FUNCTIONS}")
 
