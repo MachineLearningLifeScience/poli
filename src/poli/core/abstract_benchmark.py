@@ -42,3 +42,10 @@ class AbstractBenchmark:
     @property
     def info(self) -> str:
         raise NotImplementedError
+
+    @property
+    def problem_names(self) -> List[str]:
+        return [
+            problem_factory.get_setup_information().name
+            for problem_factory in self.problem_factories
+        ]
