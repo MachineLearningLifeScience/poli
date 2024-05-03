@@ -14,7 +14,7 @@ class SimplePrintObserver(AbstractObserver):
         caller_info: object,
         seed: int,
     ) -> None:
-        pass
+        return None
 
     def observe(self, x: np.ndarray, y: np.ndarray, context=None) -> None:
         for x_i, y_i in zip(x.tolist(), y.tolist()):

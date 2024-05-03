@@ -1,21 +1,31 @@
-"""This script takes the registered observer and instantiates it.
+"""This script instantiates the observer manually.
 
-To showcase isolation, we run this script in a _different_
-environment to the one used to register and run the observer,
-one that doesn't have e.g. wandb installed.
+The main purpose of poli is to allow seamless combination of different problems, algorithms and observers.
+This is why we encourage users to leave the instantiation of the observer to poli.
+However, the following script is maybe more intuitive and it shows what is happening in the background when all components can run in the same environment.
 """
 
 import numpy as np
 
+from poli.core.registry import DEFAULT_OBSERVER_NAME
+from print_observer import SimplePrintObserver
 from poli import objective_factory
+
 
 if __name__ == "__main__":
     # Instantiate the objective
     problem = objective_factory.create(
         name="aloha",
-        observer_name="simple_print_observer",  # instantiate the registered observer
+        observer_name=DEFAULT_OBSERVER_NAME,  # instantiates the default observer which does nothing
     )
+
+    observer = SimplePrintObserver()
+    observer_info = observer.initialize_observer(
+        seed=0, problem_setup_info=problem.black_box_information, caller_info=dict()
+    )
+
     f = problem.black_box
+    f.set_observer(observer)
 
     # Run the objective. Each objective call
     # is registered by the observer.
