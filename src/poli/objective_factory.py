@@ -17,6 +17,7 @@ from poli.core.registry import (
     _DEFAULT,
     register_problem_from_repository,
     _DEFAULT_OBSERVER_RUN_SCRIPT,
+    DEFAULT_OBSERVER_NAME,
 )
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.algorithm_observer_wrapper import AlgorithmObserverWrapper
@@ -436,7 +437,10 @@ def _instantiate_observer(observer_name: str, quiet: bool = False) -> AbstractOb
     """
     observer_script: str = registry.config[_DEFAULT][_OBSERVER]
     if observer_name is not None:
-        observer_script = registry.config[_OBSERVER][observer_name]
+        if observer_name != DEFAULT_OBSERVER_NAME:
+            observer_script = registry.config[_OBSERVER][observer_name]
+        else:
+            observer_script = _DEFAULT_OBSERVER_RUN_SCRIPT
 
     if observer_script == _DEFAULT_OBSERVER_RUN_SCRIPT:
         observer = DefaultObserver()
