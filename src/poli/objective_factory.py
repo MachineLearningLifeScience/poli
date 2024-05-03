@@ -417,7 +417,23 @@ def start(
     return f
 
 
-def _instantiate_observer(observer_name, quiet):
+def _instantiate_observer(observer_name: str, quiet: bool = False) -> AbstractObserver:
+    """
+    This function attempts to locally instantiate an observer and if that fails starts the observer in the dedicated environment.
+
+    Parameters
+    ----------
+    observer_name : str
+        The observer to use.
+    quiet : bool, optional
+        If True, we squelch the messages giving feedback about the creation process.
+
+    Returns
+    -------
+    observer : AbstractObserver
+        The black-box function, initial value, and related information.
+
+    """
     observer_script: str = registry.config[_DEFAULT][_OBSERVER]
     if observer_name is not None:
         observer_script = registry.config[_OBSERVER][observer_name]
