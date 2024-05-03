@@ -61,7 +61,8 @@ def register_observer(
         A list of paths to append to the python path of the run script.
     observer_name : str
         The name of the observer to be registered.
-
+    set_as_default_observer: bool, optional
+        Whether to register the observer as the default observer. By default, this argument is true.
     Notes
     -----
     The observer script MUST accept port and password as arguments.
@@ -73,14 +74,14 @@ def register_observer(
     run_script_location = make_observer_script(
         non_instance_observer, conda_environment_location, python_paths
     )
-    set_observer_run_script(
+    _set_observer_run_script(
         run_script_location,
         observer_name=observer_name,
         set_as_default_observer=set_as_default_observer,
     )
 
 
-def set_observer_run_script(
+def _set_observer_run_script(
     script_file_name: str, observer_name: str, set_as_default_observer: bool = True
 ) -> None:
     """Sets a run_script to be called on observer instantiation.
@@ -109,31 +110,12 @@ def set_observer_run_script(
     _write_config()
 
 
-def delete_observer_run_script(observer_name: str = None) -> str:
-    """Deletes the run script for the given observer.
-
-    This function takes as input an observer name. Using this, it deletes the
-    run script for the given observer. If no observer name is passed, the
-    default observer is deleted.
-
-    Parameters
-    ----------
-    observer_name : str
-        The name of the observer to be deleted.
-
-    Returns
-    -------
-    location : str
-        The location of the deleted run script.
-
-    Notes
-    -----
-    The observer script MUST accept port and password as arguments.
+def remove_default_observer():
     """
-    location = config[_OBSERVER][observer_name]  # no need to copy
-    config[_OBSERVER][observer_name] = ""
+    This functions resets the default observer to do nothing.
+    """
+    config[_DEFAULT][_OBSERVER] = _DEFAULT_OBSERVER_RUN_SCRIPT
     _write_config()
-    return location
 
 
 def register_problem(
