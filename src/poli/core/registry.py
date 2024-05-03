@@ -24,6 +24,7 @@ _DEFAULT = "DEFAULT"
 _OBSERVER = "observer"
 _RUN_SCRIPT_LOCATION = "run_script_location"
 _ISOLATED_FUNCTION_SCRIPT_LOCATION = "isolated_function_script_location"
+DEFAULT_OBSERVER_NAME = ""
 _DEFAULT_OBSERVER_RUN_SCRIPT = ""
 
 HOME_DIR = Path.home().resolve()
@@ -67,10 +68,17 @@ def register_observer(
     -----
     The observer script MUST accept port and password as arguments.
     """
+    if observer_name == DEFAULT_OBSERVER_NAME:
+        raise RuntimeError(
+            "You must not use the name of the default observer which is '%s'"
+            % DEFAULT_OBSERVER_NAME
+        )
     if isinstance(observer, type):
         non_instance_observer = observer
     else:
         non_instance_observer = observer.__class__
+    if observer_name is None:
+        observer_name = observer.__name__
     run_script_location = make_observer_script(
         non_instance_observer, conda_environment_location, python_paths
     )
