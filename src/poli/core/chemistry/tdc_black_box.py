@@ -22,7 +22,10 @@ import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
 
-from poli.core.util.isolation.instancing import instance_function_as_isolated_process
+from poli.core.util.isolation.instancing import (
+    instance_function_as_isolated_process,
+    get_inner_function,
+)
 
 
 class TDCBlackBox(AbstractBlackBox):
@@ -77,6 +80,11 @@ class TDCBlackBox(AbstractBlackBox):
         evaluation_budget: int = float("inf"),
         **kwargs_for_oracle,
     ):
+        if parallelize:
+            print(
+                "poli 🧪: TDCBlackBox parallelization is handled by oracles. Disabling it."
+            )
+            parallelize = False
         super().__init__(
             batch_size=batch_size,
             parallelize=parallelize,
@@ -86,31 +94,15 @@ class TDCBlackBox(AbstractBlackBox):
         self.oracle_name = oracle_name
 
         from_smiles = string_representation.upper() == "SMILES"
-        if not force_isolation:
-            try:
-                from poli.core.chemistry.tdc_isolated_function import (
-                    TDCIsolatedFunction,
-                )
-
-                self.inner_function = TDCIsolatedFunction(
-                    oracle_name=oracle_name,
-                    from_smiles=from_smiles,
-                    **kwargs_for_oracle,
-                )
-            except ImportError:
-                self.inner_function = instance_function_as_isolated_process(
-                    name="tdc__isolated",
-                    oracle_name=oracle_name,
-                    from_smiles=from_smiles,
-                    **kwargs_for_oracle,
-                )
-        else:
-            self.inner_function = instance_function_as_isolated_process(
-                name="tdc__isolated",
-                oracle_name=oracle_name,
-                from_smiles=from_smiles,
-                **kwargs_for_oracle,
-            )
+        self.inner_function = get_inner_function(
+            isolated_function_name="tdc__isolated",
+            class_name="TDCIsolatedFunction",
+            module_to_import="poli.core.chemistry.tdc_isolated_function",
+            force_isolation=force_isolation,
+            oracle_name=oracle_name,
+            from_smiles=from_smiles,
+            **kwargs_for_oracle,
+        )
 
     def _black_box(self, x: np.ndarray, context=None) -> np.ndarray:
         return self.inner_function(x, context)

@@ -14,6 +14,8 @@ also use biopython for pre-processing the PDB files [2].
     bioinformatics. Bioinformatics, 25, 1422-1423
 """
 
+from __future__ import annotations
+
 from pathlib import Path
 from typing import List, Union
 
@@ -27,7 +29,7 @@ from poli.core.exceptions import FoldXNotFoundException
 
 from poli.core.util.seeding import seed_python_numpy_and_torch
 
-from poli.core.util.isolation.instancing import instance_function_as_isolated_process
+from poli.core.util.isolation.instancing import get_inner_function
 
 from poli.objective_repository.foldx_stability.information import foldx_stability_info
 
@@ -88,41 +90,29 @@ class FoldXStabilityBlackBox(AbstractBlackBox):
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
         )
+        self.wildtype_pdb_path = wildtype_pdb_path
+        self.experiment_id = experiment_id
+        self.tmp_folder = tmp_folder
+        self.eager_repair = eager_repair
+        self.verbose = verbose
+        self.force_isolation = force_isolation
+
         if not (Path.home() / "foldx" / "foldx").exists():
             raise FoldXNotFoundException(
                 "FoldX wasn't found in ~/foldx/foldx. Please install it."
             )
-        if not force_isolation:
-            try:
-                from poli.objective_repository.foldx_stability.isolated_function import (
-                    FoldXStabilityIsolatedLogic,
-                )
 
-                self.inner_function = FoldXStabilityIsolatedLogic(
-                    wildtype_pdb_path=wildtype_pdb_path,
-                    experiment_id=experiment_id,
-                    tmp_folder=tmp_folder,
-                    eager_repair=eager_repair,
-                    verbose=verbose,
-                )
-            except ImportError:
-                self.inner_function = instance_function_as_isolated_process(
-                    name="foldx_stability__isolated",
-                    wildtype_pdb_path=wildtype_pdb_path,
-                    experiment_id=experiment_id,
-                    tmp_folder=tmp_folder,
-                    eager_repair=eager_repair,
-                    verbose=verbose,
-                )
-        else:
-            self.inner_function = instance_function_as_isolated_process(
-                name="foldx_stability__isolated",
-                wildtype_pdb_path=wildtype_pdb_path,
-                experiment_id=experiment_id,
-                tmp_folder=tmp_folder,
-                eager_repair=eager_repair,
-                verbose=verbose,
-            )
+        self.inner_function = get_inner_function(
+            isolated_function_name="foldx_stability__isolated",
+            class_name="FoldXStabilityIsolatedLogic",
+            module_to_import="poli.objective_repository.foldx_stability.isolated_function",
+            force_isolation=force_isolation,
+            wildtype_pdb_path=wildtype_pdb_path,
+            experiment_id=experiment_id,
+            tmp_folder=tmp_folder,
+            eager_repair=eager_repair,
+            verbose=verbose,
+        )
 
     def _black_box(self, x: np.ndarray, context: None) -> np.ndarray:
         """
@@ -147,7 +137,19 @@ class FoldXStabilityBlackBox(AbstractBlackBox):
             The array of stability scores.
 
         """
-        return self.inner_function(x, context)
+        inner_function = get_inner_function(
+            isolated_function_name="foldx_stability__isolated",
+            class_name="FoldXStabilityIsolatedLogic",
+            module_to_import="poli.objective_repository.foldx_stability.isolated_function",
+            force_isolation=self.force_isolation,
+            quiet=True,
+            wildtype_pdb_path=self.wildtype_pdb_path,
+            experiment_id=self.experiment_id,
+            tmp_folder=self.tmp_folder,
+            eager_repair=self.eager_repair,
+            verbose=self.verbose,
+        )
+        return inner_function(x, context)
 
     @staticmethod
     def get_black_box_info() -> BlackBoxInformation:
@@ -262,6 +264,9 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
             force_isolation=force_isolation,
         )
         wildtype_amino_acids_ = f.inner_function.wildtype_amino_acids
+
+        del f.inner_function
+
         longest_wildtype_length = max([len(x) for x in wildtype_amino_acids_])
 
         wildtype_amino_acids = [

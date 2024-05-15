@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 from pathlib import Path
 import configparser
 import subprocess
+import importlib
 
 import logging
 from poli.core.registry import (
@@ -332,3 +335,53 @@ def instance_function_as_isolated_process(
 
     # return it.
     return f
+
+
+def get_inner_function(
+    isolated_function_name: str,
+    class_name: str,
+    module_to_import: str,
+    seed: int | None = None,
+    force_isolation: bool = False,
+    quiet: bool = False,
+    **kwargs,
+):
+    """Utility for creating an instance of an inner isolated function.
+
+    This function is used in almost every single black box that requires isolation,
+    and it abstracts away the logic of trying to import the relevant AbstractIsolatedLogic
+    class from the sibling isolated_function.py file of each register.py.
+
+    Parameters
+    ----------
+    isolated_function_name : str
+        The name of the isolated function to be created (e.g. "foldx_stability__isolated").
+    class_name : str
+        The name of the class to be imported from the isolated function file (e.g. FoldXStabilityIsolatedLogic).
+    module_to_import : str
+        The full name of the module to import the class from (e.g.
+        "poli.objective_repository.foldx_stability.isolated_function").
+    seed : int, optional
+        The seed value for random number generation, passed to the isolated function.
+    force_isolation : bool, optional
+        If True, then the function is forced to run in isolation, even if the module can be imported.
+    quiet : bool, optional
+        If True, we squelch the messages giving feedback about the creation process.
+        By default, it is False.
+    **kwargs : dict
+        Additional keyword arguments for the isolated function.
+    """
+    if not force_isolation:
+        try:
+            module = importlib.import_module(module_to_import)
+            InnerFunctionClass = getattr(module, class_name)
+            inner_function = InnerFunctionClass(**kwargs)
+        except ImportError:
+            inner_function = instance_function_as_isolated_process(
+                name=isolated_function_name, seed=seed, quiet=quiet, **kwargs
+            )
+    else:
+        inner_function = instance_function_as_isolated_process(
+            name=isolated_function_name, **kwargs
+        )
+    return inner_function

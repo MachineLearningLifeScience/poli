@@ -30,7 +30,7 @@ from poli.core.exceptions import FoldXNotFoundException
 
 from poli.core.util.seeding import seed_python_numpy_and_torch
 
-from poli.core.util.isolation.instancing import instance_function_as_isolated_process
+from poli.core.util.isolation.instancing import get_inner_function
 
 from poli.objective_repository.foldx_stability_and_sasa.information import (
     foldx_stability_and_sasa_info,
@@ -88,41 +88,27 @@ class FoldXStabilityAndSASABlackBox(AbstractBlackBox):
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
         )
+        self.wildtype_pdb_path = wildtype_pdb_path
+        self.experiment_id = experiment_id
+        self.tmp_folder = tmp_folder
+        self.eager_repair = eager_repair
+        self.verbose = verbose
+        self.force_isolation = force_isolation
         if not (Path.home() / "foldx" / "foldx").exists():
             raise FoldXNotFoundException(
                 "FoldX wasn't found in ~/foldx/foldx. Please install it."
             )
-        if not force_isolation:
-            try:
-                from poli.objective_repository.foldx_stability_and_sasa.isolated_function import (
-                    FoldXStabilitityAndSASAIsolatedLogic,
-                )
-
-                self.inner_function = FoldXStabilitityAndSASAIsolatedLogic(
-                    wildtype_pdb_path=wildtype_pdb_path,
-                    experiment_id=experiment_id,
-                    tmp_folder=tmp_folder,
-                    eager_repair=eager_repair,
-                    verbose=verbose,
-                )
-            except ImportError:
-                self.inner_function = instance_function_as_isolated_process(
-                    name="foldx_stability_and_sasa__isolated",
-                    wildtype_pdb_path=wildtype_pdb_path,
-                    experiment_id=experiment_id,
-                    tmp_folder=tmp_folder,
-                    eager_repair=eager_repair,
-                    verbose=verbose,
-                )
-        else:
-            self.inner_function = instance_function_as_isolated_process(
-                name="foldx_stability_and_sasa__isolated",
-                wildtype_pdb_path=wildtype_pdb_path,
-                experiment_id=experiment_id,
-                tmp_folder=tmp_folder,
-                eager_repair=eager_repair,
-                verbose=verbose,
-            )
+        inner_function = get_inner_function(
+            isolated_function_name="foldx_stability_and_sasa__isolated",
+            class_name="FoldXStabilitityAndSASAIsolatedLogic",
+            module_to_import="poli.objective_repository.foldx_stability_and_sasa.isolated_function",
+            wildtype_pdb_path=wildtype_pdb_path,
+            experiment_id=experiment_id,
+            tmp_folder=tmp_folder,
+            eager_repair=eager_repair,
+            verbose=verbose,
+        )
+        self.wildtype_amino_acids = inner_function.wildtype_amino_acids
 
     def _black_box(self, x: np.ndarray, context: None) -> np.ndarray:
         """
@@ -145,7 +131,19 @@ class FoldXStabilityAndSASABlackBox(AbstractBlackBox):
         y: np.ndarray
             The computed stability and SASA score(s) as a numpy array.
         """
-        return self.inner_function(x, context)
+        inner_function = get_inner_function(
+            isolated_function_name="foldx_stability_and_sasa__isolated",
+            class_name="FoldXStabilitityAndSASAIsolatedLogic",
+            module_to_import="poli.objective_repository.foldx_stability_and_sasa.isolated_function",
+            quiet=True,
+            wildtype_pdb_path=self.wildtype_pdb_path,
+            experiment_id=self.experiment_id,
+            tmp_folder=self.tmp_folder,
+            eager_repair=self.eager_repair,
+            verbose=self.verbose,
+        )
+
+        return inner_function(x, context)
 
     @staticmethod
     def get_black_box_info() -> BlackBoxInformation:
@@ -276,7 +274,14 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
         # in wildtype_pdb_path. For this, we need to specify x0,
         # a vector of wildtype sequences. These are padded to
         # match the maximum length with empty strings.
-        wildtype_amino_acids_ = f.inner_function.wildtype_amino_acids
+        wildtype_amino_acids_ = f.wildtype_amino_acids
+
+        # # We may need to parallelize. If so, the inner_function object
+        # # can't be pickled. If that's the case, we need to delete it.
+        # # Each call to the black box will create its own connection
+        # # to an isolated function.
+        # del f.inner_function
+
         longest_wildtype_length = max([len(x) for x in wildtype_amino_acids_])
 
         wildtype_amino_acids = [

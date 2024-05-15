@@ -71,6 +71,9 @@ def test_parallelization_in_foldx_stability_and_sasa():
         force_register=True,
     )
 
+    f, x0 = problem.black_box, problem.x0
+    f(x0)
+
 
 if __name__ == "__main__":
     test_parallelization_in_foldx_stability_and_sasa()
