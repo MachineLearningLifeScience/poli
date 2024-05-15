@@ -12,10 +12,7 @@ from poli.core.util.seeding import seed_python_numpy_and_torch
 
 from poli.objective_repository.gfp_cbas.information import gfp_cbas_info
 
-from poli.core.util.isolation.instancing import (
-    instance_function_as_isolated_process,
-    get_inner_function,
-)
+from poli.core.util.isolation.instancing import get_inner_function
 
 
 class GFPCBasBlackBox(AbstractBlackBox):

@@ -19,10 +19,7 @@ from poli.core.problem import Problem
 
 from poli.core.util.seeding import seed_python_numpy_and_torch
 
-from poli.core.util.isolation.instancing import (
-    instance_function_as_isolated_process,
-    get_inner_function,
-)
+from poli.core.util.isolation.instancing import get_inner_function
 
 from poli.objective_repository.super_mario_bros.information import smb_info
 

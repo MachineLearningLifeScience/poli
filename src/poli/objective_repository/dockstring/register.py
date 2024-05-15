@@ -34,10 +34,7 @@ from poli.core.util.chemistry.string_to_molecule import (
 
 from poli.core.util.seeding import seed_python_numpy_and_torch
 
-from poli.core.util.isolation.instancing import (
-    instance_function_as_isolated_process,
-    get_inner_function,
-)
+from poli.core.util.isolation.instancing import get_inner_function
 
 from poli.objective_repository.dockstring.information import (
     dockstring_black_box_information,
