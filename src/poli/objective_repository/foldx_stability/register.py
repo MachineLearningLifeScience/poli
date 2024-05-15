@@ -102,7 +102,7 @@ class FoldXStabilityBlackBox(AbstractBlackBox):
                 "FoldX wasn't found in ~/foldx/foldx. Please install it."
             )
 
-        self.inner_function = get_inner_function(
+        inner_function = get_inner_function(
             isolated_function_name="foldx_stability__isolated",
             class_name="FoldXStabilityIsolatedLogic",
             module_to_import="poli.objective_repository.foldx_stability.isolated_function",
@@ -113,6 +113,7 @@ class FoldXStabilityBlackBox(AbstractBlackBox):
             eager_repair=eager_repair,
             verbose=verbose,
         )
+        self.wildtype_amino_acids = inner_function.wildtype_amino_acids
 
     def _black_box(self, x: np.ndarray, context: None) -> np.ndarray:
         """
@@ -263,9 +264,7 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
             evaluation_budget=evaluation_budget,
             force_isolation=force_isolation,
         )
-        wildtype_amino_acids_ = f.inner_function.wildtype_amino_acids
-
-        del f.inner_function
+        wildtype_amino_acids_ = f.wildtype_amino_acids
 
         longest_wildtype_length = max([len(x) for x in wildtype_amino_acids_])
 

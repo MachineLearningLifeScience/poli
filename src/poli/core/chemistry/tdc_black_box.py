@@ -22,10 +22,7 @@ import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
 
-from poli.core.util.isolation.instancing import (
-    instance_function_as_isolated_process,
-    get_inner_function,
-)
+from poli.core.util.isolation.instancing import get_inner_function
 
 
 class TDCBlackBox(AbstractBlackBox):
