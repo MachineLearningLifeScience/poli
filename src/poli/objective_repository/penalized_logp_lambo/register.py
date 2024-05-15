@@ -19,7 +19,7 @@ from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
 
-from poli.core.util.isolation.instancing import instance_function_as_isolated_process
+from poli.core.util.isolation.instancing import get_inner_function
 
 from poli.core.util.seeding import seed_python_numpy_and_torch
 
@@ -59,27 +59,20 @@ class PenalizedLogPLamboBlackBox(AbstractBlackBox):
             evaluation_budget=evaluation_budget,
         )
         from_smiles = string_representation.upper() == "SMILES"
-        if not force_isolation:
-            try:
-                from poli.objective_repository.penalized_logp_lambo.isolated_function import (
-                    PenalizedLogPIsolatedLogic,
-                )
+        self.from_smiles = from_smiles
+        self.penalized = penalized
+        self.force_isolation = force_isolation
 
-                self.inner_function = PenalizedLogPIsolatedLogic(
-                    from_smiles=from_smiles, penalized=penalized
-                )
-            except ImportError:
-                self.inner_function = instance_function_as_isolated_process(
-                    name="penalized_logp_lambo__isolated",
-                    from_smiles=from_smiles,
-                    penalized=penalized,
-                )
-        else:
-            self.inner_function = instance_function_as_isolated_process(
-                name="penalized_logp_lambo__isolated",
-                from_smiles=from_smiles,
-                penalized=penalized,
-            )
+        # Testing whether we can import in isolation
+        # to eagerly throw any import errors
+        _ = get_inner_function(
+            isolated_function_name="penalized_logp_lambo__isolated",
+            class_name="PenalizedLogPIsolatedLogic",
+            module_to_import="poli.objective_repository.penalized_logp_lambo.isolated_function",
+            force_isolation=force_isolation,
+            from_smiles=from_smiles,
+            penalized=penalized,
+        )
 
     def _black_box(self, x: np.ndarray, context: dict = None):
         """
@@ -91,7 +84,15 @@ class PenalizedLogPLamboBlackBox(AbstractBlackBox):
         and then computes the penalized logP. If the translation
         threw an error, we return NaN instead.
         """
-        return self.inner_function(x, context)
+        inner_function = get_inner_function(
+            isolated_function_name="penalized_logp_lambo__isolated",
+            class_name="PenalizedLogPIsolatedLogic",
+            module_to_import="poli.objective_repository.penalized_logp_lambo.isolated_function",
+            force_isolation=self.force_isolation,
+            from_smiles=self.from_smiles,
+            penalized=self.penalized,
+        )
+        return inner_function(x, context)
 
     @staticmethod
     def get_black_box_info() -> BlackBoxInformation:

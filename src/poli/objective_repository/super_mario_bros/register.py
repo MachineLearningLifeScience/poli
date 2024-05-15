@@ -19,7 +19,7 @@ from poli.core.problem import Problem
 
 from poli.core.util.seeding import seed_python_numpy_and_torch
 
-from poli.core.util.isolation.instancing import instance_function_as_isolated_process
+from poli.core.util.isolation.instancing import get_inner_function
 
 from poli.objective_repository.super_mario_bros.information import smb_info
 
@@ -90,33 +90,32 @@ class SuperMarioBrosBlackBox(AbstractBlackBox):
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
         )
-        if not force_isolation:
-            try:
-                from poli.objective_repository.super_mario_bros.isolated_function import (
-                    SMBIsolatedLogic,
-                )
-
-                self.inner_function = SMBIsolatedLogic(
-                    alphabet=smb_info.alphabet, max_time=max_time, visualize=visualize
-                )
-            except ImportError:
-                self.inner_function = instance_function_as_isolated_process(
-                    name="super_mario_bros__isolated",
-                    alphabet=smb_info.alphabet,
-                    max_time=max_time,
-                    visualize=visualize,
-                )
-        else:
-            self.inner_function = instance_function_as_isolated_process(
-                name="super_mario_bros__isolated",
-                alphabet=smb_info.alphabet,
-                max_time=max_time,
-                visualize=visualize,
-            )
+        self.force_isolation = force_isolation
+        self.max_time = max_time
+        self.visualize = visualize
+        _ = get_inner_function(
+            isolated_function_name="super_mario_bros__isolated",
+            class_name="SMBIsolatedLogic",
+            module_to_import="poli.objective_repository.super_mario_bros.isolated_function",
+            force_isolation=self.force_isolation,
+            alphabet=smb_info.alphabet,
+            max_time=self.max_time,
+            visualize=self.visualize,
+        )
 
     def _black_box(self, x: np.ndarray, context=None) -> np.ndarray:
         """Computes number of jumps in a given latent code x."""
-        return self.inner_function(x, context)
+        inner_function = get_inner_function(
+            isolated_function_name="super_mario_bros__isolated",
+            class_name="SMBIsolatedLogic",
+            module_to_import="poli.objective_repository.super_mario_bros.isolated_function",
+            force_isolation=self.force_isolation,
+            quiet=True,
+            alphabet=smb_info.alphabet,
+            max_time=self.max_time,
+            visualize=self.visualize,
+        )
+        return inner_function(x, context)
 
     @staticmethod
     def get_black_box_info() -> BlackBoxInformation:
