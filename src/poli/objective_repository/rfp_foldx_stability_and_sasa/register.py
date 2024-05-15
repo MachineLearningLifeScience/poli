@@ -208,7 +208,7 @@ class RFPFoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
         # in wildtype_pdb_path. For this, we need to specify x0,
         # a vector of wildtype sequences. These are padded to
         # match the maximum length with empty strings.
-        wildtype_amino_acids_ = f.inner_function.wildtype_amino_acids
+        wildtype_amino_acids_ = f.wildtype_amino_acids
         longest_wildtype_length = max([len(x) for x in wildtype_amino_acids_])
 
         wildtype_amino_acids = [
