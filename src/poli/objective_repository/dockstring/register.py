@@ -13,7 +13,9 @@ References
     https://doi.org/10.1021/acs.jcim.1c01334.
 """
 
-from typing import Tuple, Literal
+from __future__ import annotations
+
+from typing import Literal
 
 import numpy as np
 
@@ -32,7 +34,10 @@ from poli.core.util.chemistry.string_to_molecule import (
 
 from poli.core.util.seeding import seed_python_numpy_and_torch
 
-from poli.core.util.isolation.instancing import instance_function_as_isolated_process
+from poli.core.util.isolation.instancing import (
+    instance_function_as_isolated_process,
+    get_inner_function,
+)
 
 from poli.objective_repository.dockstring.information import (
     dockstring_black_box_information,
@@ -122,29 +127,18 @@ class DockstringBlackBox(AbstractBlackBox):
         )
         self.target_name = target_name
         self.string_representation = string_representation
+        self.force_isolation = force_isolation
 
-        if not force_isolation:
-            try:
-                from poli.objective_repository.dockstring.isolated_function import (
-                    IsolatedDockstringFunction,
-                )
-
-                self.inner_function = IsolatedDockstringFunction(
-                    target_name=target_name,
-                    string_representation=string_representation,
-                )
-            except ImportError:
-                self.inner_function = instance_function_as_isolated_process(
-                    name="dockstring__isolated",
-                    target_name=target_name,
-                    string_representation=string_representation,
-                )
-        else:
-            self.inner_function = instance_function_as_isolated_process(
-                name="dockstring__isolated",
-                target_name=target_name,
-                string_representation=string_representation,
-            )
+        # Testing whether we can create the isolated function
+        # without raising an exception.
+        _ = get_inner_function(
+            isolated_function_name="dockstring__isolated",
+            class_name="IsolatedDockstringFunction",
+            module_to_import="poli.objective_repository.dockstring.isolated_function",
+            force_isolation=force_isolation,
+            target_name=target_name,
+            string_representation=string_representation,
+        )
 
     def _black_box(self, x: np.ndarray, context=None) -> np.ndarray:
         """Evaluating the black box function.
@@ -171,7 +165,16 @@ class DockstringBlackBox(AbstractBlackBox):
         Exception
             If the docking score cannot be computed.
         """
-        return self.inner_function(x, context=context)
+        inner_function = get_inner_function(
+            isolated_function_name="dockstring__isolated",
+            class_name="IsolatedDockstringFunction",
+            module_to_import="poli.objective_repository.dockstring.isolated_function",
+            force_isolation=self.force_isolation,
+            quiet=True,
+            target_name=self.target_name,
+            string_representation=self.string_representation,
+        )
+        return inner_function(x, context=context)
 
     @staticmethod
     def get_black_box_info() -> BlackBoxInformation:

@@ -12,7 +12,10 @@ from poli.core.util.seeding import seed_python_numpy_and_torch
 
 from poli.objective_repository.gfp_cbas.information import gfp_cbas_info
 
-from poli.core.util.isolation.instancing import instance_function_as_isolated_process
+from poli.core.util.isolation.instancing import (
+    instance_function_as_isolated_process,
+    get_inner_function,
+)
 
 
 class GFPCBasBlackBox(AbstractBlackBox):
@@ -36,49 +39,49 @@ class GFPCBasBlackBox(AbstractBlackBox):
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
         )
-        if not force_isolation:
-            try:
-                from poli.objective_repository.gfp_cbas.isolated_function import (
-                    GFPCBasIsolatedLogic,
-                )
+        self.problem_type = problem_type
+        self.functional_only = functional_only
+        self.ignore_stops = ignore_stops
+        self.unique = unique
+        self.force_isolation = force_isolation
+        self.n_starting_points = n_starting_points
+        self.seed = seed
 
-                self.inner_function = GFPCBasIsolatedLogic(
-                    problem_type=problem_type,
-                    info=gfp_cbas_info,
-                    n_starting_points=n_starting_points,
-                    seed=seed,
-                    functional_only=functional_only,
-                    ignore_stops=ignore_stops,
-                    unique=unique,
-                )
-            except ImportError:
-                self.inner_function = instance_function_as_isolated_process(
-                    name="gfp_cbas__isolated",
-                    problem_type=problem_type,
-                    info=gfp_cbas_info,
-                    n_starting_points=n_starting_points,
-                    seed=seed,
-                    functional_only=functional_only,
-                    ignore_stops=ignore_stops,
-                    unique=unique,
-                )
-        else:
-            self.inner_function = instance_function_as_isolated_process(
-                name="gfp_cbas__isolated",
-                problem_type=problem_type,
-                info=gfp_cbas_info,
-                n_starting_points=n_starting_points,
-                seed=seed,
-                functional_only=functional_only,
-                ignore_stops=ignore_stops,
-                unique=unique,
-            )
+        inner_function = get_inner_function(
+            isolated_function_name="gfp_cbas__isolated",
+            class_name="GFPCBasIsolatedLogic",
+            module_to_import="poli.objective_repository.gfp_cbas.isolated_function",
+            seed=self.seed,
+            force_isolation=self.force_isolation,
+            quiet=False,
+            problem_type=self.problem_type,
+            info=gfp_cbas_info,
+            n_starting_points=self.n_starting_points,
+            functional_only=self.functional_only,
+            ignore_stops=self.ignore_stops,
+            unique=self.unique,
+        )
+        self.x0 = inner_function.x0
 
     def _black_box(self, x: np.array, context=None) -> np.ndarray:
         """
         x is encoded sequence return function value given problem name
         """
-        return self.inner_function(x, context=context)
+        inner_function = get_inner_function(
+            isolated_function_name="gfp_cbas__isolated",
+            class_name="GFPCBasIsolatedLogic",
+            module_to_import="poli.objective_repository.gfp_cbas.isolated_function",
+            seed=self.seed,
+            force_isolation=self.force_isolation,
+            quiet=True,
+            problem_type=self.problem_type,
+            info=gfp_cbas_info,
+            n_starting_points=self.n_starting_points,
+            functional_only=self.functional_only,
+            ignore_stops=self.ignore_stops,
+            unique=self.unique,
+        )
+        return inner_function(x, context=context)
 
     def __iter__(self, *args, **kwargs):
         warn(f"{self.__class__.__name__} iteration invoked. Not implemented!")
@@ -140,7 +143,7 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
             seed=seed,
             evaluation_budget=evaluation_budget,
         )
-        x0 = f.inner_function.x0
+        x0 = f.x0
 
         problem = Problem(f, x0)
 
