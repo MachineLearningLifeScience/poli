@@ -29,6 +29,7 @@ class GFPCBasBlackBox(AbstractBlackBox):
         seed: int = None,
         evaluation_budget: int = float("inf"),
         force_isolation: bool = False,
+        negate: bool = False,
     ):
         super().__init__(
             batch_size=batch_size,
@@ -43,6 +44,7 @@ class GFPCBasBlackBox(AbstractBlackBox):
         self.force_isolation = force_isolation
         self.n_starting_points = n_starting_points
         self.seed = seed
+        self.negate = negate
 
         inner_function = get_inner_function(
             isolated_function_name="gfp_cbas__isolated",
@@ -78,6 +80,8 @@ class GFPCBasBlackBox(AbstractBlackBox):
             ignore_stops=self.ignore_stops,
             unique=self.unique,
         )
+        if self.negate:
+            return -inner_function(x, context=context)
         return inner_function(x, context=context)
 
     def __iter__(self, *args, **kwargs):
@@ -119,6 +123,7 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
+        negate: bool = False,
     ) -> Problem:
         """
         Seed value required to shuffle the data, otherwise CSV asset data index unchanged.
@@ -139,6 +144,7 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
             num_workers=num_workers,
             seed=seed,
             evaluation_budget=evaluation_budget,
+            negate=negate,
         )
         x0 = f.x0
 
