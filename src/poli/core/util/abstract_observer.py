@@ -1,5 +1,6 @@
 """Abstract class for observers in poli."""
 
+from typing import Self
 import numpy as np
 from poli.core.problem_setup_information import ProblemSetupInformation
 
@@ -60,7 +61,7 @@ class AbstractObserver:
         x0: np.ndarray,
         y0: np.ndarray,
         seed: int,
-    ) -> object:
+    ) -> Self:
         """
         Initialize the observer.
 
@@ -79,8 +80,8 @@ class AbstractObserver:
 
         Returns
         -------
-        observer_info
-            Information about the observer after initialization (e.g. run ids).
+        observer: AbstractObserver (self)
+            The observer object. (This way, one can chain the `initialize_observer` method.)
 
         Raises
         ------
