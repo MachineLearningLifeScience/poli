@@ -126,7 +126,7 @@ class AbstractBlackBox:
         """
         if not isinstance(observer, AbstractObserver):
             warn(
-                f"poli 🧪: Observer is not an instance of AbstractObserver: {observer}"
+                f"poli 🧪: Observer is not an instance of AbstractObserver: {observer} "
                 "Are you sure you want to set this observer?"
             )
         self.observer = observer
