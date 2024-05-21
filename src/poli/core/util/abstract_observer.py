@@ -1,6 +1,5 @@
 """Abstract class for observers in poli."""
 
-from typing import Self
 import numpy as np
 from poli.core.problem_setup_information import ProblemSetupInformation
 
@@ -61,7 +60,7 @@ class AbstractObserver:
         x0: np.ndarray,
         y0: np.ndarray,
         seed: int,
-    ) -> Self:
+    ) -> object:
         """
         Initialize the observer.
 
