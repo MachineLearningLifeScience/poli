@@ -79,8 +79,8 @@ class AbstractObserver:
 
         Returns
         -------
-        observer_info
-            Information about the observer after initialization (e.g. run ids).
+        observer: AbstractObserver (self)
+            The observer object. (This way, one can chain the `initialize_observer` method.)
 
         Raises
         ------
