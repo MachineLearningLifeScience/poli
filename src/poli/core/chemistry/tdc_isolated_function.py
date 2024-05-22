@@ -1,7 +1,7 @@
 """Implement a wrapper around the Therapeutics Data Commons (TDC) oracles [1].
 
-So far, we only support two oracles: `drd3` and `synthetic accessibility`. See
-the documentation on our black-box functions for more details.
+When run, this script registers the TDCIsolatedFunction class as an
+isolated function with the name "tdc__isolated".
 
 References
 ----------
@@ -15,18 +15,15 @@ import numpy as np
 
 from tdc import Oracle
 
-from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
-from poli.core.problem_setup_information import ProblemSetupInformation
 
 from poli.core.util.chemistry.string_to_molecule import translate_selfies_to_smiles
 
 
 class TDCIsolatedFunction(AbstractIsolatedFunction):
     """
-    TDCBlackBox is a class that represents a black box for the
-    TDC (Therapeutics Data Commons) problems.
-    It inherits from the AbstractBlackBox class.
+    TDCIsolatedFunction is a class that represents the isolated logic
+    for the TDC (Therapeutics Data Commons) problems.
 
     Parameters
     -----------
@@ -34,13 +31,17 @@ class TDCIsolatedFunction(AbstractIsolatedFunction):
         The name of the oracle used for computing the docking score.
     from_smiles : bool, optional
         Flag indicating whether the input molecules are in SMILES format. Defaults to True.
+    **kwargs_for_oracle : dict, optional
+        Additional keyword arguments passed to the oracle.
 
     Attributes
     ----------
     oracle : Oracle
-        An instance of the Oracle class from TDC.
+        An instance of the Oracle class from TDC. It is instantiated as
+        Oracle(name=oracle_name, **kwargs_for_oracle)
     from_smiles : bool
         Flag indicating whether the input molecules are in SMILES format.
+        False indicates that the input molecules are in SELFIES format.
     """
 
     def __init__(
@@ -56,14 +57,6 @@ class TDCIsolatedFunction(AbstractIsolatedFunction):
         ----------
         oracle_name : str
             The name of the oracle.
-        info : ProblemSetupInformation
-            The problem setup information.
-        batch_size : int, optional
-            The batch size, by default None.
-        parallelize : bool, optional
-            Whether to parallelize the computation, by default False.
-        num_workers : int, optional
-            The number of workers to use for parallel computation, by default None.
         from_smiles : bool, optional
             Whether to use SMILES representation, by default True.
         **kwargs_for_oracle : dict, optional
@@ -106,3 +99,13 @@ class TDCIsolatedFunction(AbstractIsolatedFunction):
             scores.append(self.oracle(molecule_string))
 
         return np.array(scores).reshape(-1, 1)
+
+
+if __name__ == "__main__":
+    from poli.core.registry import register_isolated_function
+
+    register_isolated_function(
+        TDCIsolatedFunction,
+        name="tdc__isolated",
+        conda_environment_name="poli__tdc",
+    )

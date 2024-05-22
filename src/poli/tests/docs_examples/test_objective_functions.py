@@ -291,5 +291,25 @@ def test_rasp_example():
     print(f(x0))
 
 
+def test_smb_example():
+    pytest.skip("We need to check for a virtual frame buffer.")
+    # TODO: the user has to have a screen (or virtual frame
+    # buffer) to run this. How can we account for this?
+    from poli.objective_repository import (
+        SuperMarioBrosBlackBox,
+        SuperMarioBrosProblemFactory,
+    )
+
+    # Creating the black box
+    f = SuperMarioBrosBlackBox()
+
+    # Creating a problem
+    problem = SuperMarioBrosProblemFactory().create(visualize=True)
+    f, x0 = problem.black_box, problem.x0
+
+    # Querying:
+    print(f(x0))
+
+
 if __name__ == "__main__":
-    test_sa_tdc_example()
+    test_smb_example()

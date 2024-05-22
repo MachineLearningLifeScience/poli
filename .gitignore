@@ -30,3 +30,6 @@ src/poli/tests/observers/results/
 # Documentation
 docs/build/
 docs/source/generated/
+
+# Ignore slurm scripts
+slurm_scripts/

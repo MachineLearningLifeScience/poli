@@ -27,7 +27,7 @@ from poli.core.problem import Problem
 
 from poli.core.util.seeding import seed_python_numpy_and_torch
 
-from poli.core.util.isolation.instancing import instance_function_as_isolated_process
+from poli.core.util.isolation.instancing import get_inner_function
 
 from poli.objective_repository.rasp.information import rasp_information
 
@@ -135,40 +135,33 @@ class RaspBlackBox(AbstractBlackBox):
             "Missing required argument wildtype_pdb_file. "
             "Did you forget to pass it to create and into the black box?"
         )
+        if parallelize:
+            print(
+                "poli 🧪: RaspBlackBox parallelization is handled by the isolated logic. Disabling it."
+            )
+            parallelize = False
         super().__init__(
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
         )
-        if not force_isolation:
-            try:
-                from poli.objective_repository.rasp.isolated_function import (
-                    RaspIsolatedLogic,
-                )
-
-                self.inner_function = RaspIsolatedLogic(
-                    wildtype_pdb_path=wildtype_pdb_path,
-                    chains_to_keep=chains_to_keep,
-                    experiment_id=experiment_id,
-                    tmp_folder=tmp_folder,
-                )
-            except ImportError:
-                self.inner_function = instance_function_as_isolated_process(
-                    name="rasp__isolated",
-                    wildtype_pdb_path=wildtype_pdb_path,
-                    chains_to_keep=chains_to_keep,
-                    experiment_id=experiment_id,
-                    tmp_folder=tmp_folder,
-                )
-        else:
-            self.inner_function = instance_function_as_isolated_process(
-                name="rasp__isolated",
-                wildtype_pdb_path=wildtype_pdb_path,
-                chains_to_keep=chains_to_keep,
-                experiment_id=experiment_id,
-                tmp_folder=tmp_folder,
-            )
+        self.force_isolation = force_isolation
+        self.wildtype_pdb_path = wildtype_pdb_path
+        self.chains_to_keep = chains_to_keep
+        self.experiment_id = experiment_id
+        self.tmp_folder = tmp_folder
+        self.inner_function = get_inner_function(
+            isolated_function_name="rasp__isolated",
+            class_name="RaspIsolatedLogic",
+            module_to_import="poli.objective_repository.rasp.isolated_function",
+            force_isolation=self.force_isolation,
+            wildtype_pdb_path=self.wildtype_pdb_path,
+            chains_to_keep=self.chains_to_keep,
+            experiment_id=self.experiment_id,
+            tmp_folder=self.tmp_folder,
+        )
+        self.x0 = self.inner_function.x0
 
     def _black_box(self, x, context=None):
         """

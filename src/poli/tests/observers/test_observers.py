@@ -16,6 +16,7 @@ import numpy as np
 
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.util.abstract_observer import AbstractObserver
+from poli.core.util.multi_observer import MultiObserver
 
 from poli import objective_factory
 
@@ -185,6 +186,27 @@ def test_multiple_observer_registration():
     (problem_2.observer._observer.experiment_path / "metadata.json").unlink()
     problem_1.observer._observer.finish()
     problem_2.observer._observer.finish()
+
+
+def test_multi_observer_works():
+    obs_1 = SimpleObserver(experiment_id="example_1")
+    obs_2 = SimpleObserver(experiment_id="example_2")
+
+    multi_observer = MultiObserver(observers=[obs_1, obs_2])
+
+    # Creating a black box function
+    problem = objective_factory.create(name="aloha", observer=multi_observer)
+
+    # Evaluating the black box function
+    problem.black_box(np.array([list("MIGUE")]))
+
+    assert obs_1.results == [{"x": [["M", "I", "G", "U", "E"]], "y": [[0.0]]}]
+    assert obs_2.results == [{"x": [["M", "I", "G", "U", "E"]], "y": [[0.0]]}]
+
+    # Cleaning up (and testing whether we can access attributes
+    # of the external observer)
+    (obs_1.experiment_path / "metadata.json").unlink()
+    (obs_2.experiment_path / "metadata.json").unlink()
 
 
 if __name__ == "__main__":

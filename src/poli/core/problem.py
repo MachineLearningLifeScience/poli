@@ -60,3 +60,9 @@ class Problem:
     @property
     def info(self):
         return self.black_box.info
+
+    def __str__(self):
+        return f"<Problem: {self.black_box.info.get_problem_name()} x0: {self.x0}>"
+
+    def __repr__(self):
+        return f"<Problem: {self.black_box.info.get_problem_name()} x0: {self.x0} discrete={self.is_discrete()} deterministic={self.is_deterministic()}>"
