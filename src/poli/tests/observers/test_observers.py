@@ -52,9 +52,16 @@ class SimpleObserver(AbstractObserver):
         with open(self.experiment_path / "metadata.json", "w") as f:
             json.dump(metadata, f)
 
+        return None
+
     def observe(self, x: np.ndarray, y: np.ndarray, context=None) -> None:
         # Appending these results to the results file.
         self.results.append({"x": x.tolist(), "y": y.tolist()})
+
+
+def test_registering_observer_with_bad_names():
+    # TODO[SIMON]: implement
+    pass
 
 
 def test_simple_observer_can_be_defined():
@@ -69,7 +76,7 @@ def test_simple_observer_can_be_defined():
 
 def test_simple_observer_logs_properly():
     """Tests whether the __call__ of a black box function is properly logged"""
-    from poli.core.registry import register_observer, delete_observer_run_script
+    from poli.core.registry import register_observer
 
     observer = SimpleObserver()
 
@@ -99,13 +106,14 @@ def test_simple_observer_logs_properly():
 
 def test_observer_registration_and_external_instancing():
     """An integration test for the observer registration and external instancing"""
-    from poli.core.registry import register_observer, delete_observer_run_script
+    from poli.core.registry import register_observer
 
     observer = SimpleObserver()
     register_observer(
         observer=observer.__class__,
         conda_environment_location="poli__chem",
         observer_name="simple__",
+        set_as_default_observer=False,
     )
 
     # Creating a black box function
@@ -134,12 +142,9 @@ def test_observer_registration_and_external_instancing():
     (f.observer.experiment_path / "metadata.json").unlink()
     f.observer.finish()
 
-    # Cleaning up the observer run script
-    delete_observer_run_script(observer_name="simple__")
-
 
 def test_multiple_observer_registration():
-    from poli.core.registry import register_observer, delete_observer_run_script
+    from poli.core.registry import register_observer
     from poli.core.util.external_observer import ExternalObserver
 
     observer = SimpleObserver()
@@ -180,10 +185,6 @@ def test_multiple_observer_registration():
     (problem_2.observer._observer.experiment_path / "metadata.json").unlink()
     problem_1.observer._observer.finish()
     problem_2.observer._observer.finish()
-
-    # Cleaning up the observer run script
-    delete_observer_run_script(observer_name="simple__")
-    delete_observer_run_script(observer_name="simple_2__")
 
 
 if __name__ == "__main__":
