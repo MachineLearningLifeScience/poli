@@ -4,9 +4,6 @@ import numpy as np
 from poli.core.problem_setup_information import ProblemSetupInformation
 
 
-import numpy as np
-
-
 class AbstractObserver:
     """
     Abstract base class for observers in the poli library.
