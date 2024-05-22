@@ -10,7 +10,7 @@ dependencies:
     - numpy
     - pandas
     - scipy
-    - "git+https://github.com/MachineLearningLifeScience/poli.git@master"
+    - "git+https://github.com/MachineLearningLifeScience/poli.git@dev"
     - torch
     - torchvision
     - torchaudio
