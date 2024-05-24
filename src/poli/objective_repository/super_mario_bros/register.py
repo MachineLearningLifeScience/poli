@@ -64,6 +64,7 @@ class SuperMarioBrosBlackBox(AbstractBlackBox):
         self,
         max_time: int = 30,
         visualize: bool = False,
+        value_on_unplayable: float = np.NaN,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
@@ -91,8 +92,9 @@ class SuperMarioBrosBlackBox(AbstractBlackBox):
             evaluation_budget=evaluation_budget,
         )
         self.force_isolation = force_isolation
-        self.max_time = max_time
+        self.max_time = int(max_time)
         self.visualize = visualize
+        self.value_on_unplayable = value_on_unplayable
         _ = get_inner_function(
             isolated_function_name="super_mario_bros__isolated",
             class_name="SMBIsolatedLogic",
@@ -101,6 +103,7 @@ class SuperMarioBrosBlackBox(AbstractBlackBox):
             alphabet=smb_info.alphabet,
             max_time=self.max_time,
             visualize=self.visualize,
+            value_on_unplayable=self.value_on_unplayable,
         )
 
     def _black_box(self, x: np.ndarray, context=None) -> np.ndarray:
@@ -114,6 +117,7 @@ class SuperMarioBrosBlackBox(AbstractBlackBox):
             alphabet=smb_info.alphabet,
             max_time=self.max_time,
             visualize=self.visualize,
+            value_on_unplayable=self.value_on_unplayable,
         )
         return inner_function(x, context)
 
@@ -142,6 +146,7 @@ class SuperMarioBrosProblemFactory(AbstractProblemFactory):
         self,
         max_time: int = 30,
         visualize: bool = False,
+        value_on_unplayable: float = np.NaN,
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
@@ -182,6 +187,7 @@ class SuperMarioBrosProblemFactory(AbstractProblemFactory):
         f = SuperMarioBrosBlackBox(
             max_time=max_time,
             visualize=visualize,
+            value_on_unplayable=value_on_unplayable,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,

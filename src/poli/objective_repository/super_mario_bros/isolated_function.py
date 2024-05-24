@@ -66,12 +66,14 @@ class SMBIsolatedLogic(AbstractIsolatedFunction):
         alphabet: List[str] = smb_info.alphabet,
         max_time: int = 30,
         visualize: bool = False,
+        value_on_unplayable: float = np.NaN,
     ):
         self.alphabet = alphabet
         self.alphabet_s_to_i = {s: i for i, s in enumerate(alphabet)}
         self.alphabet_i_to_s = {i: s for i, s in enumerate(alphabet)}
         self.max_time = max_time
         self.visualize = visualize
+        self.value_on_unplayable = value_on_unplayable
 
     def __call__(self, x: np.ndarray, context=None) -> np.ndarray:
         """Computes number of jumps in a given latent code x."""
@@ -95,7 +97,7 @@ class SMBIsolatedLogic(AbstractIsolatedFunction):
             if res["marioStatus"] == 1:
                 jumps = res["jumpActionsPerformed"]
             else:
-                jumps = np.nan
+                jumps = self.value_on_unplayable
 
             jumps_for_all_levels.append(jumps)
 
