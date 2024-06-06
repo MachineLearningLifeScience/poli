@@ -4,9 +4,6 @@ import numpy as np
 from poli.core.problem_setup_information import ProblemSetupInformation
 
 
-import numpy as np
-
-
 class AbstractObserver:
     """
     Abstract base class for observers in the poli library.
@@ -79,8 +76,8 @@ class AbstractObserver:
 
         Returns
         -------
-        observer_info
-            Information about the observer after initialization (e.g. run ids).
+        observer: AbstractObserver (self)
+            The observer object. (This way, one can chain the `initialize_observer` method.)
 
         Raises
         ------

@@ -10,7 +10,7 @@ rdkit_logp_info = BlackBoxInformation(
     deterministic=True,
     alphabet=None,  # TODO: add once we settle for one
     log_transform_recommended=False,
-    discrete=False,
+    discrete=True,
     fidelity=None,
     padding_token="",
 )

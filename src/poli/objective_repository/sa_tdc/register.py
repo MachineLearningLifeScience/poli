@@ -13,7 +13,7 @@ import numpy as np
 
 import selfies as sf
 
-from poli.core.abstract_black_box import AbstractBlackBox
+from poli.core.chemistry.tdc_black_box import TDCBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
@@ -27,7 +27,7 @@ from poli.core.util.isolation.instancing import instance_function_as_isolated_pr
 from poli.objective_repository.sa_tdc.information import sa_tdc_info
 
 
-class SABlackBox(AbstractBlackBox):
+class SABlackBox(TDCBlackBox):
     """Synthetic-accessibility black box implementation using the TDC oracles [1].
 
     Parameters
@@ -72,32 +72,14 @@ class SABlackBox(AbstractBlackBox):
             The maximum number of evaluations, by default float("inf").
         """
         super().__init__(
+            oracle_name="SA",
+            string_representation=string_representation,
+            force_isolation=force_isolation,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
         )
-        from_smiles = string_representation.upper() == "SMILES"
-        if not force_isolation:
-            try:
-                from poli.objective_repository.sa_tdc.isolated_function import (
-                    SAIsolatedLogic,
-                )
-
-                self.inner_function = SAIsolatedLogic(from_smiles=from_smiles)
-            except ImportError:
-                self.inner_function = instance_function_as_isolated_process(
-                    name="sa_tdc__isolated",
-                    from_smiles=from_smiles,
-                )
-        else:
-            self.inner_function = instance_function_as_isolated_process(
-                name="sa_tdc__isolated",
-                from_smiles=from_smiles,
-            )
-
-    def _black_box(self, x: np.ndarray, context=None) -> np.ndarray:
-        return self.inner_function(x, context)
 
     @staticmethod
     def get_black_box_info() -> BlackBoxInformation:
@@ -162,7 +144,7 @@ class SAProblemFactory(AbstractProblemFactory):
         f: SABlackBox
             The synthetic-accessibility black box function.
         x0: np.ndarray
-            The initial input (taken from TDC: CCNC(=O)c1ccc(NC(=O)N2CC[C@H](C)[C@H](O)C2)c(C)c1).
+            The initial input (taken from TDC: CC(C)(C)[C@H]1CCc2c(sc(NC(=O)COc3ccc(Cl)cc3)c2C(N)=O)C1).
         y0: np.ndarray
             The initial output (i.e. the corresponding SA).
         """
@@ -185,7 +167,7 @@ class SAProblemFactory(AbstractProblemFactory):
         )
 
         # Initial example (from the TDC docs)
-        x0_smiles = "CCNC(=O)c1ccc(NC(=O)N2CC[C@H](C)[C@H](O)C2)c(C)c1"
+        x0_smiles = "CC(C)(C)[C@H]1CCc2c(sc(NC(=O)COc3ccc(Cl)cc3)c2C(N)=O)C1"
         x0_selfies = translate_smiles_to_selfies([x0_smiles])[0]
 
         # TODO: change for proper tokenization in the SMILES case.

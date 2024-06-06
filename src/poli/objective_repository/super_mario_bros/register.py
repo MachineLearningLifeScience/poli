@@ -19,7 +19,7 @@ from poli.core.problem import Problem
 
 from poli.core.util.seeding import seed_python_numpy_and_torch
 
-from poli.core.util.isolation.instancing import instance_function_as_isolated_process
+from poli.core.util.isolation.instancing import get_inner_function
 
 from poli.objective_repository.super_mario_bros.information import smb_info
 
@@ -38,6 +38,10 @@ class SuperMarioBrosBlackBox(AbstractBlackBox):
 
     Parameters
     ----------
+    max_time : int, optional
+        The maximum time for the simulation in seconds, by default 30.
+    visualize : bool, optional
+        Flag indicating whether to visualize the simulation, by default False.
     batch_size : int, optional
         The batch size for simultaneous execution, by default None.
     parallelize : bool, optional
@@ -58,6 +62,9 @@ class SuperMarioBrosBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
+        max_time: int = 30,
+        visualize: bool = False,
+        value_on_unplayable: float = np.NaN,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
@@ -84,25 +91,35 @@ class SuperMarioBrosBlackBox(AbstractBlackBox):
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
         )
-        if not force_isolation:
-            try:
-                from poli.objective_repository.super_mario_bros.isolated_function import (
-                    SMBIsolatedLogic,
-                )
-
-                self.inner_function = SMBIsolatedLogic()
-            except ImportError:
-                self.inner_function = instance_function_as_isolated_process(
-                    name="super_mario_bros__isolated",
-                )
-        else:
-            self.inner_function = instance_function_as_isolated_process(
-                name="super_mario_bros__isolated",
-            )
+        self.force_isolation = force_isolation
+        self.max_time = int(max_time)
+        self.visualize = visualize
+        self.value_on_unplayable = value_on_unplayable
+        _ = get_inner_function(
+            isolated_function_name="super_mario_bros__isolated",
+            class_name="SMBIsolatedLogic",
+            module_to_import="poli.objective_repository.super_mario_bros.isolated_function",
+            force_isolation=self.force_isolation,
+            alphabet=smb_info.alphabet,
+            max_time=self.max_time,
+            visualize=self.visualize,
+            value_on_unplayable=self.value_on_unplayable,
+        )
 
     def _black_box(self, x: np.ndarray, context=None) -> np.ndarray:
         """Computes number of jumps in a given latent code x."""
-        return self.inner_function(x, context)
+        inner_function = get_inner_function(
+            isolated_function_name="super_mario_bros__isolated",
+            class_name="SMBIsolatedLogic",
+            module_to_import="poli.objective_repository.super_mario_bros.isolated_function",
+            force_isolation=self.force_isolation,
+            quiet=True,
+            alphabet=smb_info.alphabet,
+            max_time=self.max_time,
+            visualize=self.visualize,
+            value_on_unplayable=self.value_on_unplayable,
+        )
+        return inner_function(x, context)
 
     @staticmethod
     def get_black_box_info() -> BlackBoxInformation:
@@ -127,17 +144,24 @@ class SuperMarioBrosProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
+        max_time: int = 30,
+        visualize: bool = False,
+        value_on_unplayable: float = np.NaN,
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
         force_isolation: bool = False,
-    ) -> Tuple[SuperMarioBrosBlackBox, np.ndarray, np.ndarray]:
+    ) -> Problem:
         """Creates a new instance of the Super Mario Bros problem.
 
         Parameters
         ----------
+        max_time : int, optional
+            The maximum time for the simulation in seconds, by default 30.
+        visualize : bool, optional
+            Flag indicating whether to visualize the simulation, by default False.
         seed : int, optional
             The seed for the random number generator, by default None.
         batch_size : int, optional
@@ -161,13 +185,18 @@ class SuperMarioBrosProblemFactory(AbstractProblemFactory):
             seed_python_numpy_and_torch(seed)
 
         f = SuperMarioBrosBlackBox(
+            max_time=max_time,
+            visualize=visualize,
+            value_on_unplayable=value_on_unplayable,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
             force_isolation=force_isolation,
         )
-        x0 = np.ones([1, 2])
+        x0 = np.array([["-"] * 14] * 14)
+        x0[-1, :] = "X"
+        x0 = x0.reshape(1, 14 * 14)
 
         problem = Problem(f, x0)
 

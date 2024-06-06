@@ -7,23 +7,27 @@ level playable.
 
 """
 
+from typing import List
 from pathlib import Path
 
-import torch
 import numpy as np
 
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
 
-from poli.objective_repository.super_mario_bros.model import load_example_model
+from poli.objective_repository.super_mario_bros.simulator import (
+    test_level_from_int_array,
+)
 
-from poli.objective_repository.super_mario_bros.simulator import test_level_from_z
+from poli.objective_repository.super_mario_bros.information import (
+    smb_info,
+)
 
 
 THIS_DIR = Path(__file__).parent.resolve()
 
-# TODO: download the model from the internet
-# if it doesn't exist, as well as the simulator
-# FIXME: do this after we remove .pt and .jar
+# TODO: download the simulator from the internet
+# if it doesn't exist
+# FIXME: do this after we remove .jar
 # files from the python installation.
 
 
@@ -51,35 +55,53 @@ class SMBIsolatedLogic(AbstractIsolatedFunction):
     Methods
     -------
     _black_box(self, x, context=None)
-        Runs the given input x as a latent code
+        Runs the given input x as a flattened level (14x14)
         through the model and returns the number
         of jumps Mario makes in the level. If the
         level is not solvable, returns np.NaN.
     """
 
-    def __init__(self):
-        """
-        Initializes a new instance of the SMBBlackBox class.
-        """
-        self.model = load_example_model(THIS_DIR / "example.pt")
+    def __init__(
+        self,
+        alphabet: List[str] = smb_info.alphabet,
+        max_time: int = 30,
+        visualize: bool = False,
+        value_on_unplayable: float = np.NaN,
+    ):
+        self.alphabet = alphabet
+        self.alphabet_s_to_i = {s: i for i, s in enumerate(alphabet)}
+        self.alphabet_i_to_s = {i: s for i, s in enumerate(alphabet)}
+        self.max_time = max_time
+        self.visualize = visualize
+        self.value_on_unplayable = value_on_unplayable
 
     def __call__(self, x: np.ndarray, context=None) -> np.ndarray:
         """Computes number of jumps in a given latent code x."""
-        z = torch.from_numpy(x).float()
-        z = z.unsqueeze(0)
+        assert x.ndim == 2, "x must be a 2D array"
+        batch_size, _ = x.shape
+
+        # Converting the level to ints
+        x = np.array(
+            [[self.alphabet_s_to_i[x_ij] for x_ij in x_i] for x_i in x]
+        ).reshape(batch_size, 14, 14)
 
         # Run the model
-        with torch.no_grad():
-            res = test_level_from_z(z, self.model, visualize=True)
+        jumps_for_all_levels = []
+        for level in x:
+            res = test_level_from_int_array(
+                level, max_time=self.max_time, visualize=self.visualize
+            )
 
-        # Return the number of jumps if the level was
-        # solved successfully, else return np.NaN
-        if res["marioStatus"] == 1:
-            jumps = res["jumpActionsPerformed"]
-        else:
-            jumps = np.nan
+            # Return the number of jumps if the level was
+            # solved successfully, else return np.NaN
+            if res["marioStatus"] == 1:
+                jumps = res["jumpActionsPerformed"]
+            else:
+                jumps = self.value_on_unplayable
 
-        return np.array([jumps], dtype=float).reshape(1, 1)
+            jumps_for_all_levels.append(jumps)
+
+        return np.array(jumps_for_all_levels, dtype=float).reshape(batch_size, 1)
 
 
 if __name__ == "__main__":

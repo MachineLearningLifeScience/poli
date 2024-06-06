@@ -2,6 +2,8 @@
 all objective functions should inherit.
 """
 
+from warnings import warn
+
 import numpy as np
 from multiprocessing import Pool, cpu_count
 
@@ -122,6 +124,11 @@ class AbstractBlackBox:
         observer : AbstractObserver
             The observer object.
         """
+        if not isinstance(observer, AbstractObserver):
+            warn(
+                f"poli 🧪: Observer is not an instance of AbstractObserver: {observer} "
+                "Are you sure you want to set this observer?"
+            )
         self.observer = observer
 
     def set_observer_info(self, observer_info: object):
