@@ -22,7 +22,7 @@ classifiers = [
 ]
 keywords = ["optimization", "molecular", "discrete", "proteins"]
 dependencies = [
-    "numpy",
+    "numpy<2",
     "rdkit",
     "selfies"
 ]
