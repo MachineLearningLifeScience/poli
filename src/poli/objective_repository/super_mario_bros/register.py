@@ -57,14 +57,14 @@ class SuperMarioBrosBlackBox(AbstractBlackBox):
         Runs the given input x as a latent code
         through the model and returns the number
         of jumps Mario makes in the level. If the
-        level is not solvable, returns np.NaN.
+        level is not solvable, returns np.nan.
     """
 
     def __init__(
         self,
         max_time: int = 30,
         visualize: bool = False,
-        value_on_unplayable: float = np.NaN,
+        value_on_unplayable: float = np.nan,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
@@ -146,7 +146,7 @@ class SuperMarioBrosProblemFactory(AbstractProblemFactory):
         self,
         max_time: int = 30,
         visualize: bool = False,
-        value_on_unplayable: float = np.NaN,
+        value_on_unplayable: float = np.nan,
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,

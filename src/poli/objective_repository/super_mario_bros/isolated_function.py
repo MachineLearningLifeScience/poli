@@ -58,7 +58,7 @@ class SMBIsolatedLogic(AbstractIsolatedFunction):
         Runs the given input x as a flattened level (14x14)
         through the model and returns the number
         of jumps Mario makes in the level. If the
-        level is not solvable, returns np.NaN.
+        level is not solvable, returns np.nan.
     """
 
     def __init__(
@@ -66,7 +66,7 @@ class SMBIsolatedLogic(AbstractIsolatedFunction):
         alphabet: List[str] = smb_info.alphabet,
         max_time: int = 30,
         visualize: bool = False,
-        value_on_unplayable: float = np.NaN,
+        value_on_unplayable: float = np.nan,
     ):
         self.alphabet = alphabet
         self.alphabet_s_to_i = {s: i for i, s in enumerate(alphabet)}
@@ -100,7 +100,7 @@ class SMBIsolatedLogic(AbstractIsolatedFunction):
                 )
 
             # Return the number of jumps if the level was
-            # solved successfully, else return np.NaN
+            # solved successfully, else return np.nan
             if res["marioStatus"] == 1:
                 jumps = res["jumpActionsPerformed"]
             else:
