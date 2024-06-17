@@ -92,6 +92,13 @@ class SMBIsolatedLogic(AbstractIsolatedFunction):
                 level, max_time=self.max_time, visualize=self.visualize
             )
 
+            if not isinstance(res, dict):
+                raise ValueError(
+                    "Something probably went wrong with the Java simulation "
+                    "of the level. It is quite likely you haven't set up a "
+                    "virtual screen/frame buffer. Check the docs."
+                )
+
             # Return the number of jumps if the level was
             # solved successfully, else return np.NaN
             if res["marioStatus"] == 1:
