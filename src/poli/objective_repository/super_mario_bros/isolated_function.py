@@ -58,7 +58,7 @@ class SMBIsolatedLogic(AbstractIsolatedFunction):
         Runs the given input x as a flattened level (14x14)
         through the model and returns the number
         of jumps Mario makes in the level. If the
-        level is not solvable, returns np.NaN.
+        level is not solvable, returns np.nan.
     """
 
     def __init__(
@@ -66,12 +66,14 @@ class SMBIsolatedLogic(AbstractIsolatedFunction):
         alphabet: List[str] = smb_info.alphabet,
         max_time: int = 30,
         visualize: bool = False,
+        value_on_unplayable: float = np.nan,
     ):
         self.alphabet = alphabet
         self.alphabet_s_to_i = {s: i for i, s in enumerate(alphabet)}
         self.alphabet_i_to_s = {i: s for i, s in enumerate(alphabet)}
         self.max_time = max_time
         self.visualize = visualize
+        self.value_on_unplayable = value_on_unplayable
 
     def __call__(self, x: np.ndarray, context=None) -> np.ndarray:
         """Computes number of jumps in a given latent code x."""
@@ -90,12 +92,19 @@ class SMBIsolatedLogic(AbstractIsolatedFunction):
                 level, max_time=self.max_time, visualize=self.visualize
             )
 
+            if not isinstance(res, dict):
+                raise ValueError(
+                    "Something probably went wrong with the Java simulation "
+                    "of the level. It is quite likely you haven't set up a "
+                    "virtual screen/frame buffer. Check the docs."
+                )
+
             # Return the number of jumps if the level was
-            # solved successfully, else return np.NaN
+            # solved successfully, else return np.nan
             if res["marioStatus"] == 1:
                 jumps = res["jumpActionsPerformed"]
             else:
-                jumps = np.nan
+                jumps = self.value_on_unplayable
 
             jumps_for_all_levels.append(jumps)
 
