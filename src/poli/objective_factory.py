@@ -8,18 +8,25 @@ from pathlib import Path
 import configparser
 import logging
 
+from poli.core import registry
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
-from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.core.registry import (
     _RUN_SCRIPT_LOCATION,
     _OBSERVER,
+    _DEFAULT,
     register_problem_from_repository,
+    _DEFAULT_OBSERVER_RUN_SCRIPT,
+    DEFAULT_OBSERVER_NAME,
 )
 from poli.core.util.abstract_observer import AbstractObserver
+from poli.core.util.algorithm_observer_wrapper import AlgorithmObserverWrapper
+from poli.core.util.default_observer import DefaultObserver
+from poli.core.util.external_observer import ExternalObserver
 from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
 from poli.core.util.isolation.external_black_box import ExternalBlackBox
 from poli.core.problem import Problem
+from poli.external_problem_factory_script import dynamically_instantiate
 
 from poli.objective_repository import AVAILABLE_OBJECTIVES, AVAILABLE_PROBLEM_FACTORIES
 
@@ -243,7 +250,7 @@ def create(
     *,
     seed: int = None,
     observer_init_info: dict = None,
-    observer: AbstractObserver = None,
+    observer_name: str = None,
     force_register: bool = True,
     force_isolation: bool = False,
     batch_size: int = None,
@@ -264,7 +271,7 @@ def create(
         The seed value for random number generation.
     observer_init_info : dict, optional
         Optional information about the caller that is forwarded to the logger to initialize the run.
-    observer : AbstractObserver, optional
+    observer_name : str, optional
         The observer to use.
     force_register : bool, optional
         If True, then the objective function is registered without asking
@@ -309,57 +316,40 @@ def create(
             evaluation_budget=evaluation_budget,
             **kwargs_for_factory,
         )
-
-        if observer is not None:
-            if not quiet:
-                print(f"poli 🧪: initializing the observer.")
-
-            # TODO: Should we be evaluating y0 here?
-            x0 = problem.x0
-            y0 = problem.black_box(x0)
-            observer_info = observer.initialize_observer(
-                problem.black_box.info, observer_init_info, x0, y0, seed
-            )
-            problem.black_box.set_observer(observer)
-            problem.black_box.set_observer_info(observer_info)
-
-        return problem
-
-    # Check if the name is indeed registered, or
-    # available in the objective repository
-    __register_objective_if_available(name, force_register=force_register, quiet=quiet)
-
-    # At this point, we know the name is registered.
-    # Thus, we should be able to start it as an isolated process
-    if not quiet:
-        print(f"poli 🧪: Creating an isolated problem ({name}).")
-    problem = __create_problem_as_isolated_process(
-        name,
-        seed=seed,
-        batch_size=batch_size,
-        parallelize=parallelize,
-        num_workers=num_workers,
-        evaluation_budget=evaluation_budget,
-        quiet=quiet,
-        **kwargs_for_factory,
-    )
-    black_box_information = problem.black_box.info
-
-    # instantiate observer (if desired)
-    observer_info = None
-    if observer is not None:
-        # TODO: Should we send the y0 to the observer initialization?
-        # f, x0 = problem.black_box, problem.x0
-        # y0 = f(x0)
-        f = problem.black_box
-        x0, y0 = None, None
-
-        observer_info = observer.initialize_observer(
-            black_box_information, observer_init_info, x0, y0, seed
+    else:
+        # Check if the name is indeed registered, or
+        # available in the objective repository
+        __register_objective_if_available(
+            name, force_register=force_register, quiet=quiet
         )
 
-        f.set_observer(observer)
-        f.set_observer_info(observer_info)
+        # At this point, we know the name is registered.
+        # Thus, we should be able to start it as an isolated process
+        if not quiet:
+            print(f"poli 🧪: Creating an isolated problem ({name}).")
+        problem = __create_problem_as_isolated_process(
+            name,
+            seed=seed,
+            batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
+            quiet=quiet,
+            **kwargs_for_factory,
+        )
+    # instantiate observer (if desired)
+    observer = _instantiate_observer(observer_name, quiet)
+    observer_info = observer.initialize_observer(
+        problem.black_box.info, observer_init_info, seed
+    )
+
+    # TODO: Should we send the y0 to the observer initialization?
+    # f, x0 = problem.black_box, problem.x0
+    # y0 = f(x0)
+    f = problem.black_box
+    f.set_observer(observer)
+    f.set_observer_info(observer_info)
+    problem.set_observer(AlgorithmObserverWrapper(observer), observer_info)
 
     return problem
 
@@ -368,7 +358,7 @@ def start(
     name: str,
     seed: int = None,
     caller_info: dict = None,
-    observer: AbstractObserver = None,
+    observer_name: str = None,
     force_register: bool = False,
     force_isolation: bool = False,
     **kwargs_for_factory,
@@ -400,7 +390,7 @@ def start(
         The seed value for random number generation.
     caller_info : dict, optional
         Optional information about the caller that is forwarded to the logger to initialize the run.
-    observer : AbstractObserver, optional
+    observer_name : str, optional
         The observer to use.
     force_register : bool, optional
         If True, then the objective function is registered without asking
@@ -411,30 +401,61 @@ def start(
     **kwargs_for_factory : dict, optional
         Additional keyword arguments for the factory.
     """
-    # Check if we can import the function immediately
-    if name in AVAILABLE_PROBLEM_FACTORIES and not force_isolation:
-        problem = __create_problem_from_repository(
-            name, seed=seed, **kwargs_for_factory
-        )
-    else:
-        # Check if the name is indeed registered, or
-        # available in the objective repository
-        __register_objective_if_available(name, force_register=force_register)
-
-        # If not, then we create it as an isolated process
-        problem = __create_problem_as_isolated_process(
-            name, seed=seed, **kwargs_for_factory
-        )
+    problem = create(
+        name=name,
+        seed=seed,
+        observer_init_info=caller_info,
+        observer_name=observer_name,
+        force_register=force_register,
+        force_isolation=force_isolation,
+        kwargs_for_factory=kwargs_for_factory,
+    )
 
     f = problem.black_box
-
-    # instantiate observer (if desired)
-    if observer is not None:
-        observer.initialize_observer(f.info, caller_info, None, None, seed)
-
-    f.set_observer(observer)
-
     # Reset the counter of evaluations
     f.reset_evaluation_budget()
 
     return f
+
+
+def _instantiate_observer(observer_name: str, quiet: bool = False) -> AbstractObserver:
+    """
+    This function attempts to locally instantiate an observer and if that fails starts the observer in the dedicated environment.
+
+    Parameters
+    ----------
+    observer_name : str
+        The observer to use.
+    quiet : bool, optional
+        If True, we squelch the messages giving feedback about the creation process.
+
+    Returns
+    -------
+    observer : AbstractObserver
+        The black-box function, initial value, and related information.
+
+    """
+    observer_script: str = registry.config[_DEFAULT][_OBSERVER]
+    if observer_name is not None:
+        if observer_name != DEFAULT_OBSERVER_NAME:
+            observer_script = registry.config[_OBSERVER][observer_name]
+        else:
+            observer_script = _DEFAULT_OBSERVER_RUN_SCRIPT
+
+    if observer_script == _DEFAULT_OBSERVER_RUN_SCRIPT:
+        observer = DefaultObserver()
+    else:
+        if not quiet:
+            print(f"poli 🧪: initializing the observer.")
+        try:
+            f = open(observer_script, "r")
+            observer_class = (
+                f.readlines()[-1].split("--objective-name=")[1].split(" --port")[0]
+            )
+            f.close()
+            observer = dynamically_instantiate(observer_class)
+        except:
+            if not quiet:
+                print(f"poli 🧪: attempting isolated observer instantiation.")
+            observer = ExternalObserver(observer_name=observer_name)
+    return observer

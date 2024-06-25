@@ -1,7 +1,8 @@
 """Abstract class for observers in poli."""
 
 import numpy as np
-from poli.core.problem_setup_information import ProblemSetupInformation
+
+from poli.core.black_box_information import BlackBoxInformation
 
 
 class AbstractObserver:
@@ -11,6 +12,8 @@ class AbstractObserver:
     Observers are used to monitor the progress of optimization algorithms
     by observing the values of the objective function and the decision variables
     at each iteration.
+
+    IMPORTANT: The __init__ function of observer classes MUST NOT require arguments.
 
     Methods
     -------
@@ -52,10 +55,8 @@ class AbstractObserver:
 
     def initialize_observer(
         self,
-        problem_setup_info: ProblemSetupInformation,
+        problem_setup_info: BlackBoxInformation,
         caller_info: object,
-        x0: np.ndarray,
-        y0: np.ndarray,
         seed: int,
     ) -> object:
         """
@@ -63,7 +64,7 @@ class AbstractObserver:
 
         Parameters
         ----------
-        problem_setup_info : ProblemSetupInformation
+        problem_setup_info : BlackBoxInformation
             The information about the problem setup.
         caller_info : object
             The information that is passed to the observer at init time.
@@ -86,6 +87,9 @@ class AbstractObserver:
 
         """
         raise NotImplementedError("abstract method")
+
+    def log(self, algorithm_info: dict):
+        pass
 
     def finish(self) -> None:
         """Finish the observer."""

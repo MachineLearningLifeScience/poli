@@ -3,7 +3,7 @@
 from typing import Any
 import numpy as np
 
-from poli.core.problem_setup_information import ProblemSetupInformation
+from poli.core.black_box_information import BlackBoxInformation
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
 from poli.core.registry import config, _DEFAULT, _OBSERVER
@@ -47,7 +47,7 @@ class ExternalObserver(AbstractObserver):
 
         self.observer_name = observer_name
 
-        self.observer_script = config[observer_name][_OBSERVER]
+        self.observer_script = config[_OBSERVER][observer_name]
         self.process_wrapper = None
         self.kwargs_for_observer = kwargs_for_observer
 
@@ -83,7 +83,7 @@ class ExternalObserver(AbstractObserver):
         # else, it was a successful observation
 
     def initialize_observer(
-        self, setup_info: ProblemSetupInformation, caller_info, x0, y0, seed
+        self, setup_info: BlackBoxInformation, caller_info, seed
     ) -> str:
         """
         Initialize the observer.
@@ -94,10 +94,6 @@ class ExternalObserver(AbstractObserver):
             The information about the problem setup.
         caller_info : object
             The information about the caller.
-        x0 : np.ndarray
-            The initial x values.
-        y0 : np.ndarray
-            The initial y values.
         seed : int
             The seed value for random number generation.
 
@@ -120,7 +116,7 @@ class ExternalObserver(AbstractObserver):
 
         # send setup information
         self.process_wrapper.send(
-            [setup_info, caller_info, x0, y0, seed, self.kwargs_for_observer]
+            [setup_info, caller_info, seed, self.kwargs_for_observer]
         )
 
         # wait for logger handle
@@ -136,6 +132,19 @@ class ExternalObserver(AbstractObserver):
 
         # forward to objective factory
         return observer_info
+
+    def log(self, algorithm_info: dict):
+        # We send the observation
+        self.process_wrapper.send(["LOG", algorithm_info])
+
+        # And we make sure the process received and logged it correctly
+        msg_type, *msg = self.process_wrapper.recv()
+        if msg_type == "EXCEPTION":
+            e, tb = msg
+            print(tb)
+            raise e
+
+        # else, it was a successful observation
 
     def finish(self) -> None:
         """Finish the external observer process.

@@ -6,9 +6,9 @@ To run this example, you will need to install wandb:
 """
 
 import numpy as np
-from poli.core.problem_setup_information import ProblemSetupInformation
 import wandb
 
+from poli.core.black_box_information import BlackBoxInformation
 from poli.core.util.abstract_observer import AbstractObserver
 
 
@@ -24,10 +24,8 @@ class WandbObserver(AbstractObserver):
 
     def initialize_observer(
         self,
-        problem_setup_info: ProblemSetupInformation,
+        problem_setup_info: BlackBoxInformation,
         caller_info: object,
-        x0: np.ndarray,
-        y0: np.ndarray,
         seed: int,
     ) -> object:
         wandb.init(
@@ -35,11 +33,10 @@ class WandbObserver(AbstractObserver):
                 "name": problem_setup_info.name,
                 "max_sequence_length": problem_setup_info.max_sequence_length,
                 "alphabet": problem_setup_info.alphabet,
-                "x0": x0,
-                "y0": y0,
                 "seed": seed,
             },
         )
+        return None
 
     def observe(self, x: np.ndarray, y: np.ndarray, context=None) -> None:
         for x_i, y_i in zip(x.tolist(), y.tolist()):
