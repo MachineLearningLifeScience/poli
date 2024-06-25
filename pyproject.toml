@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "poli"
-version = "0.1.0"
+version = "0.2.0"
 description = "poli, a library of discrete objective functions"
 readme = "README.md"
 authors = [{name="Miguel González-Duque", email="miguelgondu@gmail.com"}, {name="Simon Bartels"}]
