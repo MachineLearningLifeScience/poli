@@ -8,6 +8,6 @@ dependencies:
   - pip:
     - biopython
     - python-levenshtein
-    - numpy<2
+    - numpy
     - pdb-tools
     - "git+https://github.com/MachineLearningLifeScience/poli.git@dev"
