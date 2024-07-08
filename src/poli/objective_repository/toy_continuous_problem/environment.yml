@@ -5,5 +5,5 @@ dependencies:
   - python=3.9
   - pip
   - pip:
-    - numpy<2
+    - numpy
     - "git+https://github.com/MachineLearningLifeScience/poli.git@dev"

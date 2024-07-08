@@ -7,6 +7,6 @@ dependencies:
   - pip:
     - biopython
     - python-levenshtein
-    - numpy<2
+    - numpy
     - pandas
     - "git+https://github.com/MachineLearningLifeScience/poli.git@master"

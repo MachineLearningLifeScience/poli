@@ -11,7 +11,7 @@ dependencies:
   - openbabel
   - openmm
   - pip:
-    - numpy<2
+    - numpy
     - "git+https://github.com/MachineLearningLifeScience/poli.git@dev"
     - biopython
     - python-levenshtein
