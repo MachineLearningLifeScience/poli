@@ -50,6 +50,8 @@ class RMFIsolatedLogic(AbstractIsolatedFunction):
             "Did you forget to pass it to the create of the black box?"
         )
         oracle_name = "RMF"
+        if not isinstance(wildtype, np.ndarray):
+            wildtype = np.array(list(wildtype))
         self.wildtype = wildtype
         self.seed = seed
         if alphabet is None:
@@ -80,26 +82,32 @@ class RMFIsolatedLogic(AbstractIsolatedFunction):
     def f(f0: float, sigma: np.ndarray, sigma_star: np.ndarray, c: float, kappa: float) -> float:
         L = len(sigma)
         # from [1] (2) additive term via Hamming distance and constant
-        hamm_dist = hamming(sigma, sigma_star)
+        print(sigma.shape)
+        print(sigma_star.shape)
+        hamm_dist = hamming(sigma.flatten(), sigma_star.flatten())
+        print(hamm_dist)
         # from [2] nonadd. term is single small value accroding to RV, we use [1] RV instead of Gaussian
         eta = genpareto.rvs(kappa, size=1)
         # NOTE [1] describes eta as 2^L i.i.d. RV vector, which does not yield a single function value
         f_p = f0 + np.sum(-c * hamm_dist) / L
         f_val = f_p + eta
+        # print(f_val)
         return f_val
     
     def __call__(self, x: np.ndarray, context=None) -> np.ndarray:
-        assert len(x) == len(self.wildtype), "Inconsistent length: undefined."
+        if not isinstance(x, np.ndarray):
+            x = np.array(list(x))
+        assert x.shape[-1] == self.wildtype.shape[-1], "Inconsistent length: undefined."
         x_int = np.array([[ENCODING.get(aa) for aa in _x] for _x in x])
-        x_oh = np.zeros((len(x_int), len(AMINO_ACIDS)))
-        x_oh[np.arange(len(x_int)), x_int] = 1
+        x_oh = np.zeros((x_int.shape[-1], len(AMINO_ACIDS)))
+        x_oh[np.arange(x_int.shape[-1]), x_int] = 1
         val = self.f(
             f0 = self.f_0,
             sigma=x_oh, 
             sigma_star=self.wt_oh,
             c=self.c,
-            eta=self.kappa,
-            )
+            kappa=self.kappa,
+        )
         return np.array(val).reshape(-1, 1)
     
 
