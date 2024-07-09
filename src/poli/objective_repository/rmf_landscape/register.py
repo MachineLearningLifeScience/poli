@@ -18,6 +18,9 @@ from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
 from poli.core.util.isolation.instancing import get_inner_function
 from poli.core.util.seeding import seed_python_numpy_and_torch
+
+from poli.core.util.isolation.instancing import instance_function_as_isolated_process
+
 from poli.objective_repository.rmf_landscape.information import rmf_info
 
 
@@ -69,6 +72,18 @@ class RMFBlackBox(AbstractBlackBox):
         self.alphabet = alphabet
         self.seed = seed
         self.force_isolation = force_isolation
+        inner_function = get_inner_function( # NOTE: this implicitly registers
+            isolated_function_name="rmf_landscape__isolated",
+            class_name="RMFIsolatedLogic",
+            module_to_import="poli.objective_repository.rmf_landscape.isolated_function",
+            wildtype=self.wildtype,
+            wt_val=self.wt_val,
+            c=self.c,
+            kappa=self.kappa,
+            alphabet=self.alphabet,
+            seed=self.seed,
+            force_isolation=self.force_isolation,
+        )
 
     def _black_box(self, x: np.ndarray, context: None) -> np.ndarray:
         """
@@ -89,8 +104,9 @@ class RMFBlackBox(AbstractBlackBox):
             The computed fitness score(s) as a numpy array.
         """
         inner_function = get_inner_function(
-            isolated_function_name="rmf__isolated",
+            isolated_function_name="rmf_landscape__isolated",
             class_name="RMFIsolatedLogic",
+            module_to_import="poli.objective_repository.rmf_landscape.isolated_function",
             wildtype=self.wildtype,
             wt_val=self.wt_val,
             c=self.c,
