@@ -1,0 +1,8 @@
+name: poli__rosetta_energy
+channels:
+  - defaults
+  - conda-forge
+  - https://conda.rosettacommons.org
+dependencies:
+  - python=3.9
+  - pyrosetta
