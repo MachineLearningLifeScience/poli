@@ -12,6 +12,8 @@ from poli.objective_repository.ehrlich.information import (
     ehrlich_info,
 )
 
+from poli.core.util.seeding import seed_python_numpy_and_torch
+
 from poli.core.util.proteins.defaults import AMINO_ACIDS
 
 
@@ -21,7 +23,8 @@ class EhrlichBlackBox(AbstractBlackBox):
         sequence_length: int,
         motif_length: int,
         n_motifs: int,
-        quantization: int = 1,
+        quantization: int | None = None,
+        seed: int = None,
         alphabet: list[str] = AMINO_ACIDS,
         batch_size: int = None,
         parallelize: bool = False,
@@ -32,10 +35,16 @@ class EhrlichBlackBox(AbstractBlackBox):
         self.alphabet = alphabet
         self.sequence_length = sequence_length
 
+        if seed is not None:
+            seed_python_numpy_and_torch(seed)
+
         if motif_length * n_motifs > sequence_length:
             raise ValueError(
                 "The total length of the motifs is greater than the sequence length."
             )
+
+        if quantization is None:
+            quantization = motif_length
 
         if not (1 <= quantization <= motif_length) or motif_length % quantization != 0:
             raise ValueError(
@@ -48,20 +57,25 @@ class EhrlichBlackBox(AbstractBlackBox):
         self.quantization = quantization
 
         self.sparse_transition_matrix = _construct_sparse_transition_matrix(
-            len(alphabet)
+            size=len(alphabet),
+            seed=seed,
         )
 
         self.motifs = self.construct_random_motifs(
-            motif_length=motif_length, n_motifs=n_motifs
+            motif_length=motif_length,
+            n_motifs=n_motifs,
+            seed=seed,
         )
         self.offsets = self.construct_random_offsets(
-            motif_length=motif_length, n_motifs=n_motifs
+            motif_length=motif_length,
+            n_motifs=n_motifs,
+            seed=seed,
         )
 
     def _sample_random_sequence(
         self,
         length: int | None = None,
-        random_state: np.random.RandomState | None = None,
+        random_state: int | np.random.RandomState | None = None,
         repeating_allowed: bool = True,
     ) -> str:
         """
@@ -73,6 +87,13 @@ class EhrlichBlackBox(AbstractBlackBox):
 
         if random_state is None:
             random_state = np.random.RandomState()
+        if isinstance(random_state, int):
+            random_state = np.random.RandomState(random_state)
+        elif not isinstance(random_state, np.random.RandomState):
+            raise ValueError(
+                "The random_state parameter must be an integer or an instance of "
+                "np.random.RandomState."
+            )
 
         sequence = self.alphabet[random_state.randint(len(self.alphabet))]
         current_state = self.alphabet.index(sequence)
@@ -201,7 +222,6 @@ class EhrlichBlackBox(AbstractBlackBox):
                 [sequence[seq_idx + offset_value] for offset_value in offset]
             )
             matches = sum(sequence_at_offset == motif)
-            print(f"matching {motif} against {sequence_at_offset} gives {matches}")
 
             maximal_match = max(maximal_match, matches)
 
@@ -231,16 +251,32 @@ class EhrlichBlackBox(AbstractBlackBox):
 
 
 if __name__ == "__main__":
-    for SEED in [1]:
+    for SEED in [1, 1]:
         print(SEED)
         np.random.seed(SEED)
-        ehrlich = EhrlichBlackBox(sequence_length=20, motif_length=3, n_motifs=2)
+        ehrlich = EhrlichBlackBox(
+            sequence_length=20,
+            motif_length=3,
+            n_motifs=2,
+            quantization=3,
+            seed=SEED,
+        )
         print(ehrlich.motifs)
         print(ehrlich.offsets)
 
         optimal_sequence = ehrlich.construct_optimal_solution(
             ehrlich.motifs, ehrlich.offsets
         )
-        print(optimal_sequence)
+        # print(ehrlich.sparse_transition_matrix)
+        # print(optimal_sequence)
 
-        print(ehrlich(optimal_sequence.reshape(1, -1)))
+        # print(ehrlich(optimal_sequence.reshape(1, -1)))
+
+        xs = np.array(
+            [
+                list(ehrlich._sample_random_sequence(random_state=seed))
+                for seed in range(10)
+            ]
+        )
+        print(xs)
+        print(ehrlich(xs))

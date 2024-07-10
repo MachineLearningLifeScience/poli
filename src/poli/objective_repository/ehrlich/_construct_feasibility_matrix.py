@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import numpy as np
 
 
@@ -40,10 +42,14 @@ def _construct_binary_mask(size: int) -> np.ndarray:
     return binary_mask_matrix
 
 
-def _construct_sparse_transition_matrix(size: int) -> np.ndarray:
+def _construct_sparse_transition_matrix(
+    size: int, seed: int | None = None
+) -> np.ndarray:
     binary_mask_matrix = _construct_binary_mask(size)
 
-    random_matrix = np.random.randn(size, size)
+    # Creating a random state and matrix
+    random_state = np.random.RandomState(seed)
+    random_matrix = random_state.randn(size, size)
 
     # Softmax it
     transition_matrix = np.exp(random_matrix) / np.sum(np.exp(random_matrix), axis=0)
