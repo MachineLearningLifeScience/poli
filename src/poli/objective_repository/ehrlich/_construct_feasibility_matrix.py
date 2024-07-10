@@ -42,9 +42,7 @@ def _construct_binary_mask(size: int) -> np.ndarray:
     return binary_mask_matrix
 
 
-def _construct_sparse_transition_matrix(
-    size: int, seed: int | None = None
-) -> np.ndarray:
+def _construct_transition_matrix(size: int, seed: int | None = None) -> np.ndarray:
     binary_mask_matrix = _construct_binary_mask(size)
 
     # Creating a random state and matrix
@@ -67,7 +65,7 @@ def _construct_sparse_transition_matrix(
 
 if __name__ == "__main__":
     size = 6
-    sparse_transition_matrix = _construct_sparse_transition_matrix(size)
+    sparse_transition_matrix = _construct_transition_matrix(size)
 
     assert (
         np.linalg.matrix_power(sparse_transition_matrix, (size - 1) ** 2 + 1) > 0.0

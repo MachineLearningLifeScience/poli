@@ -1,3 +1,28 @@
+"""
+This module implements Ehrlich functions as black boxes in poli.
+
+Ehrlich functions were proposed by Stanton et al. [1] as a quick-and-easy
+alternative for testing discrete sequence optimizers (with protein
+optimization in mind). They are deviced to 
+
+(i) be easy to query,
+(ii) have feasible and unfeasible sequences,
+(iii) have uninformative random samples (i.e. randomly sampling
+     and evaluating should not be competitive, as many of these
+     should be unfeasible).
+(iv) be maximized when certain motifs are present in the sequence.
+     These motifs can be long-range within the sequence, and are
+     meant to be non-additive.
+
+Check the references for details on the implementation.
+
+References
+----------
+[1] Stanton, S., Alberstein, R., Frey, N., Watkins, A., & Cho, K. (2024).
+    Closed-Form Test Functions for Biophysical Sequence Optimization Algorithms.
+    arXiv preprint arXiv:2407.00236. https://arxiv.org/abs/2407.00236
+"""
+
 from __future__ import annotations
 
 import numpy as np
@@ -8,7 +33,7 @@ from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
 from poli.objective_repository.ehrlich._construct_feasibility_matrix import (
-    _construct_sparse_transition_matrix,
+    _construct_transition_matrix,
 )
 from poli.objective_repository.ehrlich.information import (
     ehrlich_info,
@@ -20,6 +45,60 @@ from poli.core.util.proteins.defaults import AMINO_ACIDS
 
 
 class EhrlichBlackBox(AbstractBlackBox):
+    """
+    Ehrlich functions were proposed by Stanton et al. [1] as a quick-and-easy
+    alternative for testing discrete sequence optimizers (with protein
+    optimization in mind). They are deviced to
+
+    (i) be easy to query,
+    (ii) have feasible and unfeasible sequences,
+    (iii) have uninformative random samples (i.e. randomly sampling
+        and evaluating should not be competitive, as many of these
+        should be unfeasible).
+    (iv) be maximized when certain motifs are present in the sequence.
+        These motifs can be long-range within the sequence, and are
+        meant to be non-additive.
+
+    Check the references for details on the implementation.
+
+    Parameters
+    ----------
+    sequence_length : int
+        The length of the sequence to be optimized. This length is fixed, and
+        _only_ sequences of this length are considered.
+    motif_length : int
+        The length of the motifs.
+    n_motifs : int
+        The number of motifs.
+    quantization : int, optional
+        The quantization parameter. This parameter must be between 1 and the
+        motif length, and the motif length must be divisible by the quantization.
+        By default, it is None (which corresponds to the motif length).
+    seed : int, optional
+        The seed for the random number generator. By default, it is None
+        (i.e. no seed is set).
+    alphabet : list of str, optional
+        The alphabet to be used for the sequences. By default, it is the
+        of 20 amino acids.
+    batch_size : int, optional
+        The batch size for the black box. By default, it is None (i.e. all
+        sequences are evaluated in a vectorized way).
+    parallelize : bool, optional
+        Whether to parallelize the evaluation of the black box. By default,
+        it is False.
+    num_workers : int, optional
+        The number of processors used in parallelization.
+    evaluation_budget : int, optional
+        The evaluation budget for the black box. By default, it is infinite.
+
+    References
+    ----------
+    [1] Stanton, S., Alberstein, R., Frey, N., Watkins, A., & Cho, K. (2024).
+        Closed-Form Test Functions for Biophysical Sequence Optimization Algorithms.
+        arXiv preprint arXiv:2407.00236. https://arxiv.org/abs/2407.00236
+
+    """
+
     def __init__(
         self,
         sequence_length: int,
@@ -58,7 +137,7 @@ class EhrlichBlackBox(AbstractBlackBox):
         self.n_motifs = n_motifs
         self.quantization = quantization
 
-        self.sparse_transition_matrix = _construct_sparse_transition_matrix(
+        self.transition_matrix = _construct_transition_matrix(
             size=len(alphabet),
             seed=seed,
         )
@@ -105,13 +184,13 @@ class EhrlichBlackBox(AbstractBlackBox):
 
         for _ in range(length - 1):
             next_state = random_state.choice(
-                len(self.alphabet), p=self.sparse_transition_matrix[current_state]
+                len(self.alphabet), p=self.transition_matrix[current_state]
             )
             if not repeating_allowed:
                 while next_state == current_state:
                     next_state = random_state.choice(
                         len(self.alphabet),
-                        p=self.sparse_transition_matrix[current_state],
+                        p=self.transition_matrix[current_state],
                     )
             sequence += self.alphabet[next_state]
             current_state = next_state
@@ -120,9 +199,10 @@ class EhrlichBlackBox(AbstractBlackBox):
 
     def _is_feasible(self, sequence: str | np.ndarray) -> bool:
         """
-        Checks whether a sequence (str) is feasible under the sparse transition
-        matrix. This is done by looping through the sequence and determining whether
-        the transition probabilities are non-zero.
+        Checks whether a sequence (str or array of one sequence) is feasible
+        under the transition matrix. This is done by looping through
+        the sequence and determining whether the transition probabilities
+        are non-zero.
         """
         if isinstance(sequence, np.ndarray):
             assert sequence.ndim == 1 or sequence.shape[0] == 1
@@ -132,7 +212,7 @@ class EhrlichBlackBox(AbstractBlackBox):
         for i in range(1, len(sequence)):
             next_state = self.alphabet.index(sequence[i])
 
-            if self.sparse_transition_matrix[current_state, next_state] == 0:
+            if self.transition_matrix[current_state, next_state] == 0:
                 return False
             current_state = next_state
 
@@ -141,6 +221,9 @@ class EhrlichBlackBox(AbstractBlackBox):
     def construct_random_motifs(
         self, motif_length: int, n_motifs: int, seed: int = None
     ) -> np.ndarray:
+        """
+        Creates a given number of random motifs of a certain length.
+        """
         assert motif_length * n_motifs <= self.sequence_length
 
         random_state = np.random.RandomState(seed)
@@ -168,6 +251,9 @@ class EhrlichBlackBox(AbstractBlackBox):
         n_motifs: int,
         seed: int = None,
     ) -> np.ndarray:
+        """
+        Creates a given number of random offsets for the motifs.
+        """
         all_motifs_length = motif_length * n_motifs
 
         # For each motif, we sample weights in the simplex
@@ -195,6 +281,12 @@ class EhrlichBlackBox(AbstractBlackBox):
     def construct_optimal_solution(
         self, motifs: np.ndarray | None = None, offsets: np.ndarray | None = None
     ) -> np.ndarray:
+        """
+        Constructs an optimal solution for a given set of motifs and offsets.
+
+        If None are provided, then the motifs and offsets of the black box
+        are used.
+        """
         if motifs is None:
             motifs = self.motifs
 
@@ -244,6 +336,9 @@ class EhrlichBlackBox(AbstractBlackBox):
         return maximal_match
 
     def _black_box(self, x: np.ndarray, context=None) -> np.ndarray:
+        """
+        Evaluates the sequences in x by checking maximal matches and multiplying.
+        """
         values = []
         for sequence in x:
             if not self._is_feasible(sequence):
@@ -267,6 +362,16 @@ class EhrlichBlackBox(AbstractBlackBox):
 
 
 class EhrlichProblemFactory(AbstractProblemFactory):
+    """
+    A factory for creating Ehrlich functions and initial conditions.
+
+    References
+    ----------
+    [1] Stanton, S., Alberstein, R., Frey, N., Watkins, A., & Cho, K. (2024).
+        Closed-Form Test Functions for Biophysical Sequence Optimization Algorithms.
+        arXiv preprint arXiv:2407.00236. https://arxiv.org/abs/2407.00236
+    """
+
     def __init__(self) -> None:
         super().__init__()
 
@@ -286,6 +391,46 @@ class EhrlichProblemFactory(AbstractProblemFactory):
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
     ) -> Problem:
+        """
+        Creates an Ehrlich function problem (containing an Ehrlich black box and
+        an initial condition).
+
+        Parameters
+        ----------
+        sequence_length : int
+            The length of the sequence to be optimized. This length is fixed, and
+            _only_ sequences of this length are considered.
+        motif_length : int
+            The length of the motifs.
+        n_motifs : int
+            The number of motifs.
+        quantization : int, optional
+            The quantization parameter. This parameter must be between 1 and the
+            motif length, and the motif length must be divisible by the quantization.
+            By default, it is None (which corresponds to the motif length).
+        seed : int, optional
+            The seed for the random number generator. By default, it is None
+            (i.e. no seed is set).
+        alphabet : list of str, optional
+            The alphabet to be used for the sequences. By default, it is the
+            of 20 amino acids.
+        batch_size : int, optional
+            The batch size for the black box. By default, it is None (i.e. all
+            sequences are evaluated in a vectorized way).
+        parallelize : bool, optional
+            Whether to parallelize the evaluation of the black box. By default,
+            it is False.
+        num_workers : int, optional
+            The number of processors used in parallelization.
+        evaluation_budget : int, optional
+            The evaluation budget for the black box. By default, it is infinite.
+
+        References
+        ----------
+        [1] Stanton, S., Alberstein, R., Frey, N., Watkins, A., & Cho, K. (2024).
+            Closed-Form Test Functions for Biophysical Sequence Optimization Algorithms.
+            arXiv preprint arXiv:2407.00236. https://arxiv.org/abs/2407.00236
+        """
         if seed is not None:
             seed_python_numpy_and_torch(seed)
 

@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 
 from poli.objective_repository.ehrlich._construct_feasibility_matrix import (
-    _construct_sparse_transition_matrix,
+    _construct_transition_matrix,
 )
 from poli.repository import EhrlichBlackBox, EhrlichProblemFactory
 
@@ -16,7 +16,7 @@ from poli.repository import EhrlichBlackBox, EhrlichProblemFactory
 @pytest.mark.parametrize("size", [3, 5, 8, 10])
 @pytest.mark.parametrize("seed", [1, 2, 3, 4])
 def test_sparse_matrix_construction_is_ergodic_and_aperiodic(size: int, seed: int):
-    sparse_transition_matrix = _construct_sparse_transition_matrix(size, seed=seed)
+    sparse_transition_matrix = _construct_transition_matrix(size, seed=seed)
 
     # Checking with the Perron-Frobenius condition
     assert (
