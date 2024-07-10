@@ -8,6 +8,7 @@ References
 [2] Analysis of a local fitness landscape with a model of the rough Mt. Fuji-type landscape: Application to prolyl endopeptidase and thermolysin.
     Aita T., Uchiyama H., et al. Biopolymers 54, 64-79 (2000). https://doi.org/10.1002/(SICI)1097-0282(200007)54:1<64::AID-BIP70>3.0.CO;2-R 
 """
+
 from typing import List, Optional, Union
 
 import numpy as np
@@ -32,16 +33,16 @@ class RMFBlackBox(AbstractBlackBox):
     def __init__(
         self,
         wildtype: str,
-        wt_val: Optional[float] = 0.,
+        wt_val: Optional[float] = 0.0,
         c: Optional[float] = None,
         kappa: Optional[float] = 0.1,
         seed: Optional[int] = None,
         alphabet: Optional[List[str]] = None,
-        batch_size: Optional[int] = None, 
-        parallelize: Optional[bool] = False, 
-        num_workers: Optional[int] = None, 
+        batch_size: Optional[int] = None,
+        parallelize: Optional[bool] = False,
+        num_workers: Optional[int] = None,
         evaluation_budget: Optional[int] = float("inf"),
-        force_isolation: bool = False, 
+        force_isolation: bool = False,
     ) -> None:
         """
         Initialize the RMFBlackBox object.
@@ -60,10 +61,10 @@ class RMFBlackBox(AbstractBlackBox):
             Run the blackbox in an isolated environment, default: False.
         """
         super().__init__(
-            batch_size=batch_size, 
-            parallelize=parallelize, 
-            num_workers=num_workers, 
-            evaluation_budget=evaluation_budget, 
+            batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
         )
         self.wildtype = wildtype
         self.wt_val = wt_val
@@ -72,7 +73,7 @@ class RMFBlackBox(AbstractBlackBox):
         self.alphabet = alphabet
         self.seed = seed
         self.force_isolation = force_isolation
-        inner_function = get_inner_function( # NOTE: this implicitly registers
+        inner_function = get_inner_function(  # NOTE: this implicitly registers
             isolated_function_name="rmf_landscape__isolated",
             class_name="RMFIsolatedLogic",
             module_to_import="poli.objective_repository.rmf_landscape.isolated_function",
@@ -116,7 +117,7 @@ class RMFBlackBox(AbstractBlackBox):
             force_isolation=self.force_isolation,
         )
         return inner_function(x, context)
-    
+
     @staticmethod
     def get_black_box_info() -> BlackBoxInformation:
         return rmf_info
@@ -136,11 +137,11 @@ class RMFProblemFactory(AbstractProblemFactory):
 
     def get_setup_information(self) -> BlackBoxInformation:
         return rmf_info
-    
+
     def create(
         self,
         wildtype: Union[List[str], str],
-        wt_val: Optional[float] = 0.,
+        wt_val: Optional[float] = 0.0,
         c: Optional[float] = None,
         kappa: float = 0.1,
         alphabet: Optional[List[str]] = None,
@@ -192,12 +193,10 @@ class RMFProblemFactory(AbstractProblemFactory):
         """
         if seed is not None:
             seed_python_numpy_and_torch(seed)
-        
+
         if wildtype is None:
-            raise ValueError(
-                "Missing reference sequence!"
-            )
-        
+            raise ValueError("Missing reference sequence!")
+
         if isinstance(wildtype, str):
             wildtype = list(wildtype)
 
@@ -217,7 +216,7 @@ class RMFProblemFactory(AbstractProblemFactory):
         x0 = np.array(wildtype).reshape(1, len(wildtype))
         problem = Problem(f, x0)
         return problem
-    
+
 
 if __name__ == "__main__":
     from poli.core.registry import register_problem
@@ -227,4 +226,3 @@ if __name__ == "__main__":
         rmf_problem_factory,
         conda_environment_name="poli__rmf",
     )
-    
