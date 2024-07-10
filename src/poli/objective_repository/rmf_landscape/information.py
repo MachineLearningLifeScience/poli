@@ -7,9 +7,9 @@ rmf_info = BlackBoxInformation(
     name="rmf_landscape",
     max_sequence_length=np.inf,
     aligned=True,
-    fixed_length=True, 
+    fixed_length=True,
     deterministic=False,
-    alphabet=AMINO_ACIDS, # TODO: differentiate between AA and NA inputs?
+    alphabet=AMINO_ACIDS,  # TODO: differentiate between AA and NA inputs?
     log_transform_recommended=False,
     discrete=True,
 )
