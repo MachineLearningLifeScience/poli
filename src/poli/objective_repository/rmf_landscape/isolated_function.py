@@ -1,4 +1,5 @@
 import logging
+from random import seed
 from typing import List, Optional
 
 import numpy as np
@@ -75,38 +76,46 @@ class RMFIsolatedLogic(AbstractIsolatedFunction):
         self.alphabet = alphabet
         eta_var = genpareto.stats(c, moments='v')
         self.theta = c / np.sqrt(eta_var)
+        self.rng = np.random.default_rng(seed)
         logging.info(f"landscape theta={self.theta}")
         super().__init__()
 
     @staticmethod
-    def f(f0: float, sigma: np.ndarray, sigma_star: np.ndarray, c: float, kappa: float) -> float:
-        L = len(sigma)
+    def f(f0: float, sigma: np.ndarray, sigma_star: np.ndarray, c: float, kappa: float, rand_state) -> float:
+        b, L = np.shape(sigma)
         # from [1] (2) additive term via Hamming distance and constant
         print(sigma.shape)
         print(sigma_star.shape)
-        hamm_dist = hamming(sigma.flatten(), sigma_star.flatten())
+        dists = []
+        for i in range(b): # TODO: make batch computation
+            hamm_dist = hamming(sigma[i].flatten(), sigma_star.flatten())
+            dists.append(hamm_dist)
+        hamm_dist = np.vstack(dists)
         print(hamm_dist)
         # from [2] nonadd. term is single small value accroding to RV, we use [1] RV instead of Gaussian
-        eta = genpareto.rvs(kappa, size=1)
+        eta = genpareto.rvs(kappa, size=b, random_state=rand_state)
         # NOTE [1] describes eta as 2^L i.i.d. RV vector, which does not yield a single function value
         f_p = f0 + np.sum(-c * hamm_dist) / L
         f_val = f_p + eta
-        # print(f_val)
+        print(f_val)
         return f_val
     
     def __call__(self, x: np.ndarray, context=None) -> np.ndarray:
         if not isinstance(x, np.ndarray):
             x = np.array(list(x))
-        assert x.shape[-1] == self.wildtype.shape[-1], "Inconsistent length: undefined."
+        x = np.atleast_2d(x)
+        b, L = np.shape(x)
+        assert L == self.wildtype.shape[-1], "Inconsistent length: undefined."
         x_int = np.array([[ENCODING.get(aa) for aa in _x] for _x in x])
-        x_oh = np.zeros((x_int.shape[-1], len(AMINO_ACIDS)))
-        x_oh[np.arange(x_int.shape[-1]), x_int] = 1
+        x_oh = np.zeros((L, len(AMINO_ACIDS)))
+        x_oh[np.arange(L), x_int] = 1
         val = self.f(
             f0 = self.f_0,
             sigma=x_oh, 
             sigma_star=self.wt_oh,
             c=self.c,
             kappa=self.kappa,
+            rand_state=self.rng,
         )
         return np.array(val).reshape(-1, 1)
     
