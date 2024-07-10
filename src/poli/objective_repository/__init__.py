@@ -11,6 +11,9 @@ from .toy_continuous_problem.register import (
     ToyContinuousBlackBox,
 )
 
+# Discrete toy examples
+from .ehrlich.register import EhrlichBlackBox
+
 # Chemistry black boxes
 from .dockstring.register import DockstringProblemFactory, DockstringBlackBox
 from .drd3_docking.register import DRD3ProblemFactory, DRD3BlackBox

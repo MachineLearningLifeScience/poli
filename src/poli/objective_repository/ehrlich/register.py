@@ -113,12 +113,16 @@ class EhrlichBlackBox(AbstractBlackBox):
 
         return sequence
 
-    def _is_feasible(self, sequence: str) -> bool:
+    def _is_feasible(self, sequence: str | np.ndarray) -> bool:
         """
         Checks whether a sequence (str) is feasible under the sparse transition
         matrix. This is done by looping through the sequence and determining whether
         the transition probabilities are non-zero.
         """
+        if isinstance(sequence, np.ndarray):
+            assert sequence.ndim == 1 or sequence.shape[0] == 1
+            sequence = "".join(sequence.flatten())
+
         current_state = self.alphabet.index(sequence[0])
         for i in range(1, len(sequence)):
             next_state = self.alphabet.index(sequence[i])
@@ -146,8 +150,8 @@ class EhrlichBlackBox(AbstractBlackBox):
         # Chunking it into n_motifs
         motifs = np.array(
             [
-                list(sequence[i : (i + 1) * motif_length])
-                for i in range(0, len(sequence), motif_length)
+                list(sequence[i * motif_length : (i + 1) * motif_length])
+                for i in range(0, n_motifs)
             ]
         )
 
@@ -184,8 +188,13 @@ class EhrlichBlackBox(AbstractBlackBox):
         return np.array(offsets)
 
     def construct_optimal_solution(
-        self, motifs: np.ndarray, offsets: np.ndarray
+        self, motifs: np.ndarray | None = None, offsets: np.ndarray | None = None
     ) -> np.ndarray:
+        if motifs is None:
+            motifs = self.motifs
+
+        if offsets is None:
+            offsets = self.offsets
 
         # de-cumsum the offsets
         offsets = np.diff(offsets, prepend=0)
@@ -207,7 +216,7 @@ class EhrlichBlackBox(AbstractBlackBox):
             self.sequence_length - len(optimal_sequence)
         )
 
-        return np.array(optimal_sequence)
+        return np.array(optimal_sequence).reshape(1, -1)
 
     def _maximal_motif_matches(
         self, sequence: np.ndarray, motif: np.ndarray, offset: np.ndarray
@@ -215,6 +224,8 @@ class EhrlichBlackBox(AbstractBlackBox):
         """
         Counts the maximal motif match.
         """
+        assert sequence.ndim == 1 or sequence.shape[0] == 1
+        sequence = "".join(sequence.flatten())
         maximal_match = 0
         for seq_idx in range(len(sequence) - max(offset)):
             matches = 0
