@@ -12,7 +12,7 @@ from .toy_continuous_problem.register import (
 )
 
 # Discrete toy examples
-from .ehrlich.register import EhrlichBlackBox
+from .ehrlich.register import EhrlichBlackBox, EhrlichProblemFactory
 
 # Chemistry black boxes
 from .dockstring.register import DockstringProblemFactory, DockstringBlackBox
@@ -145,6 +145,7 @@ AVAILABLE_OBJECTIVES = sorted(AVAILABLE_OBJECTIVES)
 
 AVAILABLE_PROBLEM_FACTORIES = {
     "aloha": AlohaProblemFactory,
+    "ehrlich": EhrlichProblemFactory,
     "dockstring": DockstringProblemFactory,
     "drd3_docking": DRD3ProblemFactory,
     "foldx_rfp_lambo": FoldXRFPLamboProblemFactory,
@@ -188,6 +189,7 @@ AVAILABLE_PROBLEM_FACTORIES = {
 
 AVAILABLE_BLACK_BOXES = {
     "aloha": AlohaBlackBox,
+    "ehrlich": EhrlichBlackBox,
     "dockstring": DockstringBlackBox,
     "drd3_docking": DRD3BlackBox,
     "foldx_rfp_lambo": FoldXRFPLamboBlackBox,

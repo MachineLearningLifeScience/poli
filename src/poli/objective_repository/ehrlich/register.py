@@ -3,8 +3,10 @@ from __future__ import annotations
 import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
+from poli.core.abstract_problem_factory import AbstractProblemFactory
 
 from poli.core.black_box_information import BlackBoxInformation
+from poli.core.problem import Problem
 from poli.objective_repository.ehrlich._construct_feasibility_matrix import (
     _construct_sparse_transition_matrix,
 )
@@ -87,9 +89,12 @@ class EhrlichBlackBox(AbstractBlackBox):
 
         if random_state is None:
             random_state = np.random.RandomState()
+
         if isinstance(random_state, int):
             random_state = np.random.RandomState(random_state)
-        elif not isinstance(random_state, np.random.RandomState):
+        elif isinstance(random_state, np.random.RandomState):
+            pass
+        else:
             raise ValueError(
                 "The random_state parameter must be an integer or an instance of "
                 "np.random.RandomState."
@@ -261,33 +266,41 @@ class EhrlichBlackBox(AbstractBlackBox):
         return ehrlich_info
 
 
-if __name__ == "__main__":
-    for SEED in [1, 1]:
-        print(SEED)
-        np.random.seed(SEED)
-        ehrlich = EhrlichBlackBox(
-            sequence_length=20,
-            motif_length=3,
-            n_motifs=2,
-            quantization=3,
-            seed=SEED,
-        )
-        print(ehrlich.motifs)
-        print(ehrlich.offsets)
+class EhrlichProblemFactory(AbstractProblemFactory):
+    def __init__(self) -> None:
+        super().__init__()
 
-        optimal_sequence = ehrlich.construct_optimal_solution(
-            ehrlich.motifs, ehrlich.offsets
-        )
-        # print(ehrlich.sparse_transition_matrix)
-        # print(optimal_sequence)
+    def get_setup_information(self) -> BlackBoxInformation:
+        return ehrlich_info
 
-        # print(ehrlich(optimal_sequence.reshape(1, -1)))
+    def create(
+        self,
+        sequence_length: int,
+        motif_length: int,
+        n_motifs: int,
+        quantization: int | None = None,
+        seed: int = None,
+        alphabet: list[str] = AMINO_ACIDS,
+        batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
+        evaluation_budget: int = float("inf"),
+    ) -> Problem:
+        if seed is not None:
+            seed_python_numpy_and_torch(seed)
 
-        xs = np.array(
-            [
-                list(ehrlich._sample_random_sequence(random_state=seed))
-                for seed in range(10)
-            ]
+        f = EhrlichBlackBox(
+            sequence_length=sequence_length,
+            motif_length=motif_length,
+            n_motifs=n_motifs,
+            quantization=quantization,
+            seed=seed,
+            alphabet=alphabet,
+            batch_size=batch_size,
+            parallelize=parallelize,
+            num_workers=num_workers,
+            evaluation_budget=evaluation_budget,
         )
-        print(xs)
-        print(ehrlich(xs))
+        x0 = np.array([list(f._sample_random_sequence())])
+
+        return Problem(f, x0)

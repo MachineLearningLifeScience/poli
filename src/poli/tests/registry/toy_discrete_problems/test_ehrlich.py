@@ -10,7 +10,7 @@ import pytest
 from poli.objective_repository.ehrlich._construct_feasibility_matrix import (
     _construct_sparse_transition_matrix,
 )
-from poli.repository import EhrlichBlackBox
+from poli.repository import EhrlichBlackBox, EhrlichProblemFactory
 
 
 @pytest.mark.parametrize("size", [3, 5, 8, 10])
@@ -134,3 +134,33 @@ def test_consistency_of_ehrlich_function_mofit_matching():
         )
         == 3
     )
+
+
+def test_creating_a_problem_with_a_factory():
+    problem_factory = EhrlichProblemFactory()
+
+    problem = problem_factory.create(
+        sequence_length=10,
+        motif_length=3,
+        n_motifs=2,
+        quantization=3,
+        seed=1,
+    )
+
+    f, x0 = problem.black_box, problem.x0
+    y0 = f(x0)
+
+
+def test_creating_with_create():
+    from poli import create
+
+    problem = create(
+        name="ehrlich",
+        sequence_length=10,
+        motif_length=3,
+        n_motifs=2,
+        quantization=3,
+        seed=1,
+    )
+    f, x0 = problem.black_box, problem.x0
+    y0 = f(x0)
