@@ -24,7 +24,7 @@ def test_force_isolation_rmf_landscape():
     )
     f, x0 = problem.black_box, problem.x0
     y0 = f(x0)
-    assert np.isclose(y0, 0.)
+    assert np.isclose(y0, 0.0)
     f.terminate()
 
 
@@ -35,7 +35,7 @@ def test_rmf_landscape_init():
     )
     f, x0 = problem.black_box, problem.x0
     y0 = f(x0)
-    assert np.isclose(y0, 0.)
+    assert np.isclose(y0, 0.0)
     f.terminate()
 
 
@@ -50,17 +50,18 @@ def test_rmf_landscape_batch_eval():
     x_t = []
     for i in range(N):
         _x = x0.copy()
-        _x[i] = np.random.randint(0,20)
+        _x[i] = np.random.randint(0, 20)
         x_t.append(_x)
     x_t = np.vstack(x_t)
     assert x_t.shape[0] == N
     yt = f(x_t)
+    print(yt)
     assert yt.shape[0] == N
     # TODO evaluate single variant value range
     f.terminate()
 
 
-
 if __name__ == "__main__":
     # test_rmf_is_available()
     test_force_isolation_rmf_landscape()
+    test_rmf_landscape_batch_eval()
