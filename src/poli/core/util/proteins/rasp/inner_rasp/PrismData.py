@@ -4,10 +4,10 @@
 
 """Module for data handling in the PRISM project
 
-This module implments classes for parsing (PrismParser) and handling 
+This module implments classes for parsing (PrismParser) and handling
 (PrismData derived classes) of data files.
 
-In general, calling PrismParser.read(filename) will return a data object of 
+In general, calling PrismParser.read(filename) will return a data object of
 the same derived class, e.g. a VariantData object.
 See documentation of derived parser and data classes for help.
 

@@ -12,7 +12,7 @@ protein.
     Nucleic acids research, 33(suppl_2), W382-W388.
 [2] Cock PA, Antao T, Chang JT, Chapman BA, Cox CJ, Dalke A, Friedberg I,
     Hamelryck T, Kauff F, Wilczynski B and de Hoon MJL (2009) Biopython:
-    freely available Python tools for computational molecular biology and 
+    freely available Python tools for computational molecular biology and
     bioinformatics. Bioinformatics, 25, 1422-1423
 """
 

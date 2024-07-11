@@ -1,7 +1,7 @@
 """Utilities for downloading files from GitHub repositories.
 
 This module requires the PyGithub package, install it with:
-    
+
         pip install PyGithub
 
 Most of this code was taken and adapted from:
