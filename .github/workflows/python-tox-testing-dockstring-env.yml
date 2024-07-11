@@ -1,4 +1,4 @@
-name: Tests on poli (dev, conda, python 3.9)
+name: poli dockstring (dev, conda, python 3.9)
 
 on: [push]
 
@@ -21,9 +21,6 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install tox
-    - name: Test linting with tox
+    - name: Test dockstring-related black boxes with tox and pytest
       run: |
-        tox -c tox.ini -e lint
-    - name: Test poli-base with tox (ignoring RaSP)
-      run: |
-        tox -c tox.ini -e poli-base-py39 -- --ignore=src/poli/tests/registry/proteins/test_rasp.py
+        tox -c tox.ini -e poli-dockstring-py39
