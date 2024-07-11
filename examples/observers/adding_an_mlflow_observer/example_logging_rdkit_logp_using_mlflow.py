@@ -15,10 +15,9 @@ To check its results, you will need to start a ui:
 from pathlib import Path
 
 import numpy as np
+from mlflow_observer import MlFlowObserver
 
 from poli import objective_factory
-
-from mlflow_observer import MlFlowObserver
 
 THIS_DIR = Path(__file__).parent.resolve()
 

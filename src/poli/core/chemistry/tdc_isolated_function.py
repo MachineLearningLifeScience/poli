@@ -12,11 +12,9 @@ References
 """
 
 import numpy as np
-
 from tdc import Oracle
 
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
-
 from poli.core.util.chemistry.string_to_molecule import translate_selfies_to_smiles
 
 

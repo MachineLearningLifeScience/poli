@@ -2,12 +2,11 @@
 Module that wraps utility functions for interprocess communication.
 """
 
-from pathlib import Path
 import logging
 import subprocess
 import time
-from multiprocessing.connection import Listener, Client
-
+from multiprocessing.connection import Client, Listener
+from pathlib import Path
 from uuid import uuid4
 
 

@@ -3,16 +3,15 @@
 The equivalent of objective, but for isolated black boxes instead of problem factories.
 """
 
+import argparse
 import logging
 import os
 import sys
-import argparse
 import traceback
 
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
 from poli.core.util.inter_process_communication.process_wrapper import get_connection
 from poli.core.util.seeding import seed_python_numpy_and_torch
-
 
 ADDITIONAL_IMPORT_SEARCH_PATHES_KEY = "ADDITIONAL_IMPORT_PATHS"
 

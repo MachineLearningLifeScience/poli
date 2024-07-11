@@ -21,7 +21,6 @@ from typing import Literal
 import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
-
 from poli.core.util.isolation.instancing import get_inner_function
 
 

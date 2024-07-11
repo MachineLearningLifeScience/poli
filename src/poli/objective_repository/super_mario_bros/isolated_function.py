@@ -7,21 +7,16 @@ level playable.
 
 """
 
-from typing import List
 from pathlib import Path
+from typing import List
 
 import numpy as np
 
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
-
+from poli.objective_repository.super_mario_bros.information import smb_info
 from poli.objective_repository.super_mario_bros.simulator import (
     test_level_from_int_array,
 )
-
-from poli.objective_repository.super_mario_bros.information import (
-    smb_info,
-)
-
 
 THIS_DIR = Path(__file__).parent.resolve()
 

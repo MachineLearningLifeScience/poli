@@ -16,11 +16,15 @@ See README.md for general file format definitions.
 
 __version__ = 1.001
 
-from Bio import Seq, SeqRecord, SeqIO, pairwise2, SubsMat
-from Bio.SubsMat import MatrixInfo
+import copy
+import csv
+import time
+
 import numpy as np
 import pandas as pd
-import yaml, csv, copy, time
+import yaml
+from Bio import Seq, SeqIO, SeqRecord, SubsMat, pairwise2
+from Bio.SubsMat import MatrixInfo
 
 
 class PrismFormatError(Exception):
@@ -1675,7 +1679,8 @@ class VariantData(PrismData):
 
 if __name__ == "__main__":
     # Parse commandline arguments
-    import argparse, sys
+    import argparse
+    import sys
 
     arg_parser = argparse.ArgumentParser(
         description="PRISM data file processing and alignment"

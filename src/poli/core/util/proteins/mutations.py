@@ -17,7 +17,6 @@ from pathlib import Path
 from typing import List, Tuple, Union
 
 import numpy as np
-
 from Bio.PDB.Residue import Residue
 from Bio.SeqUtils import seq1
 

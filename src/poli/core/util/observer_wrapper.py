@@ -1,8 +1,8 @@
 """Script that gets called by the mother process to start an external observer process.
 """
 
-import sys
 import argparse
+import sys
 import traceback
 
 from poli.core.util.abstract_observer import AbstractObserver

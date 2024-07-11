@@ -3,8 +3,9 @@ import pytest
 
 @pytest.mark.slow()
 def test_foldx_rfp_lambo_runs():
-    from poli import create
     import numpy as np
+
+    from poli import create
 
     # For now, we don't have automatic installation of lambo.
     # TODO: add automatic installation of lambo, and remove this

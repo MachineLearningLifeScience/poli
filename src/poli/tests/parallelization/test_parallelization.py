@@ -1,11 +1,10 @@
+from multiprocessing import cpu_count
 from pathlib import Path
 
-import pytest
 import numpy as np
+import pytest
 
 from poli import objective_factory
-
-from multiprocessing import cpu_count
 
 NUM_WORKERS = min(cpu_count(), 2)
 

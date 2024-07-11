@@ -9,8 +9,6 @@ import numpy as np
 import pandas as pd
 import torch
 from Bio.PDB.Polypeptide import index_to_one
-from torch.utils.data import DataLoader, Dataset
-
 from cavity_model import (
     CavityModel,
     DownstreamModel,
@@ -31,6 +29,7 @@ from helpers import (
     train_val_split_cavity,
     train_val_split_ds,
 )
+from torch.utils.data import DataLoader, Dataset
 from visualization import (
     hist_plot_all,
     homology_plot,

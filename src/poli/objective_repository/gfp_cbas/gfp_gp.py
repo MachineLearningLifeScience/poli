@@ -7,9 +7,11 @@ Plus some utility constants.
 import warnings
 
 warnings.filterwarnings("ignore")
-from typing import Tuple
 from pathlib import Path
+from typing import Tuple
+
 import numpy as np
+
 from poli.objective_repository.gfp_cbas import BLOSUM
 
 

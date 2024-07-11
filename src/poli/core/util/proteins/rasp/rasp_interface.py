@@ -37,45 +37,33 @@ References
     33(suppl_2), W382-W388.
 """
 
-from typing import List
-from pathlib import Path
-import os, stat
-import subprocess
 import logging
+import os
+import stat
+import subprocess
 import traceback
+from pathlib import Path
+from typing import List
 
-import pandas as pd
 import numpy as np
-
+import pandas as pd
 from Bio.PDB.Polypeptide import index_to_one, one_to_index
-
-from pdbtools.pdb_selchain import run as pdb_selchain_run
 from pdbtools.pdb_delhetatm import run as pdb_delhetatm_run
 from pdbtools.pdb_delres import run as pdb_delres_run
 from pdbtools.pdb_fixinsert import run as pdb_fixinsert_run
+from pdbtools.pdb_selchain import run as pdb_selchain_run
 from pdbtools.pdb_tidy import run as pdb_tidy_run
 
-from .inner_rasp.cavity_model import (
-    ResidueEnvironmentsDataset,
-)
-
-from .inner_rasp.helpers import (
-    ds_pred,
-)
-from .inner_rasp.pdb_parser_scripts.clean_pdb import (
-    clean_pdb,
-)
-from .inner_rasp.pdb_parser_scripts.extract_environments import (
-    extract_environments,
-)
-
-
-from poli.core.util.proteins.mutations import edits_between_strings
 from poli.core.util.files.download_files_from_github import (
     download_file_from_github_repository,
 )
 from poli.core.util.files.integrity import compute_md5_from_filepath
+from poli.core.util.proteins.mutations import edits_between_strings
 
+from .inner_rasp.cavity_model import ResidueEnvironmentsDataset
+from .inner_rasp.helpers import ds_pred
+from .inner_rasp.pdb_parser_scripts.clean_pdb import clean_pdb
+from .inner_rasp.pdb_parser_scripts.extract_environments import extract_environments
 
 THIS_DIR = Path(__file__).parent.resolve()
 HOME_DIR = THIS_DIR.home()

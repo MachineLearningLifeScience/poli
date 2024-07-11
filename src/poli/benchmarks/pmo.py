@@ -31,8 +31,8 @@ from typing import Literal, Union
 
 from poli.objective_repository import (
     DRD2ProblemFactory,
-    JNK3ProblemFactory,
     GSK3BetaProblemFactory,
+    JNK3ProblemFactory,
 )
 
 from .guacamol import GuacaMolGoalDirectedBenchmark

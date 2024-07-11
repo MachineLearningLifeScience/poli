@@ -3,6 +3,7 @@ def test_minimal_working_example_of_problem_creation():
     Tests the minimal working example from the readme, verbatum.
     """
     import numpy as np
+
     from poli import objective_factory
 
     white_noise_problem = objective_factory.create(name="white_noise")
@@ -15,6 +16,7 @@ def test_minimal_working_example_of_problem_creation():
 
 def test_minimal_working_example_of_black_box_instancing():
     import numpy as np
+
     from poli.objective_repository import WhiteNoiseBlackBox
 
     f = WhiteNoiseBlackBox()
