@@ -3,7 +3,7 @@ This module implements Ehrlich functions as black boxes in poli.
 
 Ehrlich functions were proposed by Stanton et al. [1] as a quick-and-easy
 alternative for testing discrete sequence optimizers (with protein
-optimization in mind). They are deviced to 
+optimization in mind). They are deviced to
 
 (i) be easy to query,
 (ii) have feasible and unfeasible sequences,

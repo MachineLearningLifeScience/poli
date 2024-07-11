@@ -2,7 +2,7 @@
 This script registers the stability FoldX black box and objective factory.
 
 FoldX [1] is a simulator that allows for computing the difference
-in free energy between a wildtype protein and a mutated protein. We 
+in free energy between a wildtype protein and a mutated protein. We
 also use biopython for pre-processing the PDB files [2].
 
 [1] Schymkowitz, J., Borg, J., Stricher, F., Nys, R., Rousseau, F.,
@@ -10,7 +10,7 @@ also use biopython for pre-processing the PDB files [2].
     Nucleic acids research, 33(suppl_2), W382-W388.
 [2] Cock PA, Antao T, Chang JT, Chapman BA, Cox CJ, Dalke A, Friedberg I,
     Hamelryck T, Kauff F, Wilczynski B and de Hoon MJL (2009) Biopython:
-    freely available Python tools for computational molecular biology and 
+    freely available Python tools for computational molecular biology and
     bioinformatics. Bioinformatics, 25, 1422-1423
 """
 

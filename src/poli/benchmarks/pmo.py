@@ -23,7 +23,7 @@ References
 [3] Huang, Kexin, Tianfan Fu, Wenhao Gao, Yue Zhao, Yusuf Roohani, Jure Leskovec,
     Connor W Coley, Cao Xiao, Jimeng Sun, and Marinka Zitnik.
     “Therapeutics Data Commons: Machine Learning Datasets and Tasks for Drug Discovery and Development.”
-    Proceedings of Neural Information Processing Systems, NeurIPS Datasets and Benchmarks, 2021. 
+    Proceedings of Neural Information Processing Systems, NeurIPS Datasets and Benchmarks, 2021.
 
 """
 

@@ -1,7 +1,7 @@
 """An interface to the original RaSP codebase.
 
 This module takes and adapts RaSP's original implementation
-(which can be found at [1]), and writes an interface that 
+(which can be found at [1]), and writes an interface that
 handles the preprocessing and inference steps.
 
 RaSP, like foldx [2], predicts the effect of mutations on protein
