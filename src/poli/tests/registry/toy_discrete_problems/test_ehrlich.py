@@ -101,7 +101,7 @@ def test_ehrlich_function_produces_optimal_sequences(
     assert ehrlich(optimal_sequence) == 1.0
 
 
-def test_consistency_of_ehrlich_function_mofit_matching():
+def test_consistency_of_ehrlich_function_motif_matching():
     ehrlich = EhrlichBlackBox(
         sequence_length=10,
         motif_length=3,
