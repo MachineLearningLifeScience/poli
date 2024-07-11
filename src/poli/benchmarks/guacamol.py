@@ -25,9 +25,8 @@ References
 
 from typing import Literal, Union
 
-from poli.core.problem import Problem
 from poli.core.abstract_benchmark import AbstractBenchmark
-
+from poli.core.problem import Problem
 from poli.objective_repository import (
     AlbuterolSimilarityProblemFactory,
     AmlodipineMPOProblemFactory,
@@ -36,14 +35,14 @@ from poli.objective_repository import (
     FexofenadineMPOProblemFactory,
     IsomerC7H8N2O2ProblemFactory,
     IsomerC9H10N2O2PF2ClProblemFactory,
+    LogPProblemFactory,
     Median1ProblemFactory,
     Median2ProblemFactory,
     MestranolSimilarityProblemFactory,
     OsimetrinibMPOProblemFactory,
     PerindoprilMPOProblemFactory,
-    RanolazineMPOProblemFactory,
-    LogPProblemFactory,
     QEDProblemFactory,
+    RanolazineMPOProblemFactory,
     SAProblemFactory,
     ScaffoldHopProblemFactory,
     SitagliptinMPOProblemFactory,

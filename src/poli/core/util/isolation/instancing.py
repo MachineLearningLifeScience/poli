@@ -1,16 +1,12 @@
 from __future__ import annotations
 
-from pathlib import Path
 import configparser
-import subprocess
 import importlib
-
 import logging
-from poli.core.registry import (
-    _OBSERVER,
-    _ISOLATED_FUNCTION_SCRIPT_LOCATION,
-)
+import subprocess
+from pathlib import Path
 
+from poli.core.registry import _ISOLATED_FUNCTION_SCRIPT_LOCATION, _OBSERVER
 from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
 
 from .external_function import ExternalFunction

@@ -12,7 +12,7 @@ import base64
 import os
 from pathlib import Path
 
-from github import Github, GithubException, BadCredentialsException
+from github import BadCredentialsException, Github, GithubException
 from github.ContentFile import ContentFile
 from github.Repository import Repository
 

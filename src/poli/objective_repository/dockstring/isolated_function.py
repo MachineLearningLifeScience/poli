@@ -1,18 +1,16 @@
-from typing import Tuple, Literal
+from typing import Literal, Tuple
 
 import numpy as np
+from dockstring import load_target
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
 from poli.core.black_box_information import BlackBoxInformation
-from poli.core.util.chemistry.string_to_molecule import translate_selfies_to_smiles
 from poli.core.registry import register_isolated_function
-
+from poli.core.util.chemistry.string_to_molecule import translate_selfies_to_smiles
 from poli.objective_repository.dockstring.information import (
     dockstring_black_box_information,
 )
-
-from dockstring import load_target
 
 
 class IsolatedDockstringFunction(AbstractIsolatedFunction):

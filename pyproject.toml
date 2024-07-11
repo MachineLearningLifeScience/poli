@@ -38,3 +38,6 @@ Homepage = "https://github.com/MachineLearningLifeScience/poli"
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
 ]
+
+[tool.isort]
+profile = "black"

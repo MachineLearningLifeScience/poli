@@ -1,7 +1,7 @@
 """This module implements a batched input generator."""
 
-from typing import Iterable
 from itertools import islice
+from typing import Iterable
 
 
 def batched(iterable: Iterable, chunk_size: int):

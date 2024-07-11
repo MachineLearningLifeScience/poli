@@ -3,101 +3,28 @@
 
 from pathlib import Path
 
-# Toy examples
-from .white_noise.register import WhiteNoiseProblemFactory, WhiteNoiseBlackBox
-from .aloha.register import AlohaProblemFactory, AlohaBlackBox
-from .toy_continuous_problem.register import (
-    ToyContinuousProblemFactory,
-    ToyContinuousBlackBox,
-)
-
-# Discrete toy examples
-from .ehrlich.register import EhrlichBlackBox, EhrlichProblemFactory
-
-# Chemistry black boxes
-from .dockstring.register import DockstringProblemFactory, DockstringBlackBox
-from .drd3_docking.register import DRD3ProblemFactory, DRD3BlackBox
-from .sa_tdc.register import SAProblemFactory, SABlackBox
-from .rdkit_logp.register import LogPBlackBox, LogPProblemFactory
-from .rdkit_qed.register import QEDBlackBox, QEDProblemFactory
-from .gsk3_beta.register import GSK3BetaBlackBox, GSK3BetaProblemFactory
-from .drd2_docking.register import DRD2BlackBox, DRD2ProblemFactory
-from .jnk3.register import JNK3BlackBox, JNK3ProblemFactory
-from .celecoxib_rediscovery.register import (
-    CelecoxibRediscoveryBlackBox,
-    CelecoxibRediscoveryProblemFactory,
-)
-from .thiothixene_rediscovery.register import (
-    ThiothixeneRediscoveryBlackBox,
-    ThiothixeneRediscoveryProblemFactory,
-)
-from .troglitazone_rediscovery.register import (
-    TroglitazoneRediscoveryBlackBox,
-    TroglitazoneRediscoveryProblemFactory,
-)
 from .albuterol_similarity.register import (
     AlbuterolSimilarityBlackBox,
     AlbuterolSimilarityProblemFactory,
 )
-from .mestranol_similarity.register import (
-    MestranolSimilarityBlackBox,
-    MestranolSimilarityProblemFactory,
+from .aloha.register import AlohaBlackBox, AlohaProblemFactory
+from .amlodipine_mpo.register import AmlodipineMPOBlackBox, AmlodipineMPOProblemFactory
+from .celecoxib_rediscovery.register import (
+    CelecoxibRediscoveryBlackBox,
+    CelecoxibRediscoveryProblemFactory,
 )
-from .amlodipine_mpo.register import (
-    AmlodipineMPOProblemFactory,
-    AmlodipineMPOBlackBox,
-)
+from .deco_hop.register import DecoHopBlackBox, DecoHopProblemFactory
+
+# Chemistry black boxes
+from .dockstring.register import DockstringBlackBox, DockstringProblemFactory
+from .drd2_docking.register import DRD2BlackBox, DRD2ProblemFactory
+from .drd3_docking.register import DRD3BlackBox, DRD3ProblemFactory
+
+# Discrete toy examples
+from .ehrlich.register import EhrlichBlackBox, EhrlichProblemFactory
 from .fexofenadine_mpo.register import (
-    FexofenadineMPOProblemFactory,
     FexofenadineMPOBlackBox,
-)
-from .osimetrinib_mpo.register import (
-    OsimetrinibMPOProblemFactory,
-    OsimetrinibMPOBlackBox,
-)
-from .perindopril_mpo.register import (
-    PerindoprilMPOProblemFactory,
-    PerindoprilMPOBlackBox,
-)
-from .ranolazine_mpo.register import (
-    RanolazineMPOProblemFactory,
-    RanolazineMPOBlackBox,
-)
-from .sitagliptin_mpo.register import (
-    SitagliptinMPOProblemFactory,
-    SitagliptinMPOBlackBox,
-)
-from .zaleplon_mpo.register import (
-    ZaleplonMPOProblemFactory,
-    ZaleplonMPOBlackBox,
-)
-from .deco_hop.register import (
-    DecoHopProblemFactory,
-    DecoHopBlackBox,
-)
-from .scaffold_hop.register import (
-    ScaffoldHopProblemFactory,
-    ScaffoldHopBlackBox,
-)
-from .isomer_c7h8n2o2.register import (
-    IsomerC7H8N2O2ProblemFactory,
-    IsomerC7H8N2O2BlackBox,
-)
-from .isomer_c9h10n2o2pf2cl.register import (
-    IsomerC9H10N2O2PF2ClProblemFactory,
-    IsomerC9H10N2O2PF2ClBlackBox,
-)
-from .median_1.register import (
-    Median1ProblemFactory,
-    Median1BlackBox,
-)
-from .median_2.register import (
-    Median2ProblemFactory,
-    Median2BlackBox,
-)
-from .valsartan_smarts.register import (
-    ValsartanSMARTSProblemFactory,
-    ValsartanSMARTSBlackBox,
+    FexofenadineMPOProblemFactory,
 )
 
 # Protein black boxes
@@ -113,21 +40,73 @@ from .foldx_stability_and_sasa.register import (
 )
 from .gfp_cbas.register import GFPCBasBlackBox, GFPCBasProblemFactory
 from .gfp_select.register import GFPSelectionBlackBox, GFPSelectionProblemFactory
+from .gsk3_beta.register import GSK3BetaBlackBox, GSK3BetaProblemFactory
+from .isomer_c7h8n2o2.register import (
+    IsomerC7H8N2O2BlackBox,
+    IsomerC7H8N2O2ProblemFactory,
+)
+from .isomer_c9h10n2o2pf2cl.register import (
+    IsomerC9H10N2O2PF2ClBlackBox,
+    IsomerC9H10N2O2PF2ClProblemFactory,
+)
+from .jnk3.register import JNK3BlackBox, JNK3ProblemFactory
+from .median_1.register import Median1BlackBox, Median1ProblemFactory
+from .median_2.register import Median2BlackBox, Median2ProblemFactory
+from .mestranol_similarity.register import (
+    MestranolSimilarityBlackBox,
+    MestranolSimilarityProblemFactory,
+)
+from .osimetrinib_mpo.register import (
+    OsimetrinibMPOBlackBox,
+    OsimetrinibMPOProblemFactory,
+)
 from .penalized_logp_lambo.register import (
     PenalizedLogPLamboBlackBox,
     PenalizedLogPLamboProblemFactory,
 )
+from .perindopril_mpo.register import (
+    PerindoprilMPOBlackBox,
+    PerindoprilMPOProblemFactory,
+)
+from .ranolazine_mpo.register import RanolazineMPOBlackBox, RanolazineMPOProblemFactory
 from .rasp.register import RaspBlackBox, RaspProblemFactory
+from .rdkit_logp.register import LogPBlackBox, LogPProblemFactory
+from .rdkit_qed.register import QEDBlackBox, QEDProblemFactory
 from .rfp_foldx_stability_and_sasa.register import (
     RFPFoldXStabilityAndSASAProblemFactory,
+)
+from .sa_tdc.register import SABlackBox, SAProblemFactory
+from .scaffold_hop.register import ScaffoldHopBlackBox, ScaffoldHopProblemFactory
+from .sitagliptin_mpo.register import (
+    SitagliptinMPOBlackBox,
+    SitagliptinMPOProblemFactory,
 )
 
 # Other
 from .super_mario_bros.register import (
-    SuperMarioBrosProblemFactory,
     SuperMarioBrosBlackBox,
+    SuperMarioBrosProblemFactory,
+)
+from .thiothixene_rediscovery.register import (
+    ThiothixeneRediscoveryBlackBox,
+    ThiothixeneRediscoveryProblemFactory,
+)
+from .toy_continuous_problem.register import (
+    ToyContinuousBlackBox,
+    ToyContinuousProblemFactory,
+)
+from .troglitazone_rediscovery.register import (
+    TroglitazoneRediscoveryBlackBox,
+    TroglitazoneRediscoveryProblemFactory,
+)
+from .valsartan_smarts.register import (
+    ValsartanSMARTSBlackBox,
+    ValsartanSMARTSProblemFactory,
 )
 
+# Toy examples
+from .white_noise.register import WhiteNoiseBlackBox, WhiteNoiseProblemFactory
+from .zaleplon_mpo.register import ZaleplonMPOBlackBox, ZaleplonMPOProblemFactory
 
 THIS_DIR = Path(__file__).parent.resolve()
 

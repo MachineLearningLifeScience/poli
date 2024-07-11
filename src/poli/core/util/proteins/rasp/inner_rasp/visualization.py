@@ -1,18 +1,15 @@
-import os
-
-import Bio.PDB.Polypeptide
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-from scipy import stats
-from sklearn.metrics import mean_absolute_error
-
 # plt.rcParams["figure.dpi"] = 300
 # plt.rcParams["figure.figsize"] = [8.0, 8.0]
 # plt.rcParams.update({"font.size": 14})
 import glob
 import math
+import os
 import pickle
+
+import Bio.PDB.Polypeptide
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 
 # import mpl_scatter_density
 import ptitprince as pt
@@ -20,6 +17,8 @@ import seaborn as sns
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.offsetbox import AnchoredText
 from matplotlib.ticker import FormatStrFormatter
+from scipy import stats
+from sklearn.metrics import mean_absolute_error
 
 white_viridis = LinearSegmentedColormap.from_list(
     "white_viridis",

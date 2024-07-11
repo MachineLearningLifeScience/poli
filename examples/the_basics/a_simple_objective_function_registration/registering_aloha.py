@@ -5,8 +5,8 @@ instances of the problem: the objective function,
 the initial point, and its first evaluation.
 """
 
-from typing import Tuple
 from string import ascii_uppercase
+from typing import Tuple
 
 import numpy as np
 

@@ -13,21 +13,18 @@ arXiv, July 12, 2022. http://arxiv.org/abs/2203.12742.
 
 import logging
 import os
-import numpy as np
 from pathlib import Path
 
 import lambo
-from lambo.tasks.chem.logp import logP
+import numpy as np
 from lambo import __file__ as project_root_file
+from lambo.tasks.chem.logp import logP
 
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
-
 from poli.core.util.chemistry.string_to_molecule import translate_selfies_to_smiles
-
 from poli.core.util.files.download_files_from_github import (
     download_file_from_github_repository,
 )
-
 
 project_root = os.path.dirname(os.path.dirname(project_root_file))
 LAMBO_IN_POLI_OBJECTIVES_PATH = Path.home() / ".poli_objectives" / "lambo"

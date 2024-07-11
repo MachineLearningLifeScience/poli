@@ -1,13 +1,12 @@
 """This module tests the instancing of toy continuous problems."""
 
-import pytest
-
 import numpy as np
+import pytest
 
 from poli.objective_repository.toy_continuous_problem.register import (
     POSSIBLE_FUNCTIONS,
-    TWO_DIMENSIONAL_PROBLEMS,
     SIX_DIMENSIONAL_PROBLEMS,
+    TWO_DIMENSIONAL_PROBLEMS,
 )
 
 

@@ -6,9 +6,8 @@ reproducibility purposes, and to make sure no malicious
 code is being executed.
 """
 
-from pathlib import Path
-
 import hashlib
+from pathlib import Path
 
 
 def compute_md5_from_filepath(filepath: Path, read_mode: str = "rb") -> str:

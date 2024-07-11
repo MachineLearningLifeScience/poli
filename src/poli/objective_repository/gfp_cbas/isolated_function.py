@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Tuple, Literal
+from typing import List, Literal, Tuple
 from warnings import warn
 
 import numpy as np
@@ -8,7 +8,6 @@ import torch
 
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
 from poli.core.black_box_information import BlackBoxInformation
-
 from poli.objective_repository.gfp_cbas.cbas_alphabet_preprocessing import (
     convert_aas_to_idx_array,
     one_hot_encode_aa_array,

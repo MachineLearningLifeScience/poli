@@ -9,7 +9,8 @@ import pytest
 
 def test_white_noise_example():
     import numpy as np
-    from poli.objective_repository import WhiteNoiseProblemFactory, WhiteNoiseBlackBox
+
+    from poli.objective_repository import WhiteNoiseBlackBox, WhiteNoiseProblemFactory
 
     # Creating the black box
     f = WhiteNoiseBlackBox()
@@ -27,7 +28,8 @@ def test_white_noise_example():
 
 def test_aloha_example():
     import numpy as np
-    from poli.objective_repository import AlohaProblemFactory, AlohaBlackBox
+
+    from poli.objective_repository import AlohaBlackBox, AlohaProblemFactory
 
     # Creating the black box
     f = AlohaBlackBox()
@@ -52,6 +54,7 @@ def test_aloha_example():
 
 def test_toy_continuous_example():
     import numpy as np
+
     from poli.objective_repository import (
         ToyContinuousBlackBox,
         ToyContinuousProblemFactory,
@@ -87,7 +90,8 @@ def test_toy_continuous_example():
 
 def test_qed_example():
     import numpy as np
-    from poli.objective_repository import QEDProblemFactory, QEDBlackBox
+
+    from poli.objective_repository import QEDBlackBox, QEDProblemFactory
 
     # Creating the black box
     f = QEDBlackBox(string_representation="SELFIES")
@@ -107,7 +111,8 @@ def test_qed_example():
 
 def test_logp_example():
     import numpy as np
-    from poli.objective_repository import LogPProblemFactory, LogPBlackBox
+
+    from poli.objective_repository import LogPBlackBox, LogPProblemFactory
 
     # Creating the black box
     f = LogPBlackBox(string_representation="SMILES")
@@ -127,7 +132,8 @@ def test_logp_example():
 
 def test_dockstring_example():
     import numpy as np
-    from poli.objective_repository import DockstringProblemFactory, DockstringBlackBox
+
+    from poli.objective_repository import DockstringBlackBox, DockstringProblemFactory
 
     # Creating the black box
     f = DockstringBlackBox(target_name="DRD2")
@@ -156,7 +162,8 @@ def test_drd3_docking_example():
     # that can't be handled by conda. We should skip this test for now.
     pytest.skip()
     import numpy as np
-    from poli.objective_repository import DRD3ProblemFactory, DRD3BlackBox
+
+    from poli.objective_repository import DRD3BlackBox, DRD3ProblemFactory
 
     # Creating the black box
     f = DRD3BlackBox(string_representation="SMILES", force_isolation=True)
@@ -182,8 +189,8 @@ def test_penalized_logp_lambo():
     _ = pytest.importorskip("lambo")
 
     from poli.objective_repository import (
-        PenalizedLogPLamboProblemFactory,
         PenalizedLogPLamboBlackBox,
+        PenalizedLogPLamboProblemFactory,
     )
 
     # Creating the black box
@@ -204,7 +211,8 @@ def test_penalized_logp_lambo():
 
 def test_sa_tdc_example():
     import numpy as np
-    from poli.objective_repository import SAProblemFactory, SABlackBox
+
+    from poli.objective_repository import SABlackBox, SAProblemFactory
 
     # Creating the black box
     f = SABlackBox()
@@ -231,8 +239,8 @@ def test_foldx_stability():
     from pathlib import Path
 
     from poli.objective_repository import (
-        FoldXStabilityProblemFactory,
         FoldXStabilityBlackBox,
+        FoldXStabilityProblemFactory,
     )
 
     wildtype_pdb_path = (
@@ -260,7 +268,7 @@ def test_foldx_sasa():
 
     from pathlib import Path
 
-    from poli.objective_repository import FoldXSASAProblemFactory, FoldXSASABlackBox
+    from poli.objective_repository import FoldXSASABlackBox, FoldXSASAProblemFactory
 
     wildtype_pdb_path = (
         Path(__file__).parent.parent / "static_files_for_tests" / "101m_Repair.pdb"
@@ -280,6 +288,7 @@ def test_foldx_sasa():
 @pytest.mark.slow()
 def test_rasp_example():
     from pathlib import Path
+
     from poli.objective_repository import RaspBlackBox, RaspProblemFactory
 
     wildtype_pdb_path = (

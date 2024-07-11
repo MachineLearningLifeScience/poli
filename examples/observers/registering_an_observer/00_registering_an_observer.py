@@ -15,9 +15,9 @@ Check ./01_using_a_registered_observer.py for an example
 of how to instantiate it after registration.
 """
 
-from poli.core.registry import register_observer
-
 from print_observer import SimplePrintObserver
+
+from poli.core.registry import register_observer
 
 if __name__ == "__main__":
     register_observer(

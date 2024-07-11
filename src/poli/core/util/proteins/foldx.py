@@ -24,17 +24,16 @@ References
 
 """
 
-from typing import List, Union
-from pathlib import Path
+import logging
+import os
 import shutil
 import subprocess
-import os
-import logging
+from pathlib import Path
+from typing import List, Union
 
-from Bio.PDB.Residue import Residue
 from Bio.PDB import SASA
+from Bio.PDB.Residue import Residue
 from Bio.SeqUtils import seq1
-
 from pdbtools.pdb_delhetatm import run as pdb_delhetatm_run
 
 from poli.core.util.proteins.mutations import (

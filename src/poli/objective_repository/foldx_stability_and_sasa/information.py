@@ -1,7 +1,7 @@
 import numpy as np
 
-from poli.core.util.proteins.defaults import AMINO_ACIDS
 from poli.core.black_box_information import BlackBoxInformation
+from poli.core.util.proteins.defaults import AMINO_ACIDS
 
 foldx_stability_and_sasa_info = BlackBoxInformation(
     name="foldx_stability_and_sasa",
