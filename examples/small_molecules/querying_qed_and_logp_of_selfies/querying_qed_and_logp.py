@@ -13,7 +13,7 @@ from pathlib import Path
 
 import numpy as np
 
-from poli.objective_repository import QEDBlackBox, LogPBlackBox
+from poli.objective_repository import LogPBlackBox, QEDBlackBox
 
 THIS_DIR = Path(__file__).parent.resolve()
 

@@ -1,7 +1,7 @@
 """Utilities for downloading files from GitHub repositories.
 
 This module requires the PyGithub package, install it with:
-    
+
         pip install PyGithub
 
 Most of this code was taken and adapted from:
@@ -12,7 +12,7 @@ import base64
 import os
 from pathlib import Path
 
-from github import Github, GithubException, BadCredentialsException
+from github import BadCredentialsException, Github, GithubException
 from github.ContentFile import ContentFile
 from github.Repository import Repository
 

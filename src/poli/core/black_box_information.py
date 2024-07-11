@@ -12,8 +12,7 @@ The black box information includes the following information:
 - The alphabet of allowed characters.
 """
 
-from typing import Union, Literal
-
+from typing import Literal, Union
 
 import numpy as np
 

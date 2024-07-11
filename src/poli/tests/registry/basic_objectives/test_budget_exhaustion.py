@@ -1,8 +1,7 @@
 """Tests for the budget exhaustion inside objective functions."""
 
-import pytest
-
 import numpy as np
+import pytest
 
 from poli.core.exceptions import BudgetExhaustedException
 

@@ -1,4 +1,4 @@
-from typing import Tuple, Literal
+from typing import Literal, Tuple
 from warnings import warn
 
 import numpy as np
@@ -7,12 +7,9 @@ from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
-
-from poli.core.util.seeding import seed_python_numpy_and_torch
-
-from poli.objective_repository.gfp_cbas.information import gfp_cbas_info
-
 from poli.core.util.isolation.instancing import get_inner_function
+from poli.core.util.seeding import seed_python_numpy_and_torch
+from poli.objective_repository.gfp_cbas.information import gfp_cbas_info
 
 
 class GFPCBasBlackBox(AbstractBlackBox):

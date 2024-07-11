@@ -44,3 +44,6 @@ markers = [
     "poli__rasp: marks tests that run in the poli__rasp environment",
     "unmarked: All other tests, which usually run in the base environment",
 ]
+
+[tool.isort]
+profile = "black"

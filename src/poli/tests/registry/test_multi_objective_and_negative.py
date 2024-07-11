@@ -2,8 +2,8 @@ import numpy as np
 
 
 def test_multi_objective_instantiation():
-    from poli.objective_repository import AlohaBlackBox
     from poli.core.multi_objective_black_box import MultiObjectiveBlackBox
+    from poli.objective_repository import AlohaBlackBox
 
     f_aloha = AlohaBlackBox()
 

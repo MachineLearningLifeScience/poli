@@ -3,26 +3,24 @@
 __author__ = "Simon Bartels"
 
 import logging
-import yaml
-from pathlib import Path
 import os
 from collections import namedtuple
+from pathlib import Path
 
-import numpy as np
 import hydra
-from poli.core.abstract_isolated_function import AbstractIsolatedFunction
-from poli.objective_repository.foldx_rfp_lambo import PROBLEM_SEQ, CORRECT_SEQ
+import lambo
+import numpy as np
+import yaml
+from lambo import __file__ as project_root_file
+from lambo.tasks.proxy_rfp.proxy_rfp import ProxyRFPTask
+from lambo.utils import AMINO_ACIDS
 
+from poli.core.abstract_isolated_function import AbstractIsolatedFunction
+from poli.core.registry import register_isolated_function
 from poli.core.util.files.download_files_from_github import (
     download_file_from_github_repository,
 )
-from poli.core.registry import register_isolated_function
-
-import lambo
-from lambo.tasks.proxy_rfp.proxy_rfp import ProxyRFPTask
-from lambo.utils import AMINO_ACIDS
-from lambo import __file__ as project_root_file
-
+from poli.objective_repository.foldx_rfp_lambo import CORRECT_SEQ, PROBLEM_SEQ
 
 project_root = os.path.dirname(os.path.dirname(project_root_file))
 LAMBO_IN_POLI_OBJECTIVES_PATH = Path.home() / ".poli_objectives" / "lambo"

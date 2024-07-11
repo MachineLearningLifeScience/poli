@@ -1,33 +1,33 @@
-import pytest
 from pathlib import Path
 
 import numpy as np
+import pytest
 
 from poli import objective_factory
 from poli.objective_repository import (
-    GSK3BetaBlackBox,
-    DRD2BlackBox,
-    JNK3BlackBox,
-    SABlackBox,
-    CelecoxibRediscoveryBlackBox,
-    ThiothixeneRediscoveryBlackBox,
-    TroglitazoneRediscoveryBlackBox,
     AlbuterolSimilarityBlackBox,
-    MestranolSimilarityBlackBox,
     AmlodipineMPOBlackBox,
+    CelecoxibRediscoveryBlackBox,
+    DecoHopBlackBox,
+    DRD2BlackBox,
     FexofenadineMPOBlackBox,
+    GSK3BetaBlackBox,
+    IsomerC7H8N2O2BlackBox,
+    IsomerC9H10N2O2PF2ClBlackBox,
+    JNK3BlackBox,
+    Median1BlackBox,
+    Median2BlackBox,
+    MestranolSimilarityBlackBox,
     OsimetrinibMPOBlackBox,
     PerindoprilMPOBlackBox,
     RanolazineMPOBlackBox,
-    SitagliptinMPOBlackBox,
-    ZaleplonMPOBlackBox,
-    DecoHopBlackBox,
+    SABlackBox,
     ScaffoldHopBlackBox,
-    IsomerC7H8N2O2BlackBox,
-    IsomerC9H10N2O2PF2ClBlackBox,
-    Median1BlackBox,
-    Median2BlackBox,
+    SitagliptinMPOBlackBox,
+    ThiothixeneRediscoveryBlackBox,
+    TroglitazoneRediscoveryBlackBox,
     ValsartanSMARTSBlackBox,
+    ZaleplonMPOBlackBox,
 )
 
 THIS_DIR = Path(__file__).parent.resolve()

@@ -7,21 +7,17 @@ poli__protein environment, we add a skip to the
 whole module if the import fails.
 """
 
-import pytest
-
 from pathlib import Path
 
+import pytest
+
 try:
-    from poli.core.util.proteins.foldx import (
-        FoldxInterface,
-    )
+    from poli.core.util.proteins.foldx import FoldxInterface
 except (ImportError, FileNotFoundError):
     pytest.skip("Could not import the foldx interface. ", allow_module_level=True)
 
 try:
-    from poli.core.util.proteins.pdb_parsing import (
-        parse_pdb_as_residue_strings,
-    )
+    from poli.core.util.proteins.pdb_parsing import parse_pdb_as_residue_strings
 except ImportError:
     pytest.skip(
         "Could not import the protein utilities for parsing. ", allow_module_level=True

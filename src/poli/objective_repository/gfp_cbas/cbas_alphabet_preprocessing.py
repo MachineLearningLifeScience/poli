@@ -1,9 +1,9 @@
 import os.path
+
 import numpy as np
 import pandas as pd
 
 from .information import AA
-
 
 AA_IDX = {AA[i]: i for i in range(len(AA))}
 

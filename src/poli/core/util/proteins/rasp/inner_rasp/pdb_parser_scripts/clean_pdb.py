@@ -3,17 +3,15 @@ import os
 import subprocess
 import sys
 import tempfile
-from io import BytesIO, StringIO
 import time
+from io import BytesIO, StringIO
 from pathlib import Path
 
 import Bio.PDB
 import Bio.PDB.Polypeptide
 import Bio.SeqIO
-import pdbfixer
-
 import openmm.app
-
+import pdbfixer
 
 PDBIO = Bio.PDB.PDBIO()
 PDB_PARSER = Bio.PDB.PDBParser(PERMISSIVE=0)

@@ -1,7 +1,7 @@
-import pytest
 from pathlib import Path
 
 import numpy as np
+import pytest
 
 from poli import objective_factory
 

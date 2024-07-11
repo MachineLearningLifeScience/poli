@@ -2,18 +2,17 @@
 all objective functions should inherit.
 """
 
+from multiprocessing import Pool, cpu_count
 from warnings import warn
 
 import numpy as np
-from multiprocessing import Pool, cpu_count
 
 from poli.core.black_box_information import BlackBoxInformation
-from poli.core.problem_setup_information import ProblemSetupInformation
-
-from poli.core.util.abstract_observer import AbstractObserver
-from poli.core.util.batch import batched
-from poli.core.util.alignment import is_aligned_input
 from poli.core.exceptions import BudgetExhaustedException
+from poli.core.problem_setup_information import ProblemSetupInformation
+from poli.core.util.abstract_observer import AbstractObserver
+from poli.core.util.alignment import is_aligned_input
+from poli.core.util.batch import batched
 
 
 class AbstractBlackBox:

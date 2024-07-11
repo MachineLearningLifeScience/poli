@@ -6,11 +6,10 @@ However, the following script is maybe more intuitive and it shows what is happe
 """
 
 import numpy as np
-
-from poli.core.registry import DEFAULT_OBSERVER_NAME
 from print_observer import SimplePrintObserver
-from poli import objective_factory
 
+from poli import objective_factory
+from poli.core.registry import DEFAULT_OBSERVER_NAME
 
 if __name__ == "__main__":
     # Instantiate the objective

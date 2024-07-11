@@ -4,9 +4,8 @@ molecules into molecules in RDKit.
 
 from typing import List
 
-from rdkit import Chem
-
 import selfies as sf
+from rdkit import Chem
 
 
 def translate_smiles_to_selfies(

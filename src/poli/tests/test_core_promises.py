@@ -1,6 +1,7 @@
 """This test suite contains the core promises we make to the user."""
 
 import numpy as np
+import pytest
 
 
 def test_creating_an_instance_of_a_black_box():

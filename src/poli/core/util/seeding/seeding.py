@@ -1,7 +1,8 @@
 """Utilities for seeding random number generators."""
 
-import numpy as np
 import random
+
+import numpy as np
 
 
 def seed_numpy(seed: int = None) -> None:
