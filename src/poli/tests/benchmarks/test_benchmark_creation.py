@@ -7,6 +7,8 @@ of the benchmarks. In the case of PMO and Guacamol, those
 tests are already covered by the tests in objective_repository.
 """
 
+import pytest
+
 
 def test_creating_toy_continuous_functions_benchmark():
     from poli.benchmarks import ToyContinuousFunctionsBenchmark
@@ -32,8 +34,10 @@ def test_creating_guacamol_benchmark():
 
     benchmark = GuacaMolGoalDirectedBenchmark(string_representation="SELFIES")
 
-    for problem in benchmark:
+    for i, problem in enumerate(benchmark):
         f, x0 = problem.black_box, problem.x0
+        if i > 3:
+            break
 
 
 def test_creating_pmo_benchmark():
@@ -41,9 +45,8 @@ def test_creating_pmo_benchmark():
 
     benchmark = PMOBenchmark(string_representation="SELFIES")
 
-    for problem in benchmark:
+    for i, problem in enumerate(benchmark):
         f, x0 = problem.black_box, problem.x0
 
-
-if __name__ == "__main__":
-    test_creating_embedded_toy_continuous_functions_benchmark()
+        if i > 3:
+            break
