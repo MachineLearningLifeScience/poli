@@ -3,35 +3,6 @@
 
 from pathlib import Path
 
-# Toy examples
-from .white_noise.register import WhiteNoiseProblemFactory, WhiteNoiseBlackBox
-from .aloha.register import AlohaProblemFactory, AlohaBlackBox
-from .toy_continuous_problem.register import (
-    ToyContinuousProblemFactory,
-    ToyContinuousBlackBox,
-)
-
-# Chemistry black boxes
-from .dockstring.register import DockstringProblemFactory, DockstringBlackBox
-from .drd3_docking.register import DRD3ProblemFactory, DRD3BlackBox
-from .sa_tdc.register import SAProblemFactory, SABlackBox
-from .rdkit_logp.register import LogPBlackBox, LogPProblemFactory
-from .rdkit_qed.register import QEDBlackBox, QEDProblemFactory
-from .gsk3_beta.register import GSK3BetaBlackBox, GSK3BetaProblemFactory
-from .drd2_docking.register import DRD2BlackBox, DRD2ProblemFactory
-from .jnk3.register import JNK3BlackBox, JNK3ProblemFactory
-from .celecoxib_rediscovery.register import (
-    CelecoxibRediscoveryBlackBox,
-    CelecoxibRediscoveryProblemFactory,
-)
-from .thiothixene_rediscovery.register import (
-    ThiothixeneRediscoveryBlackBox,
-    ThiothixeneRediscoveryProblemFactory,
-)
-from .troglitazone_rediscovery.register import (
-    TroglitazoneRediscoveryBlackBox,
-    TroglitazoneRediscoveryProblemFactory,
-)
 from .albuterol_similarity.register import (
     AlbuterolSimilarityBlackBox,
     AlbuterolSimilarityProblemFactory,
@@ -153,6 +124,7 @@ AVAILABLE_OBJECTIVES = sorted(AVAILABLE_OBJECTIVES)
 
 AVAILABLE_PROBLEM_FACTORIES = {
     "aloha": AlohaProblemFactory,
+    "ehrlich": EhrlichProblemFactory,
     "dockstring": DockstringProblemFactory,
     "drd3_docking": DRD3ProblemFactory,
     "foldx_rfp_lambo": FoldXRFPLamboProblemFactory,
@@ -196,6 +168,7 @@ AVAILABLE_PROBLEM_FACTORIES = {
 
 AVAILABLE_BLACK_BOXES = {
     "aloha": AlohaBlackBox,
+    "ehrlich": EhrlichBlackBox,
     "dockstring": DockstringBlackBox,
     "drd3_docking": DRD3BlackBox,
     "foldx_rfp_lambo": FoldXRFPLamboBlackBox,
