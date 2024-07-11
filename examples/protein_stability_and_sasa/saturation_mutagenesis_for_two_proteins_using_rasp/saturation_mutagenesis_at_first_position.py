@@ -13,8 +13,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from poli.core.util.proteins.defaults import AMINO_ACIDS
 from poli import objective_factory
+from poli.core.util.proteins.defaults import AMINO_ACIDS
 
 THIS_DIR = Path(__file__).parent.resolve()
 

@@ -41,7 +41,7 @@ Create the `poli__lambo` environment
 This can easily be done by running
 
 .. code-block:: bash
-    
+
         # From the base of the poli repo
         conda env create --file src/poli/objective_repository/ddr3_docking/environment.yml
 
@@ -49,10 +49,10 @@ This can easily be done by running
 We also need `lambo`'s tasks to be available in Python's path for `poli__lambo`:
 
 .. code-block:: bash
-    
+
             git clone https://github.com/samuelstanton/lambo    # For reference, we use 431b052
             cd lambo
-            pip install -e .  
+            pip install -e .
 
 
 In particular, we need

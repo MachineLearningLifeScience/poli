@@ -6,6 +6,7 @@ after asking the user to confirm.
 """
 
 import numpy as np
+
 from poli import objective_factory
 
 problem = objective_factory.create(name="white_noise")

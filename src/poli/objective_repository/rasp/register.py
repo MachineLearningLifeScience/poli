@@ -17,22 +17,18 @@ Detlef Weigel, Nir Ben-Tal, and Julian Echave. eLife 12
 
 """
 
-from typing import Union, List
 from pathlib import Path
+from typing import List, Union
+
+import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
-
-from poli.core.util.seeding import seed_python_numpy_and_torch
-
 from poli.core.util.isolation.instancing import get_inner_function
-
+from poli.core.util.seeding import seed_python_numpy_and_torch
 from poli.objective_repository.rasp.information import rasp_information
-
-
-import numpy as np
 
 
 class RaspBlackBox(AbstractBlackBox):

@@ -1,12 +1,13 @@
 """External observer, which can be run in an isolated process."""
 
 from typing import Any
+
 import numpy as np
 
 from poli.core.black_box_information import BlackBoxInformation
+from poli.core.registry import _DEFAULT, _OBSERVER, config
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
-from poli.core.registry import config, _DEFAULT, _OBSERVER
 
 
 class ExternalObserver(AbstractObserver):

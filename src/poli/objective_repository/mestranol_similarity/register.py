@@ -20,20 +20,14 @@ References
 from typing import Literal
 
 import numpy as np
-
 import selfies as sf
 
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.chemistry.tdc_black_box import TDCBlackBox
 from poli.core.problem import Problem
-
 from poli.core.util.chemistry.string_to_molecule import translate_smiles_to_selfies
-
 from poli.core.util.seeding import seed_numpy, seed_python
-
-from poli.core.chemistry.tdc_black_box import TDCBlackBox
-
 from poli.objective_repository.mestranol_similarity.information import (
     mestranol_similarity_info,
 )

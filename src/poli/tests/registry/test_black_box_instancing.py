@@ -1,7 +1,7 @@
 from pathlib import Path
-import pytest
 
 import numpy as np
+import pytest
 
 from poli.objective_repository import (
     AlohaBlackBox,
@@ -9,14 +9,14 @@ from poli.objective_repository import (
     DRD3BlackBox,
     FoldXRFPLamboBlackBox,
     FoldXSASABlackBox,
-    FoldXStabilityBlackBox,
     FoldXStabilityAndSASABlackBox,
+    FoldXStabilityBlackBox,
     GFPCBasBlackBox,
     GFPSelectionBlackBox,
-    PenalizedLogPLamboBlackBox,
-    RaspBlackBox,
     LogPBlackBox,
+    PenalizedLogPLamboBlackBox,
     QEDBlackBox,
+    RaspBlackBox,
     SABlackBox,
     SuperMarioBrosBlackBox,
     ToyContinuousBlackBox,

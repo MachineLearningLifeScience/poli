@@ -7,8 +7,9 @@ poli__protein environment, we add a skip to the
 whole module if the import fails.
 """
 
-import pytest
 from pathlib import Path
+
+import pytest
 
 try:
     from poli.core.util.proteins.pdb_parsing import (
@@ -23,8 +24,8 @@ except ImportError:
 try:
     from poli.core.util.proteins.mutations import (
         edits_between_strings,
-        mutations_from_wildtype_residues_and_mutant,
         find_closest_wildtype_pdb_file_to_mutant,
+        mutations_from_wildtype_residues_and_mutant,
     )
 except ImportError:
     pytest.skip(

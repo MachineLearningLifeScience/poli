@@ -5,8 +5,8 @@ import os
 import pickle
 import random
 import sys
-from typing import Dict, List, Union
 from pathlib import Path
+from typing import Dict, List, Union
 
 import numpy as np
 import pandas as pd

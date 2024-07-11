@@ -4,7 +4,6 @@ proposed by Stanton et al. (2024).
 """
 
 import numpy as np
-
 import pytest
 
 from poli.objective_repository.ehrlich._construct_feasibility_matrix import (

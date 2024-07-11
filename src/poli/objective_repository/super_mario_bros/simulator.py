@@ -4,14 +4,12 @@ This script will send things to simulator.jar.
 When ran, it lets a human play a level.
 """
 
-import subprocess
 import json
+import subprocess
 from pathlib import Path
 
 import numpy as np
-
 from level_utils import clean_level
-
 
 filepath = Path(__file__).parent.resolve()
 JARFILE_PATH = f"{filepath}/simulator.jar"

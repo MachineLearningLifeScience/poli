@@ -12,23 +12,20 @@ protein.
     Nucleic acids research, 33(suppl_2), W382-W388.
 [2] Cock PA, Antao T, Chang JT, Chapman BA, Cox CJ, Dalke A, Friedberg I,
     Hamelryck T, Kauff F, Wilczynski B and de Hoon MJL (2009) Biopython:
-    freely available Python tools for computational molecular biology and 
+    freely available Python tools for computational molecular biology and
     bioinformatics. Bioinformatics, 25, 1422-1423
 """
 
+import warnings
 from pathlib import Path
 from typing import List, Union
-import warnings
 
 import numpy as np
 
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
-
 from poli.core.util.seeding import seed_numpy, seed_python
-
-
 from poli.objective_repository.foldx_stability_and_sasa.register import (
     FoldXStabilityAndSASABlackBox,
 )

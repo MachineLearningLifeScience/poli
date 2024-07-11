@@ -1,22 +1,21 @@
 """This module contains utilities for creating run scripts for problems and observers.
 """
 
-from typing import List, Union, Type
-from pathlib import Path
+import inspect
 import os
+import stat
 import sys
 from os.path import basename, dirname, join
-import inspect
-import stat
+from pathlib import Path
+from typing import List, Type, Union
 
-from poli import external_problem_factory_script
-from poli import external_isolated_function_script
-from poli.external_problem_factory_script import ADDITIONAL_IMPORT_SEARCH_PATHES_KEY
-from poli.core.util import observer_wrapper
-from poli.core.abstract_problem_factory import AbstractProblemFactory
+from poli import external_isolated_function_script, external_problem_factory_script
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
+from poli.core.abstract_problem_factory import AbstractProblemFactory
+from poli.core.util import observer_wrapper
 from poli.core.util.abstract_observer import AbstractObserver
+from poli.external_problem_factory_script import ADDITIONAL_IMPORT_SEARCH_PATHES_KEY
 
 # By default, we will store the run scripts inside the
 # home folder of the user, on the hidden folder

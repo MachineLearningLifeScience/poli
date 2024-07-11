@@ -20,14 +20,13 @@ References
 [2] Huang, Kexin, Tianfan Fu, Wenhao Gao, Yue Zhao, Yusuf Roohani, Jure Leskovec,
     Connor W Coley, Cao Xiao, Jimeng Sun, and Marinka Zitnik.
     “Therapeutics Data Commons: Machine Learning Datasets and Tasks for Drug Discovery and Development.”
-    Proceedings of Neural Information Processing Systems, NeurIPS Datasets and Benchmarks, 2021. 
+    Proceedings of Neural Information Processing Systems, NeurIPS Datasets and Benchmarks, 2021.
 """
 
 from typing import Literal, Union
 
-from poli.core.problem import Problem
 from poli.core.abstract_benchmark import AbstractBenchmark
-
+from poli.core.problem import Problem
 from poli.objective_repository import (
     AlbuterolSimilarityProblemFactory,
     AmlodipineMPOProblemFactory,
@@ -36,14 +35,14 @@ from poli.objective_repository import (
     FexofenadineMPOProblemFactory,
     IsomerC7H8N2O2ProblemFactory,
     IsomerC9H10N2O2PF2ClProblemFactory,
+    LogPProblemFactory,
     Median1ProblemFactory,
     Median2ProblemFactory,
     MestranolSimilarityProblemFactory,
     OsimetrinibMPOProblemFactory,
     PerindoprilMPOProblemFactory,
-    RanolazineMPOProblemFactory,
-    LogPProblemFactory,
     QEDProblemFactory,
+    RanolazineMPOProblemFactory,
     SAProblemFactory,
     ScaffoldHopProblemFactory,
     SitagliptinMPOProblemFactory,

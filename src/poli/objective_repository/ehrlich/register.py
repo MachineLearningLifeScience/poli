@@ -3,7 +3,7 @@ This module implements Ehrlich functions as black boxes in poli.
 
 Ehrlich functions were proposed by Stanton et al. [1] as a quick-and-easy
 alternative for testing discrete sequence optimizers (with protein
-optimization in mind). They are deviced to 
+optimization in mind). They are deviced to
 
 (i) be easy to query,
 (ii) have feasible and unfeasible sequences,
@@ -29,19 +29,14 @@ import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
-
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
+from poli.core.util.proteins.defaults import AMINO_ACIDS
+from poli.core.util.seeding import seed_python_numpy_and_torch
 from poli.objective_repository.ehrlich._construct_feasibility_matrix import (
     _construct_transition_matrix,
 )
-from poli.objective_repository.ehrlich.information import (
-    ehrlich_info,
-)
-
-from poli.core.util.seeding import seed_python_numpy_and_torch
-
-from poli.core.util.proteins.defaults import AMINO_ACIDS
+from poli.objective_repository.ehrlich.information import ehrlich_info
 
 
 class EhrlichBlackBox(AbstractBlackBox):

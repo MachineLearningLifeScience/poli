@@ -5,31 +5,31 @@ See for more examples:
 https://en.wikipedia.org/wiki/Test_functions_for_optimization
 """
 
-from typing import Literal, List
+from typing import List, Literal
 
 import numpy as np
 
 from .definitions import (
-    easom,
-    cross_in_tray,
-    shifted_sphere,
-    egg_holder,
     ackley_function_01,
     alpine_01,
     alpine_02,
     bent_cigar,
+    branin_2d,
     brown,
+    camelback_2d,
     chung_reynolds,
     cosine_mixture,
+    cross_in_tray,
     deb_01,
     deb_02,
     deflected_corrugated_spring,
-    camelback_2d,
-    styblinski_tang,
+    easom,
+    egg_holder,
     hartmann_6d,
-    branin_2d,
-    rosenbrock,
     levy,
+    rosenbrock,
+    shifted_sphere,
+    styblinski_tang,
 )
 
 # Notice: these will be used by pytest to test the

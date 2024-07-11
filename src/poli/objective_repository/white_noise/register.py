@@ -11,13 +11,11 @@ environment.yml file in this folder).
 
 import numpy as np
 
-from poli.core.abstract_problem_factory import AbstractProblemFactory
-from poli.core.problem import Problem
 from poli.core.abstract_black_box import AbstractBlackBox
-
-from poli.core.problem_setup_information import ProblemSetupInformation
+from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
-
+from poli.core.problem import Problem
+from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.core.util.seeding import seed_python_numpy_and_torch
 
 

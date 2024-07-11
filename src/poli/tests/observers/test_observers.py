@@ -8,17 +8,16 @@ This module implements tests for
   them in isolated processes using `set_observer`.
 """
 
-from pathlib import Path
 import json
 import shutil
+from pathlib import Path
 
 import numpy as np
 
-from poli.core.black_box_information import BlackBoxInformation
-from poli.core.util.abstract_observer import AbstractObserver
-from poli.core.registry import register_observer
-
 from poli import objective_factory
+from poli.core.black_box_information import BlackBoxInformation
+from poli.core.registry import register_observer
+from poli.core.util.abstract_observer import AbstractObserver
 
 THIS_DIR = Path(__file__).parent.resolve()
 
