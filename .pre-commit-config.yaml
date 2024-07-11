@@ -14,4 +14,3 @@ repos:
     rev: 5.13.2
     hooks:
     -   id: isort
-        exclude: examples/
