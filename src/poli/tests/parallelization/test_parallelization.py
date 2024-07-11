@@ -51,6 +51,7 @@ def test_parallelization_in_qed():
     assert np.isclose(y1, np.array([[0.35978494], [0.37278556], [0.38547066]])).all()
 
 
+@pytest.mark.poli__protein
 def test_parallelization_in_foldx_stability_and_sasa():
     HOME_DIR = Path().home().resolve()
     PATH_TO_FOLDX_FILES = HOME_DIR / "foldx"
@@ -72,7 +73,3 @@ def test_parallelization_in_foldx_stability_and_sasa():
 
     f, x0 = problem.black_box, problem.x0
     f(x0)
-
-
-if __name__ == "__main__":
-    test_parallelization_in_foldx_stability_and_sasa()

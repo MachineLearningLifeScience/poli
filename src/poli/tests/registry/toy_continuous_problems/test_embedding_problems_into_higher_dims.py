@@ -48,7 +48,3 @@ def test_embed_camelback_into_high_dimensions():
         f_camelback(one_x),
         f_camelback(another_x),
     )
-
-
-if __name__ == "__main__":
-    test_embed_camelback_into_high_dimensions()

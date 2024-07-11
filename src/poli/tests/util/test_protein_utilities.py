@@ -36,6 +36,7 @@ except ImportError:
 THIS_DIR = Path(__file__).parent.resolve()
 
 
+@pytest.mark.poli__protein
 class TestClosestPDBFilesToMutation:
     wildtype_pdb_paths = [
         THIS_DIR / "3ned.pdb",

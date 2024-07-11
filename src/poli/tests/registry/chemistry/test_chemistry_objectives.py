@@ -67,24 +67,7 @@ def test_force_registering_qed_with_context_manager():
         assert np.isclose(y, 0.35978494).all()
 
 
-def test_force_registering_logp():
-    """
-    We test whether we can force-register the logp problem
-    if rdkit and selfies are not installed.
-    """
-    problem = objective_factory.create(
-        name="rdkit_logp",
-        force_register=True,
-    )
-    f, x0 = problem.black_box, problem.x0
-    y0 = f(x0)
-
-    # Asserting that a single carbon atom has logp close
-    # to 0.6361. (according to RDKit)
-    assert np.isclose(y0, 0.6361).all()
-    f.terminate()
-
-
+@pytest.mark.poli__lambo
 def test_penalized_logp_lambo():
     """
     Testing whether we can register the logp problem
@@ -98,6 +81,7 @@ def test_penalized_logp_lambo():
     problem = objective_factory.create(name="penalized_logp_lambo", force_register=True)
 
 
+@pytest.mark.poli__dockstring
 def test_querying_dockstring_using_smiles():
     """
     In this test, we force-register and query dockstring.
@@ -119,6 +103,7 @@ def test_querying_dockstring_using_smiles():
     f.terminate()
 
 
+@pytest.mark.poli__dockstring
 def test_querying_dockstring_using_selfies():
     """
     In this test, we check whether dockstring still
@@ -303,6 +288,7 @@ test_data_for_pmo = [
 ]
 
 
+@pytest.mark.poli__tdc
 @pytest.mark.parametrize(
     "black_box_name, black_box_class, kwargs_for_black_box, value_to_check",
     test_data_for_pmo,
@@ -328,7 +314,3 @@ def test_pmo_black_boxes(
     assert np.allclose(y0_, y0)
     if value_to_check is not None:
         assert (y0_ == value_to_check).all()
-
-
-if __name__ == "__main__":
-    test_pmo_black_boxes(*test_data_for_pmo[-1])

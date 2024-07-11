@@ -37,6 +37,12 @@ Homepage = "https://github.com/MachineLearningLifeScience/poli"
 [tool.pytest.ini_options]
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "poli__lambo: marks tests that run in the poli__lambo environment",
+    "poli__dockstring: marks tests that run in the poli__dockstring environment",
+    "poli__tdc: marks tests that run in the poli__tdc environment",
+    "poli__protein: marks tests that run in the poli__protein environment",
+    "poli__rasp: marks tests that run in the poli__rasp environment",
+    "unmarked: All other tests, which usually run in the base environment",
 ]
 
 [tool.isort]

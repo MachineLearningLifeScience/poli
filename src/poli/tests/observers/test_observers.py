@@ -9,7 +9,6 @@ This module implements tests for
 """
 
 import json
-import shutil
 from pathlib import Path
 
 import numpy as np
@@ -184,5 +183,20 @@ def test_multiple_observer_registration():
     problem_2.observer._observer.finish()
 
 
-if __name__ == "__main__":
-    test_observer_registration_and_external_instancing()
+def test_attaching_an_observer_to_a_black_box():
+    from poli.repository import ToyContinuousBlackBox
+
+    f = ToyContinuousBlackBox(
+        function_name="ackley_function_01",
+        n_dimensions=10,
+    )
+
+    observer = SimpleObserver()
+
+    f.set_observer(observer)
+
+    observer.initialize_observer(f.info, {"experiment_id": "attaching"}, seed=0)
+
+    f(np.array([0.0] * 10).reshape(1, 10))
+
+    assert len(observer.results[0]["x"]) == 1

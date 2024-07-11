@@ -14,6 +14,8 @@ The black box information includes the following information:
 
 from typing import Literal, Union
 
+import numpy as np
+
 
 class BlackBoxInformation:
     def __init__(
@@ -145,7 +147,11 @@ class BlackBoxInformation:
     def as_dict(self):
         return {
             "name": self.name,
-            "max_sequence_length": self.max_sequence_length,
+            "max_sequence_length": (
+                self.max_sequence_length
+                if self.max_sequence_length != np.inf
+                else "inf"
+            ),
             "aligned": self.aligned,
             "fixed_length": self.fixed_length,
             "deterministic": self.deterministic,

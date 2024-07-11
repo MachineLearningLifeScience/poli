@@ -6,12 +6,6 @@ import pytest
 from poli.core.exceptions import BudgetExhaustedException
 
 
-def test_budget_exhaustion_exception():
-    """Test that the exception is raised when the budget is exhausted."""
-    with pytest.raises(BudgetExhaustedException):
-        raise BudgetExhaustedException()
-
-
 def test_num_evaluation_tracks_correctly():
     from poli import objective_factory
 
@@ -51,7 +45,3 @@ def test_budget_exhausts():
 
     with pytest.raises(BudgetExhaustedException):
         f(x0)
-
-
-if __name__ == "__main__":
-    test_budget_exhausts()
