@@ -1,6 +1,7 @@
 import pytest
 
 
+@pytest.mark.poli__lambo
 @pytest.mark.slow()
 def test_foldx_rfp_lambo_runs():
     from poli import create
@@ -49,7 +50,3 @@ def test_foldx_rfp_lambo_runs():
         f(first_base_candidate_and_mutation),
         np.array([[-10591.87684184, -61.8757], [-10634.23150497, -61.5511]]),
     ).all()
-
-
-if __name__ == "__main__":
-    test_foldx_rfp_lambo_runs()

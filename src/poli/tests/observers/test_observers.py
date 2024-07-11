@@ -201,7 +201,3 @@ def test_attaching_an_observer_to_a_black_box():
     f(np.array([0.0] * 10).reshape(1, 10))
 
     assert len(observer.results[0]["x"]) == 1
-
-
-if __name__ == "__main__":
-    test_attaching_an_observer_to_a_black_box()

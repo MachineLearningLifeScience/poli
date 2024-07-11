@@ -29,24 +29,31 @@ def test_creating_embedded_toy_continuous_functions_benchmark():
             f(x0)
 
 
+@pytest.mark.poli__tdc
 def test_creating_guacamol_benchmark():
     from poli.benchmarks import GuacaMolGoalDirectedBenchmark
 
     benchmark = GuacaMolGoalDirectedBenchmark(string_representation="SELFIES")
 
-    for i, problem in enumerate(benchmark):
+    for problem in benchmark:
         f, x0 = problem.black_box, problem.x0
-        if i > 3:
-            break
+
+        # Break after the first iteration
+        # for CI efficiency
+        break
 
 
+@pytest.mark.poli__tdc
 def test_creating_pmo_benchmark():
     from poli.benchmarks import PMOBenchmark
 
     benchmark = PMOBenchmark(string_representation="SELFIES")
 
-    for i, problem in enumerate(benchmark):
+    for problem in benchmark:
         f, x0 = problem.black_box, problem.x0
 
-        if i > 3:
-            break
+        # Break after the first iteration
+        # for CI efficiency. The creation of all
+        # these black boxes is already being tested
+        # in the chemistry test suite.
+        break

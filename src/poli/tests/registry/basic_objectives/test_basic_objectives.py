@@ -1,10 +1,6 @@
-from pathlib import Path
-
 import numpy as np
 
 from poli import objective_factory
-
-THIS_DIR = Path(__file__).parent.resolve()
 
 
 def test_registering_white_noise():

@@ -30,6 +30,7 @@ except ImportError:
 THIS_DIR = Path(__file__).parent.resolve()
 
 
+@pytest.mark.poli__protein
 class TestFoldxInterface:
     wildtype_pdb_path = THIS_DIR / "3ned.pdb"
     tmp_path = THIS_DIR / "tmp"

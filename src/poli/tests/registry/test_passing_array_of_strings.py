@@ -5,8 +5,6 @@ from typing import List
 
 import pytest
 
-from poli.objective_repository import AVAILABLE_OBJECTIVES
-
 
 # TODO: parametrize by all non-aligned blackboxes
 @pytest.mark.parametrize(
@@ -126,20 +124,3 @@ def test_passing_array_of_strings(
     x_non_flat = np.array(example_non_flat_input)
 
     assert np.array_equal(f(x_flat), f(x_non_flat), equal_nan=True)
-
-
-if __name__ == "__main__":
-    test_passing_array_of_strings(
-        "dockstring",
-        [
-            ["C", ""],
-            ["C", "C"],
-        ],
-        [
-            "C",
-            "CC",
-        ],
-        {
-            "target_name": "ABL1",
-        },
-    )

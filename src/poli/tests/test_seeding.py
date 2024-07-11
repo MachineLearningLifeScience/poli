@@ -28,7 +28,3 @@ def test_seeding_in_white_noise_factory_creation():
     y2 = f(x0)
 
     assert (y0 == y1).all() and not np.isclose(y0, y2).all()
-
-
-if __name__ == "__main__":
-    test_seeding_in_white_noise_factory_creation()
