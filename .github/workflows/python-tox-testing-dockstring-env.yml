@@ -1,4 +1,4 @@
-name: poli dockstring (dev, conda, python 3.9)
+name: poli dockstring (conda, py3.9)
 
 on:
   push:

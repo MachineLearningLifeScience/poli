@@ -1,4 +1,4 @@
-name: poli protein (dev, conda, python 3.9)
+name: poli protein (conda, py3.9)
 
 on:
   push:

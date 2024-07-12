@@ -1,4 +1,4 @@
-name: poli tdc (dev, conda, python 3.9)
+name: poli tdc (conda, py3.9)
 
 on:
   push:
