@@ -1,14 +1,22 @@
-# poli 🧪, a library for discrete objective functions
+# `poli` 🧪, a library for discrete objective functions
 
-[![Testing (conda, python 3.9)](https://github.com/MachineLearningLifeScience/poli/actions/workflows/python-tox-testing-including-conda.yml/badge.svg)](https://github.com/MachineLearningLifeScience/poli/actions/workflows/python-tox-testing-including-conda.yml)
-[![Link to documentation](https://img.shields.io/badge/docs-poli_docs-blue)](https://machinelearninglifescience.github.io/poli-docs/)
+[![poli base (dev, conda, python 3.9)](https://github.com/MachineLearningLifeScience/poli/actions/workflows/python-tox-testing-base.yml/badge.svg)](https://github.com/MachineLearningLifeScience/poli/actions/workflows/python-tox-testing-base.yml)
+[![Link to documentation](https://img.shields.io/badge/documentation-poli_docs-blue)](https://machinelearninglifescience.github.io/poli-docs/)
 
-poli is a library of discrete objective functions for benchmarking optimization algorithms. Examples include:
-- 🔬 **stability** of mutations from a wildtype protein (using [foldx](https://foldxsuite.crg.eu/) or [rasp](https://github.com/KULL-Centre/_2022_ML-ddG-Blaabjerg)).
-- 🧪 **docking scores** of ligands to proteins (using [dockstring](https://github.com/dockstring/dockstring), [pyscreener](https://github.com/coleygroup/pyscreener) and [pytdc](https://tdcommons.ai/functions/oracles/)).
-- 💊 **druglikeness** or **synthetic acccesibility** of small molecules (using [rdkit](https://github.com/rdkit/rdkit) and [pytdc](https://tdcommons.ai/functions/oracles/)).
+`poli` is a library of discrete objective functions for benchmarking optimization algorithms.
 
-Some of `poli`'s features:
+## Black boxes
+
+| Black box | Tests | References |
+|----------|----------|----------|
+|   [Toy continuous functions (e.g. Ackley, Hartmann...)](https://machinelearninglifescience.github.io/poli-docs/using_poli/objective_repository/toy_continuous_problems.html)  |   [![poli base (dev, conda, python 3.9)](https://github.com/MachineLearningLifeScience/poli/actions/workflows/python-tox-testing-base.yml/badge.svg)](https://github.com/MachineLearningLifeScience/poli/actions/workflows/python-tox-testing-base.yml)  |   [(Al-Roomi 2015)](https://www.al-roomi.org/benchmarks/unconstrained), [(Surjanovic & Bingham 2013)](https://www.sfu.ca/~ssurjano/optimization.html)  |
+|   Ehrlich functions  |   [![poli base (dev, conda, python 3.9)](https://github.com/MachineLearningLifeScience/poli/actions/workflows/python-tox-testing-base.yml/badge.svg)](https://github.com/MachineLearningLifeScience/poli/actions/workflows/python-tox-testing-base.yml)  |   [(Stanton et al. 2024)](https://arxiv.org/abs/2407.00236)  |
+|   [PMO/GuacaMol benchmark](https://machinelearninglifescience.github.io/poli-docs/#small-molecules)  |   [![poli tdc (dev, conda, python 3.9)](https://github.com/MachineLearningLifeScience/poli/actions/workflows/python-tox-testing-tdc-env.yml/badge.svg)](https://github.com/MachineLearningLifeScience/poli/actions/workflows/python-tox-testing-tdc-env.yml)  |   [(Brown et al. 2019)](https://arxiv.org/abs/1811.09621), [(Gao et al. 2022)](https://openreview.net/forum?id=yCZRdI0Y7G)  |
+|   [Dockstring](https://machinelearninglifescience.github.io/poli-docs/using_poli/objective_repository/dockstring.html)  | [![poli dockstring (dev, conda, python 3.9)](https://github.com/MachineLearningLifeScience/poli/actions/workflows/python-tox-testing-dockstring-env.yml/badge.svg)](https://github.com/MachineLearningLifeScience/poli/actions/workflows/python-tox-testing-dockstring-env.yml)  |  [(García-Ortegón et al. 2022)](https://pubs.acs.org/doi/full/10.1021/acs.jcim.1c01334)  |
+|   [FoldX stability and SASA](https://machinelearninglifescience.github.io/poli-docs/#proteins)  |   -  |   [(Schymkowitz et al. 2005)](https://academic.oup.com/nar/article/33/suppl_2/W382/2505499?login=true)  |
+|   [RaSP](https://machinelearninglifescience.github.io/poli-docs/using_poli/objective_repository/RaSP.html)  |   -  |   [(Blaabjerg et al. 2023)](https://elifesciences.org/articles/82593)  |
+
+## Features
 - 🔲 **isolation** of black box function calls inside conda environments. Don't worry about clashes w. black box requirements, poli will create the relevant conda environments for you.
 - 🗒️ **logging** each black box call using observers.
 -  A numpy interface. Inputs are `np.array`s of strings, outputs are `np.array`s of floats.
@@ -27,8 +35,7 @@ pip install git+https://github.com/MachineLearningLifeScience/poli.git@dev
 To check if everything went well, you can run
 
 ```bash
-$ python -c "from poli import get_problems ; print(get_problems())"
-['aloha', ..., 'white_noise']
+$ python -c "from poli import create"
 ```
 
 ### An example: dockstring
