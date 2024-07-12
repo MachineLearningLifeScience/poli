@@ -61,10 +61,7 @@ class RMFIsolatedLogic(AbstractIsolatedFunction):
         assert all(
             [aa in ENCODING.keys() for aa in wildtype]
         ), "Input wildtype elements not in encoding alphabet."
-        wt_int = [ENCODING.get(aa) for aa in wildtype]
-        wt_oh = np.zeros((len(wildtype), len(AMINO_ACIDS)))
-        wt_oh[np.arange(len(wildtype)), wt_int] = 1
-        self.wt_oh = wt_oh
+        self.wt_int = np.array([ENCODING.get(aa) for aa in wildtype])
         if c is None:
             c = 1 / (len(alphabet) - 1)
         else:
@@ -93,42 +90,33 @@ class RMFIsolatedLogic(AbstractIsolatedFunction):
         kappa: float,
         rand_state,
     ) -> float:
-        b, L = np.shape(sigma)
+        L = len(sigma)
         # from [1] (2) additive term via Hamming distance and constant
-        print(sigma.shape)
-        print(sigma_star.shape)
-        dists = []
-        for i in range(b):  # TODO: make batch computation
-            hamm_dist = hamming(sigma[i].flatten(), sigma_star.flatten())
-            dists.append(hamm_dist)
-        hamm_dist = np.vstack(dists)
-        print(hamm_dist)
-        # from [2] nonadd. term is single small value accroding to RV, we use [1] RV instead of Gaussian
-        eta = genpareto.rvs(kappa, size=b, random_state=rand_state)
+        # hamm_dist = hamming(sigma.flatten(), sigma_star.flatten()) # NOTE scipy HD is normalized, DON't USE
+        hamm_dist = np.sum(sigma != sigma_star)
+        # from [2] nonadd. term is single small value accroding to RV, we use [1]gen.Pareto RV instead of Gaussian
+        eta = genpareto.rvs(kappa, size=1, random_state=rand_state)
         # NOTE [1] describes eta as 2^L i.i.d. RV vector, which does not yield a single function value
-        f_p = f0 + np.sum(-c * hamm_dist) / L
+        f_p = f0 + -c * hamm_dist
         f_val = f_p + eta
-        print(f_val)
         return f_val
 
     def __call__(self, x: np.ndarray, context=None) -> np.ndarray:
-        if not isinstance(x, np.ndarray):
-            x = np.array(list(x))
-        x = np.atleast_2d(x)
-        b, L = np.shape(x)
-        assert L == self.wildtype.shape[-1], "Inconsistent length: undefined."
-        x_int = np.array([[ENCODING.get(aa) for aa in _x] for _x in x])
-        x_oh = np.zeros((L, len(AMINO_ACIDS)))
-        x_oh[np.arange(L), x_int] = 1
-        val = self.f(
-            f0=self.f_0,
-            sigma=x_oh,
-            sigma_star=self.wt_oh,
-            c=self.c,
-            kappa=self.kappa,
-            rand_state=self.rng,
-        )
-        return np.array(val).reshape(-1, 1)
+        values = []
+        for sequence in x:
+            L = len(sequence)
+            assert L == self.wildtype.shape[-1], "Inconsistent length: undefined."
+            x_int = np.array([ENCODING.get(aa) for aa in sequence])
+            val = self.f(
+                f0=self.f_0,
+                sigma=x_int,
+                sigma_star=self.wt_int,
+                c=self.c,
+                kappa=self.kappa,
+                rand_state=self.rng,
+            )
+            values.append(val)
+        return np.array(values).reshape(-1, 1)
 
 
 if __name__ == "__main__":
