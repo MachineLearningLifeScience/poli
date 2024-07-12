@@ -1,6 +1,9 @@
-name: poli lambo (dev, conda, python 3.9)
+name: poli lambo (conda, py3.9)
 
-on: [push]
+on:
+  push:
+  schedule:
+    - cron: '0 0 * * 0'
 
 jobs:
   build-linux:
