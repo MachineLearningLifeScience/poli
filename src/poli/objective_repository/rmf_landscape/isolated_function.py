@@ -124,7 +124,7 @@ if __name__ == "__main__":
 
     register_isolated_function(
         RMFIsolatedLogic,
-        name="rmf__isolated",
+        name="rmf_landscape__isolated",
         conda_environment_name="poli__rmf",
         force=True,
     )
