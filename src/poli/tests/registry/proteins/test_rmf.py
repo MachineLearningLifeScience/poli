@@ -1,7 +1,5 @@
 import numpy as np
 import pytest
-from numpy.random import RandomState
-from scipy.stats import genpareto
 
 from poli import objective_factory
 from poli.objective_repository import AVAILABLE_PROBLEM_FACTORIES
@@ -100,6 +98,7 @@ def test_rmf_seed_consistent(seed: int):
 @pytest.mark.poli__rmf
 @pytest.mark.parametrize("n_mutations", [1, 2, 3])
 def test_rmf_num_mutations_expected_val(n_mutations: int):
+    from scipy.stats import genpareto
     SEED = 1
     mutation_seq = list(ref_aa_seq)
     for m in range(n_mutations):
