@@ -99,6 +99,7 @@ def test_rmf_seed_consistent(seed: int):
 @pytest.mark.parametrize("n_mutations", [1, 2, 3])
 def test_rmf_num_mutations_expected_val(n_mutations: int):
     from scipy.stats import genpareto
+
     SEED = 1
     mutation_seq = list(ref_aa_seq)
     for m in range(n_mutations):
