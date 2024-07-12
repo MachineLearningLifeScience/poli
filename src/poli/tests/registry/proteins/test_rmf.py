@@ -10,6 +10,7 @@ from poli.objective_repository import AVAILABLE_PROBLEM_FACTORIES
 ref_aa_seq = "HPETLVKVKDAEDQLGARVGYIELDLNSGKILESFRPEERFPMMSTFKVLLCGAVLSRVDAGQEQLGRRIHYSQNDLVEYSPVTEKHLTDGMTVRELCSAAITMSDNTAANLLLTTIGGPKELTAFLHNMGDHVTRLDRWNPELNEAIPNDERDTTMPAAMATTLRKLLTGELLTLASRQQLIDWMEADKVAGPLLRSALPAGWFIADKSGAGERGSRGIIAALGPDGKPSRIVVIYTTGSQATMDERNRQIAEIGASLIKHW"
 
 
+@pytest.mark.poli__rmf
 def test_rmf_is_available():
     """
     Test if rmf_landscape is available when scipy is installed.
@@ -18,6 +19,7 @@ def test_rmf_is_available():
     assert "rmf_landscape" in AVAILABLE_PROBLEM_FACTORIES
 
 
+@pytest.mark.poli__rmf
 def test_force_isolation_rmf_landscape():
     """
     Test if we can force-register the rmf_landscape problem.
@@ -34,6 +36,7 @@ def test_force_isolation_rmf_landscape():
     f.terminate()
 
 
+@pytest.mark.poli__rmf
 def test_rmf_landscape_init():
     problem = objective_factory.create(
         name="rmf_landscape",
@@ -46,6 +49,7 @@ def test_rmf_landscape_init():
     f.terminate()
 
 
+@pytest.mark.poli__rmf
 def test_rmf_landscape_batch_eval():
     problem = objective_factory.create(
         name="rmf_landscape",
@@ -64,6 +68,7 @@ def test_rmf_landscape_batch_eval():
     f.terminate()
 
 
+@pytest.mark.poli__rmf
 @pytest.mark.parametrize("seed", [1, 2, 3])
 def test_rmf_seed_consistent(seed: int):
     mutation_seq = list(ref_aa_seq)
@@ -93,6 +98,7 @@ def test_rmf_seed_consistent(seed: int):
     f_b.terminate()
 
 
+@pytest.mark.poli__rmf
 @pytest.mark.parametrize("n_mutations", [1, 2, 3])
 def test_rmf_num_mutations_expected_val(n_mutations: int):
     SEED = 1
@@ -120,10 +126,3 @@ def test_rmf_num_mutations_expected_val(n_mutations: int):
     assert np.isclose(np.round(y0 - ref_noise_0), 0)
     assert np.isclose(np.round(y1 - ref_noise_1), -n_mutations)
     f.terminate()
-
-
-if __name__ == "__main__":
-    # test_rmf_is_available()
-    test_force_isolation_rmf_landscape()
-    test_rmf_landscape_batch_eval()
-    test_rmf_seed_consistent()
