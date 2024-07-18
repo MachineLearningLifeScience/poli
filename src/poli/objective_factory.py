@@ -435,6 +435,9 @@ def _instantiate_observer(observer_name: str, quiet: bool = False) -> AbstractOb
         The black-box function, initial value, and related information.
 
     """
+    if _OBSERVER not in registry.config[_DEFAULT]:
+        registry.config[_DEFAULT][_OBSERVER] = _DEFAULT_OBSERVER_RUN_SCRIPT
+
     observer_script: str = registry.config[_DEFAULT][_OBSERVER]
     if observer_name is not None:
         if observer_name != DEFAULT_OBSERVER_NAME:
