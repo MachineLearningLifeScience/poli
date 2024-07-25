@@ -8,6 +8,7 @@ References
 [2] Analysis of a local fitness landscape with a model of the rough Mt. Fuji-type landscape: Application to prolyl endopeptidase and thermolysin.
     Aita T., Uchiyama H., et al. Biopolymers 54, 64-79 (2000). https://doi.org/10.1002/(SICI)1097-0282(200007)54:1<64::AID-BIP70>3.0.CO;2-R 
 """
+
 from __future__ import annotations
 from typing import List, Optional, Union
 
@@ -38,7 +39,7 @@ class RMFBlackBox(AbstractBlackBox):
     c : float, optional
         Constant scalar used in RMF computation, by default is the normalizing constant relative to alphabet size
     kappa : float, optional
-        Parameterizes the generalized Pareto distribution, by default 0.1 . 
+        Parameterizes the generalized Pareto distribution, by default 0.1 .
         Determines what type of distribution will be sampled from exponential family, Weibull, etc.
     seed : int, optional
         Random seed for replicability of results, by default None.
