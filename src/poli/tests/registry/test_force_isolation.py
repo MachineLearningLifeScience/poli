@@ -2,12 +2,11 @@
 box objectives indeed spawns an isolated process."""
 
 
-def test_force_isolation_on_aloha():
+def test_force_isolation():
     from poli import objective_factory
 
     problem = objective_factory.create(
-        name="aloha",
-        force_register=True,
+        name="deco_hop",
         force_isolation=True,
     )
 
