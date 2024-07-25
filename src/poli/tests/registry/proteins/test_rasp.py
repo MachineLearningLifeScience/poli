@@ -58,7 +58,6 @@ def test_rasp_on_3ned_against_notebooks_results_isolated():
     problem = objective_factory.create(
         name="rasp",
         wildtype_pdb_path=THIS_DIR / "3ned.pdb",
-        force_register=True,
     )
     f, x0 = problem.black_box, problem.x0
 

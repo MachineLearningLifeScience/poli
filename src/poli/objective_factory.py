@@ -6,9 +6,6 @@ import configparser
 import importlib
 import logging
 from pathlib import Path
-from typing import Tuple
-
-import numpy as np
 
 from poli.core import registry
 from poli.core.abstract_black_box import AbstractBlackBox
@@ -122,7 +119,6 @@ def create(
     seed: int = None,
     observer_init_info: dict = None,
     observer_name: str = None,
-    force_register: bool = True,
     force_isolation: bool = False,
     batch_size: int = None,
     parallelize: bool = False,
@@ -144,9 +140,6 @@ def create(
         Optional information about the caller that is forwarded to the logger to initialize the run.
     observer_name : str, optional
         The observer to use.
-    force_register : bool, deprecated
-        Force the registration of the objective function. This is deprecated and will be removed in the future.
-        As it stands, this kwarg is not used.
     force_isolation : bool, optional
         If True, then the objective function is instantiated as an isolated
         process.
@@ -248,7 +241,6 @@ def start(
     seed: int = None,
     caller_info: dict = None,
     observer_name: str = None,
-    force_register: bool = False,
     force_isolation: bool = False,
     **kwargs_for_factory,
 ) -> AbstractBlackBox:
@@ -281,9 +273,6 @@ def start(
         Optional information about the caller that is forwarded to the logger to initialize the run.
     observer_name : str, optional
         The observer to use.
-    force_register : bool, optional
-        If True, then the objective function is registered without asking
-        for confirmation, overwriting any previous registration.
     force_isolation : bool, optional
         If True, then the objective function is instantiated as an isolated
         process.
@@ -295,7 +284,6 @@ def start(
         seed=seed,
         observer_init_info=caller_info,
         observer_name=observer_name,
-        force_register=force_register,
         force_isolation=force_isolation,
         **kwargs_for_factory,
     )

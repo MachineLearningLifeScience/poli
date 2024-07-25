@@ -35,7 +35,6 @@ def test_parallelization_in_qed():
         num_workers=NUM_WORKERS,
         batch_size=4,
         string_representation="SMILES",
-        force_register=True,
     )
     f = problem.black_box
 
@@ -68,7 +67,6 @@ def test_parallelization_in_foldx_stability_and_sasa():
         parallelize=True,
         num_workers=NUM_WORKERS,
         batch_size=3,
-        force_register=True,
     )
 
     f, x0 = problem.black_box, problem.x0
