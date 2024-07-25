@@ -295,41 +295,58 @@ def create(
     """
     # If the user can run it with the envionment they currently
     # have, then we do not need to install it.
-    if not force_isolation:
-        if not quiet:
-            print(f"poli 🧪: Creating the objective {name} from the repository.")
+    # if not force_isolation:
+    #     if not quiet:
+    #         print(f"poli 🧪: Creating the objective {name} from the repository.")
 
-        problem = __create_problem_from_repository(
-            name,
-            seed=seed,
-            batch_size=batch_size,
-            parallelize=parallelize,
-            num_workers=num_workers,
-            evaluation_budget=evaluation_budget,
-            **kwargs_for_factory,
-        )
-    else:
-        # Check if the name is indeed registered, or
-        # available in the objective repository
-        # This function will
-        # 1. Create the conda environment for the objective
-        # 2. Run registration inside said environment.
-        __register_objective_if_available(name, quiet=quiet)
+    #     problem = __create_problem_from_repository(
+    #         name,
+    #         seed=seed,
+    #         batch_size=batch_size,
+    #         parallelize=parallelize,
+    #         num_workers=num_workers,
+    #         evaluation_budget=evaluation_budget,
+    #         **kwargs_for_factory,
+    #     )
+    # else:
+    #     # Check if the name is indeed registered, or
+    #     # available in the objective repository
+    #     # This function will
+    #     # 1. Create the conda environment for the objective
+    #     # 2. Run registration inside said environment.
 
-        # At this point, we know the name is registered.
-        # Thus, we should be able to start it as an isolated process
-        if not quiet:
-            print(f"poli 🧪: Creating an isolated problem ({name}).")
-        problem = __create_problem_as_isolated_process(
-            name,
-            seed=seed,
-            batch_size=batch_size,
-            parallelize=parallelize,
-            num_workers=num_workers,
-            evaluation_budget=evaluation_budget,
-            quiet=quiet,
-            **kwargs_for_factory,
-        )
+    #     # Assert that the problem has an isolated_function.py
+
+    #     # Register the isolated function.
+
+    #     # Create the problem as usual. The isolated function
+    #     # will run just fine.
+    #     __register_objective_if_available(name, quiet=quiet)
+
+    #     # At this point, we know the name is registered.
+    #     # Thus, we should be able to start it as an isolated process
+    #     if not quiet:
+    #         print(f"poli 🧪: Creating an isolated problem ({name}).")
+    #     problem = __create_problem_as_isolated_process(
+    #         name,
+    #         seed=seed,
+    #         batch_size=batch_size,
+    #         parallelize=parallelize,
+    #         num_workers=num_workers,
+    #         evaluation_budget=evaluation_budget,
+    #         quiet=quiet,
+    #         **kwargs_for_factory,
+    #     )
+    problem = __create_problem_from_repository(
+        name,
+        seed=seed,
+        batch_size=batch_size,
+        parallelize=parallelize,
+        num_workers=num_workers,
+        evaluation_budget=evaluation_budget,
+        **kwargs_for_factory,
+    )
+
     # instantiate observer (if desired)
     observer = _instantiate_observer(observer_name, quiet)
     observer_info = observer.initialize_observer(
