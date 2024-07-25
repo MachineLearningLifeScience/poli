@@ -206,14 +206,3 @@ class FexofenadineMPOProblemFactory(AbstractProblemFactory):
         )
 
         return fexofenadine_mpo_problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    register_problem(
-        FexofenadineMPOProblemFactory(),
-        name="fexofenadine_mpo",
-        conda_environment_name="poli__tdc",
-        force=True,
-    )

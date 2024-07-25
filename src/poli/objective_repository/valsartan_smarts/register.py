@@ -205,14 +205,3 @@ class ValsartanSMARTSProblemFactory(AbstractProblemFactory):
         )
 
         return valsartan_smarts_problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    register_problem(
-        ValsartanSMARTSProblemFactory(),
-        name="valsartan_smarts",
-        conda_environment_name="poli__tdc",
-        force=True,
-    )

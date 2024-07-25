@@ -205,14 +205,3 @@ class Median1ProblemFactory(AbstractProblemFactory):
         )
 
         return median_problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    register_problem(
-        Median1ProblemFactory(),
-        name="median_1",
-        conda_environment_name="poli__tdc",
-        force=True,
-    )

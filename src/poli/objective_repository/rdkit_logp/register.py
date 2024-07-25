@@ -9,7 +9,7 @@ descriptors. We allow for both SMILES and SELFIES
 strings.
 """
 
-from typing import Literal, Tuple
+from typing import Literal
 
 import numpy as np
 from rdkit.Chem import Descriptors
@@ -217,18 +217,3 @@ class LogPProblemFactory(AbstractProblemFactory):
         problem = Problem(f, x0)
 
         return problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    # Once we have created a simple conda enviroment
-    # (see the environment.yml file in this folder),
-    # we can register our problem s.t. it uses
-    # said conda environment.
-    logp_problem_factory = LogPProblemFactory()
-    register_problem(
-        logp_problem_factory,
-        conda_environment_name="poli__chem",
-        # force=True,
-    )

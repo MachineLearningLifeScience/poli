@@ -230,13 +230,3 @@ class RFPFoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
         problem = Problem(f, x0)
 
         return problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    rfp_foldx_problem_factory = RFPFoldXStabilityAndSASAProblemFactory()
-    register_problem(
-        rfp_foldx_problem_factory,
-        conda_environment_name="poli__protein",
-    )

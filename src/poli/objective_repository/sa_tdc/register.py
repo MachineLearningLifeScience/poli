@@ -17,7 +17,6 @@ from poli.core.black_box_information import BlackBoxInformation
 from poli.core.chemistry.tdc_black_box import TDCBlackBox
 from poli.core.problem import Problem
 from poli.core.util.chemistry.string_to_molecule import translate_smiles_to_selfies
-from poli.core.util.isolation.instancing import instance_function_as_isolated_process
 from poli.core.util.seeding import seed_python_numpy_and_torch
 from poli.objective_repository.sa_tdc.information import sa_tdc_info
 
@@ -176,13 +175,3 @@ class SAProblemFactory(AbstractProblemFactory):
             x0=x0,
         )
         return problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    register_problem(
-        SAProblemFactory(),
-        conda_environment_name="poli__tdc",
-        force=True,
-    )

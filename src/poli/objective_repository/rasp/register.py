@@ -20,8 +20,6 @@ Detlef Weigel, Nir Ben-Tal, and Julian Echave. eLife 12
 from pathlib import Path
 from typing import List, Union
 
-import numpy as np
-
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
@@ -289,14 +287,3 @@ class RaspProblemFactory(AbstractProblemFactory):
         problem = Problem(f, x0)
 
         return problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    rasp_problem_factory = RaspProblemFactory()
-    register_problem(
-        rasp_problem_factory,
-        conda_environment_name="poli__rasp",
-        force=True,
-    )

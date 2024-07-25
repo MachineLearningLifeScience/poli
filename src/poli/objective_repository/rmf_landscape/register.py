@@ -4,14 +4,14 @@ Implements a (tunable) fitness landscape of the type RMF [1] for NA [1], AA [2] 
 References
 ----------
 [1] Adaptation in Tunably Rugged Fitness Landscapes: The Rough Mount Fuji Model.
-    Neidhart J., Szendro I.G., and Krug, J. Genetics 198, 699-721 (2014). https://doi.org/10.1534/genetics.114.167668 
+    Neidhart J., Szendro I.G., and Krug, J. Genetics 198, 699-721 (2014). https://doi.org/10.1534/genetics.114.167668
 [2] Analysis of a local fitness landscape with a model of the rough Mt. Fuji-type landscape: Application to prolyl endopeptidase and thermolysin.
-    Aita T., Uchiyama H., et al. Biopolymers 54, 64-79 (2000). https://doi.org/10.1002/(SICI)1097-0282(200007)54:1<64::AID-BIP70>3.0.CO;2-R 
+    Aita T., Uchiyama H., et al. Biopolymers 54, 64-79 (2000). https://doi.org/10.1002/(SICI)1097-0282(200007)54:1<64::AID-BIP70>3.0.CO;2-R
 """
 
 from __future__ import annotations
 
-from typing import List, Optional, Union
+from typing import List
 
 import numpy as np
 
@@ -245,13 +245,3 @@ class RMFProblemFactory(AbstractProblemFactory):
         x0 = np.array(wildtype).reshape(1, len(wildtype))
         problem = Problem(f, x0)
         return problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    rmf_problem_factory = RMFProblemFactory()
-    register_problem(
-        rmf_problem_factory,
-        conda_environment_name="poli__rmf",
-    )

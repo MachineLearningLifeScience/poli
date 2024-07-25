@@ -209,14 +209,3 @@ class DRD2ProblemFactory(AbstractProblemFactory):
         )
 
         return drd2_problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    register_problem(
-        DRD2ProblemFactory(),
-        name="drd2_docking",
-        conda_environment_name="poli__tdc",
-        force=True,
-    )

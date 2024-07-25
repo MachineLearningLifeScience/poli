@@ -208,14 +208,3 @@ class TroglitazoneRediscoveryProblemFactory(AbstractProblemFactory):
         )
 
         return troglitazone_rediscovery_problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    register_problem(
-        TroglitazoneRediscoveryProblemFactory(),
-        name="troglitazone_rediscovery",
-        conda_environment_name="poli__tdc",
-        force=True,
-    )

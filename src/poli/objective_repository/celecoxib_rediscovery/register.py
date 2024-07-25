@@ -211,14 +211,3 @@ class CelecoxibRediscoveryProblemFactory(AbstractProblemFactory):
         )
 
         return celecoxib_rediscovery_problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    register_problem(
-        CelecoxibRediscoveryProblemFactory(),
-        name="celecoxib_rediscovery",
-        conda_environment_name="poli__tdc",
-        force=True,
-    )

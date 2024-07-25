@@ -271,13 +271,3 @@ class DockstringProblemFactory(AbstractProblemFactory):
         dockstring_problem = Problem(black_box=dockstring_black_box, x0=x0)
 
         return dockstring_problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    dockstring_problem_factory = DockstringProblemFactory()
-    register_problem(
-        dockstring_problem_factory,
-        conda_environment_name="poli__dockstring",
-    )

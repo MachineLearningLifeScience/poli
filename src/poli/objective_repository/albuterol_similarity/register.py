@@ -213,14 +213,3 @@ class AlbuterolSimilarityProblemFactory(AbstractProblemFactory):
         )
 
         return albuterol_similarity_problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    register_problem(
-        AlbuterolSimilarityProblemFactory(),
-        name="albuterol_similarity",
-        conda_environment_name="poli__tdc",
-        force=True,
-    )

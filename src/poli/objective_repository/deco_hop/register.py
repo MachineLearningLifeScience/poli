@@ -209,14 +209,3 @@ class DecoHopProblemFactory(AbstractProblemFactory):
         )
 
         return deco_hop_problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    register_problem(
-        DecoHopProblemFactory(),
-        name="deco_hop",
-        conda_environment_name="poli__tdc",
-        force=True,
-    )

@@ -205,14 +205,3 @@ class RanolazineMPOProblemFactory(AbstractProblemFactory):
         )
 
         return ranolazine_mpo_problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    register_problem(
-        RanolazineMPOProblemFactory(),
-        name="ranolazine_mpo",
-        conda_environment_name="poli__tdc",
-        force=True,
-    )

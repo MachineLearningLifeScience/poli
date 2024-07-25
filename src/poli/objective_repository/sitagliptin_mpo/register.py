@@ -204,14 +204,3 @@ class SitagliptinMPOProblemFactory(AbstractProblemFactory):
         )
 
         return sitagliptin_mpo_problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    register_problem(
-        SitagliptinMPOProblemFactory(),
-        name="sitagliptin_mpo",
-        conda_environment_name="poli__tdc",
-        force=True,
-    )

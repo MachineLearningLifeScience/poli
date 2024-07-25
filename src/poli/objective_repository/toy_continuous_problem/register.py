@@ -25,12 +25,7 @@ from poli.objective_repository.toy_continuous_problem.information import (
     toy_continuous_info,
 )
 
-from .toy_continuous_problem import (
-    POSSIBLE_FUNCTIONS,
-    SIX_DIMENSIONAL_PROBLEMS,
-    TWO_DIMENSIONAL_PROBLEMS,
-    ToyContinuousProblem,
-)
+from .toy_continuous_problem import POSSIBLE_FUNCTIONS, ToyContinuousProblem
 
 
 class ToyContinuousBlackBox(AbstractBlackBox):
@@ -222,18 +217,3 @@ class ToyContinuousProblemFactory(AbstractProblemFactory):
         x0 = f.function.x0
 
         return Problem(f, x0)
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    # Once we have created a simple conda enviroment
-    # (see the environment.yml file in this folder),
-    # we can register our problem s.t. it uses
-    # said conda environment.
-    toy_continuous_problem_factory = ToyContinuousProblemFactory()
-    register_problem(
-        toy_continuous_problem_factory,
-        conda_environment_name="poli__base",
-        # force=True
-    )

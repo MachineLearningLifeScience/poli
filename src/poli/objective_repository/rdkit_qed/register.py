@@ -10,7 +10,7 @@ Chem.QED.qed function, which returns a float between
 0 and 1. We allow for both SMILES and SELFIES strings.
 """
 
-from typing import List, Literal, Tuple
+from typing import Literal
 
 import numpy as np
 from rdkit.Chem.QED import qed
@@ -19,7 +19,6 @@ from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
-from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.core.util.chemistry.string_to_molecule import strings_to_molecules
 from poli.core.util.seeding import seed_python_numpy_and_torch
 from poli.objective_repository.rdkit_qed.information import rdkit_qed_info
@@ -246,18 +245,3 @@ class QEDProblemFactory(AbstractProblemFactory):
             x0 = np.array([["[C]"]])
 
         return Problem(f, x0)
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    # Once we have created a simple conda enviroment
-    # (see the environment.yml file in this folder),
-    # we can register our problem s.t. it uses
-    # said conda environment.
-    qed_problem_factory = QEDProblemFactory()
-    register_problem(
-        qed_problem_factory,
-        conda_environment_name="poli__chem",
-        # force=True,
-    )
