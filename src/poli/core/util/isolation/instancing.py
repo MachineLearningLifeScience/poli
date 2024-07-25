@@ -150,7 +150,9 @@ def __register_isolated_function_from_core(name: str, quiet: bool = False) -> No
 
 
 def __run_file_in_env(env_name: str, file_path: Path):
-    # Running the file
+    """
+    Runs a file from a given conda env.
+    """
     command = " ".join(["conda", "run", "-n", env_name, "python", str(file_path)])
     try:
         subprocess.run(command, check=True, shell=True, capture_output=True)
@@ -176,7 +178,6 @@ def __register_isolated_file(
     env_name = __read_env_name(environment_file)
 
     # 2. Running the file
-    # warnings.warn("Running the following command: %s. " % command)
     if not quiet:
         if name_for_show:
             print(
@@ -213,6 +214,15 @@ def register_isolated_function(name: str, quiet: bool = False):
     config = load_config()
     if name not in config:
         # Register problem
+
+        # Two cases:
+        # (i) some of the isolated functions are not alongside
+        # their black boxes and problem factories, but are rather inside
+        # the core of poli. For now, the only case is tdc, but more may
+        # come in the future.
+        #
+        # (ii) the isolated function is in the repository, living alongside
+        # the black box and the problem factory.
         if name == "tdc__isolated":
             logging.debug(
                 f"poli 🧪: Registered the isolated function from the repository."
