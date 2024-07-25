@@ -3,8 +3,6 @@ Creates objective functions by providing a common interface to all factories in 
 """
 
 import configparser
-import importlib
-import logging
 from pathlib import Path
 
 from poli.core import registry
@@ -325,7 +323,7 @@ def _instantiate_observer(observer_name: str, quiet: bool = False) -> AbstractOb
         observer = DefaultObserver()
     else:
         if not quiet:
-            print(f"poli 🧪: initializing the observer.")
+            print("poli 🧪: initializing the observer.")
         try:
             f = open(observer_script, "r")
             observer_class = (
@@ -333,8 +331,8 @@ def _instantiate_observer(observer_name: str, quiet: bool = False) -> AbstractOb
             )
             f.close()
             observer = dynamically_instantiate(observer_class)
-        except:
+        except Exception:
             if not quiet:
-                print(f"poli 🧪: attempting isolated observer instantiation.")
+                print("poli 🧪: attempting isolated observer instantiation.")
             observer = ExternalObserver(observer_name=observer_name)
     return observer

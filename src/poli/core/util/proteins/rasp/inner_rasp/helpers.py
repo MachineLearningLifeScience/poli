@@ -1,30 +1,18 @@
 import datetime
-import glob
-import itertools
 import os
 import pickle
 import random
-import sys
 from pathlib import Path
-from typing import Dict, List, Union
 
 import numpy as np
 import pandas as pd
 import pytz
 import torch
-from Bio.PDB.Polypeptide import index_to_one, one_to_index
+from Bio.PDB.Polypeptide import one_to_index
 from scipy.stats import pearsonr
-from torch.nn.functional import softmax
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader
 
-from .cavity_model import (
-    CavityModel,
-    DDGDataset,
-    DDGToTensor,
-    DownstreamModel,
-    ResidueEnvironmentsDataset,
-    ToTensor,
-)
+from .cavity_model import DDGDataset, DDGToTensor, ResidueEnvironmentsDataset, ToTensor
 from .PrismData import PrismParser, VariantData
 from .visualization import learning_curve_cavity, learning_curve_ds
 
@@ -201,7 +189,7 @@ def train_loop(
         else:
             patience += 1
         if patience > PATIENCE_CUTOFF:
-            print(f"Early stopping activated.")
+            print("Early stopping activated.")
             break
 
     learning_curve_cavity(acc_val_list, acc_train_list, loss_train_list)
@@ -220,7 +208,7 @@ def populate_dfs_with_resenvs(ddg_data, resenv_dataset):
     """
     print(
         "Dropping data points where residue is not defined in structure "
-        f"or due to missing parsed pdb file"
+        "or due to missing parsed pdb file"
     )
     # Add wt residue environments to standard ddg data dataframes
 

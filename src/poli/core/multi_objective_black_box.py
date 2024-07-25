@@ -10,7 +10,6 @@ import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.black_box_information import BlackBoxInformation
-from poli.core.problem_setup_information import ProblemSetupInformation
 
 
 class MultiObjectiveBlackBox(AbstractBlackBox):

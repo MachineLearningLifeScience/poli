@@ -2,8 +2,6 @@
 Implements the problem setup information, which contains the problem information (e.g. alphabet, sequence length...).
 """
 
-import numpy as np
-
 from poli.core.black_box_information import BlackBoxInformation
 
 

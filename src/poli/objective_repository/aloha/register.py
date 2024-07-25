@@ -11,7 +11,6 @@ environment.yml file in this folder).
 """
 
 from string import ascii_uppercase
-from typing import Literal, Tuple
 
 import numpy as np
 

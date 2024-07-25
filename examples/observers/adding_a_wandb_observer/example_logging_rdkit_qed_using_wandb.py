@@ -11,7 +11,6 @@ from pathlib import Path
 import numpy as np
 from wandb_observer import WandbObserver
 
-from poli.core.problem import Problem
 from poli.objective_repository import QEDProblemFactory
 
 THIS_DIR = Path(__file__).parent.resolve()

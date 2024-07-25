@@ -225,13 +225,13 @@ def register_isolated_function(name: str, quiet: bool = False):
         # the black box and the problem factory.
         if name == "tdc__isolated":
             logging.debug(
-                f"poli 🧪: Registered the isolated function from the repository."
+                "poli 🧪: Registered the isolated function from the repository."
             )
             __register_isolated_function_from_core(name, quiet=quiet)
             config = load_config()
         else:
             logging.debug(
-                f"poli 🧪: Registered the isolated function from the repository."
+                "poli 🧪: Registered the isolated function from the repository."
             )
             __register_isolated_function_from_repository(name, quiet=quiet)
             # Refresh the config

@@ -85,7 +85,7 @@ class PenalizedLogPIsolatedLogic(AbstractIsolatedFunction):
         and then computes the penalized logP. If the translation
         threw an error, we return NaN instead.
         """
-        if not x.dtype.kind in ["U", "S"]:
+        if x.dtype.kind not in ["U", "S"]:
             raise ValueError(
                 f"We expect x to be an array of strings, but we got {x.dtype}"
             )

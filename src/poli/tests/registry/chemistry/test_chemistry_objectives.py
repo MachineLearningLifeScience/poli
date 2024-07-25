@@ -41,12 +41,11 @@ def test_penalized_logp_lambo():
     Testing whether we can register the logp problem
     from lambo.
     """
-    from poli import objective_factory
 
     _ = pytest.importorskip("lambo")
 
     # Using create
-    problem = objective_factory.create(name="penalized_logp_lambo")
+    _ = objective_factory.create(name="penalized_logp_lambo")
 
 
 @pytest.mark.poli__dockstring
@@ -54,7 +53,6 @@ def test_querying_dockstring_using_smiles():
     """
     In this test, we force-register and query dockstring.
     """
-    from poli import objective_factory
 
     problem = objective_factory.create(
         name="dockstring",
@@ -65,7 +63,7 @@ def test_querying_dockstring_using_smiles():
 
     # Docking another smiles
     x1 = np.array([list("CC(=O)OC1=CC=CC=C1C(=O)O")])
-    y1 = f(x1)
+    _ = f(x1)
 
     f.terminate()
 
@@ -76,7 +74,6 @@ def test_querying_dockstring_using_selfies():
     In this test, we check whether dockstring still
     works when using SELFIES instead of SMILES.
     """
-    from poli import objective_factory
 
     problem = objective_factory.create(
         name="dockstring",
@@ -112,7 +109,7 @@ def test_querying_dockstring_using_selfies():
         ]
     )
 
-    y1 = f(selfies_aspirin)
+    _ = f(selfies_aspirin)
     f.terminate()
 
 
