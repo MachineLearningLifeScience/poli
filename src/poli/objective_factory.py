@@ -18,9 +18,7 @@ from poli.core.registry import (
     _DEFAULT,
     _DEFAULT_OBSERVER_RUN_SCRIPT,
     _OBSERVER,
-    _RUN_SCRIPT_LOCATION,
     DEFAULT_OBSERVER_NAME,
-    register_problem_from_repository,
 )
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.algorithm_observer_wrapper import AlgorithmObserverWrapper
@@ -118,126 +116,6 @@ def __create_problem_from_repository(
         problem.black_box.set_observer(observer)
 
     return problem
-
-
-def __create_problem_as_isolated_process(
-    name: str,
-    seed: int = None,
-    batch_size: int = None,
-    parallelize: bool = False,
-    num_workers: int = None,
-    evaluation_budget: int = float("inf"),
-    quiet: bool = False,
-    **kwargs_for_factory,
-) -> Problem:
-    """Creates the objective function as an isolated process.
-
-    If the problem is registered, we create it as an isolated
-    process. Otherwise, we raise an error. That is, this function
-    expects the problem to be registered.
-
-    Parameters
-    ----------
-    name : str
-        The name of the objective function.
-    seed : int, optional
-        The seed value for random number generation.
-    batch_size : int, optional
-        The batch size, passed to the black box to run evaluations on batches.
-        If None, it will evaluate all inputs at once.
-    parallelize : bool, optional
-        If True, then the objective function runs in parallel.
-    num_workers : int, optional
-        When parallelize is True, this specifies the number of processes to use.
-        By default, it uses half the number of available CPUs (rounded down).
-    evaluation_budget : int, optional
-        The maximum number of evaluations allowed. By default, it is infinity.
-    quiet : bool, optional
-        If True, we squelch the messages giving feedback about the creation process.
-        By default, it is False.
-    **kwargs_for_factory : dict, optional
-        Additional keyword arguments for the factory.
-    """
-    config = load_config()
-    if name not in config:
-        raise ValueError(f"Objective function '{name}' is not registered. ")
-
-    # start objective process
-    # VERY IMPORTANT: the script MUST accept port and password as arguments
-    kwargs_for_factory["batch_size"] = batch_size
-    kwargs_for_factory["parallelize"] = parallelize
-    kwargs_for_factory["num_workers"] = num_workers
-    kwargs_for_factory["evaluation_budget"] = evaluation_budget
-
-    if not quiet:
-        print(f"poli 🧪: Starting the problem {name} as an isolated objective process.")
-
-    process_wrapper = ProcessWrapper(
-        config[name][_RUN_SCRIPT_LOCATION], **kwargs_for_factory
-    )
-    # TODO: add signal listener that intercepts when proc ends
-    # wait for connection from objective process
-    # TODO: potential (unlikely) race condition! (process might try to connect before listener is ready!)
-    # TODO: We could be sending all the kwargs for the factory here.
-    process_wrapper.send(("SETUP", seed))
-
-    msg_type, *msg = process_wrapper.recv()
-    if msg_type == "SETUP":
-        # Then the instance of the abstract factory
-        # was correctly set-up, and
-        x0 = msg[0]
-    elif msg_type == "EXCEPTION":
-        e, tb = msg
-        print(tb)
-        raise e
-    else:
-        raise ValueError(
-            f"Internal error: received {msg_type} when expecting SETUP or EXCEPTION"
-        )
-
-    f = ExternalBlackBox(process_wrapper)
-    external_problem = Problem(
-        black_box=f,
-        x0=x0,
-    )
-
-    return external_problem
-
-
-def __register_objective_if_available(name: str, quiet: bool = False):
-    """Registers the objective function if it is available in the repository.
-
-    If the objective function is not available in the repository,
-    then we raise an error. If it is available, then we ask the
-    user for confirmation to register it. If the user confirms,
-    then we register it. Otherwise, we raise an error.
-
-    Parameters
-    ----------
-    name : str
-        The name of the objective function.
-    force_register : bool, optional
-        If True, then the objective function is registered without asking
-        for confirmation, overwriting any previous registration. By default,
-        it is True.
-    quiet : bool, optional
-        If True, we squelch the messages giving feedback about the creation process.
-        By default, it is False.
-    """
-    config = load_config()
-    if name not in config:
-        if name not in AVAILABLE_OBJECTIVES:
-            raise ValueError(
-                f"Objective function '{name}' is not registered, "
-                "and it is not available in the repository."
-            )
-
-        # Register problem
-        register_problem_from_repository(name, quiet=quiet)
-        logging.debug(f"poli 🧪: Registered the objective from the repository.")
-
-        # Refresh the config
-        config = load_config()
 
 
 def create(
