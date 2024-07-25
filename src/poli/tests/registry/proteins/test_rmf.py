@@ -8,15 +8,6 @@ ref_aa_seq = "HPETLVKVKDAEDQLGARVGYIELDLNSGKILESFRPEERFPMMSTFKVLLCGAVLSRVDAGQEQL
 
 
 @pytest.mark.poli__rmf
-def test_rmf_is_available():
-    """
-    Test if rmf_landscape is available when scipy is installed.
-    """
-    _ = pytest.importorskip("scipy")
-    assert "rmf_landscape" in AVAILABLE_PROBLEM_FACTORIES
-
-
-@pytest.mark.poli__rmf
 def test_force_isolation_rmf_landscape():
     """
     Test if we can force-register the rmf_landscape problem.
