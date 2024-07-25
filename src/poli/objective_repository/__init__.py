@@ -75,6 +75,7 @@ from .rdkit_qed.register import QEDBlackBox, QEDProblemFactory
 from .rfp_foldx_stability_and_sasa.register import (
     RFPFoldXStabilityAndSASAProblemFactory,
 )
+from .rmf_landscape.register import RMFBlackBox, RMFProblemFactory
 from .sa_tdc.register import SABlackBox, SAProblemFactory
 from .scaffold_hop.register import ScaffoldHopBlackBox, ScaffoldHopProblemFactory
 from .sitagliptin_mpo.register import (
@@ -138,6 +139,7 @@ AVAILABLE_PROBLEM_FACTORIES = {
     "rdkit_logp": LogPProblemFactory,
     "rdkit_qed": QEDProblemFactory,
     "rfp_foldx_stability_and_sasa": RFPFoldXStabilityAndSASAProblemFactory,
+    "rmf_landscape": RMFProblemFactory,
     "sa_tdc": SAProblemFactory,
     "super_mario_bros": SuperMarioBrosProblemFactory,
     "white_noise": WhiteNoiseProblemFactory,
@@ -182,6 +184,7 @@ AVAILABLE_BLACK_BOXES = {
     "rdkit_logp": LogPBlackBox,
     "rdkit_qed": QEDBlackBox,
     "rfp_foldx_stability_and_sasa": FoldXStabilityAndSASABlackBox,
+    "rmf_landscape": RMFBlackBox,
     "sa_tdc": SABlackBox,
     "super_mario_bros": SuperMarioBrosBlackBox,
     "white_noise": WhiteNoiseBlackBox,
