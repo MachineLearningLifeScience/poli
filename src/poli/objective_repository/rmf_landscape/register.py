@@ -27,15 +27,42 @@ from poli.objective_repository.rmf_landscape.information import rmf_info
 
 class RMFBlackBox(AbstractBlackBox):
     """
-    TODO: docstring
+    RMF Black Box implementation.
+
+    Parameters
+    ----------
+    wildtype : str
+        The wildtype amino-acid sequence (aka reference sequence) against which all RMF values are computed against.
+    wt_val : float , optional
+        The reference value for the WT, zero if observations are standardized, else float value e.g. ddGs
+    c : float, optional
+        Constant scalar used in RMF computation, by default is the normalizing constant relative to alphabet size
+    kappa : float, optional
+        Parameterizes the generalized Pareto distribution, by default 0.1 . 
+        Determines what type of distribution will be sampled from exponential family, Weibull, etc.
+    seed : int, optional
+        Random seed for replicability of results, by default None.
+    alphabet : List[str], optional
+        Type of alphabet of the sequences, by default Amino Acids.
+        Nucleic Acids possible.
+    batch_size : int, optional
+        The batch size for parallel evaluation, by default None.
+    parallelize : bool, optional
+        Flag to parallelize evaluation, by default False.
+    num_workers : int, optional
+        The number of workers for parallel evaluation, by default None.
+    evaluation_budget : int, optional
+        The evaluation budget, by default float("inf").
+    force_isolation : bool, optional
+        Run in an isolated environment and process, by default False.
     """
 
     def __init__(
         self,
         wildtype: str,
-        wt_val: float | None = 0.0,
+        wt_val: float = 0.0,
         c: float | None = None,
-        kappa: float | None = 0.1,
+        kappa: float = 0.1,
         seed: int | None = None,
         alphabet: List[str] | None = None,
         batch_size: int | None = None,
