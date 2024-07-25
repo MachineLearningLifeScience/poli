@@ -23,6 +23,10 @@ STARTING_N = "n_D0"
 ALGORITHM = "ALGORITHM"
 BATCH_SIZE = "BATCH_SIZE"
 
-from poli.objective_repository.foldx_rfp_lambo.register import (
-    FoldXRFPLamboProblemFactory,
-)
+__all__ = [
+    "PROBLEM_SEQ",
+    "CORRECT_SEQ",
+    "STARTING_N",
+    "ALGORITHM",
+    "BATCH_SIZE",
+]

@@ -36,7 +36,7 @@ def test_creating_guacamol_benchmark():
     benchmark = GuacaMolGoalDirectedBenchmark(string_representation="SELFIES")
 
     for problem in benchmark:
-        f, x0 = problem.black_box, problem.x0
+        _, _ = problem.black_box, problem.x0
 
         # Break after the first iteration
         # for CI efficiency
@@ -50,7 +50,7 @@ def test_creating_pmo_benchmark():
     benchmark = PMOBenchmark(string_representation="SELFIES")
 
     for problem in benchmark:
-        f, x0 = problem.black_box, problem.x0
+        _, _ = problem.black_box, problem.x0
 
         # Break after the first iteration
         # for CI efficiency. The creation of all

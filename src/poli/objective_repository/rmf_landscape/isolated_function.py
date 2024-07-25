@@ -1,11 +1,9 @@
 from __future__ import annotations
 
 import logging
-from random import seed
-from typing import List, Optional
+from typing import List
 
 import numpy as np
-from scipy.spatial.distance import hamming
 from scipy.stats import genpareto
 
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
@@ -52,7 +50,6 @@ class RMFIsolatedLogic(AbstractIsolatedFunction):
             "Missing reference input sequence. "
             "Did you forget to pass it to the create of the black box?"
         )
-        oracle_name = "RMF"
         if not isinstance(wildtype, np.ndarray):
             wildtype = np.array(list(wildtype))
         self.wildtype = wildtype
@@ -92,7 +89,6 @@ class RMFIsolatedLogic(AbstractIsolatedFunction):
         kappa: float,
         rand_state,
     ) -> float:
-        L = len(sigma)
         # from [1] (2) additive term via Hamming distance and constant
         # hamm_dist = hamming(sigma.flatten(), sigma_star.flatten()) # NOTE scipy HD is normalized, DON't USE
         hamm_dist = np.sum(sigma != sigma_star)

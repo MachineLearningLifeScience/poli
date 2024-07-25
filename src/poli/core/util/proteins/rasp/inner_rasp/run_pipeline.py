@@ -1,35 +1,25 @@
 import glob
 import os
-import pathlib
 import random
 import subprocess
-import sys
 
 import numpy as np
 import pandas as pd
 import torch
 from Bio.PDB.Polypeptide import index_to_one
-from cavity_model import (
-    CavityModel,
-    DownstreamModel,
-    ResidueEnvironment,
-    ResidueEnvironmentsDataset,
-)
+from cavity_model import CavityModel, DownstreamModel, ResidueEnvironmentsDataset
 from helpers import (
     compute_pdb_combo_corrs,
     ds_pred,
     ds_train_val,
     fermi_transform,
-    get_ddg_dataloader,
     init_lin_weights,
-    inverse_fermi_transform,
     populate_dfs_with_resenvs,
     remove_disulfides,
     train_loop,
     train_val_split_cavity,
     train_val_split_ds,
 )
-from torch.utils.data import DataLoader, Dataset
 from visualization import (
     hist_plot_all,
     homology_plot,
@@ -67,7 +57,7 @@ NUM_ENSEMBLE = 10
 
 def main():
     # Pre-process all protein structures
-    print(f"Pre-processing PDBs ...")
+    print("Pre-processing PDBs ...")
     pdb_dirs = [
         f"{os.path.dirname(os.getcwd())}/data/train/cavity/structure/",
         f"{os.path.dirname(os.getcwd())}/data/train/downstream/structure/",

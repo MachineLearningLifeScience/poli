@@ -147,7 +147,7 @@ def test_creating_a_problem_with_a_factory():
     )
 
     f, x0 = problem.black_box, problem.x0
-    y0 = f(x0)
+    _ = f(x0)
 
 
 def test_creating_with_create():
@@ -162,4 +162,4 @@ def test_creating_with_create():
         seed=1,
     )
     f, x0 = problem.black_box, problem.x0
-    y0 = f(x0)
+    _ = f(x0)

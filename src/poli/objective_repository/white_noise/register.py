@@ -161,7 +161,6 @@ class WhiteNoiseProblemFactory(AbstractProblemFactory):
         if seed is not None:
             seed_python_numpy_and_torch(seed)
 
-        problem_info = self.get_setup_information()
         f = WhiteNoiseBlackBox(
             batch_size=batch_size,
             parallelize=parallelize,

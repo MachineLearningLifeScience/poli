@@ -12,7 +12,6 @@ import lambo
 import numpy as np
 import yaml
 from lambo import __file__ as project_root_file
-from lambo.tasks.proxy_rfp.proxy_rfp import ProxyRFPTask
 from lambo.utils import AMINO_ACIDS
 
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction

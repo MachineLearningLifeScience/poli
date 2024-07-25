@@ -1,16 +1,11 @@
-from typing import Literal, Tuple
+from typing import Literal
 
 import numpy as np
 from dockstring import load_target
 
-from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
-from poli.core.black_box_information import BlackBoxInformation
 from poli.core.registry import register_isolated_function
 from poli.core.util.chemistry.string_to_molecule import translate_selfies_to_smiles
-from poli.objective_repository.dockstring.information import (
-    dockstring_black_box_information,
-)
 
 
 class IsolatedDockstringFunction(AbstractIsolatedFunction):
@@ -127,7 +122,7 @@ class IsolatedDockstringFunction(AbstractIsolatedFunction):
         for smiles in molecules_as_smiles:
             try:
                 score = self.target.dock(smiles)[0]
-            except Exception as e:
+            except Exception:
                 score = np.nan
             scores.append(score)
 

@@ -10,11 +10,6 @@ THIS_DIR = Path(__file__).parent.resolve()
 
 @pytest.mark.poli__rasp
 def test_rasp_on_3ned_against_notebooks_results_on_rasp_env():
-    try:
-        from poli.objective_repository.rasp.isolated_function import RaspIsolatedLogic
-    except ImportError:
-        pytest.skip("Could not import the rasp isolated logic. ")
-
     import torch
 
     # For us to match what the notebook says, we have
