@@ -1,3 +1,4 @@
+from __future__ import annotations
 import logging
 from random import seed
 from typing import List, Optional
@@ -37,11 +38,11 @@ class RMFIsolatedLogic(AbstractIsolatedFunction):
     def __init__(
         self,
         wildtype: List[str],
-        wt_val: Optional[float] = 0.0,
-        c: Optional[float] = None,
-        kappa: Optional[float] = 0.1,
-        alphabet: Optional[List[str]] = None,
-        seed: Optional[int] = 0,
+        wt_val: float | None = 0.0,
+        c: float | None = None,
+        kappa: float | None = 0.1,
+        alphabet: List[str] | None = None,
+        seed: int | None = 0,
     ) -> None:
         """
         Initialize the RMFBlackBox object.
