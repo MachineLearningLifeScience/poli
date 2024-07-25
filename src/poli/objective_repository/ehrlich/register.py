@@ -385,6 +385,7 @@ class EhrlichProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
+        force_isolation: bool = False,
     ) -> Problem:
         """
         Creates an Ehrlich function problem (containing an Ehrlich black box and

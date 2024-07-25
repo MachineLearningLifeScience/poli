@@ -197,6 +197,7 @@ class QEDProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
+        force_isolation: bool = False,
     ) -> Problem:
         """Creates a QED black box function and initial observations.
 

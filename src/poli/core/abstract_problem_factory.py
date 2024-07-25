@@ -1,10 +1,5 @@
 """This module implements the abstract problem factory."""
 
-from typing import Tuple
-
-import numpy as np
-
-from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
 
@@ -64,6 +59,7 @@ class AbstractProblemFactory(metaclass=MetaProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
+        force_isolation: bool = False,
     ) -> Problem:
         """
         Returns a blackbox function and initial observations.
@@ -80,7 +76,9 @@ class AbstractProblemFactory(metaclass=MetaProblemFactory):
             The number of workers for parallel evaluation. Default is None.
         evaluation_budget:  int, optional
             The maximum number of function evaluations. Default is infinity.
-
+        force_isolation: bool, optional
+            Whether to force the isolation of the black box. Default
+            is False.
         Returns
         --------
         problem: AbstractProblem

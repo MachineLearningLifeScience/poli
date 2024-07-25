@@ -56,6 +56,7 @@ def __create_problem_from_repository(
     parallelize: bool = False,
     num_workers: int = None,
     evaluation_budget: int = float("inf"),
+    force_isolation: bool = False,
     observer: AbstractObserver = None,
     **kwargs_for_factory,
 ) -> Problem:
@@ -109,6 +110,7 @@ def __create_problem_from_repository(
         parallelize=parallelize,
         num_workers=num_workers,
         evaluation_budget=evaluation_budget,
+        force_isolation=force_isolation,
         **kwargs_for_factory,
     )
 
@@ -344,6 +346,7 @@ def create(
         parallelize=parallelize,
         num_workers=num_workers,
         evaluation_budget=evaluation_budget,
+        force_isolation=force_isolation,
         **kwargs_for_factory,
     )
 
@@ -418,7 +421,7 @@ def start(
         observer_name=observer_name,
         force_register=force_register,
         force_isolation=force_isolation,
-        kwargs_for_factory=kwargs_for_factory,
+        **kwargs_for_factory,
     )
 
     f = problem.black_box

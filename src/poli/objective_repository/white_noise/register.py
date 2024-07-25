@@ -134,6 +134,7 @@ class WhiteNoiseProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
+        force_isolation: bool = False,
     ) -> Problem:
         """
         Create a white noise problem with the specified parameters.
