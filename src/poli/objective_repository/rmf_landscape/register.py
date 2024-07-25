@@ -8,7 +8,7 @@ References
 [2] Analysis of a local fitness landscape with a model of the rough Mt. Fuji-type landscape: Application to prolyl endopeptidase and thermolysin.
     Aita T., Uchiyama H., et al. Biopolymers 54, 64-79 (2000). https://doi.org/10.1002/(SICI)1097-0282(200007)54:1<64::AID-BIP70>3.0.CO;2-R 
 """
-
+from __future__ import annotations
 from typing import List, Optional, Union
 
 import numpy as np
@@ -33,15 +33,15 @@ class RMFBlackBox(AbstractBlackBox):
     def __init__(
         self,
         wildtype: str,
-        wt_val: Optional[float] = 0.0,
-        c: Optional[float] = None,
-        kappa: Optional[float] = 0.1,
-        seed: Optional[int] = None,
-        alphabet: Optional[List[str]] = None,
-        batch_size: Optional[int] = None,
-        parallelize: Optional[bool] = False,
-        num_workers: Optional[int] = None,
-        evaluation_budget: Optional[int] = float("inf"),
+        wt_val: float | None = 0.0,
+        c: float | None = None,
+        kappa: float | None = 0.1,
+        seed: int | None = None,
+        alphabet: List[str] | None = None,
+        batch_size: int | None = None,
+        parallelize: bool | None = False,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = float("inf"),
         force_isolation: bool = False,
     ) -> None:
         """
@@ -140,11 +140,11 @@ class RMFProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
-        wildtype: Union[List[str], str],
-        wt_val: Optional[float] = 0.0,
-        c: Optional[float] = None,
+        wildtype: List[str] | str,
+        wt_val: float | None = 0.0,
+        c: float | None = None,
         kappa: float = 0.1,
-        alphabet: Optional[List[str]] = None,
+        alphabet: List[str] | None = None,
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
