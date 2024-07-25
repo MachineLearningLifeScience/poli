@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import logging
 from random import seed
 from typing import List, Optional
