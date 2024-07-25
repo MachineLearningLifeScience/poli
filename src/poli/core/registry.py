@@ -2,19 +2,16 @@
 """
 
 import configparser
-import subprocess
 import warnings
 from pathlib import Path
-from typing import Dict, List, Type, Union
+from typing import List, Type, Union
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
-from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.objective_management.make_run_script import (
     make_isolated_function_script,
     make_observer_script,
-    make_run_script,
 )
 
 # from poli.objective_repository import AVAILABLE_PROBLEM_FACTORIES, AVAILABLE_OBJECTIVES

@@ -24,9 +24,7 @@ from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.algorithm_observer_wrapper import AlgorithmObserverWrapper
 from poli.core.util.default_observer import DefaultObserver
 from poli.core.util.external_observer import ExternalObserver
-from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
-from poli.core.util.isolation.external_black_box import ExternalBlackBox
-from poli.external_problem_factory_script import dynamically_instantiate
+from poli.external_isolated_function_script import dynamically_instantiate
 from poli.objective_repository import AVAILABLE_OBJECTIVES, AVAILABLE_PROBLEM_FACTORIES
 
 

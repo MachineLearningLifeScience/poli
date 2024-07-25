@@ -1,9 +1,0 @@
-name: poli_aloha_problem
-channels:
-  - defaults
-dependencies:
-  - python=3.9
-  - pip
-  - pip:
-    - numpy<2
-    - "git+https://github.com/MachineLearningLifeScience/poli.git@dev"

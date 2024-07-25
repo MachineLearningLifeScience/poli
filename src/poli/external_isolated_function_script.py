@@ -16,52 +16,6 @@ from poli.core.util.seeding import seed_python_numpy_and_torch
 ADDITIONAL_IMPORT_SEARCH_PATHES_KEY = "ADDITIONAL_IMPORT_PATHS"
 
 
-def parse_factory_kwargs(factory_kwargs: str) -> dict:
-    """Parses the factory kwargs passed to the objective function.
-
-    Parameters
-    ----------
-    factory_kwargs : str
-        The string containing the factory kwargs (see ProcessWrapper
-        for details about how this factory_kwargs strings is built).
-
-    Returns
-    -------
-    kwargs : dict
-        A dictionary containing the factory kwargs, parsed from the string.
-    """
-    if factory_kwargs == "":
-        # Then the user didn't pass any arguments
-        kwargs = {}
-    else:
-        factory_kwargs = factory_kwargs.split()
-        kwargs = {}
-        for item in factory_kwargs:
-            item = item.strip("--")
-            key, value = item.split("=")
-            if value.startswith("list:"):
-                # Then we assume that the value was a list
-                value = value.strip("list:")
-                value = value.split(",")
-            elif value.startswith("int:"):
-                value = int(value.strip("int:"))
-            elif value.startswith("float:"):
-                if value == "float:inf":
-                    value = float("inf")
-                elif value == "float:-inf":
-                    value = float("-inf")
-                else:
-                    value = float(value.strip("float:"))
-            elif value.startswith("bool:"):
-                value = value.strip("bool:") == "True"
-            elif value.startswith("none:"):
-                value = None
-
-            kwargs[key] = value
-
-    return kwargs
-
-
 def dynamically_instantiate(obj: str, **kwargs):
     """Dynamically instantiates an object from a string.
 

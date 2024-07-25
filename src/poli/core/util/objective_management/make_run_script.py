@@ -9,13 +9,11 @@ from os.path import basename, dirname, join
 from pathlib import Path
 from typing import List, Type, Union
 
-from poli import external_isolated_function_script, external_problem_factory_script
-from poli.core.abstract_black_box import AbstractBlackBox
+from poli import external_isolated_function_script
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
-from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.util import observer_wrapper
 from poli.core.util.abstract_observer import AbstractObserver
-from poli.external_problem_factory_script import ADDITIONAL_IMPORT_SEARCH_PATHES_KEY
+from poli.external_isolated_function_script import ADDITIONAL_IMPORT_SEARCH_PATHES_KEY
 
 # By default, we will store the run scripts inside the
 # home folder of the user, on the hidden folder
@@ -52,41 +50,8 @@ def make_isolated_function_script(
 
     """
     command = inspect.getfile(external_isolated_function_script)
-    return _make_run_script(
+    return _make_run_script_from_template(
         command, isolated_function, conda_environment_name, python_paths, cwd, **kwargs
-    )
-
-
-def make_run_script(
-    problem_factory: Type[AbstractProblemFactory],
-    conda_environment_name: Union[str, Path] = None,
-    python_paths: List[str] = None,
-    cwd=None,
-    **kwargs,
-) -> str:
-    """
-    Create a run script for a given problem factory.
-
-    Parameters
-    ----------
-    problem_factory : AbstractProblemFactory
-        The problem factory to create the run script for.
-    conda_environment_name : str or Path, optional
-        The conda environment to use for the run script.
-        Either a string containing the name, or a path to the environment.
-    python_paths : list of str, optional
-        A list of paths to append to the python path of the run script.
-    cwd : str or Path, optional
-        The working directory of the run script.
-
-    Returns
-    -------
-    run_script: str
-        The generated run script.
-    """
-    command = inspect.getfile(external_problem_factory_script)
-    return _make_run_script(
-        command, problem_factory, conda_environment_name, python_paths, cwd, **kwargs
     )
 
 
@@ -117,27 +82,17 @@ def make_observer_script(
 
     """
     command = inspect.getfile(observer_wrapper)
-    return _make_run_script(command, observer, conda_environment, python_paths, cwd)
+    return _make_run_script_from_template(
+        command, observer, conda_environment, python_paths, cwd
+    )
 
 
-def _make_black_box_script(
-    command: str,
-    command_for_instancing_the_black_box: str,
-    conda_environment_name: Union[str, Path],
-    python_paths: List[str],
-    cwd=None,
-):
-    # TODO: implement in such a way that
-    ...
-
-
-def _make_run_script(
+def _make_run_script_from_template(
     command: str,
     non_instantiated_object,
     conda_environment_name: Union[str, Path],
     python_paths: List[str],
     cwd=None,
-    **kwargs,
 ):
     """
     An internal function for creating run scripts; returns the location of the run script.

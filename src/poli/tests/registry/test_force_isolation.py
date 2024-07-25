@@ -37,10 +37,3 @@ def test_force_isolation_on_tdc():
         quiet=True,
     )
     assert (problem.black_box(problem.x0) == inner_f(problem.x0)).all()
-
-
-def test_isolation_on_dockstring(): ...
-
-
-if __name__ == "__main__":
-    test_force_isolation_on_tdc()
