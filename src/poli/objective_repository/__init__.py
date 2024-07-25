@@ -123,6 +123,9 @@ for d in THIS_DIR.glob("*"):
 
 AVAILABLE_OBJECTIVES = sorted(AVAILABLE_OBJECTIVES)
 
+# Available problem factories
+# maps names of problems to their respective
+# problem factories
 AVAILABLE_PROBLEM_FACTORIES = {
     "aloha": AlohaProblemFactory,
     "ehrlich": EhrlichProblemFactory,
@@ -215,4 +218,4 @@ AVAILABLE_BLACK_BOXES = {
 
 
 def get_problems():
-    return list(AVAILABLE_PROBLEM_FACTORIES.keys())
+    return AVAILABLE_OBJECTIVES

@@ -3,9 +3,10 @@ Creates objective functions by providing a common interface to all factories in 
 """
 
 import configparser
+import importlib
 import logging
 from pathlib import Path
-from typing import Any, Tuple
+from typing import Tuple
 
 import numpy as np
 
@@ -57,12 +58,10 @@ def __create_problem_from_repository(
     evaluation_budget: int = float("inf"),
     observer: AbstractObserver = None,
     **kwargs_for_factory,
-) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+) -> Problem:
     """Creates the objective function from the repository.
 
-    If the problem is available in AVAILABLE_PROBLEM_FACTORIES
-    (i.e. if the user could import all the dependencies directly),
-    we create the problem directly. Otherwise, we raise an error.
+    We create the problem directly, without starting it as an isolated process.
 
     Parameters
     ----------
@@ -86,10 +85,23 @@ def __create_problem_from_repository(
         Additional keyword arguments for the factory.
     """
     if name not in AVAILABLE_PROBLEM_FACTORIES:
-        raise ValueError(
-            f"Objective function '{name}' is not available in the repository."
-        )
-
+        if name in AVAILABLE_OBJECTIVES:
+            # For poli developers:
+            # If you get this error while developing a new black box,
+            # it might be because you forgot to register your problem
+            # factory and black box inside the __init__.py file of
+            # the objective_repository. Remember that you need to add
+            # them to AVAILABLE_PROBLEM_FACTORIES and AVAILABLE_BLACK_BOXES.
+            raise ValueError(
+                f"Objective function '{name}' is available in the repository, "
+                "but it is not registered as available. This is an internal error. "
+                "We encourage you to report it to the developers by creating an "
+                "issue in the GitHub repository of poli."
+            )
+        else:
+            raise ValueError(
+                f"Objective function '{name}' is not available in the repository."
+            )
     problem_factory: AbstractProblemFactory = AVAILABLE_PROBLEM_FACTORIES[name]()
     problem = problem_factory.create(
         seed=seed,
@@ -190,9 +202,7 @@ def __create_problem_as_isolated_process(
     return external_problem
 
 
-def __register_objective_if_available(
-    name: str, force_register: bool = True, quiet: bool = False
-):
+def __register_objective_if_available(name: str, quiet: bool = False):
     """Registers the objective function if it is available in the repository.
 
     If the objective function is not available in the repository,
@@ -220,29 +230,12 @@ def __register_objective_if_available(
                 "and it is not available in the repository."
             )
 
-        # At this point, we know that the function is available
-        # in the repository
-        if force_register:
-            # Then we install it.
-            answer = "y"
-        else:
-            # We ask the user for their confirmation
-            answer = input(
-                f"Objective function '{name}' is not registered, "
-                "but it is available in the repository. Do you "
-                "want to install it? (y/[n]): "
-            )
+        # Register problem
+        register_problem_from_repository(name, quiet=quiet)
+        logging.debug(f"poli 🧪: Registered the objective from the repository.")
 
-        if answer == "y":
-            # Register problem
-            logging.debug(f"poli 🧪: Registered the objective from the repository.")
-            register_problem_from_repository(name, quiet=quiet)
-            # Refresh the config
-            config = load_config()
-        else:
-            raise ValueError(
-                f"Objective function '{name}' won't be registered. Aborting."
-            )
+        # Refresh the config
+        config = load_config()
 
 
 def create(
@@ -273,10 +266,9 @@ def create(
         Optional information about the caller that is forwarded to the logger to initialize the run.
     observer_name : str, optional
         The observer to use.
-    force_register : bool, optional
-        If True, then the objective function is registered without asking
-        for confirmation, overwriting any previous registration. By default,
-        it is True.
+    force_register : bool, deprecated
+        Force the registration of the objective function. This is deprecated and will be removed in the future.
+        As it stands, this kwarg is not used.
     force_isolation : bool, optional
         If True, then the objective function is instantiated as an isolated
         process.
@@ -303,7 +295,7 @@ def create(
     """
     # If the user can run it with the envionment they currently
     # have, then we do not need to install it.
-    if name in AVAILABLE_PROBLEM_FACTORIES and not force_isolation:
+    if not force_isolation:
         if not quiet:
             print(f"poli 🧪: Creating the objective {name} from the repository.")
 
@@ -319,9 +311,10 @@ def create(
     else:
         # Check if the name is indeed registered, or
         # available in the objective repository
-        __register_objective_if_available(
-            name, force_register=force_register, quiet=quiet
-        )
+        # This function will
+        # 1. Create the conda environment for the objective
+        # 2. Run registration inside said environment.
+        __register_objective_if_available(name, quiet=quiet)
 
         # At this point, we know the name is registered.
         # Thus, we should be able to start it as an isolated process
@@ -432,8 +425,7 @@ def _instantiate_observer(observer_name: str, quiet: bool = False) -> AbstractOb
     Returns
     -------
     observer : AbstractObserver
-        The black-box function, initial value, and related information.
-
+        The observer, either dynamically instantiated or started as an isolated process.
     """
     if _OBSERVER not in registry.config[_DEFAULT]:
         registry.config[_DEFAULT][_OBSERVER] = _DEFAULT_OBSERVER_RUN_SCRIPT
