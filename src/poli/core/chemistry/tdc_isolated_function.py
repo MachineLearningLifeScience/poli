@@ -82,7 +82,7 @@ class TDCIsolatedFunction(AbstractIsolatedFunction):
         scores : array-like
             An array of oracle scores computed for each input molecule.
         """
-        if not x.dtype.kind in ["U", "S"]:
+        if x.dtype.kind not in ["U", "S"]:
             raise ValueError(
                 f"We expect x to be an array of strings, but we got {x.dtype}"
             )

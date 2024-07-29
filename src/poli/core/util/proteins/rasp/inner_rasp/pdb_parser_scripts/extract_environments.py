@@ -1,5 +1,4 @@
 import argparse
-import enum
 import os
 import sys
 import time

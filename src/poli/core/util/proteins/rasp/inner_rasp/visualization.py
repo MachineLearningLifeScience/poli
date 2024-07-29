@@ -6,7 +6,6 @@ import math
 import os
 import pickle
 
-import Bio.PDB.Polypeptide
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd

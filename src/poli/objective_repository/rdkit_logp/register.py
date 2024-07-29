@@ -9,7 +9,7 @@ descriptors. We allow for both SMILES and SELFIES
 strings.
 """
 
-from typing import Literal, Tuple
+from typing import Literal
 
 import numpy as np
 from rdkit.Chem import Descriptors

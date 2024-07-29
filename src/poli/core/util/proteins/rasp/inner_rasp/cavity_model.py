@@ -1,12 +1,8 @@
-import glob
 import os
-import random
-from typing import Callable, List, Union
 
 import numpy as np
-import pandas as pd
 import torch
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import Dataset
 
 __all__ = [
     "ResidueEnvironment",

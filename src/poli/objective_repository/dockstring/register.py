@@ -24,10 +24,7 @@ from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
-from poli.core.util.chemistry.string_to_molecule import (
-    translate_selfies_to_smiles,
-    translate_smiles_to_selfies,
-)
+from poli.core.util.chemistry.string_to_molecule import translate_smiles_to_selfies
 from poli.core.util.isolation.instancing import get_inner_function
 from poli.core.util.seeding import seed_python_numpy_and_torch
 from poli.objective_repository.dockstring.information import (

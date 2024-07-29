@@ -17,7 +17,9 @@ except (ImportError, FileNotFoundError):
     pytest.skip("Could not import the foldx interface. ", allow_module_level=True)
 
 try:
-    from poli.core.util.proteins.pdb_parsing import parse_pdb_as_residue_strings
+    from poli.core.util.proteins.pdb_parsing import (  # noqa F401
+        parse_pdb_as_residue_strings,
+    )
 except ImportError:
     pytest.skip(
         "Could not import the protein utilities for parsing. ", allow_module_level=True

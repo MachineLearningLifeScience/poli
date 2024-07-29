@@ -2,7 +2,6 @@ import numpy as np
 import pytest
 
 from poli import objective_factory
-from poli.objective_repository import AVAILABLE_PROBLEM_FACTORIES
 
 ref_aa_seq = "HPETLVKVKDAEDQLGARVGYIELDLNSGKILESFRPEERFPMMSTFKVLLCGAVLSRVDAGQEQLGRRIHYSQNDLVEYSPVTEKHLTDGMTVRELCSAAITMSDNTAANLLLTTIGGPKELTAFLHNMGDHVTRLDRWNPELNEAIPNDERDTTMPAAMATTLRKLLTGELLTLASRQQLIDWMEADKVAGPLLRSALPAGWFIADKSGAGERGSRGIIAALGPDGKPSRIVVIYTTGSQATMDERNRQIAEIGASLIKHW"
 
@@ -45,7 +44,7 @@ def test_rmf_landscape_batch_eval():
     )
     N = 10
     f, x0 = problem.black_box, problem.x0
-    y0 = f(x0)
+    _ = f(x0)
     x_t = []
     seq_b = x0.copy()
     seq_b[0, 1] = "Y"

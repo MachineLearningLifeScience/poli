@@ -1,15 +1,9 @@
 from pathlib import Path
-from typing import Tuple
 
 import numpy as np
 import pandas as pd
 
-from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
-from poli.core.abstract_problem_factory import AbstractProblemFactory
-from poli.core.problem_setup_information import ProblemSetupInformation
-from poli.core.util.proteins.defaults import AMINO_ACIDS
-from poli.core.util.seeding import seed_numpy, seed_python
 
 
 class GFPSelectIsolatedLogic(AbstractIsolatedFunction):

@@ -61,8 +61,6 @@ class MlFlowObserver(AbstractObserver):
             }
         )
 
-        mlflow.log_param("x0", x0)
-        mlflow.log_param("y0", y0)
         mlflow.log_param("seed", seed)
 
     def observe(self, x: np.ndarray, y: np.ndarray, context=None) -> None:

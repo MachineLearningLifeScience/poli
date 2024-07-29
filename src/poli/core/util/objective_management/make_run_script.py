@@ -10,7 +10,6 @@ from pathlib import Path
 from typing import List, Type, Union
 
 from poli import external_isolated_function_script, external_problem_factory_script
-from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.util import observer_wrapper

@@ -5,3 +5,11 @@ from .toy_continuous_functions_benchmark import (
     EmbeddedHartmann6D,
     ToyContinuousFunctionsBenchmark,
 )
+
+__all__ = [
+    "GuacaMolGoalDirectedBenchmark",
+    "PMOBenchmark",
+    "ToyContinuousFunctionsBenchmark",
+    "EmbeddedBranin2D",
+    "EmbeddedHartmann6D",
+]

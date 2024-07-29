@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from poli.objective_repository.toy_continuous_problem.register import (
+from poli.objective_repository.toy_continuous_problem.toy_continuous_problem import (
     POSSIBLE_FUNCTIONS,
     SIX_DIMENSIONAL_PROBLEMS,
     TWO_DIMENSIONAL_PROBLEMS,

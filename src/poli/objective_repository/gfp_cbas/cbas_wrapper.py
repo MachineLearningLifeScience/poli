@@ -9,8 +9,6 @@ Last Changes: RM
 __author__ = "Simon Bartels, Richard Michael"
 
 
-import os
-import warnings
 from collections import OrderedDict
 from pathlib import Path
 

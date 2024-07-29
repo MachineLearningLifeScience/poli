@@ -1,4 +1,4 @@
-from typing import Literal, Tuple
+from typing import Literal
 from warnings import warn
 
 import numpy as np

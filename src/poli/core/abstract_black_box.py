@@ -9,7 +9,6 @@ import numpy as np
 
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.exceptions import BudgetExhaustedException
-from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.alignment import is_aligned_input
 from poli.core.util.batch import batched

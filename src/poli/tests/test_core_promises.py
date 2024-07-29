@@ -1,7 +1,6 @@
 """This test suite contains the core promises we make to the user."""
 
 import numpy as np
-import pytest
 
 
 def test_creating_an_instance_of_a_black_box():
@@ -9,7 +8,7 @@ def test_creating_an_instance_of_a_black_box():
 
     f = WhiteNoiseBlackBox()
     x = np.array([["1", "2", "3"]])
-    y = f(x)
+    _ = f(x)
 
 
 def test_creating_a_problem():
@@ -22,6 +21,6 @@ def test_creating_a_problem():
     )
 
     f, x0 = white_noise_problem.black_box, white_noise_problem.x0
-    y0 = f(x0)
+    _ = f(x0)
 
     f.terminate()

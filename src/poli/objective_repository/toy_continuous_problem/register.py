@@ -25,12 +25,7 @@ from poli.objective_repository.toy_continuous_problem.information import (
     toy_continuous_info,
 )
 
-from .toy_continuous_problem import (
-    POSSIBLE_FUNCTIONS,
-    SIX_DIMENSIONAL_PROBLEMS,
-    TWO_DIMENSIONAL_PROBLEMS,
-    ToyContinuousProblem,
-)
+from .toy_continuous_problem import POSSIBLE_FUNCTIONS, ToyContinuousProblem
 
 
 class ToyContinuousBlackBox(AbstractBlackBox):

@@ -4,14 +4,14 @@ Implements a (tunable) fitness landscape of the type RMF [1] for NA [1], AA [2] 
 References
 ----------
 [1] Adaptation in Tunably Rugged Fitness Landscapes: The Rough Mount Fuji Model.
-    Neidhart J., Szendro I.G., and Krug, J. Genetics 198, 699-721 (2014). https://doi.org/10.1534/genetics.114.167668 
+    Neidhart J., Szendro I.G., and Krug, J. Genetics 198, 699-721 (2014). https://doi.org/10.1534/genetics.114.167668
 [2] Analysis of a local fitness landscape with a model of the rough Mt. Fuji-type landscape: Application to prolyl endopeptidase and thermolysin.
-    Aita T., Uchiyama H., et al. Biopolymers 54, 64-79 (2000). https://doi.org/10.1002/(SICI)1097-0282(200007)54:1<64::AID-BIP70>3.0.CO;2-R 
+    Aita T., Uchiyama H., et al. Biopolymers 54, 64-79 (2000). https://doi.org/10.1002/(SICI)1097-0282(200007)54:1<64::AID-BIP70>3.0.CO;2-R
 """
 
 from __future__ import annotations
 
-from typing import List, Optional, Union
+from typing import List
 
 import numpy as np
 
@@ -19,10 +19,7 @@ from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
-from poli.core.util.isolation.instancing import (
-    get_inner_function,
-    instance_function_as_isolated_process,
-)
+from poli.core.util.isolation.instancing import get_inner_function
 from poli.core.util.seeding import seed_python_numpy_and_torch
 from poli.objective_repository.rmf_landscape.information import rmf_info
 
@@ -102,7 +99,7 @@ class RMFBlackBox(AbstractBlackBox):
         self.alphabet = alphabet
         self.seed = seed
         self.force_isolation = force_isolation
-        inner_function = get_inner_function(  # NOTE: this implicitly registers
+        _ = get_inner_function(  # NOTE: this implicitly registers
             isolated_function_name="rmf_landscape__isolated",
             class_name="RMFIsolatedLogic",
             module_to_import="poli.objective_repository.rmf_landscape.isolated_function",

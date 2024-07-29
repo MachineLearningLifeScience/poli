@@ -1,4 +1,3 @@
-from multiprocessing import cpu_count
 from pathlib import Path
 from time import time
 from typing import List, Union
@@ -7,7 +6,6 @@ from uuid import uuid4
 import numpy as np
 
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
-from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.core.util.proteins.foldx import FoldxInterface
 from poli.core.util.proteins.pdb_parsing import (
     parse_pdb_as_residue_strings,
