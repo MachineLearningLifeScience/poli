@@ -235,7 +235,7 @@ def __register_objective_if_available(
 
         if answer == "y":
             # Register problem
-            logging.debug(f"poli 🧪: Registered the objective from the repository.")
+            logging.debug("poli 🧪: Registered the objective from the repository.")
             register_problem_from_repository(name, quiet=quiet)
             # Refresh the config
             config = load_config()

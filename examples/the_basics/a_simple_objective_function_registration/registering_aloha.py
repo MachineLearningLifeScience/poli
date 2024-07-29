@@ -6,7 +6,6 @@ the initial point, and its first evaluation.
 """
 
 from string import ascii_uppercase
-from typing import Tuple
 
 import numpy as np
 

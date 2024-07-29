@@ -20,8 +20,6 @@ Detlef Weigel, Nir Ben-Tal, and Julian Echave. eLife 12
 from pathlib import Path
 from typing import List, Union
 
-import numpy as np
-
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation

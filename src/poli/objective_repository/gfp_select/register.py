@@ -1,5 +1,3 @@
-from typing import Tuple
-
 import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox

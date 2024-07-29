@@ -5,7 +5,7 @@ import configparser
 import subprocess
 import warnings
 from pathlib import Path
-from typing import Dict, List, Type, Union
+from typing import List, Type, Union
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
