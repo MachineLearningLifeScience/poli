@@ -11,4 +11,4 @@ dependencies:
     - rdkit
     - selfies
     - dockstring
-    - pkg-resources
+    - pkg-resources==0.0.0
