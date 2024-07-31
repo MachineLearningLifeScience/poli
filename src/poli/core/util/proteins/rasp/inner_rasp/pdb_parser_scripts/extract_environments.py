@@ -1,5 +1,4 @@
 import argparse
-import enum
 import os
 import sys
 import time
@@ -7,7 +6,6 @@ import time
 import Bio
 import Bio.PDB
 import numpy as np
-
 import openmm.app
 import simtk.unit
 

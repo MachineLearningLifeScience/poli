@@ -4,10 +4,10 @@
 
 """Module for data handling in the PRISM project
 
-This module implments classes for parsing (PrismParser) and handling 
+This module implments classes for parsing (PrismParser) and handling
 (PrismData derived classes) of data files.
 
-In general, calling PrismParser.read(filename) will return a data object of 
+In general, calling PrismParser.read(filename) will return a data object of
 the same derived class, e.g. a VariantData object.
 See documentation of derived parser and data classes for help.
 
@@ -16,11 +16,15 @@ See README.md for general file format definitions.
 
 __version__ = 1.001
 
-from Bio import Seq, SeqRecord, SeqIO, pairwise2, SubsMat
-from Bio.SubsMat import MatrixInfo
+import copy
+import csv
+import time
+
 import numpy as np
 import pandas as pd
-import yaml, csv, copy, time
+import yaml
+from Bio import Seq, SeqIO, SeqRecord, pairwise2
+from Bio.SubsMat import MatrixInfo
 
 
 class PrismFormatError(Exception):
@@ -220,24 +224,24 @@ class PrismParser:
 
     def check_header(self, header):
         """Check a header for fields required by all data files"""
-        if not "version" in header.keys():
+        if "version" not in header.keys():
             raise PrismFormatError("Header has no 'version' field")
-        if not "protein" in header.keys():
+        if "protein" not in header.keys():
             raise PrismFormatError("Header has no 'protein' field")
-        if not "name" in header["protein"].keys():
+        if "name" not in header["protein"].keys():
             raise PrismFormatError("Header has no 'protein: name' field")
-        if not "sequence" in header["protein"].keys():
+        if "sequence" not in header["protein"].keys():
             raise PrismFormatError("Header has no 'protein: sequence' field")
-        if not "uniprot" in header["protein"].keys():
+        if "uniprot" not in header["protein"].keys():
             raise PrismFormatError("Header has no 'protein: uniprot' field")
         if "first_residue_number" in header["protein"].keys():
             if int(header["protein"]["first_residue_number"]) < 0:
                 raise PrismFormatError("First residue number must be non-negative")
-        if not "columns" in header.keys():
+        if "columns" not in header.keys():
             raise PrismFormatError("Header has no 'columns' field")
         if "filename" in header.keys():
             data_type = header["filename"].split("_")[1]
-            if not data_type.lower() in header.keys():
+            if data_type.lower() not in header.keys():
                 raise PrismFormatError(
                     "Header has no '%s' field but filename indicates this data type"
                     % (data_type)
@@ -276,9 +280,9 @@ class PrismParser:
         def update_keys(key_dic, dic):
             """Update key_dic with keys from dic recursively"""
             for key in dic.keys():
-                if not key in key_dic.keys():
+                if key not in key_dic.keys():
                     key_dic[key] = {}
-                if type(dic[key]) == dict:
+                if isinstance(dic[key], dict):
                     update_keys(key_dic[key], dic[key])
 
         # Read all header keys
@@ -326,7 +330,7 @@ class PrismParser:
             for header in header_list:
                 row = []
                 for key in common_header_keys.keys():
-                    if not key in header:
+                    if key not in header:
                         row += [""] * np.max([1, len(common_header_keys[key])])
                     elif len(common_header_keys[key].keys()) == 0:
                         row += [header[key]]
@@ -401,7 +405,7 @@ class PrismData:
         Data is assumed to have index columns resi and aa_ref
         """
 
-        if not "aa_ref" in self.dataframe.columns:
+        if "aa_ref" not in self.dataframe.columns:
             self.add_index_columns()
 
         n_res = 0
@@ -516,12 +520,12 @@ class PrismData:
             1:
         ]  # first column is data specific and not in header
         for cn in data_colnames:
-            if not cn in meta_colnames:
+            if cn not in meta_colnames:
                 raise PrismFormatError(
                     "Could not find column name '%s' in header" % (cn)
                 )
         for cn in meta_colnames:
-            if not cn in data_colnames:
+            if cn not in data_colnames:
                 raise PrismFormatError(
                     "Could not find header column name '%s' in data" % (cn)
                 )
@@ -612,7 +616,7 @@ class VariantData(PrismData):
             - exclude : Only return single mutants
         """
         # Check argument
-        if not multimutant_mode in ["any", "all", "exclude"]:
+        if multimutant_mode not in ["any", "all", "exclude"]:
             raise ValueError(
                 "Function get_var_into_aa argument multimutant_mode must be 'any', 'all' or 'exclude'"
             )
@@ -645,7 +649,7 @@ class VariantData(PrismData):
             - exclude : Only return single mutants
         """
         # Check argument
-        if not multimutant_mode in ["any", "all", "exclude"]:
+        if multimutant_mode not in ["any", "all", "exclude"]:
             raise ValueError(
                 "Function get_var_from_aa argument multimutant_mode must be 'any', 'all' or 'exclude'"
             )
@@ -678,7 +682,7 @@ class VariantData(PrismData):
             - exact : Substitutions at all given position and no others
         """
         # Check argument mode
-        if not mode in ["any", "all", "exact"]:
+        if mode not in ["any", "all", "exact"]:
             raise ValueError(
                 "Function get_var_from_aa argument mode must be 'any', 'all' or 'exact'"
             )
@@ -929,7 +933,7 @@ class VariantData(PrismData):
             # Variant width
             if "width" in self.metadata["variants"].keys():
                 if recalc_variants["width"] == "single mutants":
-                    if not strip_all(self.metadata["variants"]["width"]) in [
+                    if strip_all(self.metadata["variants"]["width"]) not in [
                         "singlemutants",
                         "singlemutant",
                         "singlemut",
@@ -945,7 +949,7 @@ class VariantData(PrismData):
                         elif verbose > 0:
                             print("WARNING: " + s)
                 elif recalc_variants["width"] == "multi mutants":
-                    if not strip_all(self.metadata["variants"]["width"]) in [
+                    if strip_all(self.metadata["variants"]["width"]) not in [
                         "multimutants",
                         "multimutant",
                         "multimut",
@@ -961,7 +965,7 @@ class VariantData(PrismData):
                         elif verbose > 0:
                             print("WARNING: " + s)
                 elif recalc_variants["width"] == "single and double mutants":
-                    if not strip_all(self.metadata["variants"]["width"]) in [
+                    if strip_all(self.metadata["variants"]["width"]) not in [
                         "singleanddoublemutants",
                         "singleanddoublemutant",
                         "singleanddouble",
@@ -1266,7 +1270,7 @@ class VariantData(PrismData):
         resi_rm = []
         resi_shift = np.full(n_res_data, resi_shift_init)
         aa_change = {}
-        if not target_seq is None:
+        if target_seq is not None:
             if not PrismParser.is_aa_one_nat(None, target_seq, "X"):
                 raise ValueError(
                     "Argument target_seq to VariantData.to_new_reference must be a single-letter amino acid string (or None)"
@@ -1402,7 +1406,7 @@ class VariantData(PrismData):
                     )
                 )
 
-        if not first_resn is None:
+        if first_resn is not None:
             self.metadata["protein"]["first_residue_number"] = first_resn
         assert int(self.metadata["protein"]["first_residue_number"]) == first_resn
 
@@ -1518,7 +1522,7 @@ class VariantData(PrismData):
         **kwargs : keyword arguments
             Passed to to_new_reference function
         """
-        if not merge in ["left", "outer", "inner"]:
+        if merge not in ["left", "outer", "inner"]:
             raise ValueError("Allowed merge arguments are left, outer or inner")
 
         merged_data = self.copy()
@@ -1532,7 +1536,7 @@ class VariantData(PrismData):
         if target_seq is None:
             # Make from meta data, variant residue numbers will match the index of this
             target_seq = self.metadata["protein"]["sequence"]
-            if not first_resn is None:
+            if first_resn is not None:
                 raise ValueError(
                     "merge argument first_resn can only be set if target_seq != None\n"
                     + "Use VariantData.to_new_reference to only shift residue numbering"
@@ -1675,7 +1679,8 @@ class VariantData(PrismData):
 
 if __name__ == "__main__":
     # Parse commandline arguments
-    import argparse, sys
+    import argparse
+    import sys
 
     arg_parser = argparse.ArgumentParser(
         description="PRISM data file processing and alignment"
@@ -1810,7 +1815,7 @@ if __name__ == "__main__":
         ):
             record = None
             for r in SeqIO.parse(args.target_seq, "fasta"):
-                if not record is None:
+                if record is not None:
                     # if args.verbose > 0:
                     print(
                         "WARNING: Only using the first sequence record in %s"

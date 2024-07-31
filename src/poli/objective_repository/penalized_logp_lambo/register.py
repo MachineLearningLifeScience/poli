@@ -11,18 +11,16 @@ Emily Delaney, Peyton Greenside, and Andrew Gordon Wilson.
 arXiv, July 12, 2022. http://arxiv.org/abs/2203.12742.
 """
 
-from typing import Tuple, Literal
+from typing import Literal, Tuple
+
 import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
-
 from poli.core.util.isolation.instancing import get_inner_function
-
 from poli.core.util.seeding import seed_python_numpy_and_torch
-
 from poli.objective_repository.penalized_logp_lambo.information import (
     penalized_logp_lambo_info,
 )

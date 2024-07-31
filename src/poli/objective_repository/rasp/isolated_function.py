@@ -17,26 +17,24 @@ Detlef Weigel, Nir Ben-Tal, and Julian Echave. eLife 12
 
 """
 
-from typing import Union, List
-from pathlib import Path
-from uuid import uuid4
-from time import time
 from collections import defaultdict
+from pathlib import Path
+from time import time
+from typing import List, Union
+from uuid import uuid4
+
+import numpy as np
 
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
-
-from poli.core.util.proteins.rasp import (
-    RaspInterface,
-    load_cavity_and_downstream_models,
-)
-
+from poli.core.util.proteins.mutations import find_closest_wildtype_pdb_file_to_mutant
 from poli.core.util.proteins.pdb_parsing import (
     parse_pdb_as_residue_strings,
     parse_pdb_as_residues,
 )
-from poli.core.util.proteins.mutations import find_closest_wildtype_pdb_file_to_mutant
-
-import numpy as np
+from poli.core.util.proteins.rasp import (
+    RaspInterface,
+    load_cavity_and_downstream_models,
+)
 
 RASP_NUM_ENSEMBLE = 10
 RASP_DEVICE = "cpu"

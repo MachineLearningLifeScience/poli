@@ -4,9 +4,8 @@ molecules into molecules in RDKit.
 
 from typing import List
 
-from rdkit import Chem
-
 import selfies as sf
+from rdkit import Chem
 
 
 def translate_smiles_to_selfies(
@@ -41,7 +40,7 @@ def translate_smiles_to_selfies(
             selfies_strings.append(sf.encoder(smile))
         except sf.EncoderError:
             if strict:
-                raise ValueError(f"Failed to encode SMILES to SELFIES.")
+                raise ValueError("Failed to encode SMILES to SELFIES.")
             else:
                 selfies_strings.append(None)
 
@@ -79,7 +78,7 @@ def translate_selfies_to_smiles(
             smiles_strings.append(sf.decoder(selfies))
         except sf.DecoderError:
             if strict:
-                raise ValueError(f"Failed to decode SELFIES to SMILES.")
+                raise ValueError("Failed to decode SELFIES to SMILES.")
             else:
                 smiles_strings.append(None)
 

@@ -1,7 +1,6 @@
 import numpy as np
 
 from poli.core.black_box_information import BlackBoxInformation
-
 from poli.core.util.proteins.defaults import AMINO_ACIDS
 
 rasp_information = BlackBoxInformation(

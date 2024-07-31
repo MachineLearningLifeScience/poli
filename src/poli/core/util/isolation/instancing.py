@@ -1,16 +1,12 @@
 from __future__ import annotations
 
-from pathlib import Path
 import configparser
-import subprocess
 import importlib
-
 import logging
-from poli.core.registry import (
-    _OBSERVER,
-    _ISOLATED_FUNCTION_SCRIPT_LOCATION,
-)
+import subprocess
+from pathlib import Path
 
+from poli.core.registry import _ISOLATED_FUNCTION_SCRIPT_LOCATION, _OBSERVER
 from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
 
 from .external_function import ExternalFunction
@@ -237,13 +233,13 @@ def register_isolated_function_if_available(
         # Register problem
         if name == "tdc__isolated":
             logging.debug(
-                f"poli 🧪: Registered the isolated function from the repository."
+                "poli 🧪: Registered the isolated function from the repository."
             )
             __register_isolated_function_from_core(name, quiet=quiet)
             config = load_config()
         else:
             logging.debug(
-                f"poli 🧪: Registered the isolated function from the repository."
+                "poli 🧪: Registered the isolated function from the repository."
             )
             __register_isolated_function_from_repository(name, quiet=quiet)
             # Refresh the config

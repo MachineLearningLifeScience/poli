@@ -20,19 +20,12 @@ from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
-
 from poli.core.util.seeding import seed_python_numpy_and_torch
-
-from .toy_continuous_problem import (
-    POSSIBLE_FUNCTIONS,
-    ToyContinuousProblem,
-    TWO_DIMENSIONAL_PROBLEMS,
-    SIX_DIMENSIONAL_PROBLEMS,
-)
-
 from poli.objective_repository.toy_continuous_problem.information import (
     toy_continuous_info,
 )
+
+from .toy_continuous_problem import POSSIBLE_FUNCTIONS, ToyContinuousProblem
 
 
 class ToyContinuousBlackBox(AbstractBlackBox):

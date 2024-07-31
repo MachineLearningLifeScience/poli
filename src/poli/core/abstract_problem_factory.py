@@ -1,10 +1,5 @@
 """This module implements the abstract problem factory."""
 
-from typing import Tuple
-
-import numpy as np
-
-from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
 

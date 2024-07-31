@@ -15,15 +15,15 @@ References
     https://www.sfu.ca/~ssurjano/optimization.html.
 """
 
-from typing import Union, List
+from typing import List, Union
+
 from poli.core.abstract_benchmark import AbstractBenchmark
 from poli.core.problem import Problem
-
 from poli.objective_repository import ToyContinuousProblemFactory
 from poli.objective_repository.toy_continuous_problem.toy_continuous_problem import (
     POSSIBLE_FUNCTIONS,
-    TWO_DIMENSIONAL_PROBLEMS,
     SIX_DIMENSIONAL_PROBLEMS,
+    TWO_DIMENSIONAL_PROBLEMS,
 )
 
 

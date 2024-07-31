@@ -1,6 +1,9 @@
-name: Tests on poli (dev, conda, python 3.9)
+name: poli base (conda, py3.9)
 
-on: [push]
+on:
+  push:
+  schedule:
+    - cron: '0 0 * * 0'
 
 jobs:
   build-linux:
@@ -24,6 +27,6 @@ jobs:
     - name: Test linting with tox
       run: |
         tox -c tox.ini -e lint
-    - name: Test poli-base with tox (ignoring RaSP)
+    - name: Test basic behaviors of poli with tox and pytest
       run: |
-        tox -c tox.ini -e poli-base-py39 -- --ignore=src/poli/tests/registry/proteins/test_rasp.py
+        tox -c tox.ini -e poli-base-py39

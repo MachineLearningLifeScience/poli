@@ -2,12 +2,11 @@
 Module that wraps utility functions for interprocess communication.
 """
 
-from pathlib import Path
 import logging
 import subprocess
 import time
-from multiprocessing.connection import Listener, Client
-
+from multiprocessing.connection import Client, Listener
+from pathlib import Path
 from uuid import uuid4
 
 
@@ -48,14 +47,14 @@ def get_connection(port: int, password: str) -> Client:
             # if we manage to establish a connection we exit the function
             return Client(address, authkey=password.encode())
         # maybe the host process isn't ready yet
-        except EOFError as e:
+        except EOFError:
             pass
-        except ConnectionRefusedError as e:
+        except ConnectionRefusedError:
             pass
         retries -= 1
     # when we get here, e must have been instantiated
     logging.fatal("Could not connect to host process.")
-    raise e
+    raise ConnectionError("Could not connect to host process.")
 
 
 class ProcessWrapper:

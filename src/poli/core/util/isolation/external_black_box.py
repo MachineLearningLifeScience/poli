@@ -93,7 +93,7 @@ class ExternalBlackBox(AbstractBlackBox):
             try:
                 self.observer.finish()
                 self.observer = None
-            except:
+            except Exception:
                 pass
 
     def __getattr__(self, __name: str) -> Any:

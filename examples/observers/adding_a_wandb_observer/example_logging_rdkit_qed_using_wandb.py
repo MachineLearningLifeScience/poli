@@ -9,11 +9,9 @@ To run this example, you will need to install wandb:
 from pathlib import Path
 
 import numpy as np
-
-from poli.core.problem import Problem
-from poli.objective_repository import QEDProblemFactory
-
 from wandb_observer import WandbObserver
+
+from poli.objective_repository import QEDProblemFactory
 
 THIS_DIR = Path(__file__).parent.resolve()
 

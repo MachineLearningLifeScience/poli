@@ -1,0 +1,11 @@
+name: poli__rmf
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - pip=23.2.1
+  - pip:
+    - numpy
+    - "git+https://github.com/MachineLearningLifeScience/poli.git@dev"
+    - scipy

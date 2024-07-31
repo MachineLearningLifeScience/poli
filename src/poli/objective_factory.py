@@ -2,22 +2,24 @@
 Creates objective functions by providing a common interface to all factories in the repository.
 """
 
-from typing import Tuple, Any
-import numpy as np
-from pathlib import Path
 import configparser
 import logging
+from pathlib import Path
+from typing import Tuple
+
+import numpy as np
 
 from poli.core import registry
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
+from poli.core.problem import Problem
 from poli.core.registry import (
-    _RUN_SCRIPT_LOCATION,
-    _OBSERVER,
     _DEFAULT,
-    register_problem_from_repository,
     _DEFAULT_OBSERVER_RUN_SCRIPT,
+    _OBSERVER,
+    _RUN_SCRIPT_LOCATION,
     DEFAULT_OBSERVER_NAME,
+    register_problem_from_repository,
 )
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.algorithm_observer_wrapper import AlgorithmObserverWrapper
@@ -25,9 +27,7 @@ from poli.core.util.default_observer import DefaultObserver
 from poli.core.util.external_observer import ExternalObserver
 from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
 from poli.core.util.isolation.external_black_box import ExternalBlackBox
-from poli.core.problem import Problem
 from poli.external_problem_factory_script import dynamically_instantiate
-
 from poli.objective_repository import AVAILABLE_OBJECTIVES, AVAILABLE_PROBLEM_FACTORIES
 
 
@@ -235,7 +235,7 @@ def __register_objective_if_available(
 
         if answer == "y":
             # Register problem
-            logging.debug(f"poli 🧪: Registered the objective from the repository.")
+            logging.debug("poli 🧪: Registered the objective from the repository.")
             register_problem_from_repository(name, quiet=quiet)
             # Refresh the config
             config = load_config()
@@ -435,6 +435,9 @@ def _instantiate_observer(observer_name: str, quiet: bool = False) -> AbstractOb
         The black-box function, initial value, and related information.
 
     """
+    if _OBSERVER not in registry.config[_DEFAULT]:
+        registry.config[_DEFAULT][_OBSERVER] = _DEFAULT_OBSERVER_RUN_SCRIPT
+
     observer_script: str = registry.config[_DEFAULT][_OBSERVER]
     if observer_name is not None:
         if observer_name != DEFAULT_OBSERVER_NAME:
@@ -446,7 +449,7 @@ def _instantiate_observer(observer_name: str, quiet: bool = False) -> AbstractOb
         observer = DefaultObserver()
     else:
         if not quiet:
-            print(f"poli 🧪: initializing the observer.")
+            print("poli 🧪: initializing the observer.")
         try:
             f = open(observer_script, "r")
             observer_class = (
@@ -454,8 +457,8 @@ def _instantiate_observer(observer_name: str, quiet: bool = False) -> AbstractOb
             )
             f.close()
             observer = dynamically_instantiate(observer_class)
-        except:
+        except Exception:
             if not quiet:
-                print(f"poli 🧪: attempting isolated observer instantiation.")
+                print("poli 🧪: attempting isolated observer instantiation.")
             observer = ExternalObserver(observer_name=observer_name)
     return observer

@@ -1,14 +1,13 @@
 """Executable script used for isolation of objective factories and functions."""
 
+import argparse
 import logging
 import os
 import sys
-import argparse
 import traceback
 
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.util.inter_process_communication.process_wrapper import get_connection
-
 
 ADDITIONAL_IMPORT_SEARCH_PATHES_KEY = "ADDITIONAL_IMPORT_PATHS"
 

@@ -3,13 +3,10 @@ from typing import List, Union
 
 import numpy as np
 
-from poli.core.registry import register_isolated_function
-
-from poli.core.util.proteins.mutations import (
-    find_closest_wildtype_pdb_file_to_mutant,
-)
-from poli.core.util.proteins.foldx import FoldxInterface
 from poli.core.proteins.foldx_isolated_function import FoldxIsolatedFunction
+from poli.core.registry import register_isolated_function
+from poli.core.util.proteins.foldx import FoldxInterface
+from poli.core.util.proteins.mutations import find_closest_wildtype_pdb_file_to_mutant
 
 
 class FoldXSASAIsolatedLogic(FoldxIsolatedFunction):

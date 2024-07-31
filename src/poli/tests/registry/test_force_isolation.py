@@ -12,7 +12,3 @@ def test_force_isolation_on_aloha():
     )
 
     assert isinstance(problem.black_box, objective_factory.ExternalBlackBox)
-
-
-if __name__ == "__main__":
-    test_force_isolation_on_aloha()

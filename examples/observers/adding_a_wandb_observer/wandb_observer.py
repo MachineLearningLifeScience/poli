@@ -6,8 +6,8 @@ To run this example, you will need to install wandb:
 """
 
 import numpy as np
-import wandb
 
+import wandb
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.util.abstract_observer import AbstractObserver
 

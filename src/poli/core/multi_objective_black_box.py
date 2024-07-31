@@ -9,7 +9,6 @@ from typing import List
 import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
-from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.core.black_box_information import BlackBoxInformation
 
 

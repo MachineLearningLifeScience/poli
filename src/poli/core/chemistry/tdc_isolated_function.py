@@ -12,11 +12,9 @@ References
 """
 
 import numpy as np
-
 from tdc import Oracle
 
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
-
 from poli.core.util.chemistry.string_to_molecule import translate_selfies_to_smiles
 
 
@@ -84,7 +82,7 @@ class TDCIsolatedFunction(AbstractIsolatedFunction):
         scores : array-like
             An array of oracle scores computed for each input molecule.
         """
-        if not x.dtype.kind in ["U", "S"]:
+        if x.dtype.kind not in ["U", "S"]:
             raise ValueError(
                 f"We expect x to be an array of strings, but we got {x.dtype}"
             )

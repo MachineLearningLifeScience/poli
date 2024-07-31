@@ -1,19 +1,15 @@
-import pytest
 from pathlib import Path
 
 import numpy as np
+import pytest
 
 from poli import objective_factory
 
 THIS_DIR = Path(__file__).parent.resolve()
 
 
+@pytest.mark.poli__rasp
 def test_rasp_on_3ned_against_notebooks_results_on_rasp_env():
-    try:
-        from poli.objective_repository.rasp.isolated_function import RaspIsolatedLogic
-    except ImportError:
-        pytest.skip("Could not import the rasp isolated logic. ")
-
     import torch
 
     # For us to match what the notebook says, we have
@@ -49,6 +45,7 @@ def test_rasp_on_3ned_against_notebooks_results_on_rasp_env():
     assert np.isclose(y[2], -0.2835593180137258, atol=1e-4)
 
 
+@pytest.mark.poli__rasp
 def test_rasp_on_3ned_against_notebooks_results_isolated():
     """
     We test forceful registration of the RaSP problem.

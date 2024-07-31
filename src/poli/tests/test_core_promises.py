@@ -1,6 +1,5 @@
 """This test suite contains the core promises we make to the user."""
 
-import pytest
 import numpy as np
 
 
@@ -9,7 +8,7 @@ def test_creating_an_instance_of_a_black_box():
 
     f = WhiteNoiseBlackBox()
     x = np.array([["1", "2", "3"]])
-    y = f(x)
+    _ = f(x)
 
 
 def test_creating_a_problem():
@@ -22,22 +21,6 @@ def test_creating_a_problem():
     )
 
     f, x0 = white_noise_problem.black_box, white_noise_problem.x0
-    y0 = f(x0)
+    _ = f(x0)
 
     f.terminate()
-
-
-def test_instancing_a_black_box_that_requires_isolation():
-    from poli.objective_repository.dockstring.register import DockstringBlackBox
-
-    f = DockstringBlackBox(
-        target_name="DRD2",
-        string_representation="SMILES",
-    )
-
-    risperidone_smiles = "CC1=C(C(=O)N2CCCCC2=N1)CCN3CCC(CC3)C4=NOC5=C4C=CC(=C5)F"
-
-    # TODO: replace for proper smiles tokenization.
-    x0 = np.array([list(risperidone_smiles)])
-
-    print(f(x0))

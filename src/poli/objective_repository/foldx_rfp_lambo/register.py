@@ -6,17 +6,15 @@ from pathlib import Path
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
-from poli.core.problem import Problem
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.exceptions import FoldXNotFoundException
-
-from poli.objective_repository.foldx_rfp_lambo import PROBLEM_SEQ, CORRECT_SEQ
+from poli.core.problem import Problem
 from poli.core.util.isolation.instancing import instance_function_as_isolated_process
 from poli.core.util.seeding import seed_python_numpy_and_torch
-
+from poli.objective_repository.foldx_rfp_lambo import CORRECT_SEQ, PROBLEM_SEQ
 from poli.objective_repository.foldx_rfp_lambo.information import (
-    foldx_rfp_lambo_information,
     AMINO_ACIDS,
+    foldx_rfp_lambo_information,
 )
 
 
