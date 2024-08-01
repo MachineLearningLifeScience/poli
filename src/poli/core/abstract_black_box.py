@@ -75,6 +75,7 @@ class AbstractBlackBox:
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
+        force_isolation: bool = False,
     ):
         """
         Initialize the AbstractBlackBox object.
@@ -95,6 +96,7 @@ class AbstractBlackBox:
         self.parallelize = parallelize
         self.evaluation_budget = evaluation_budget
         self.num_evaluations = 0
+        self.force_isolation = force_isolation
 
         if num_workers is None:
             num_workers = cpu_count() // 2
