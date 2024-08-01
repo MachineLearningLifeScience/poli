@@ -24,6 +24,6 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install tox
-    - name: Test rmf-related black boxes with tox and pytest
+    - name: Test RMF-related black boxes with tox and pytest
       run: |
         tox -c tox.ini -e poli-rmf-py39
