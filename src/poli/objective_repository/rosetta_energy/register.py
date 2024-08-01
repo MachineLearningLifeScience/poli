@@ -1,25 +1,27 @@
-from typing import Tuple, List
+from typing import List
+
 import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
-
 from poli.core.util.isolation.instancing import instance_function_as_isolated_process
-from poli.objective_repository.rosetta_energy.information import rosetta_energy_information
+from poli.objective_repository.rosetta_energy.information import (
+    rosetta_energy_information,
+)
 
 
 class RosettaEnergyBlackBox(AbstractBlackBox):
     def __init__(
-            self,
-            your_arg: str,
-            your_second_arg: List[float],
-            your_kwarg: str = ...,
-            batch_size: int = None,
-            parallelize: bool = False,
-            num_workers: int = None,
-            evaluation_budget: int = float("inf")
+        self,
+        your_arg: str,
+        your_second_arg: List[float],
+        your_kwarg: str = ...,
+        batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
+        evaluation_budget: int = float("inf"),
     ):
         super().__init__(
             batch_size=batch_size,
@@ -32,7 +34,7 @@ class RosettaEnergyBlackBox(AbstractBlackBox):
 
         # Importing the isolated logic if we can:
         try:
-            #from poli.objective_repository.rosetta_energy.isolated_function import
+            # from poli.objective_repository.rosetta_energy.isolated_function import
 
             self.inner_function = None
         except ImportError:
@@ -57,15 +59,15 @@ class RosettaEnergyProblemFactory(AbstractProblemFactory):
         return rosetta_energy_information
 
     def create(
-            self,
-            seed: int = None,
-            your_arg: str = ...,
-            your_second_arg: List[float] = ...,
-            your_kwarg: str = ...,
-            batch_size: int = None,
-            parallelize: bool = False,
-            num_workers: int = None,
-            evaluation_budget: int = float("inf")
+        self,
+        seed: int = None,
+        your_arg: str = ...,
+        your_second_arg: List[float] = ...,
+        your_kwarg: str = ...,
+        batch_size: int = None,
+        parallelize: bool = False,
+        num_workers: int = None,
+        evaluation_budget: int = float("inf"),
     ) -> Problem:
         # Manipulate args and kwargs you might need at creation time...
         ...
@@ -85,17 +87,3 @@ class RosettaEnergyProblemFactory(AbstractProblemFactory):
         x0 = ...
 
         return Problem(f, x0)
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem_from_repository
-
-    blackbox = RosettaEnergyBlackBox(your_arg=None, your_second_arg=None)
-
-    # Once we have created a simple conda enviroment
-    # (see the environment.yml file in this folder),
-    # we can register our problem s.t. it uses
-    # said conda environment.
-    register_problem_from_repository(
-        name=blackbox.get_black_box_info().get_problem_name()
-    )
