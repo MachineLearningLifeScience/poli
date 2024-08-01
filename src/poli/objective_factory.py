@@ -162,50 +162,6 @@ def create(
     problem : AbstractProblem
         The black-box function, initial value, and related information.
     """
-    # If the user can run it with the envionment they currently
-    # have, then we do not need to install it.
-    # if not force_isolation:
-    #     if not quiet:
-    #         print(f"poli 🧪: Creating the objective {name} from the repository.")
-
-    #     problem = __create_problem_from_repository(
-    #         name,
-    #         seed=seed,
-    #         batch_size=batch_size,
-    #         parallelize=parallelize,
-    #         num_workers=num_workers,
-    #         evaluation_budget=evaluation_budget,
-    #         **kwargs_for_factory,
-    #     )
-    # else:
-    #     # Check if the name is indeed registered, or
-    #     # available in the objective repository
-    #     # This function will
-    #     # 1. Create the conda environment for the objective
-    #     # 2. Run registration inside said environment.
-
-    #     # Assert that the problem has an isolated_function.py
-
-    #     # Register the isolated function.
-
-    #     # Create the problem as usual. The isolated function
-    #     # will run just fine.
-    #     __register_objective_if_available(name, quiet=quiet)
-
-    #     # At this point, we know the name is registered.
-    #     # Thus, we should be able to start it as an isolated process
-    #     if not quiet:
-    #         print(f"poli 🧪: Creating an isolated problem ({name}).")
-    #     problem = __create_problem_as_isolated_process(
-    #         name,
-    #         seed=seed,
-    #         batch_size=batch_size,
-    #         parallelize=parallelize,
-    #         num_workers=num_workers,
-    #         evaluation_budget=evaluation_budget,
-    #         quiet=quiet,
-    #         **kwargs_for_factory,
-    #     )
     problem = __create_problem_from_repository(
         name,
         seed=seed,
@@ -223,9 +179,6 @@ def create(
         problem.black_box.info, observer_init_info, seed
     )
 
-    # TODO: Should we send the y0 to the observer initialization?
-    # f, x0 = problem.black_box, problem.x0
-    # y0 = f(x0)
     f = problem.black_box
     f.set_observer(observer)
     f.set_observer_info(observer_info)
