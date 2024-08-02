@@ -130,6 +130,12 @@ def register_isolated_function(
     force: bool = True,
     **kwargs,
 ):
+    if name == _OBSERVER:
+        warnings.warn(
+            "The name "
+            + name
+            + " is a reserved keyword. Please choose another name. Doing nothing."
+        )
     if "conda_environment_location" in kwargs:
         conda_environment_name = kwargs["conda_environment_location"]
 
