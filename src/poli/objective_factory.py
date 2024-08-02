@@ -3,11 +3,7 @@ Creates objective functions by providing a common interface to all factories in 
 """
 
 import configparser
-import logging
 from pathlib import Path
-from typing import Tuple
-
-import numpy as np
 
 from poli.core import registry
 from poli.core.abstract_black_box import AbstractBlackBox
@@ -17,17 +13,13 @@ from poli.core.registry import (
     _DEFAULT,
     _DEFAULT_OBSERVER_RUN_SCRIPT,
     _OBSERVER,
-    _RUN_SCRIPT_LOCATION,
     DEFAULT_OBSERVER_NAME,
-    register_problem_from_repository,
 )
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.algorithm_observer_wrapper import AlgorithmObserverWrapper
 from poli.core.util.default_observer import DefaultObserver
 from poli.core.util.external_observer import ExternalObserver
-from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
-from poli.core.util.isolation.external_black_box import ExternalBlackBox
-from poli.external_problem_factory_script import dynamically_instantiate
+from poli.external_isolated_function_script import dynamically_instantiate
 from poli.objective_repository import AVAILABLE_OBJECTIVES, AVAILABLE_PROBLEM_FACTORIES
 
 
@@ -55,14 +47,13 @@ def __create_problem_from_repository(
     parallelize: bool = False,
     num_workers: int = None,
     evaluation_budget: int = float("inf"),
+    force_isolation: bool = False,
     observer: AbstractObserver = None,
     **kwargs_for_factory,
-) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+) -> Problem:
     """Creates the objective function from the repository.
 
-    If the problem is available in AVAILABLE_PROBLEM_FACTORIES
-    (i.e. if the user could import all the dependencies directly),
-    we create the problem directly. Otherwise, we raise an error.
+    We create the problem directly, without starting it as an isolated process.
 
     Parameters
     ----------
@@ -86,10 +77,23 @@ def __create_problem_from_repository(
         Additional keyword arguments for the factory.
     """
     if name not in AVAILABLE_PROBLEM_FACTORIES:
-        raise ValueError(
-            f"Objective function '{name}' is not available in the repository."
-        )
-
+        if name in AVAILABLE_OBJECTIVES:
+            # For poli developers:
+            # If you get this error while developing a new black box,
+            # it might be because you forgot to register your problem
+            # factory and black box inside the __init__.py file of
+            # the objective_repository. Remember that you need to add
+            # them to AVAILABLE_PROBLEM_FACTORIES and AVAILABLE_BLACK_BOXES.
+            raise ValueError(
+                f"Objective function '{name}' is available in the repository, "
+                "but it is not registered as available. This is an internal error. "
+                "We encourage you to report it to the developers by creating an "
+                "issue in the GitHub repository of poli."
+            )
+        else:
+            raise ValueError(
+                f"Objective function '{name}' is not available in the repository."
+            )
     problem_factory: AbstractProblemFactory = AVAILABLE_PROBLEM_FACTORIES[name]()
     problem = problem_factory.create(
         seed=seed,
@@ -97,6 +101,7 @@ def __create_problem_from_repository(
         parallelize=parallelize,
         num_workers=num_workers,
         evaluation_budget=evaluation_budget,
+        force_isolation=force_isolation,
         **kwargs_for_factory,
     )
 
@@ -106,152 +111,12 @@ def __create_problem_from_repository(
     return problem
 
 
-def __create_problem_as_isolated_process(
-    name: str,
-    seed: int = None,
-    batch_size: int = None,
-    parallelize: bool = False,
-    num_workers: int = None,
-    evaluation_budget: int = float("inf"),
-    quiet: bool = False,
-    **kwargs_for_factory,
-) -> Problem:
-    """Creates the objective function as an isolated process.
-
-    If the problem is registered, we create it as an isolated
-    process. Otherwise, we raise an error. That is, this function
-    expects the problem to be registered.
-
-    Parameters
-    ----------
-    name : str
-        The name of the objective function.
-    seed : int, optional
-        The seed value for random number generation.
-    batch_size : int, optional
-        The batch size, passed to the black box to run evaluations on batches.
-        If None, it will evaluate all inputs at once.
-    parallelize : bool, optional
-        If True, then the objective function runs in parallel.
-    num_workers : int, optional
-        When parallelize is True, this specifies the number of processes to use.
-        By default, it uses half the number of available CPUs (rounded down).
-    evaluation_budget : int, optional
-        The maximum number of evaluations allowed. By default, it is infinity.
-    quiet : bool, optional
-        If True, we squelch the messages giving feedback about the creation process.
-        By default, it is False.
-    **kwargs_for_factory : dict, optional
-        Additional keyword arguments for the factory.
-    """
-    config = load_config()
-    if name not in config:
-        raise ValueError(f"Objective function '{name}' is not registered. ")
-
-    # start objective process
-    # VERY IMPORTANT: the script MUST accept port and password as arguments
-    kwargs_for_factory["batch_size"] = batch_size
-    kwargs_for_factory["parallelize"] = parallelize
-    kwargs_for_factory["num_workers"] = num_workers
-    kwargs_for_factory["evaluation_budget"] = evaluation_budget
-
-    if not quiet:
-        print(f"poli 🧪: Starting the problem {name} as an isolated objective process.")
-
-    process_wrapper = ProcessWrapper(
-        config[name][_RUN_SCRIPT_LOCATION], **kwargs_for_factory
-    )
-    # TODO: add signal listener that intercepts when proc ends
-    # wait for connection from objective process
-    # TODO: potential (unlikely) race condition! (process might try to connect before listener is ready!)
-    # TODO: We could be sending all the kwargs for the factory here.
-    process_wrapper.send(("SETUP", seed))
-
-    msg_type, *msg = process_wrapper.recv()
-    if msg_type == "SETUP":
-        # Then the instance of the abstract factory
-        # was correctly set-up, and
-        x0 = msg[0]
-    elif msg_type == "EXCEPTION":
-        e, tb = msg
-        print(tb)
-        raise e
-    else:
-        raise ValueError(
-            f"Internal error: received {msg_type} when expecting SETUP or EXCEPTION"
-        )
-
-    f = ExternalBlackBox(process_wrapper)
-    external_problem = Problem(
-        black_box=f,
-        x0=x0,
-    )
-
-    return external_problem
-
-
-def __register_objective_if_available(
-    name: str, force_register: bool = True, quiet: bool = False
-):
-    """Registers the objective function if it is available in the repository.
-
-    If the objective function is not available in the repository,
-    then we raise an error. If it is available, then we ask the
-    user for confirmation to register it. If the user confirms,
-    then we register it. Otherwise, we raise an error.
-
-    Parameters
-    ----------
-    name : str
-        The name of the objective function.
-    force_register : bool, optional
-        If True, then the objective function is registered without asking
-        for confirmation, overwriting any previous registration. By default,
-        it is True.
-    quiet : bool, optional
-        If True, we squelch the messages giving feedback about the creation process.
-        By default, it is False.
-    """
-    config = load_config()
-    if name not in config:
-        if name not in AVAILABLE_OBJECTIVES:
-            raise ValueError(
-                f"Objective function '{name}' is not registered, "
-                "and it is not available in the repository."
-            )
-
-        # At this point, we know that the function is available
-        # in the repository
-        if force_register:
-            # Then we install it.
-            answer = "y"
-        else:
-            # We ask the user for their confirmation
-            answer = input(
-                f"Objective function '{name}' is not registered, "
-                "but it is available in the repository. Do you "
-                "want to install it? (y/[n]): "
-            )
-
-        if answer == "y":
-            # Register problem
-            logging.debug("poli 🧪: Registered the objective from the repository.")
-            register_problem_from_repository(name, quiet=quiet)
-            # Refresh the config
-            config = load_config()
-        else:
-            raise ValueError(
-                f"Objective function '{name}' won't be registered. Aborting."
-            )
-
-
 def create(
     name: str,
     *,
     seed: int = None,
     observer_init_info: dict = None,
     observer_name: str = None,
-    force_register: bool = True,
     force_isolation: bool = False,
     batch_size: int = None,
     parallelize: bool = False,
@@ -273,10 +138,6 @@ def create(
         Optional information about the caller that is forwarded to the logger to initialize the run.
     observer_name : str, optional
         The observer to use.
-    force_register : bool, optional
-        If True, then the objective function is registered without asking
-        for confirmation, overwriting any previous registration. By default,
-        it is True.
     force_isolation : bool, optional
         If True, then the objective function is instantiated as an isolated
         process.
@@ -301,51 +162,23 @@ def create(
     problem : AbstractProblem
         The black-box function, initial value, and related information.
     """
-    # If the user can run it with the envionment they currently
-    # have, then we do not need to install it.
-    if name in AVAILABLE_PROBLEM_FACTORIES and not force_isolation:
-        if not quiet:
-            print(f"poli 🧪: Creating the objective {name} from the repository.")
+    problem = __create_problem_from_repository(
+        name,
+        seed=seed,
+        batch_size=batch_size,
+        parallelize=parallelize,
+        num_workers=num_workers,
+        evaluation_budget=evaluation_budget,
+        force_isolation=force_isolation,
+        **kwargs_for_factory,
+    )
 
-        problem = __create_problem_from_repository(
-            name,
-            seed=seed,
-            batch_size=batch_size,
-            parallelize=parallelize,
-            num_workers=num_workers,
-            evaluation_budget=evaluation_budget,
-            **kwargs_for_factory,
-        )
-    else:
-        # Check if the name is indeed registered, or
-        # available in the objective repository
-        __register_objective_if_available(
-            name, force_register=force_register, quiet=quiet
-        )
-
-        # At this point, we know the name is registered.
-        # Thus, we should be able to start it as an isolated process
-        if not quiet:
-            print(f"poli 🧪: Creating an isolated problem ({name}).")
-        problem = __create_problem_as_isolated_process(
-            name,
-            seed=seed,
-            batch_size=batch_size,
-            parallelize=parallelize,
-            num_workers=num_workers,
-            evaluation_budget=evaluation_budget,
-            quiet=quiet,
-            **kwargs_for_factory,
-        )
     # instantiate observer (if desired)
     observer = _instantiate_observer(observer_name, quiet)
     observer_info = observer.initialize_observer(
         problem.black_box.info, observer_init_info, seed
     )
 
-    # TODO: Should we send the y0 to the observer initialization?
-    # f, x0 = problem.black_box, problem.x0
-    # y0 = f(x0)
     f = problem.black_box
     f.set_observer(observer)
     f.set_observer_info(observer_info)
@@ -359,7 +192,6 @@ def start(
     seed: int = None,
     caller_info: dict = None,
     observer_name: str = None,
-    force_register: bool = False,
     force_isolation: bool = False,
     **kwargs_for_factory,
 ) -> AbstractBlackBox:
@@ -392,9 +224,6 @@ def start(
         Optional information about the caller that is forwarded to the logger to initialize the run.
     observer_name : str, optional
         The observer to use.
-    force_register : bool, optional
-        If True, then the objective function is registered without asking
-        for confirmation, overwriting any previous registration.
     force_isolation : bool, optional
         If True, then the objective function is instantiated as an isolated
         process.
@@ -406,9 +235,8 @@ def start(
         seed=seed,
         observer_init_info=caller_info,
         observer_name=observer_name,
-        force_register=force_register,
         force_isolation=force_isolation,
-        kwargs_for_factory=kwargs_for_factory,
+        **kwargs_for_factory,
     )
 
     f = problem.black_box
@@ -432,8 +260,7 @@ def _instantiate_observer(observer_name: str, quiet: bool = False) -> AbstractOb
     Returns
     -------
     observer : AbstractObserver
-        The black-box function, initial value, and related information.
-
+        The observer, either dynamically instantiated or started as an isolated process.
     """
     if _OBSERVER not in registry.config[_DEFAULT]:
         registry.config[_DEFAULT][_OBSERVER] = _DEFAULT_OBSERVER_RUN_SCRIPT

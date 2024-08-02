@@ -161,6 +161,7 @@ class ToyContinuousProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
+        force_isolation: bool = False,
     ) -> Problem:
         """
         Creates a new instance of the toy continuous problem.
@@ -217,18 +218,3 @@ class ToyContinuousProblemFactory(AbstractProblemFactory):
         x0 = f.function.x0
 
         return Problem(f, x0)
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    # Once we have created a simple conda enviroment
-    # (see the environment.yml file in this folder),
-    # we can register our problem s.t. it uses
-    # said conda environment.
-    toy_continuous_problem_factory = ToyContinuousProblemFactory()
-    register_problem(
-        toy_continuous_problem_factory,
-        conda_environment_name="poli__base",
-        # force=True
-    )

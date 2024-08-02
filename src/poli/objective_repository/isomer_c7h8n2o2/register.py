@@ -206,14 +206,3 @@ class IsomerC7H8N2O2ProblemFactory(AbstractProblemFactory):
         )
 
         return isomer_problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    register_problem(
-        IsomerC7H8N2O2ProblemFactory(),
-        name="isomer_c7h8n2o2",
-        conda_environment_name="poli__tdc",
-        force=True,
-    )

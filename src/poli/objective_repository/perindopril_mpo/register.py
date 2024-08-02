@@ -204,14 +204,3 @@ class PerindoprilMPOProblemFactory(AbstractProblemFactory):
         )
 
         return perindopril_mpo_problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    register_problem(
-        PerindoprilMPOProblemFactory(),
-        name="perindopril_mpo",
-        conda_environment_name="poli__tdc",
-        force=True,
-    )

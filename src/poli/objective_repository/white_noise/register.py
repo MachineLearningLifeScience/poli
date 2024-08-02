@@ -134,6 +134,7 @@ class WhiteNoiseProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
+        force_isolation: bool = False,
     ) -> Problem:
         """
         Create a white noise problem with the specified parameters.
@@ -171,18 +172,3 @@ class WhiteNoiseProblemFactory(AbstractProblemFactory):
         white_noise_problem = Problem(black_box=f, x0=x0)
 
         return white_noise_problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    # Once we have created a simple conda enviroment
-    # (see the environment.yml file in this folder),
-    # we can register our problem s.t. it uses
-    # said conda environment.
-    white_noise_problem_factory = WhiteNoiseProblemFactory()
-    register_problem(
-        white_noise_problem_factory,
-        conda_environment_name="poli__base",
-        force=True,
-    )

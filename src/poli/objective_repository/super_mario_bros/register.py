@@ -197,14 +197,3 @@ class SuperMarioBrosProblemFactory(AbstractProblemFactory):
         problem = Problem(f, x0)
 
         return problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    # (once) we have to register our factory
-    smb_problem_factory = SuperMarioBrosProblemFactory()
-    register_problem(
-        smb_problem_factory,
-        conda_environment_name="poli__mario",
-    )

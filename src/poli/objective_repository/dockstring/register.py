@@ -207,6 +207,7 @@ class DockstringProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
+        force_isolation: bool = False,
     ) -> Problem:
         """Creates a dockstring black box function and initial observations.
 
@@ -248,6 +249,7 @@ class DockstringProblemFactory(AbstractProblemFactory):
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
+            force_isolation=force_isolation,
         )
 
         # Using the initial example they provide in the
@@ -268,13 +270,3 @@ class DockstringProblemFactory(AbstractProblemFactory):
         dockstring_problem = Problem(black_box=dockstring_black_box, x0=x0)
 
         return dockstring_problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    dockstring_problem_factory = DockstringProblemFactory()
-    register_problem(
-        dockstring_problem_factory,
-        conda_environment_name="poli__dockstring",
-    )

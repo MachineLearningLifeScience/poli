@@ -35,38 +35,6 @@ THIS_DIR = Path(__file__).parent.resolve()
 SEED = np.random.randint(0, 1000)
 
 
-def test_force_registering_qed():
-    """
-    We test whether we can force-register the qed problem
-    if rdkit and selfies are not installed.
-    """
-    problem = objective_factory.create(
-        name="rdkit_qed",
-        force_register=True,
-    )
-    f, x0 = problem.black_box, problem.x0
-    y0 = f(x0)
-
-    # Asserting that the QED of a single carbon
-    # is close to 0.35978494 (according to RDKit).
-    assert np.isclose(y0, 0.35978494).all()
-    f.terminate()
-
-
-def test_force_registering_qed_with_context_manager():
-    """
-    Tests the objective_factory.start method on QED.
-    """
-    with objective_factory.start(
-        name="rdkit_qed",
-        force_register=True,
-        force_isolation=True,
-    ) as f:
-        x = np.array([["C"]])
-        y = f(x)
-        assert np.isclose(y, 0.35978494).all()
-
-
 @pytest.mark.poli__lambo
 def test_penalized_logp_lambo():
     """
@@ -90,7 +58,6 @@ def test_querying_dockstring_using_smiles():
         name="dockstring",
         target_name="DRD2",
         string_representation="SMILES",
-        force_register=True,
     )
     f = problem.black_box
 
@@ -112,7 +79,6 @@ def test_querying_dockstring_using_selfies():
         name="dockstring",
         target_name="ABL1",
         string_representation="SELFIES",
-        force_register=True,
     )
     f = problem.black_box
 

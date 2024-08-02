@@ -167,6 +167,7 @@ class LogPProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
+        force_isolation: bool = False,
     ) -> Problem:
         """Creates a logP problem instance.
 
@@ -217,18 +218,3 @@ class LogPProblemFactory(AbstractProblemFactory):
         problem = Problem(f, x0)
 
         return problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    # Once we have created a simple conda enviroment
-    # (see the environment.yml file in this folder),
-    # we can register our problem s.t. it uses
-    # said conda environment.
-    logp_problem_factory = LogPProblemFactory()
-    register_problem(
-        logp_problem_factory,
-        conda_environment_name="poli__chem",
-        # force=True,
-    )

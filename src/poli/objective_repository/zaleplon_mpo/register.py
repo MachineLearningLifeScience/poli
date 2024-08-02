@@ -205,14 +205,3 @@ class ZaleplonMPOProblemFactory(AbstractProblemFactory):
         )
 
         return zaleplon_mpo_problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    register_problem(
-        ZaleplonMPOProblemFactory(),
-        name="zaleplon_mpo",
-        conda_environment_name="poli__tdc",
-        force=True,
-    )

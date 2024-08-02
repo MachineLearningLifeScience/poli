@@ -197,6 +197,7 @@ class QEDProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
+        force_isolation: bool = False,
     ) -> Problem:
         """Creates a QED black box function and initial observations.
 
@@ -245,18 +246,3 @@ class QEDProblemFactory(AbstractProblemFactory):
             x0 = np.array([["[C]"]])
 
         return Problem(f, x0)
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    # Once we have created a simple conda enviroment
-    # (see the environment.yml file in this folder),
-    # we can register our problem s.t. it uses
-    # said conda environment.
-    qed_problem_factory = QEDProblemFactory()
-    register_problem(
-        qed_problem_factory,
-        conda_environment_name="poli__chem",
-        # force=True,
-    )

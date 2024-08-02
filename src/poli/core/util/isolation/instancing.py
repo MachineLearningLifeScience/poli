@@ -36,6 +36,44 @@ def load_config():
     return config
 
 
+def __read_env_name(environment_file: Path) -> str:
+    with open(environment_file, "r") as f:
+        # This is a really crude way of doing this,
+        # but it works. We should probably use a
+        # yaml parser instead, but the idea is to keep
+        # the dependencies to a minimum.
+        yml = f.read()
+        lines = yml.split("\n")
+        conda_env_name_line = lines[0]
+        assert conda_env_name_line.startswith("name:"), (
+            "The first line of the environment.yml file "
+            "should be the name of the environment"
+        )
+        env_name = lines[0].split(":")[1].strip()
+    return env_name
+
+
+def __create_conda_env(environment_file: Path, quiet: bool = False):
+    env_name = __read_env_name(environment_file=environment_file)
+
+    # 1. create the environment from the yaml file
+    if not quiet:
+        print(f"poli 🧪: creating environment {env_name} from {environment_file}")
+    try:
+        subprocess.run(
+            " ".join(["conda", "env", "create", "-f", str(environment_file)]),
+            shell=True,
+            check=True,
+            capture_output=True,
+        )
+    except subprocess.CalledProcessError as e:
+        if "already exists" in e.stderr.decode():
+            if not quiet:
+                print(f"poli 🧪: {env_name} already exists.")
+        else:
+            raise e
+
+
 def __register_isolated_function_from_repository(
     name: str, quiet: bool = False
 ) -> None:
@@ -57,10 +95,6 @@ def __register_isolated_function_from_repository(
         If True, we squelch the feedback about environment creation and
         problem registration, by default False.
     """
-    assert name.endswith(
-        "__isolated"
-    ), "By convention, the names of isolated functions always end with '__isolated'"
-
     # Load up the environment name
     PATH_TO_REPOSITORY = (
         Path(__file__).parent.parent.parent.parent / "objective_repository"
@@ -70,7 +104,7 @@ def __register_isolated_function_from_repository(
     environment_file = PATH_TO_REPOSITORY / name_without_isolated / "environment.yml"
     isolated_file = PATH_TO_REPOSITORY / name_without_isolated / "isolated_function.py"
 
-    __register_isolated_function(
+    __register_isolated_file(
         environment_file=environment_file,
         isolated_file=isolated_file,
         name_for_show=name,
@@ -102,7 +136,7 @@ def __register_isolated_function_from_core(name: str, quiet: bool = False) -> No
         isolated_file = (
             ROOT_DIR_OF_POLI_PACKAGE / "core" / "chemistry" / "tdc_isolated_function.py"
         )
-        __register_isolated_function(
+        __register_isolated_file(
             environment_file=environment_file,
             isolated_file=isolated_file,
             name_for_show="TDC isolated function",
@@ -115,51 +149,35 @@ def __register_isolated_function_from_core(name: str, quiet: bool = False) -> No
         )
 
 
-def __register_isolated_function(
+def __run_file_in_env(env_name: str, file_path: Path):
+    """
+    Runs a file from a given conda env.
+    """
+    command = " ".join(["conda", "run", "-n", env_name, "python", str(file_path)])
+    try:
+        subprocess.run(command, check=True, shell=True, capture_output=True)
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(
+            f"Found error when running {file_path} from environment {env_name}: \n"
+            f"{e.stderr.decode()}"
+        ) from e
+
+
+def __register_isolated_file(
     environment_file: Path,
     isolated_file: Path,
     name_for_show: str = None,
     quiet: bool = False,
 ):
-    with open(environment_file, "r") as f:
-        # This is a really crude way of doing this,
-        # but it works. We should probably use a
-        # yaml parser instead, but the idea is to keep
-        # the dependencies to a minimum.
-        yml = f.read()
-        lines = yml.split("\n")
-        conda_env_name_line = lines[0]
-        assert conda_env_name_line.startswith("name:"), (
-            "The first line of the environment.yml file "
-            "should be the name of the environment"
-        )
-        env_name = lines[0].split(":")[1].strip()
+    """
+    Creates the conda environment in the environment file and
+    runs the isolated file.
+    """
+    # 1. Create the conda env.
+    __create_conda_env(environment_file, quiet=quiet)
+    env_name = __read_env_name(environment_file)
 
-    # 1. create the environment from the yaml file
-    if not quiet:
-        print(f"poli 🧪: creating environment {env_name} from {environment_file}")
-    try:
-        subprocess.run(
-            " ".join(["conda", "env", "create", "-f", str(environment_file)]),
-            shell=True,
-            check=True,
-            capture_output=True,
-        )
-    except subprocess.CalledProcessError as e:
-        if "already exists" in e.stderr.decode():
-            if not quiet:
-                print(f"poli 🧪: {env_name} already exists.")
-        else:
-            raise e
-
-    # 2. run the file from said enviroment (since
-    #    we can't import the factory: it may have
-    #    dependencies that are not installed)
-
-    # Running the file
-    command = " ".join(["conda", "run", "-n", env_name, "python", str(isolated_file)])
-    # warnings.warn("Running the following command: %s. " % command)
-
+    # 2. Running the file
     if not quiet:
         if name_for_show:
             print(
@@ -167,18 +185,11 @@ def __register_isolated_function(
             )
         else:
             print(f"poli 🧪: running {isolated_file} from environment {env_name}")
-    try:
-        subprocess.run(command, check=True, shell=True, capture_output=True)
-    except subprocess.CalledProcessError as e:
-        raise RuntimeError(
-            f"Found error when running {isolated_file} from environment {env_name}: \n"
-            f"{e.stderr.decode()}"
-        ) from e
+
+    __run_file_in_env(env_name, isolated_file)
 
 
-def register_isolated_function_if_available(
-    name: str, force_register: bool = True, quiet: bool = False
-):
+def register_isolated_function(name: str, quiet: bool = False):
     """Registers the objective function if it is available in the repository.
 
     If the objective function is not available in the repository,
@@ -196,41 +207,22 @@ def register_isolated_function_if_available(
         `isolated_function.py`. An exception to this
         is "tdc__isolated", which registers the
         TDCIsolatedFunction.
-    force_register : bool, optional
-        If True, then the objective function is registered without asking
-        for confirmation, overwriting any previous registration. By default,
-        it is True.
     quiet : bool, optional
         If True, we squelch the messages giving feedback about the creation process.
         By default, it is False.
     """
     config = load_config()
     if name not in config:
-        # if name not in AVAILABLE_OBJECTIVES:
-        #     raise ValueError(
-        #         f"Objective function '{name}' is not registered, "
-        #         "and it is not available in the repository."
-        #     )
-
-        # At this point, we know that the function is available
-        # in the repository
-        if force_register:
-            # Then we install it.
-            answer = "y"
-        else:
-            # We ask the user for their confirmation
-            answer = input(
-                f"Objective function '{name}' is not registered, "
-                "but it is available in the repository. Do you "
-                "want to install it? (y/[n]): "
-            )
-
-        if answer != "y":
-            raise ValueError(
-                f"Objective function '{name}' is not registered. Aborting."
-            )
-
         # Register problem
+
+        # Two cases:
+        # (i) some of the isolated functions are not alongside
+        # their black boxes and problem factories, but are rather inside
+        # the core of poli. For now, the only case is tdc, but more may
+        # come in the future.
+        #
+        # (ii) the isolated function is in the repository, living alongside
+        # the black box and the problem factory.
         if name == "tdc__isolated":
             logging.debug(
                 "poli 🧪: Registered the isolated function from the repository."
@@ -313,15 +305,11 @@ def instance_function_as_isolated_process(
     name: str,
     seed: int = None,
     quiet: bool = False,
-    force_register: bool = True,
     **kwargs_for_black_box,
 ) -> ExternalFunction:
-    # Register the problem
-    register_isolated_function_if_available(
-        name=name, force_register=force_register, quiet=quiet
-    )
+    # Register the problem if it hasn't been registered.
+    register_isolated_function(name=name, quiet=quiet)
 
-    # Create the external process wrapper
     f = __create_function_as_isolated_process(
         name=name,
         seed=seed,
@@ -329,7 +317,6 @@ def instance_function_as_isolated_process(
         **kwargs_for_black_box,
     )
 
-    # return it.
     return f
 
 
@@ -378,6 +365,6 @@ def get_inner_function(
             )
     else:
         inner_function = instance_function_as_isolated_process(
-            name=isolated_function_name, **kwargs
+            name=isolated_function_name, seed=seed, quiet=quiet, **kwargs
         )
     return inner_function

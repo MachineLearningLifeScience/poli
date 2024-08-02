@@ -277,13 +277,3 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
         problem = Problem(f, x0)
 
         return problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    foldx_problem_factory = FoldXStabilityProblemFactory()
-    register_problem(
-        foldx_problem_factory,
-        conda_environment_name="poli__protein",
-    )

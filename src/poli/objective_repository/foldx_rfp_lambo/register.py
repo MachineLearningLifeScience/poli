@@ -104,14 +104,3 @@ class FoldXRFPLamboProblemFactory(AbstractProblemFactory):
         x0 = black_box.inner_function.x0
 
         return Problem(black_box, x0)
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    rfp_problem_factory = FoldXRFPLamboProblemFactory()
-    register_problem(
-        rfp_problem_factory,
-        conda_environment_name="poli__lambo",
-        force=True,
-    )

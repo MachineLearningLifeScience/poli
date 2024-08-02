@@ -175,13 +175,3 @@ class SAProblemFactory(AbstractProblemFactory):
             x0=x0,
         )
         return problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    register_problem(
-        SAProblemFactory(),
-        conda_environment_name="poli__tdc",
-        force=True,
-    )

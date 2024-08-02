@@ -12,7 +12,6 @@ if __name__ == "__main__":
         parallelize=True,
         num_workers=5,
         batch_size=10,
-        force_register=True,
     )
     f, x0 = foldx_problem_in_parallel.black_box, foldx_problem_in_parallel.x0
     print("Running in parallel")

@@ -211,14 +211,3 @@ class IsomerC9H10N2O2PF2ClProblemFactory(AbstractProblemFactory):
         )
 
         return isomer_problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    register_problem(
-        IsomerC9H10N2O2PF2ClProblemFactory(),
-        name="isomer_c9h10n2o2pf2cl",
-        conda_environment_name="poli__tdc",
-        force=True,
-    )

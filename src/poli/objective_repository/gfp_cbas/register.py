@@ -148,28 +148,3 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
         problem = Problem(f, x0)
 
         return problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    gfp_problem_factory = GFPCBasProblemFactory()
-    register_problem(
-        gfp_problem_factory,
-        conda_environment_name="poli__protein_cbas",
-    )
-    # NOTE: default problem is GP problem
-    gfp_problem_factory.create(seed=12)
-    # instantiate different types of CBas problems:
-    gfp_problem_factory_vae = GFPCBasProblemFactory(problem_type="vae")
-    register_problem(
-        gfp_problem_factory_vae,
-        conda_environment_name="poli__protein_cbas",
-    )
-    gfp_problem_factory_vae.create(seed=12, problem_type="vae")
-    gfp_problem_factory_elbo = GFPCBasProblemFactory(problem_type="elbo")
-    register_problem(
-        gfp_problem_factory_elbo,
-        conda_environment_name="poli__protein_cbas",
-    )
-    gfp_problem_factory_elbo.create(seed=12, problem_type="elbo")

@@ -208,14 +208,3 @@ class AmlodipineMPOProblemFactory(AbstractProblemFactory):
         )
 
         return amlodipine_mpo_problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    register_problem(
-        AmlodipineMPOProblemFactory(),
-        name="amlodipine_mpo",
-        conda_environment_name="poli__tdc",
-        force=True,
-    )

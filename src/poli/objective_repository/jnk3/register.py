@@ -222,14 +222,3 @@ class JNK3ProblemFactory(AbstractProblemFactory):
         )
 
         return jnk3_problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    register_problem(
-        JNK3ProblemFactory(),
-        name="jnk3",
-        conda_environment_name="poli__tdc",
-        force=True,
-    )

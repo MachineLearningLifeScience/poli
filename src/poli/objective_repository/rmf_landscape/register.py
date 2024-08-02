@@ -242,13 +242,3 @@ class RMFProblemFactory(AbstractProblemFactory):
         x0 = np.array(wildtype).reshape(1, len(wildtype))
         problem = Problem(f, x0)
         return problem
-
-
-if __name__ == "__main__":
-    from poli.core.registry import register_problem
-
-    rmf_problem_factory = RMFProblemFactory()
-    register_problem(
-        rmf_problem_factory,
-        conda_environment_name="poli__rmf",
-    )
