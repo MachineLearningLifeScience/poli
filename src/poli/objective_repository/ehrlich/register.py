@@ -47,12 +47,8 @@ class EhrlichBlackBox(AbstractBlackBox):
 
     (i) be easy to query,
     (ii) have feasible and unfeasible sequences,
-    (iii) have uninformative random samples (i.e. randomly sampling
-        and evaluating should not be competitive, as many of these
-        should be unfeasible).
-    (iv) be maximized when certain motifs are present in the sequence.
-        These motifs can be long-range within the sequence, and are
-        meant to be non-additive.
+    (iii) have uninformative random samples (i.e. randomly sampling and evaluating should not be competitive, as many of these should be unfeasible).
+    (iv) be maximized when certain motifs are present in the sequence. These motifs can be long-range within the sequence, and are meant to be non-additive.
 
     Check the references for details on the implementation.
 

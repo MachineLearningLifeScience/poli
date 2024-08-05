@@ -218,4 +218,4 @@ AVAILABLE_BLACK_BOXES = {
 
 
 def get_problems():
-    return AVAILABLE_OBJECTIVES
+    return sorted(list(AVAILABLE_PROBLEM_FACTORIES.keys()))
