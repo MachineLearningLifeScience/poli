@@ -91,7 +91,7 @@ class IsomerC9H10N2O2PF2ClBlackBox(TDCBlackBox):
             evaluation_budget=evaluation_budget,
         )
 
-    def get_black_box_info() -> BlackBoxInformation:
+    def get_black_box_info(self) -> BlackBoxInformation:
         return BlackBoxInformation(
             name="isomer_c9h10n2o2pf2cl",
             max_sequence_length=np.inf,

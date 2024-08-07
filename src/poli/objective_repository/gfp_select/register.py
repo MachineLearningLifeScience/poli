@@ -47,8 +47,7 @@ class GFPSelectionBlackBox(AbstractBlackBox):
         """
         return self.inner_function(x, context)
 
-    @staticmethod
-    def get_black_box_info() -> BlackBoxInformation:
+    def get_black_box_info(self) -> BlackBoxInformation:
         return BlackBoxInformation(
             name="gfp_select",
             max_sequence_length=237,  # max len of aaSequence
