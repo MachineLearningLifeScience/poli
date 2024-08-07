@@ -68,8 +68,8 @@ serialize = [
     "{major}.{minor}.{patch}.{pre_l}{pre_n}",
     "{major}.{minor}.{patch}",
 ]
-search = "{current_version}"
-replace = "{new_version}"
+search = 'current_version = "{current_version}"'
+replace = 'current_version = "{new_version}"'
 regex = false
 ignore_missing_version = false
 ignore_missing_files = false
