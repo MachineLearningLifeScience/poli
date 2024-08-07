@@ -92,7 +92,6 @@ class DecoHopBlackBox(TDCBlackBox):
             evaluation_budget=evaluation_budget,
         )
 
-    @staticmethod
     def get_black_box_info(self) -> BlackBoxInformation:
         return BlackBoxInformation(
             name="deco_hop",
