@@ -4,3 +4,4 @@ pytest
 setuptools
 sphinx
 furo
+bump-my-version
