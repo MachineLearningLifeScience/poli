@@ -31,7 +31,6 @@ from poli.core.chemistry.tdc_black_box import TDCBlackBox
 from poli.core.problem import Problem
 from poli.core.util.chemistry.string_to_molecule import translate_smiles_to_selfies
 from poli.core.util.seeding import seed_numpy, seed_python
-from poli.objective_repository.jnk3.information import jnk3_info
 
 
 class JNK3BlackBox(TDCBlackBox):
@@ -101,9 +100,18 @@ class JNK3BlackBox(TDCBlackBox):
             evaluation_budget=evaluation_budget,
         )
 
-    @staticmethod
-    def get_black_box_info() -> BlackBoxInformation:
-        return jnk3_info
+    def get_black_box_info(self) -> BlackBoxInformation:
+        return BlackBoxInformation(
+            name="jnk3",
+            max_sequence_length=np.inf,
+            aligned=False,
+            fixed_length=False,
+            deterministic=True,  # ?
+            alphabet=None,  # TODO: add alphabet once we settle for one for SMLIES/SELFIES.
+            log_transform_recommended=False,
+            discrete=True,
+            padding_token="",
+        )
 
 
 class JNK3ProblemFactory(AbstractProblemFactory):
@@ -114,8 +122,6 @@ class JNK3ProblemFactory(AbstractProblemFactory):
 
     Methods
     ------
-    get_setup_information:
-        Retrieves the setup information for the problem.
     create:
         Creates a JNK3 problem.
 
@@ -134,17 +140,6 @@ class JNK3ProblemFactory(AbstractProblemFactory):
         Jiangming, Sun, et al.
         Journal of cheminformatics 9.1 (2017).
     """
-
-    def get_setup_information(self) -> BlackBoxInformation:
-        """
-        Retrieves the setup information for the problem.
-
-        Returns
-        --------
-        problem_info: ProblemSetupInformation
-            The setup information for the problem.
-        """
-        return jnk3_info
 
     def create(
         self,

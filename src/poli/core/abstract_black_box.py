@@ -105,15 +105,14 @@ class AbstractBlackBox:
 
         self.batch_size = batch_size
 
-    @staticmethod
-    def get_black_box_info() -> BlackBoxInformation:
+    def get_black_box_info(self) -> BlackBoxInformation:
         raise NotImplementedError(
             "Black box information must be implemented in subclasses."
         )
 
     @property
     def info(self) -> BlackBoxInformation:
-        return self.__class__.get_black_box_info()
+        return self.get_black_box_info()
 
     def set_observer(self, observer: AbstractObserver):
         """

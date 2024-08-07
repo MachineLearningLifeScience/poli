@@ -21,9 +21,6 @@ from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
 from poli.core.util.isolation.instancing import get_inner_function
 from poli.core.util.seeding import seed_python_numpy_and_torch
-from poli.objective_repository.penalized_logp_lambo.information import (
-    penalized_logp_lambo_info,
-)
 
 
 class PenalizedLogPLamboBlackBox(AbstractBlackBox):
@@ -47,9 +44,6 @@ class PenalizedLogPLamboBlackBox(AbstractBlackBox):
         evaluation_budget: int = float("inf"),
         force_isolation: bool = False,
     ):
-        """
-        TODO: document
-        """
         super().__init__(
             batch_size=batch_size,
             parallelize=parallelize,
@@ -92,16 +86,22 @@ class PenalizedLogPLamboBlackBox(AbstractBlackBox):
         )
         return inner_function(x, context)
 
-    @staticmethod
-    def get_black_box_info() -> BlackBoxInformation:
-        return penalized_logp_lambo_info
+    def get_black_box_info(self) -> BlackBoxInformation:
+        return BlackBoxInformation(
+            name="penalized_logp_lambo",
+            max_sequence_length=np.inf,
+            aligned=False,
+            fixed_length=False,
+            alphabet=None,  # TODO: add when we settle for an alphabet
+            deterministic=True,
+            log_transform_recommended=False,
+            discrete=True,
+            fidelity=None,
+            padding_token="",
+        )
 
 
 class PenalizedLogPLamboProblemFactory(AbstractProblemFactory):
-    def get_setup_information(self) -> BlackBoxInformation:
-        # TODO: do they have an alphabet?
-        return penalized_logp_lambo_info
-
     def create(
         self,
         penalized: bool = True,

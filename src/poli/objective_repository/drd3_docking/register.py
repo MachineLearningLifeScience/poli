@@ -18,7 +18,6 @@ from poli.core.chemistry.tdc_black_box import TDCBlackBox
 from poli.core.problem import Problem
 from poli.core.util.chemistry.string_to_molecule import translate_smiles_to_selfies
 from poli.core.util.seeding import seed_numpy, seed_python
-from poli.objective_repository.drd3_docking.information import drd3_docking_info
 
 
 class DRD3BlackBox(TDCBlackBox):
@@ -71,9 +70,18 @@ class DRD3BlackBox(TDCBlackBox):
             evaluation_budget=evaluation_budget,
         )
 
-    @staticmethod
-    def get_black_box_info() -> BlackBoxInformation:
-        return drd3_docking_info
+    def get_black_box_info(self) -> BlackBoxInformation:
+        return BlackBoxInformation(
+            name="drd3_docking",
+            max_sequence_length=np.inf,
+            aligned=False,
+            fixed_length=False,
+            deterministic=True,  # ?
+            alphabet=None,  # TODO: add alphabet once we settle for one for SMLIES/SELFIES.
+            log_transform_recommended=False,
+            discrete=True,
+            padding_token="",
+        )
 
 
 class DRD3ProblemFactory(AbstractProblemFactory):
@@ -84,22 +92,9 @@ class DRD3ProblemFactory(AbstractProblemFactory):
 
     Methods
     ------
-    get_setup_information:
-        Retrieves the setup information for the problem.
     create:
         Creates a DRD3 docking problem.
     """
-
-    def get_setup_information(self) -> BlackBoxInformation:
-        """
-        Retrieves the setup information for the problem.
-
-        Returns
-        --------
-        problem_info: ProblemSetupInformation
-            The setup information for the problem.
-        """
-        return drd3_docking_info
 
     def create(
         self,

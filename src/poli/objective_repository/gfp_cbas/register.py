@@ -9,7 +9,7 @@ from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
 from poli.core.util.isolation.instancing import get_inner_function
 from poli.core.util.seeding import seed_python_numpy_and_torch
-from poli.objective_repository.gfp_cbas.information import gfp_cbas_info
+from poli.objective_repository.gfp_cbas.information import AA
 
 
 class GFPCBasBlackBox(AbstractBlackBox):
@@ -51,7 +51,7 @@ class GFPCBasBlackBox(AbstractBlackBox):
             force_isolation=self.force_isolation,
             quiet=False,
             problem_type=self.problem_type,
-            info=gfp_cbas_info,
+            info=self.get_black_box_info(),
             n_starting_points=self.n_starting_points,
             functional_only=self.functional_only,
             ignore_stops=self.ignore_stops,
@@ -71,7 +71,7 @@ class GFPCBasBlackBox(AbstractBlackBox):
             force_isolation=self.force_isolation,
             quiet=True,
             problem_type=self.problem_type,
-            info=gfp_cbas_info,
+            info=self.get_black_box_info(),
             n_starting_points=self.n_starting_points,
             functional_only=self.functional_only,
             ignore_stops=self.ignore_stops,
@@ -84,9 +84,19 @@ class GFPCBasBlackBox(AbstractBlackBox):
     def __iter__(self, *args, **kwargs):
         warn(f"{self.__class__.__name__} iteration invoked. Not implemented!")
 
-    @staticmethod
-    def get_black_box_info() -> BlackBoxInformation:
-        return gfp_cbas_info
+    def get_black_box_info(self) -> BlackBoxInformation:
+        return BlackBoxInformation(
+            name="gfp_cbas",
+            max_sequence_length=237,  # max len of aaSequence
+            aligned=True,
+            fixed_length=True,
+            deterministic=False,
+            alphabet=AA,
+            log_transform_recommended=False,
+            discrete=True,
+            fidelity=None,
+            padding_token="",
+        )
 
 
 class GFPCBasProblemFactory(AbstractProblemFactory):
@@ -97,17 +107,6 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
                 f"Specified problem type: {problem_type} does not exist!"
             )
         self.problem_type = problem_type.lower()
-
-    def get_setup_information(self) -> BlackBoxInformation:
-        """
-        The problem is set up such that all available sequences
-        are provided in x0, however only batch_size amount of observations are known.
-        I.e. f(x0[:batch_size]) is returned as f_0 .
-        The task is to find the minimum, given that only limited inquiries (batch_size) can be done.
-        Given that all X are known it is recommended to use an acquisition function to rank
-        and inquire the highest rated sequences with the _black_box.
-        """
-        return gfp_cbas_info
 
     def create(
         self,
@@ -130,7 +129,7 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
         self.problem_type = problem_type
         if seed is not None:
             seed_python_numpy_and_torch(seed)
-        problem_info = self.get_setup_information()
+        problem_info = self.get_problem_name()
         f = GFPCBasBlackBox(
             problem_type=problem_type,
             functional_only=functional_only,

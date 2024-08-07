@@ -23,14 +23,10 @@ from typing import List, Union
 import numpy as np
 
 from poli.core.abstract_problem_factory import AbstractProblemFactory
-from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
 from poli.core.util.seeding import seed_numpy, seed_python
 from poli.objective_repository.foldx_stability_and_sasa.register import (
     FoldXStabilityAndSASABlackBox,
-)
-from poli.objective_repository.rfp_foldx_stability_and_sasa.information import (
-    rfp_foldx_stability_and_sasa_info,
 )
 
 
@@ -40,27 +36,9 @@ class RFPFoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
 
     Methods
     -------
-    get_setup_information:
-        Returns the setup information for the problem.
     create:
         Creates a problem instance with the specified parameters.
     """
-
-    def get_setup_information(self) -> BlackBoxInformation:
-        """
-        Get the setup information for the foldx_sasa objective.
-
-        Returns
-        -------
-        ProblemSetupInformation
-            The setup information for the objective.
-
-        Notes
-        -----
-        By default, the method uses the 20 amino acids shown in
-        poli.core.util.proteins.defaults.
-        """
-        return rfp_foldx_stability_and_sasa_info
 
     def create(
         self,

@@ -17,7 +17,7 @@ from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
 from poli.core.util.isolation.instancing import get_inner_function
 from poli.core.util.seeding import seed_python_numpy_and_torch
-from poli.objective_repository.super_mario_bros.information import smb_info
+from poli.objective_repository.super_mario_bros.information import SMB_ALPHABET
 
 THIS_DIR = Path(__file__).parent.resolve()
 
@@ -96,7 +96,7 @@ class SuperMarioBrosBlackBox(AbstractBlackBox):
             class_name="SMBIsolatedLogic",
             module_to_import="poli.objective_repository.super_mario_bros.isolated_function",
             force_isolation=self.force_isolation,
-            alphabet=smb_info.alphabet,
+            alphabet=self.get_black_box_info().alphabet,
             max_time=self.max_time,
             visualize=self.visualize,
             value_on_unplayable=self.value_on_unplayable,
@@ -110,16 +110,25 @@ class SuperMarioBrosBlackBox(AbstractBlackBox):
             module_to_import="poli.objective_repository.super_mario_bros.isolated_function",
             force_isolation=self.force_isolation,
             quiet=True,
-            alphabet=smb_info.alphabet,
+            alphabet=self.get_black_box_info().alphabet,
             max_time=self.max_time,
             visualize=self.visualize,
             value_on_unplayable=self.value_on_unplayable,
         )
         return inner_function(x, context)
 
-    @staticmethod
-    def get_black_box_info() -> BlackBoxInformation:
-        return smb_info
+    def get_black_box_info(self) -> BlackBoxInformation:
+        return BlackBoxInformation(
+            name="super_mario_bros",
+            max_sequence_length=14 * 14,
+            aligned=True,
+            fixed_length=True,
+            deterministic=False,
+            alphabet=SMB_ALPHABET,
+            log_transform_recommended=True,
+            discrete=True,
+            padding_token=None,
+        )
 
 
 class SuperMarioBrosProblemFactory(AbstractProblemFactory):
@@ -128,15 +137,9 @@ class SuperMarioBrosProblemFactory(AbstractProblemFactory):
 
     Methods
     -------
-    get_setup_information(self)
-        Returns the setup information for the problem.
     create(...) -> Tuple[SMBBlackBox, np.ndarray, np.ndarray]
         Creates a new instance of the SMBBlackBox class.
     """
-
-    def get_setup_information(self) -> BlackBoxInformation:
-        """Returns the setup information for the problem."""
-        return smb_info
 
     def create(
         self,

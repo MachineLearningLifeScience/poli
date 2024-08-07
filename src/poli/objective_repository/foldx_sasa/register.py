@@ -25,8 +25,8 @@ from poli.core.black_box_information import BlackBoxInformation
 from poli.core.exceptions import FoldXNotFoundException
 from poli.core.problem import Problem
 from poli.core.util.isolation.instancing import get_inner_function
+from poli.core.util.proteins.defaults import AMINO_ACIDS
 from poli.core.util.seeding import seed_python_numpy_and_torch
-from poli.objective_repository.foldx_sasa.information import foldx_sasa_info
 
 
 class FoldXSASABlackBox(AbstractBlackBox):
@@ -138,9 +138,19 @@ class FoldXSASABlackBox(AbstractBlackBox):
         )
         return inner_function(x, context)
 
-    @staticmethod
-    def get_black_box_info() -> BlackBoxInformation:
-        return foldx_sasa_info
+    def get_black_box_info(self) -> BlackBoxInformation:
+        return BlackBoxInformation(
+            name="foldx_sasa",
+            max_sequence_length=np.inf,
+            aligned=False,
+            fixed_length=False,
+            deterministic=True,
+            alphabet=AMINO_ACIDS,
+            log_transform_recommended=False,
+            discrete=True,
+            fidelity=None,
+            padding_token="",
+        )
 
 
 class FoldXSASAProblemFactory(AbstractProblemFactory):
@@ -149,30 +159,9 @@ class FoldXSASAProblemFactory(AbstractProblemFactory):
 
     Methods
     -------
-    get_setup_information:
-        Returns the setup information for the problem.
     create:
         Creates a problem instance with the specified parameters.
     """
-
-    def get_setup_information(self) -> BlackBoxInformation:
-        """
-        Get the setup information for the foldx_sasa objective.
-
-        Returns
-        -------
-        ProblemSetupInformation
-            The setup information for the objective.
-
-        Notes
-        -----
-        By default, the method uses the 20 amino acids shown in
-        poli.core.util.proteins.defaults.
-
-        """
-        # By default, we use the 20 amino acids shown in
-        # poli.core.util.proteins.defaults
-        return foldx_sasa_info
 
     def create(
         self,

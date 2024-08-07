@@ -20,13 +20,15 @@ Detlef Weigel, Nir Ben-Tal, and Julian Echave. eLife 12
 from pathlib import Path
 from typing import List, Union
 
+import numpy as np
+
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
 from poli.core.util.isolation.instancing import get_inner_function
+from poli.core.util.proteins.defaults import AMINO_ACIDS
 from poli.core.util.seeding import seed_python_numpy_and_torch
-from poli.objective_repository.rasp.information import rasp_information
 
 
 class RaspBlackBox(AbstractBlackBox):
@@ -183,21 +185,25 @@ class RaspBlackBox(AbstractBlackBox):
         """
         return self.inner_function(x, context=context)
 
-    @staticmethod
-    def get_black_box_info() -> BlackBoxInformation:
+    def get_black_box_info(self) -> BlackBoxInformation:
         """
         Returns the black box information for RaSP.
         """
-        return rasp_information
+        return BlackBoxInformation(
+            name="rasp",
+            max_sequence_length=np.inf,
+            aligned=True,
+            fixed_length=False,
+            deterministic=True,
+            alphabet=AMINO_ACIDS,
+            log_transform_recommended=False,
+            discrete=True,
+            fidelity="low",
+            padding_token="",
+        )
 
 
 class RaspProblemFactory(AbstractProblemFactory):
-    def get_setup_information(self) -> BlackBoxInformation:
-        """
-        Returns the problem setup information for RaSP.
-        """
-        return rasp_information
-
     def create(
         self,
         wildtype_pdb_path: Union[Path, List[Path]],

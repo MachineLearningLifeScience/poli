@@ -21,9 +21,6 @@ from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
 from poli.core.util.seeding import seed_python_numpy_and_torch
-from poli.objective_repository.toy_continuous_problem.information import (
-    toy_continuous_info,
-)
 
 from .toy_continuous_problem import POSSIBLE_FUNCTIONS, ToyContinuousProblem
 
@@ -133,23 +130,23 @@ class ToyContinuousBlackBox(AbstractBlackBox):
 
         return self.function(x)
 
-    @staticmethod
-    def get_black_box_info() -> BlackBoxInformation:
-        return toy_continuous_info
+    def get_black_box_info(self) -> BlackBoxInformation:
+        return BlackBoxInformation(
+            name="toy_continuous_problem",
+            max_sequence_length=(
+                self.embed_in if self.embed_in is not None else self.n_dimensions
+            ),
+            aligned=True,
+            fixed_length=True,
+            deterministic=True,
+            alphabet=None,
+            log_transform_recommended=False,
+            discrete=False,
+            padding_token=None,
+        )
 
 
 class ToyContinuousProblemFactory(AbstractProblemFactory):
-    def get_setup_information(self) -> BlackBoxInformation:
-        """
-        Returns the setup information for the problem.
-
-        Returns
-        -------
-        problem_info : ProblemSetupInformation
-            The setup information for the problem.
-        """
-        return toy_continuous_info
-
     def create(
         self,
         function_name: str,
