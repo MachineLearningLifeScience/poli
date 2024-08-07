@@ -36,7 +36,6 @@ from poli.core.util.seeding import seed_python_numpy_and_torch
 from poli.objective_repository.ehrlich._construct_feasibility_matrix import (
     _construct_transition_matrix,
 )
-from poli.objective_repository.ehrlich.information import ehrlich_info
 
 
 class EhrlichBlackBox(AbstractBlackBox):
@@ -347,9 +346,18 @@ class EhrlichBlackBox(AbstractBlackBox):
 
         return np.array(values).reshape(-1, 1)
 
-    @staticmethod
-    def get_black_box_info() -> BlackBoxInformation:
-        return ehrlich_info
+    def get_black_box_info(self) -> BlackBoxInformation:
+        return BlackBoxInformation(
+            name="ehrlich",
+            max_sequence_length=self.sequence_length,
+            aligned=True,
+            fixed_length=True,
+            deterministic=True,  # ?
+            alphabet=self.alphabet,
+            log_transform_recommended=False,
+            discrete=True,
+            padding_token="",
+        )
 
 
 class EhrlichProblemFactory(AbstractProblemFactory):
@@ -362,12 +370,6 @@ class EhrlichProblemFactory(AbstractProblemFactory):
         Closed-Form Test Functions for Biophysical Sequence Optimization Algorithms.
         arXiv preprint arXiv:2407.00236. https://arxiv.org/abs/2407.00236
     """
-
-    def __init__(self) -> None:
-        super().__init__()
-
-    def get_setup_information(self) -> BlackBoxInformation:
-        return ehrlich_info
 
     def create(
         self,

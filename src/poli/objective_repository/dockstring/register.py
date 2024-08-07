@@ -27,9 +27,6 @@ from poli.core.problem import Problem
 from poli.core.util.chemistry.string_to_molecule import translate_smiles_to_selfies
 from poli.core.util.isolation.instancing import get_inner_function
 from poli.core.util.seeding import seed_python_numpy_and_torch
-from poli.objective_repository.dockstring.information import (
-    dockstring_black_box_information,
-)
 
 
 class DockstringBlackBox(AbstractBlackBox):
@@ -164,9 +161,18 @@ class DockstringBlackBox(AbstractBlackBox):
         )
         return inner_function(x, context=context)
 
-    @staticmethod
-    def get_black_box_info() -> BlackBoxInformation:
-        return dockstring_black_box_information
+    def get_black_box_info(self) -> BlackBoxInformation:
+        return BlackBoxInformation(
+            name="dockstring",
+            max_sequence_length=np.inf,
+            aligned=False,
+            fixed_length=False,
+            deterministic=True,
+            alphabet=None,  # TODO: fix when we have a smiles alphabet
+            log_transform_recommended=False,
+            discrete=True,
+            padding_token="",
+        )
 
 
 class DockstringProblemFactory(AbstractProblemFactory):
@@ -190,13 +196,6 @@ class DockstringProblemFactory(AbstractProblemFactory):
         Journal of Chemical Information and Modeling 62, no. 15 (August 8, 2022): 3486-3502.
         https://doi.org/10.1021/acs.jcim.1c01334.
     """
-
-    @staticmethod
-    def get_setup_information() -> BlackBoxInformation:
-        # TODO: We might change this in the future for a
-        # default dictionary, depending on whether we
-        # are using SMILES or SELFIES.
-        return dockstring_black_box_information
 
     def create(
         self,

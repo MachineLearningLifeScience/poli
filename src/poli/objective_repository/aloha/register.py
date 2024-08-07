@@ -81,8 +81,7 @@ class AlohaBlackBox(AbstractBlackBox):
             evaluation_budget=evaluation_budget,
         )
 
-    @staticmethod
-    def get_black_box_info() -> BlackBoxInformation:
+    def get_black_box_info(self) -> BlackBoxInformation:
         return BlackBoxInformation(
             name="aloha",
             max_sequence_length=5,
@@ -138,34 +137,9 @@ class AlohaProblemFactory(AbstractProblemFactory):
 
     Methods
     -------
-    get_setup_information()
-        Returns the setup information for the problem.
-
     create(...)
         Creates a problem instance with the specified parameters.
     """
-
-    @staticmethod
-    def get_setup_information() -> BlackBoxInformation:
-        """
-        Returns the setup information for the problem.
-
-        Returns
-        --------
-        problem_info: ProblemSetupInformation
-            The setup information for the problem.
-        """
-        return BlackBoxInformation(
-            name="aloha",
-            max_sequence_length=5,
-            aligned=True,
-            fixed_length=True,
-            deterministic=True,
-            alphabet=list(ascii_uppercase),
-            log_transform_recommended=False,
-            discrete=True,
-            padding_token="",
-        )
 
     def create(
         self,
@@ -191,6 +165,8 @@ class AlohaProblemFactory(AbstractProblemFactory):
             The number of workers for parallel evaluation. Default is None.
         evaluation_budget:  int, optional
             The maximum number of function evaluations. Default is infinity.
+        force_isolation: bool, optional
+            Unused in this black box, since it runs directly on the base environment.
 
         Returns
         --------

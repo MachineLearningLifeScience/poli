@@ -12,10 +12,7 @@ from poli.core.problem import Problem
 from poli.core.util.isolation.instancing import instance_function_as_isolated_process
 from poli.core.util.seeding import seed_python_numpy_and_torch
 from poli.objective_repository.foldx_rfp_lambo import CORRECT_SEQ, PROBLEM_SEQ
-from poli.objective_repository.foldx_rfp_lambo.information import (
-    AMINO_ACIDS,
-    foldx_rfp_lambo_information,
-)
+from poli.objective_repository.foldx_rfp_lambo.information import AMINO_ACIDS
 
 
 class FoldXRFPLamboBlackBox(AbstractBlackBox):
@@ -60,9 +57,18 @@ class FoldXRFPLamboBlackBox(AbstractBlackBox):
     def _black_box(self, x, context=None):
         return self.inner_function(x, context)
 
-    @staticmethod
-    def get_black_box_info() -> BlackBoxInformation:
-        return foldx_rfp_lambo_information
+    def get_black_box_info(self) -> BlackBoxInformation:
+        return BlackBoxInformation(
+            name="foldx_rfp_lambo",
+            max_sequence_length=244,
+            aligned=False,
+            fixed_length=False,
+            deterministic=True,  # ?
+            alphabet=AMINO_ACIDS,
+            discrete=True,
+            fidelity=None,
+            padding_token="-",
+        )
 
 
 class FoldXRFPLamboProblemFactory(AbstractProblemFactory):
@@ -70,9 +76,6 @@ class FoldXRFPLamboProblemFactory(AbstractProblemFactory):
         self.alphabet = AMINO_ACIDS
         self.problem_sequence = PROBLEM_SEQ
         self.correct_sequence = CORRECT_SEQ
-
-    def get_setup_information(self) -> BlackBoxInformation:
-        return foldx_rfp_lambo_information
 
     def create(
         self,

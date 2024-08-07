@@ -1,6 +1,5 @@
 """This module implements the abstract problem factory."""
 
-from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
 
 
@@ -11,12 +10,7 @@ class MetaProblemFactory(type):
     """
 
     def __repr__(cls) -> str:
-        try:
-            problem_info = cls().get_setup_information()
-        except NotImplementedError:
-            return f"<{cls.__name__}()>"
-
-        return f"<{cls.__name__}(L={problem_info.max_sequence_length})>"
+        return f"<{cls.__name__}()>"
 
     def __str__(cls) -> str:
         return f"{cls.__name__}"
@@ -30,27 +24,9 @@ class AbstractProblemFactory(metaclass=MetaProblemFactory):
 
     Methods
     -------
-    get_setup_information:
-        Returns the setup information for the problem.
     create:
         Creates a problem instance with the specified parameters.
     """
-
-    def get_setup_information(self) -> BlackBoxInformation:
-        """
-        Returns the setup information for the problem.
-
-        Returns
-        --------
-        problem_info: BlackBoxInformation
-            Information for the problem (e.g. whether it is discrete, deterministic...).
-
-        Raises
-        -------
-        NotImplementedError:
-            This method is abstract and must be implemented by subclasses.
-        """
-        raise NotImplementedError("abstract method")
 
     def create(
         self,
@@ -90,4 +66,6 @@ class AbstractProblemFactory(metaclass=MetaProblemFactory):
             NotImplementedError: This method is abstract and must be implemented by subclasses.
 
         """
-        raise NotImplementedError("abstract method")
+        raise NotImplementedError(
+            "Abstract method create() must be implemented by subclasses."
+        )

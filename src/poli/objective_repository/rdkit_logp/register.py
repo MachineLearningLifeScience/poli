@@ -20,7 +20,6 @@ from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
 from poli.core.util.chemistry.string_to_molecule import strings_to_molecules
 from poli.core.util.seeding import seed_python_numpy_and_torch
-from poli.objective_repository.rdkit_logp.information import rdkit_logp_info
 
 
 class LogPBlackBox(AbstractBlackBox):
@@ -72,6 +71,7 @@ class LogPBlackBox(AbstractBlackBox):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
+        force_isolation: bool = False,
     ):
         """
         Initializes the LogP black box.
@@ -142,23 +142,22 @@ class LogPBlackBox(AbstractBlackBox):
 
         return np.array(logp_values).reshape(-1, 1)
 
-    @staticmethod
-    def get_black_box_info() -> BlackBoxInformation:
-        return rdkit_logp_info
+    def get_black_box_info(self) -> BlackBoxInformation:
+        return BlackBoxInformation(
+            name="rdkit_logp",
+            max_sequence_length=np.inf,
+            aligned=False,
+            fixed_length=False,
+            deterministic=True,
+            alphabet=None,  # TODO: add once we settle for one
+            log_transform_recommended=False,
+            discrete=True,
+            fidelity=None,
+            padding_token="",
+        )
 
 
 class LogPProblemFactory(AbstractProblemFactory):
-    def get_setup_information(self) -> BlackBoxInformation:
-        """
-        Returns the setup information for the logP problem.
-
-        Returns
-        -------
-        info : ProblemSetupInformation
-            The setup information for the logP problem.
-        """
-        return rdkit_logp_info
-
     def create(
         self,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",

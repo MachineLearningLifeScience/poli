@@ -95,7 +95,7 @@ class GuacaMolGoalDirectedBenchmark(AbstractBenchmark):
             evaluation_budget=evaluation_budget,
         )
 
-        self.problem_factories = [
+        self.problem_factory_names = [
             AlbuterolSimilarityProblemFactory(),
             AmlodipineMPOProblemFactory(),
             CelecoxibRediscoveryProblemFactory(),
@@ -122,7 +122,7 @@ class GuacaMolGoalDirectedBenchmark(AbstractBenchmark):
         self.string_representation = string_representation
 
     def _initialize_problem(self, index: int) -> Problem:
-        problem_factory = self.problem_factories[index]
+        problem_factory = self.problem_factory_names[index]
 
         problem = problem_factory.create(
             string_representation=self.string_representation,

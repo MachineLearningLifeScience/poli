@@ -73,12 +73,12 @@ class ToyContinuousFunctionsBenchmark(AbstractBenchmark):
                 - set(SIX_DIMENSIONAL_PROBLEMS)
             )
         )
-        self.problem_factories = [ToyContinuousProblemFactory()] * len(
+        self.problem_factory_names = [ToyContinuousProblemFactory()] * len(
             self.function_names
         )
 
     def _initialize_problem(self, index: int) -> Problem:
-        problem_factory: ToyContinuousProblemFactory = self.problem_factories[index]
+        problem_factory: ToyContinuousProblemFactory = self.problem_factory_names[index]
 
         problem = problem_factory.create(
             function_name=self.function_names[index],
@@ -131,10 +131,12 @@ class EmbeddedBranin2D(AbstractBenchmark):
             evaluation_budget,
         )
         self.embed_in = [5, 10, 25, 50, 100]
-        self.problem_factories = [ToyContinuousProblemFactory()] * len(self.embed_in)
+        self.problem_factory_names = [ToyContinuousProblemFactory()] * len(
+            self.embed_in
+        )
 
     def _initialize_problem(self, index: int) -> Problem:
-        problem_factory: ToyContinuousProblemFactory = self.problem_factories[index]
+        problem_factory: ToyContinuousProblemFactory = self.problem_factory_names[index]
 
         problem = problem_factory.create(
             function_name="branin_2d",
@@ -184,10 +186,12 @@ class EmbeddedHartmann6D(AbstractBenchmark):
             evaluation_budget,
         )
         self.embed_in = [None, 10, 25, 50, 100]
-        self.problem_factories = [ToyContinuousProblemFactory()] * len(self.embed_in)
+        self.problem_factory_names = [ToyContinuousProblemFactory()] * len(
+            self.embed_in
+        )
 
     def _initialize_problem(self, index: int) -> Problem:
-        problem_factory: ToyContinuousProblemFactory = self.problem_factories[index]
+        problem_factory: ToyContinuousProblemFactory = self.problem_factory_names[index]
 
         if index == 0:
             problem = problem_factory.create(
