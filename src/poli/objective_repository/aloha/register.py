@@ -18,7 +18,6 @@ from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
-from poli.core.problem_setup_information import ProblemSetupInformation
 from poli.core.util.seeding import seed_python_numpy_and_torch
 
 
@@ -147,7 +146,7 @@ class AlohaProblemFactory(AbstractProblemFactory):
     """
 
     @staticmethod
-    def get_setup_information() -> ProblemSetupInformation:
+    def get_setup_information() -> BlackBoxInformation:
         """
         Returns the setup information for the problem.
 
