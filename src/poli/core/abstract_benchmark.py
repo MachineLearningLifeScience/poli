@@ -7,7 +7,7 @@ from poli.core.problem import Problem
 
 
 class AbstractBenchmark:
-    problem_factory_names: List[str] | List[AbstractProblemFactory]
+    problem_factories: List[AbstractProblemFactory]
     index: int = 0
 
     def __init__(
@@ -25,13 +25,13 @@ class AbstractBenchmark:
         self.evaluation_budget = evaluation_budget
 
     def __len__(self) -> int:
-        return len(self.problem_factory_names)
+        return len(self.problem_factories)
 
     def __getitem__(self, index: int) -> Problem:
         return self._initialize_problem(index)
 
     def __next__(self) -> Problem:
-        if self.index < len(self.problem_factory_names):
+        if self.index < len(self.problem_factories):
             self.index += 1
             return self._initialize_problem(self.index - 1)
         else:
@@ -48,6 +48,8 @@ class AbstractBenchmark:
     @property
     def problem_names(self) -> List[str]:
         return [
-            problem_factory.get_problem_name()
-            for problem_factory in self.problem_factory_names
+            problem_factory.__module__.replace(
+                "poli.objective_repository.", ""
+            ).replace(".register", "")
+            for problem_factory in self.problem_factories
         ]

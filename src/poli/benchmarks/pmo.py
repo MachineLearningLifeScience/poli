@@ -86,7 +86,7 @@ class PMOBenchmark(GuacaMolGoalDirectedBenchmark):
             evaluation_budget=evaluation_budget,
         )
 
-        self.problem_factory_names.extend(
+        self.problem_factories.extend(
             [
                 JNK3ProblemFactory(),
                 GSK3BetaProblemFactory(),
