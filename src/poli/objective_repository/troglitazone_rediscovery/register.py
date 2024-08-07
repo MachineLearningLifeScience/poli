@@ -112,8 +112,6 @@ class TroglitazoneRediscoveryProblemFactory(AbstractProblemFactory):
 
     Methods
     ------
-    get_setup_information:
-        Retrieves the setup information for the problem.
     create:
         Creates a Troglitazone rediscovery problem.
 

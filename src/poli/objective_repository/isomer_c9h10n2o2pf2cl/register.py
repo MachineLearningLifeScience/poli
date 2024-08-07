@@ -114,8 +114,6 @@ class IsomerC9H10N2O2PF2ClProblemFactory(AbstractProblemFactory):
 
     Methods
     ------
-    get_setup_information:
-        Retrieves the setup information for the problem.
     create:
         Creates an Isomer C9H10N2O2PF2Cl problem, containing a black box
         and an initial value x0 (taken from the documentation of TDC).

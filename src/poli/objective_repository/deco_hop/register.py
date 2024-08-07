@@ -114,8 +114,6 @@ class DecoHopProblemFactory(AbstractProblemFactory):
 
     Methods
     ------
-    get_setup_information:
-        Retrieves the setup information for the problem.
     create:
         Creates an Decorator Hop problem, containing a black box
         and an initial value x0 (taken from the documentation of TDC).

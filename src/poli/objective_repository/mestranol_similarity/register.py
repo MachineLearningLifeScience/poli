@@ -114,8 +114,6 @@ class MestranolSimilarityProblemFactory(AbstractProblemFactory):
 
     Methods
     ------
-    get_setup_information:
-        Retrieves the setup information for the problem.
     create:
         Creates a Mestranol Similarity problem, containing a black box
         and an initial value x0 (taken from the documentation of TDC).

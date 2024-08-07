@@ -113,8 +113,6 @@ class DRD2ProblemFactory(AbstractProblemFactory):
 
     Methods
     ------
-    get_setup_information:
-        Retrieves the setup information for the problem.
     create:
         Creates a DRD2 docking problem.
 

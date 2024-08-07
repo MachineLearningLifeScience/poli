@@ -36,8 +36,6 @@ class RFPFoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
 
     Methods
     -------
-    get_setup_information:
-        Returns the setup information for the problem.
     create:
         Creates a problem instance with the specified parameters.
     """
