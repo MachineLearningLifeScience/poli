@@ -11,8 +11,7 @@ class SMILESTokenizer(AbstractTokenizer):
     ) -> None:
         """Tokenizer for SMILES strings, based on DeepChem's basic SMILES tokenizer."""
         # DeepChem's SMILES tokenizer
-        SMI_REGEX_PATTERN = r"""(\[[^\]]+]|Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p|\(|\)|\.|=|
-#|-|\+|\\|\/|:|~|@|\?|>>?|\*|\$|\%[0-9]{2}|[0-9])"""
+        SMI_REGEX_PATTERN = r"""(\[[^\]]+]|Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p|\(|\)|\.|=|\#|-|\+|\\|\/|:|~|@|\?|>>?|\*|\$|\%[0-9]{2}|[0-9])"""
 
         self.REGEX_FOR_SMILES = re.compile(SMI_REGEX_PATTERN)
         super().__init__(max_sequence_length, padding_token)
