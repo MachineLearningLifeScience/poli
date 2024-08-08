@@ -3,8 +3,8 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from poli.core.util.chemistry.selfies_tokenizer import SELFIESTokenizer
-from poli.core.util.chemistry.smiles_tokenizer import SMILESTokenizer
+from poli.core.util.tokenizers.selfies_tokenizer import SELFIESTokenizer
+from poli.core.util.tokenizers.smiles_tokenizer import SMILESTokenizer
 
 
 @pytest.mark.parametrize(
