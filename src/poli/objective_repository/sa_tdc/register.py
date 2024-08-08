@@ -18,7 +18,6 @@ from poli.core.chemistry.tdc_black_box import TDCBlackBox
 from poli.core.problem import Problem
 from poli.core.util.chemistry.string_to_molecule import translate_smiles_to_selfies
 from poli.core.util.seeding import seed_python_numpy_and_torch
-from poli.objective_repository.sa_tdc.information import sa_tdc_info
 
 
 class SABlackBox(TDCBlackBox):
@@ -75,9 +74,18 @@ class SABlackBox(TDCBlackBox):
             evaluation_budget=evaluation_budget,
         )
 
-    @staticmethod
-    def get_black_box_info() -> BlackBoxInformation:
-        return sa_tdc_info
+    def get_black_box_info(self) -> BlackBoxInformation:
+        return BlackBoxInformation(
+            name="sa_tdc",
+            max_sequence_length=np.inf,
+            aligned=False,
+            fixed_length=False,
+            deterministic=True,  # ?
+            alphabet=None,  # TODO: add alphabet once we settle for one for SMLIES/SELFIES.
+            log_transform_recommended=False,
+            discrete=True,
+            padding_token="",
+        )
 
 
 class SAProblemFactory(AbstractProblemFactory):
@@ -85,22 +93,9 @@ class SAProblemFactory(AbstractProblemFactory):
 
     Methods
     -------
-    get_setup_information()
-        Returns the setup information for the problem.
     create(...)
         Creates a synthetic-accessibility problem instance with the specified parameters.
     """
-
-    def get_setup_information(self) -> BlackBoxInformation:
-        """
-        Returns the setup information for the problem.
-
-        Returns
-        --------
-        problem_info: BlackBoxInformation
-            The setup information for the problem.
-        """
-        return sa_tdc_info
 
     def create(
         self,

@@ -63,6 +63,24 @@ There are several different environments (depending on the black boxes we test).
 
 If you want to run tests in all environments, remove `-e poli-base-py39` and just run `tox`. This might take a while, and several conda envs will be created.
 
+## Bump the version!
+
+Your last commit in your branch should be a bump version.
+
+One of the dev requirements is `bump-my-version`. You should be able to check what the version would be bumped to by running
+
+```bash
+bump-my-version show-bump
+```
+
+For most cases, you'll be bumping `pre_n` in the `dev` branch. You can bump it with
+
+```bash
+bump-my-version bump pre_n
+```
+
+This will modify the relevant files: `pyproject.toml` and `src/poli/__init__.py`.
+
 ## Create a pull request to dev
 
 Once all tests pass and you are ready to share your changes, create a pull request to the `dev` branch.

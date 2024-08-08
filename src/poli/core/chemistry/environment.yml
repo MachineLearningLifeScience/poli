@@ -19,7 +19,7 @@ dependencies:
     - cachetools
     - rdkit
     - selfies
-    - pytdc==0.4.7
+    - pytdc
     - pyscreener
     - colorama
     - configparse

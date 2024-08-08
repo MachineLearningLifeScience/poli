@@ -24,7 +24,6 @@ from poli.core.chemistry.tdc_black_box import TDCBlackBox
 from poli.core.problem import Problem
 from poli.core.util.chemistry.string_to_molecule import translate_smiles_to_selfies
 from poli.core.util.seeding import seed_numpy, seed_python
-from poli.objective_repository.sitagliptin_mpo.information import sitagliptin_mpo_info
 
 
 class SitagliptinMPOBlackBox(TDCBlackBox):
@@ -88,9 +87,18 @@ class SitagliptinMPOBlackBox(TDCBlackBox):
             evaluation_budget=evaluation_budget,
         )
 
-    @staticmethod
-    def get_black_box_info() -> BlackBoxInformation:
-        return sitagliptin_mpo_info
+    def get_black_box_info(self) -> BlackBoxInformation:
+        return BlackBoxInformation(
+            name="sitagliptin_mpo",
+            max_sequence_length=np.inf,
+            aligned=False,
+            fixed_length=False,
+            deterministic=True,  # ?
+            alphabet=None,  # TODO: add alphabet once we settle for one for SMLIES/SELFIES.
+            log_transform_recommended=False,
+            discrete=True,
+            padding_token="",
+        )
 
 
 class SitagliptinMPOProblemFactory(AbstractProblemFactory):
@@ -100,9 +108,7 @@ class SitagliptinMPOProblemFactory(AbstractProblemFactory):
     We recommend you cite the references [1] and [2] when using this task.
 
     Methods
-    ------
-    get_setup_information:
-        Retrieves the setup information for the problem.
+    -------
     create:
         Creates an sitagliptin MPO problem, containing a black box
         and an initial value x0 (taken from the documentation of TDC).
@@ -116,17 +122,6 @@ class SitagliptinMPOProblemFactory(AbstractProblemFactory):
         Brown, N. et al.  J Chem Inf Model 59 (2019).
         https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
     """
-
-    def get_setup_information(self) -> BlackBoxInformation:
-        """
-        Retrieves the setup information for the problem.
-
-        Returns
-        --------
-        problem_info: ProblemSetupInformation
-            The setup information for the problem.
-        """
-        return sitagliptin_mpo_info
 
     def create(
         self,

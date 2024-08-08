@@ -21,7 +21,6 @@ from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
 from poli.core.util.chemistry.string_to_molecule import strings_to_molecules
 from poli.core.util.seeding import seed_python_numpy_and_torch
-from poli.objective_repository.rdkit_qed.information import rdkit_qed_info
 
 
 class QEDBlackBox(AbstractBlackBox):
@@ -158,8 +157,7 @@ class QEDBlackBox(AbstractBlackBox):
 
         return np.array(qed_values).reshape(-1, 1)
 
-    @staticmethod
-    def get_black_box_info() -> BlackBoxInformation:
+    def get_black_box_info(self) -> BlackBoxInformation:
         """Returns the black box information for the QED problem.
 
         Returns
@@ -167,7 +165,18 @@ class QEDBlackBox(AbstractBlackBox):
         BlackBoxInformation
             The black box information for the QED problem.
         """
-        return rdkit_qed_info
+        return BlackBoxInformation(
+            name="rdkit_qed",
+            max_sequence_length=np.inf,
+            aligned=False,
+            fixed_length=False,
+            deterministic=True,
+            alphabet=None,  # TODO: add once we settle for one
+            log_transform_recommended=False,
+            discrete=True,
+            fidelity=None,
+            padding_token="",
+        )
 
 
 class QEDProblemFactory(AbstractProblemFactory):
@@ -180,14 +189,9 @@ class QEDProblemFactory(AbstractProblemFactory):
 
     Methods
     -------
-    get_setup_information()
-        Returns the setup information for the problem.
     create(...)
         Creates a problem instance with the specified parameters.
     """
-
-    def get_setup_information(self) -> BlackBoxInformation:
-        return rdkit_qed_info
 
     def create(
         self,

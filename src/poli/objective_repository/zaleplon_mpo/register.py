@@ -24,7 +24,6 @@ from poli.core.chemistry.tdc_black_box import TDCBlackBox
 from poli.core.problem import Problem
 from poli.core.util.chemistry.string_to_molecule import translate_smiles_to_selfies
 from poli.core.util.seeding import seed_numpy, seed_python
-from poli.objective_repository.zaleplon_mpo.information import zaleplon_mpo_info
 
 
 class ZaleplonMPOBlackBox(TDCBlackBox):
@@ -89,9 +88,18 @@ class ZaleplonMPOBlackBox(TDCBlackBox):
             evaluation_budget=evaluation_budget,
         )
 
-    @staticmethod
-    def get_black_box_info() -> BlackBoxInformation:
-        return zaleplon_mpo_info
+    def get_black_box_info(self) -> BlackBoxInformation:
+        return BlackBoxInformation(
+            name="zaleplon_mpo",
+            max_sequence_length=np.inf,
+            aligned=False,
+            fixed_length=False,
+            deterministic=True,  # ?
+            alphabet=None,  # TODO: add alphabet once we settle for one for SMLIES/SELFIES.
+            log_transform_recommended=False,
+            discrete=True,
+            padding_token="",
+        )
 
 
 class ZaleplonMPOProblemFactory(AbstractProblemFactory):
@@ -102,8 +110,6 @@ class ZaleplonMPOProblemFactory(AbstractProblemFactory):
 
     Methods
     ------
-    get_setup_information:
-        Retrieves the setup information for the problem.
     create:
         Creates an zaleplon MPO problem, containing a black box
         and an initial value x0 (taken from the documentation of TDC).
@@ -117,17 +123,6 @@ class ZaleplonMPOProblemFactory(AbstractProblemFactory):
         Brown, N. et al.  J Chem Inf Model 59 (2019).
         https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
     """
-
-    def get_setup_information(self) -> BlackBoxInformation:
-        """
-        Retrieves the setup information for the problem.
-
-        Returns
-        --------
-        problem_info: ProblemSetupInformation
-            The setup information for the problem.
-        """
-        return zaleplon_mpo_info
 
     def create(
         self,

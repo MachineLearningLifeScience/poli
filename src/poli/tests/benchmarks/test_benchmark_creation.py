@@ -29,6 +29,37 @@ def test_creating_embedded_toy_continuous_functions_benchmark():
             f(x0)
 
 
+def test_names_from_guacamol_benchmark():
+    from poli.benchmarks import GuacaMolGoalDirectedBenchmark
+
+    assert GuacaMolGoalDirectedBenchmark(
+        string_representation="SMILES"
+    ).problem_names == [
+        "albuterol_similarity",
+        "amlodipine_mpo",
+        "celecoxib_rediscovery",
+        "deco_hop",
+        "fexofenadine_mpo",
+        "isomer_c7h8n2o2",
+        "isomer_c9h10n2o2pf2cl",
+        "median_1",
+        "median_2",
+        "mestranol_similarity",
+        "osimetrinib_mpo",
+        "perindopril_mpo",
+        "ranolazine_mpo",
+        "rdkit_logp",
+        "rdkit_qed",
+        "sa_tdc",
+        "scaffold_hop",
+        "sitagliptin_mpo",
+        "thiothixene_rediscovery",
+        "troglitazone_rediscovery",
+        "valsartan_smarts",
+        "zaleplon_mpo",
+    ]
+
+
 @pytest.mark.poli__tdc
 def test_creating_guacamol_benchmark():
     from poli.benchmarks import GuacaMolGoalDirectedBenchmark

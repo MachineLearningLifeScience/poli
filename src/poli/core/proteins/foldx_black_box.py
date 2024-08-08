@@ -18,7 +18,7 @@ from typing import List, Union
 from uuid import uuid4
 
 from poli.core.abstract_black_box import AbstractBlackBox
-from poli.core.problem_setup_information import ProblemSetupInformation
+from poli.core.black_box_information import BlackBoxInformation
 from poli.core.util.proteins.foldx import FoldxInterface
 from poli.core.util.proteins.pdb_parsing import (
     parse_pdb_as_residue_strings,
@@ -85,7 +85,7 @@ class FoldxBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        info: ProblemSetupInformation = None,
+        info: BlackBoxInformation = None,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,

@@ -89,8 +89,7 @@ class WhiteNoiseBlackBox(AbstractBlackBox):
         """
         return np.random.randn(x.shape[0], 1)
 
-    @staticmethod
-    def get_black_box_info() -> BlackBoxInformation:
+    def get_black_box_info(self) -> BlackBoxInformation:
         return BlackBoxInformation(
             name="white_noise",
             max_sequence_length=np.inf,
@@ -105,28 +104,6 @@ class WhiteNoiseBlackBox(AbstractBlackBox):
 
 
 class WhiteNoiseProblemFactory(AbstractProblemFactory):
-    @staticmethod
-    def get_setup_information() -> BlackBoxInformation:
-        """
-        Returns the setup information for the problem.
-
-        Returns
-        -------
-        problem_info : BlackBoxInformation
-            The setup information for the problem.
-        """
-        return BlackBoxInformation(
-            name="white_noise",
-            max_sequence_length=np.inf,
-            aligned=False,
-            fixed_length=False,
-            deterministic=False,
-            alphabet=[str(i) for i in range(10)],
-            log_transform_recommended=False,
-            discrete=True,
-            padding_token="",
-        )
-
     def create(
         self,
         seed: int = None,
