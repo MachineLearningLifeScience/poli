@@ -63,7 +63,3 @@ def test_character_tokenizer_outputs_error_on_wrong_max_sequence():
 
     with pytest.raises(ValueError):
         _ = tokenizer.tokenize(texts)
-
-
-if __name__ == "__main__":
-    test_character_tokenizer_on_multiple_sequences_of_varying_length()
