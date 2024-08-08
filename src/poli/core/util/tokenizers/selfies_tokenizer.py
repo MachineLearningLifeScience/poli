@@ -7,7 +7,9 @@ from poli.core.util.tokenizers.abstract_tokenizer import AbstractTokenizer
 
 class SELFIESTokenizer(AbstractTokenizer):
     def __init__(
-        self, max_sequence_length: int | float | None, padding_token: str = "[nop]"
+        self,
+        max_sequence_length: int | float | None = None,
+        padding_token: str = "[nop]",
     ) -> None:
         super().__init__(max_sequence_length, padding_token)
 

@@ -17,7 +17,7 @@ def _pad(
 
 class AbstractTokenizer:
     def __init__(
-        self, max_sequence_length: int | float | None, padding_token: str = ""
+        self, max_sequence_length: int | float | None = None, padding_token: str = ""
     ) -> None:
         if isinstance(max_sequence_length, float):
             assert (

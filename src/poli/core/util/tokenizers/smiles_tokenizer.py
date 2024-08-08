@@ -5,20 +5,14 @@ import re
 from poli.core.util.tokenizers.abstract_tokenizer import AbstractTokenizer
 
 
-def tokenize_smiles(smiles: str | list[str]) -> list[str] | list[list[str]]:
-    """
-    Tokenize a SMILES strings using the Basic tokenizer from DeepChem [1].
-    """
-
-
 class SMILESTokenizer(AbstractTokenizer):
     def __init__(
-        self, max_sequence_length: int | float | None, padding_token: str = ""
+        self, max_sequence_length: int | float | None = None, padding_token: str = ""
     ) -> None:
-        self.SMI_REGEX_PATTERN = r"""(\[[^\]]+]|Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p|\(|\)|\.|=|
-#|-|\+|\\|\/|:|~|@|\?|>>?|\*|\$|\%[0-9]{2}|[0-9])"""
-
-        self.REGEX_FOR_SMILES = re.compile(self.SMI_REGEX_PATTERN)
+        # DeepChem's SMILES tokenizer plus tokenizing single integers
+        self.REGEX_FOR_SMILES = re.compile(
+            r"(\[[^\]]+]|Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p|\(|\)|\.|=|#||\+|\\\\\/|:||@|\?|>|\*|\$|\%[0-9]{2}|[0-9]|\d{1})"
+        )
         super().__init__(max_sequence_length, padding_token)
 
     def _tokenize(self, texts: str | list[str]) -> list[str] | list[list[str]]:
