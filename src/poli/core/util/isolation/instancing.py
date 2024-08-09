@@ -211,31 +211,25 @@ def register_isolated_function(name: str, quiet: bool = False):
         If True, we squelch the messages giving feedback about the creation process.
         By default, it is False.
     """
-    config = load_config()
-    if name not in config:
-        # Register problem
-
-        # Two cases:
-        # (i) some of the isolated functions are not alongside
-        # their black boxes and problem factories, but are rather inside
-        # the core of poli. For now, the only case is tdc, but more may
-        # come in the future.
-        #
-        # (ii) the isolated function is in the repository, living alongside
-        # the black box and the problem factory.
-        if name == "tdc__isolated":
-            logging.debug(
-                "poli 🧪: Registered the isolated function from the repository."
-            )
-            __register_isolated_function_from_core(name, quiet=quiet)
-            config = load_config()
-        else:
-            logging.debug(
-                "poli 🧪: Registered the isolated function from the repository."
-            )
-            __register_isolated_function_from_repository(name, quiet=quiet)
-            # Refresh the config
-            config = load_config()
+    # Register problem
+    # Two cases:
+    # (i) some of the isolated functions are not alongside
+    # their black boxes and problem factories, but are rather inside
+    # the core of poli. For now, the only case is tdc, but more may
+    # come in the future.
+    #
+    # (ii) the isolated function is in the repository, living alongside
+    # the black box and the problem factory.
+    if name == "tdc__isolated":
+        logging.debug("poli 🧪: Registered the isolated function from the repository.")
+        __register_isolated_function_from_core(name, quiet=quiet)
+        # Refresh the config
+        _ = load_config()
+    else:
+        logging.debug("poli 🧪: Registered the isolated function from the repository.")
+        __register_isolated_function_from_repository(name, quiet=quiet)
+        # Refresh the config
+        _ = load_config()
 
 
 def __create_function_as_isolated_process(
