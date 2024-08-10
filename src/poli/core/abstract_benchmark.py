@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import List, Union
 
 from poli.core.abstract_problem_factory import AbstractProblemFactory
@@ -46,6 +48,8 @@ class AbstractBenchmark:
     @property
     def problem_names(self) -> List[str]:
         return [
-            problem_factory.get_setup_information().name
+            problem_factory.__module__.replace(
+                "poli.objective_repository.", ""
+            ).replace(".register", "")
             for problem_factory in self.problem_factories
         ]

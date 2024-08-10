@@ -20,8 +20,8 @@ from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
 from poli.core.util.isolation.instancing import get_inner_function
+from poli.core.util.proteins.defaults import AMINO_ACIDS
 from poli.core.util.seeding import seed_python_numpy_and_torch
-from poli.objective_repository.rmf_landscape.information import rmf_info
 
 
 class RMFBlackBox(AbstractBlackBox):
@@ -144,9 +144,17 @@ class RMFBlackBox(AbstractBlackBox):
         )
         return inner_function(x, context)
 
-    @staticmethod
-    def get_black_box_info() -> BlackBoxInformation:
-        return rmf_info
+    def get_black_box_info(self) -> BlackBoxInformation:
+        return BlackBoxInformation(
+            name="rmf_landscape",
+            max_sequence_length=np.inf,
+            aligned=True,
+            fixed_length=True,
+            deterministic=False,
+            alphabet=AMINO_ACIDS,  # TODO: differentiate between AA and NA inputs?
+            log_transform_recommended=False,
+            discrete=True,
+        )
 
 
 class RMFProblemFactory(AbstractProblemFactory):
@@ -155,14 +163,9 @@ class RMFProblemFactory(AbstractProblemFactory):
 
     Methods
     -------
-    get_setup_information()
-        returns problem setup information.
     create(...)
         Creates RMF problem instance with specified parameters.
     """
-
-    def get_setup_information(self) -> BlackBoxInformation:
-        return rmf_info
 
     def create(
         self,

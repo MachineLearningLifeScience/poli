@@ -23,8 +23,7 @@ class AbstractObserver:
             set in the creation of an objective function, this method will be
             called every time the objective function is called.
 
-        initialize_observer(problem_setup_info: ProblemSetupInformation, caller_info: object,
-                            x0: np.ndarray, y0: np.ndarray, seed: int) -> object:
+        initialize_observer(problem_setup_info: ProblemSetupInformation, caller_info: object, seed: int) -> object:
             Initializes the observer with the necessary information to monitor
             the optimization process.
 
@@ -68,10 +67,6 @@ class AbstractObserver:
             The information about the problem setup.
         caller_info : object
             The information that is passed to the observer at init time.
-        x0 : np.ndarray
-            The initial x values.
-        y0 : np.ndarray
-            The initial y values.
         seed : int
             The seed value for random number generation.
 

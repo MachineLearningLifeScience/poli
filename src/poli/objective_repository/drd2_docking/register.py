@@ -27,7 +27,6 @@ from poli.core.chemistry.tdc_black_box import TDCBlackBox
 from poli.core.problem import Problem
 from poli.core.util.chemistry.string_to_molecule import translate_smiles_to_selfies
 from poli.core.util.seeding import seed_numpy, seed_python
-from poli.objective_repository.drd2_docking.information import drd2_docking_info
 
 
 class DRD2BlackBox(TDCBlackBox):
@@ -92,9 +91,18 @@ class DRD2BlackBox(TDCBlackBox):
             evaluation_budget=evaluation_budget,
         )
 
-    @staticmethod
-    def get_black_box_info() -> BlackBoxInformation:
-        return drd2_docking_info
+    def get_black_box_info(self) -> BlackBoxInformation:
+        return BlackBoxInformation(
+            name="drd2_docking",
+            max_sequence_length=np.inf,
+            aligned=False,
+            fixed_length=False,
+            deterministic=True,
+            alphabet=None,  # TODO: add alphabet once we settle for one for SMLIES/SELFIES.
+            log_transform_recommended=False,
+            discrete=True,
+            padding_token="",
+        )
 
 
 class DRD2ProblemFactory(AbstractProblemFactory):
@@ -105,8 +113,6 @@ class DRD2ProblemFactory(AbstractProblemFactory):
 
     Methods
     ------
-    get_setup_information:
-        Retrieves the setup information for the problem.
     create:
         Creates a DRD2 docking problem.
 
@@ -121,17 +127,6 @@ class DRD2ProblemFactory(AbstractProblemFactory):
         https://jcheminf.biomedcentral.com/articles/10.1186/s13321-017-0235-x
 
     """
-
-    def get_setup_information(self) -> BlackBoxInformation:
-        """
-        Retrieves the setup information for the problem.
-
-        Returns
-        --------
-        problem_info: ProblemSetupInformation
-            The setup information for the problem.
-        """
-        return drd2_docking_info
 
     def create(
         self,
