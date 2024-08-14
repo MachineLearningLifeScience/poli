@@ -163,3 +163,23 @@ def test_creating_with_create():
     )
     f, x0 = problem.black_box, problem.x0
     _ = f(x0)
+
+
+@pytest.mark.parametrize("seed", [1, 2, 3, 4])
+@pytest.mark.parametrize("unfeasible_value", [-1.0, 0.0])
+def test_unfeasible_value(seed: int, unfeasible_value: float):
+    f = EhrlichBlackBox(
+        sequence_length=3,
+        motif_length=2,
+        n_motifs=1,
+        seed=seed,
+        return_value_on_unfeasible=unfeasible_value,
+        alphabet=["A", "B", "C"],
+    )
+
+    unfeasible_pairs = np.where(f.transition_matrix == 0)
+    for i, j in zip(*unfeasible_pairs):
+        assert (
+            f(np.array([[f.alphabet[i], f.alphabet[j], f.alphabet[i]]]))
+            == unfeasible_value
+        )
