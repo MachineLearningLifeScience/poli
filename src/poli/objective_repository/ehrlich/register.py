@@ -67,6 +67,9 @@ class EhrlichBlackBox(AbstractBlackBox):
     seed : int, optional
         The seed for the random number generator. By default, it is None
         (i.e. no seed is set).
+    return_value_on_unfeasible : float, optional
+        The value to be returned when an unfeasible sequence is evaluated.
+        By default, it is -np.inf.
     alphabet : list of str, optional
         The alphabet to be used for the sequences. By default, it is the
         of 20 amino acids.
@@ -380,6 +383,7 @@ class EhrlichProblemFactory(AbstractProblemFactory):
         n_motifs: int,
         quantization: int | None = None,
         seed: int = None,
+        return_value_on_unfeasible: float = -np.inf,
         alphabet: list[str] = AMINO_ACIDS,
         batch_size: int = None,
         parallelize: bool = False,
@@ -407,6 +411,9 @@ class EhrlichProblemFactory(AbstractProblemFactory):
         seed : int, optional
             The seed for the random number generator. By default, it is None
             (i.e. no seed is set).
+        return_value_on_unfeasible : float, optional
+            The value to be returned when an unfeasible sequence is evaluated.
+            By default, it is -np.inf.
         alphabet : list of str, optional
             The alphabet to be used for the sequences. By default, it is the
             of 20 amino acids.
