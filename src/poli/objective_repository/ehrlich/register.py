@@ -96,6 +96,7 @@ class EhrlichBlackBox(AbstractBlackBox):
         n_motifs: int,
         quantization: int | None = None,
         seed: int = None,
+        return_value_on_unfeasible: float = -np.inf,
         alphabet: list[str] = AMINO_ACIDS,
         batch_size: int = None,
         parallelize: bool = False,
@@ -105,6 +106,7 @@ class EhrlichBlackBox(AbstractBlackBox):
         super().__init__(batch_size, parallelize, num_workers, evaluation_budget)
         self.alphabet = alphabet
         self.sequence_length = sequence_length
+        self.return_value_on_unfeasible = return_value_on_unfeasible
 
         if seed is not None:
             seed_python_numpy_and_torch(seed)
@@ -332,7 +334,7 @@ class EhrlichBlackBox(AbstractBlackBox):
         values = []
         for sequence in x:
             if not self._is_feasible(sequence):
-                values.append(-np.inf)
+                values.append(self.return_value_on_unfeasible)
                 continue
 
             value = 1.0
@@ -352,7 +354,7 @@ class EhrlichBlackBox(AbstractBlackBox):
             max_sequence_length=self.sequence_length,
             aligned=True,
             fixed_length=True,
-            deterministic=True,  # ?
+            deterministic=True,
             alphabet=self.alphabet,
             log_transform_recommended=False,
             discrete=True,
