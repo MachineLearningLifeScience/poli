@@ -29,11 +29,15 @@ if __name__ == "__main__":
     # Initializing a logP objective function.
     problem = objective_factory.create(
         name="rdkit_logp",
-        observer=observer,
         string_representation="SELFIES",
-        observer_init_info={"run_id": None, "experiment_id": None},
     )
     f, x0 = problem.black_box, problem.x0
+
+    # Attaching the observer to the black box
+    observer.initialize_observer(
+        f.info, caller_info={"run_id": None, "experiment_id": None}, seed=1
+    )
+    f.set_observer(observer)
 
     # Logging some examples
     # The observer will register each call to f.
