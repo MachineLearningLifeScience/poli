@@ -20,7 +20,7 @@ dependencies:
     - biopython==1.72
     - torch
     - pandas
-    - matplotlib
+    - matplotlib==3.8.1
     - pdb-tools
     - ptitprince
     - scikit-learn
