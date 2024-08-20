@@ -344,7 +344,12 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
             )
 
             if hamming_distance > 1 and not self.additive:
-                raise ValueError("RaSP is only able to simulate single mutations.")
+                raise ValueError(
+                    "RaSP is only able to simulate single mutations."
+                    " If you want to simulate multiple mutations,"
+                    " you should set additive=True in the create method"
+                    " or in the black box of RaSP."
+                )
 
             closest_wildtypes[closest_wildtype_pdb_file].append(mutant_residue_string)
             mutant_residue_strings.append(mutant_residue_string)

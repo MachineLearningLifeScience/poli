@@ -10,8 +10,6 @@ THIS_DIR = Path(__file__).parent.resolve()
 
 @pytest.mark.poli__rasp
 def test_rasp_on_3ned_against_notebooks_results():
-    # If the previous import was successful, we can
-    # create a RaSP problem:
     problem = objective_factory.create(
         name="rasp",
         wildtype_pdb_path=THIS_DIR / "3ned.pdb",
@@ -79,8 +77,6 @@ def test_rasp_on_3ned_against_notebooks_results_isolated():
 
 @pytest.mark.poli__rasp
 def test_rasp_using_additive_flag_on_two_mutations():
-    # If the previous import was successful, we can
-    # create a RaSP problem:
     problem = objective_factory.create(
         name="rasp",
         wildtype_pdb_path=THIS_DIR / "3ned.pdb",
