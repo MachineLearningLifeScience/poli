@@ -429,14 +429,11 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
 
 
 if __name__ == "__main__":
-    # from poli.core.registry import register_isolated_function
+    from poli.core.registry import register_isolated_function
 
-    # register_isolated_function(
-    #     RaspIsolatedLogic,
-    #     name="rasp__isolated",
-    #     conda_environment_name="poli__rasp",
-    #     force=True,
-    # )
-
-    PDB_DIR = THIS_DIR.parent.parent / "tests" / "registry" / "proteins" / "3ned.pdb"
-    f = RaspIsolatedLogic(wildtype_pdb_path=[PDB_DIR])
+    register_isolated_function(
+        RaspIsolatedLogic,
+        name="rasp__isolated",
+        conda_environment_name="poli__rasp",
+        force=True,
+    )
