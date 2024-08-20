@@ -24,6 +24,7 @@ from typing import List, Union
 from uuid import uuid4
 
 import numpy as np
+import torch
 
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
 from poli.core.util.proteins.mutations import find_closest_wildtype_pdb_file_to_mutant
@@ -37,7 +38,10 @@ from poli.core.util.proteins.rasp import (
 )
 
 RASP_NUM_ENSEMBLE = 10
-RASP_DEVICE = "cpu"
+if torch.cuda.is_available():
+    RASP_DEVICE = "cuda"
+else:
+    RASP_DEVICE = "cpu"
 
 THIS_DIR = Path(__file__).parent.resolve()
 HOME_DIR = THIS_DIR.home()
@@ -77,6 +81,11 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
     ----------
     wildtype_pdb_path : Union[Path, List[Path]]
         The path(s) to the wildtype PDB file(s), by default None.
+    additive : bool, optional
+        Whether we treat multiple mutations as additive, by default False.
+        If you are interested in running this black box with multiple
+        mutations, you should set this to True. Otherwise, it will
+        raise an error if you pass a sequence with more than one mutation.
     chains_to_keep : List[str], optional
         The chains to keep in the PDB file(s), by default we
         keep the chain "A" for all pdbs passed.
@@ -115,6 +124,7 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
     def __init__(
         self,
         wildtype_pdb_path: Union[Path, List[Path]],
+        additive: bool = False,
         chains_to_keep: List[str] = None,
         experiment_id: str = None,
         tmp_folder: Path = None,
@@ -126,6 +136,11 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
         -----------
         wildtype_pdb_path : Union[Path, List[Path]]
             The path(s) to the wildtype PDB file(s).
+        additive : bool, optional
+            Whether we treat multiple mutations as additive, by default False.
+            If you are interested in running this black box with multiple
+            mutations, you should set this to True. Otherwise, it will
+            raise an error if you pass a sequence with more than one mutation.
         chains_to_keep : List[str], optional
             The chains to keep in the PDB file(s), by default we
             keep the chain "A" for all pdbs passed.
@@ -234,6 +249,7 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
         x0_pre_array = [x + [""] * (max_len - len(x)) for x in x0_pre_array]
 
         self.x0 = np.array(x0_pre_array)
+        self.additive = additive
 
     def _clean_wildtype_pdb_files(self):
         """
@@ -302,10 +318,9 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
           of the longest sequence in the batch, and b is the batch size.
           We process it by concantenating the array into a single string,
           where we assume the padding to be an empty string (if there was any).
-          Each of these x_i's will be matched to the wildtype in self.  wildtype_residue_strings with the lowest Hamming distance.
+          Each of these x_i's will be matched to the wildtype in
+          self.wildtype_residue_strings with the lowest Hamming distance.
         """
-        # Creating an interface for this experiment id
-
         # We need to find the closest wildtype to each of the
         # sequences in x. For this, we need to compute the
         # Hamming distance between each of the sequences in x
@@ -315,6 +330,7 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
         # of the form {wildtype_path: List[str] of mutations}
         closest_wildtypes = defaultdict(list)
         mutant_residue_strings = []
+        mutant_residue_to_hamming_distances = dict()
         for x_i in x:
             # Assuming x_i is an array of strings
             mutant_residue_string = "".join(x_i)
@@ -327,11 +343,19 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
                 return_hamming_distance=True,
             )
 
-            if hamming_distance > 1:
-                raise ValueError("RaSP is only able to simulate single mutations.")
+            if hamming_distance > 1 and not self.additive:
+                raise ValueError(
+                    "RaSP is only able to simulate single mutations."
+                    " If you want to simulate multiple mutations,"
+                    " you should set additive=True in the create method"
+                    " or in the black box of RaSP."
+                )
 
             closest_wildtypes[closest_wildtype_pdb_file].append(mutant_residue_string)
             mutant_residue_strings.append(mutant_residue_string)
+            mutant_residue_to_hamming_distances[mutant_residue_string] = (
+                hamming_distance
+            )
 
         # Loading the models in preparation for inference
         cavity_model_net, ds_model_net = load_cavity_and_downstream_models()
@@ -367,9 +391,35 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
             for (
                 mutant_residue_string_for_wildtype
             ) in mutant_residue_strings_for_wildtype:
-                results[mutant_residue_string_for_wildtype] = df_ml["score_ml"][
+                sliced_values_for_mutant = df_ml["score_ml"][
                     df_ml["mutant_residue_string"] == mutant_residue_string_for_wildtype
                 ].values
+                results[mutant_residue_string_for_wildtype] = sliced_values_for_mutant
+
+                if self.additive:
+                    assert (
+                        sliced_values_for_mutant.shape[0]
+                        == mutant_residue_to_hamming_distances[
+                            mutant_residue_string_for_wildtype
+                        ]
+                    ), (
+                        " The number of predictions made for this mutant"
+                        " is not equal to the Hamming distance between the"
+                        " mutant and the wildtype.\n"
+                        "This is an internal error in `poli`. Please report"
+                        " this issue by referencing the RaSP problem.\n"
+                        " https://github.com/MachineLearningLifeScience/poli/issues"
+                    )
+
+                    # If we are treating the mutations as additive
+                    # the sliced values for mutant will be an array
+                    # of length equal to the Hamming distance between
+                    # the mutant and the wildtype. These are the individual
+                    # mutation predictions made by RaSP. We need to sum
+                    # them up to get the final score.
+                    results[mutant_residue_string_for_wildtype] = np.sum(
+                        sliced_values_for_mutant
+                    )
 
         # To reconstruct the final score, we rely
         # on mutant_residue_strings, which is a list

@@ -39,6 +39,11 @@ class RaspBlackBox(AbstractBlackBox):
     ----------
     wildtype_pdb_path : Union[Path, List[Path]]
         The path(s) to the wildtype PDB file(s), by default None.
+    additive : bool, optional
+        Whether we treat multiple mutations as additive, by default False.
+        If you are interested in running this black box with multiple
+        mutations, you should set this to True. Otherwise, it will
+        raise an error if you pass a sequence with more than one mutation.
     chains_to_keep : List[str], optional
         The chains to keep in the PDB file(s), by default we
         keep the chain "A" for all pdbs passed.
@@ -83,6 +88,7 @@ class RaspBlackBox(AbstractBlackBox):
     def __init__(
         self,
         wildtype_pdb_path: Union[Path, List[Path]],
+        additive: bool = False,
         chains_to_keep: List[str] = None,
         experiment_id: str = None,
         tmp_folder: Path = None,
@@ -99,6 +105,18 @@ class RaspBlackBox(AbstractBlackBox):
         -----------
         wildtype_pdb_path : Union[Path, List[Path]]
             The path(s) to the wildtype PDB file(s).
+        additive : bool, optional
+            Whether we treat multiple mutations as additive, by default False.
+            If you are interested in running this black box with multiple
+            mutations, you should set this to True. Otherwise, it will
+            raise an error if you pass a sequence with more than one mutation.
+        chains_to_keep : List[str], optional
+            The chains to keep in the PDB file(s), by default we
+            keep the chain "A" for all pdbs passed.
+        experiment_id : str, optional
+            The experiment ID, by default None.
+        tmp_folder : Path, optional
+            The temporary folder path, by default None.
         batch_size : int, optional
             The batch size for parallel evaluation, by default None.
         parallelize : bool, optional
@@ -107,13 +125,6 @@ class RaspBlackBox(AbstractBlackBox):
             The number of workers for parallel evaluation, by default None.
         evaluation_budget : int, optional
             The evaluation budget, by default float("inf").
-        chains_to_keep : List[str], optional
-            The chains to keep in the PDB file(s), by default we
-            keep the chain "A" for all pdbs passed.
-        experiment_id : str, optional
-            The experiment ID, by default None.
-        tmp_folder : Path, optional
-            The temporary folder path, by default None.
 
         Raises:
         -------
@@ -147,12 +158,14 @@ class RaspBlackBox(AbstractBlackBox):
         self.chains_to_keep = chains_to_keep
         self.experiment_id = experiment_id
         self.tmp_folder = tmp_folder
+        self.additive = additive
         self.inner_function = get_inner_function(
             isolated_function_name="rasp__isolated",
             class_name="RaspIsolatedLogic",
             module_to_import="poli.objective_repository.rasp.isolated_function",
             force_isolation=self.force_isolation,
             wildtype_pdb_path=self.wildtype_pdb_path,
+            additive=self.additive,
             chains_to_keep=self.chains_to_keep,
             experiment_id=self.experiment_id,
             tmp_folder=self.tmp_folder,
@@ -207,6 +220,7 @@ class RaspProblemFactory(AbstractProblemFactory):
     def create(
         self,
         wildtype_pdb_path: Union[Path, List[Path]],
+        additive: bool = False,
         chains_to_keep: List[str] = None,
         experiment_id: str = None,
         tmp_folder: Path = None,
@@ -225,6 +239,11 @@ class RaspProblemFactory(AbstractProblemFactory):
         ----------
         wildtype_pdb_path : Union[Path, List[Path]]
             The path(s) to the wildtype PDB file(s).
+        additive: bool, optional
+            Whether we treat multiple mutations as additive, by default False.
+            If you are interested in running this black box with multiple
+            mutations, you should set this to True. Otherwise, it will
+            raise an error if you pass a sequence with more than one mutation.
         experiment_id : str, optional
             The experiment ID, by default None.
         tmp_folder : Path, optional
@@ -276,6 +295,7 @@ class RaspProblemFactory(AbstractProblemFactory):
 
         f = RaspBlackBox(
             wildtype_pdb_path=wildtype_pdb_path,
+            additive=additive,
             chains_to_keep=chains_to_keep,
             experiment_id=experiment_id,
             tmp_folder=tmp_folder,
