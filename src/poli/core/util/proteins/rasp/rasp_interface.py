@@ -477,7 +477,7 @@ class RaspInterface:
         """
         # TODO: this is the convention inside the cleaning scripts,
         # but it feels flimsy. We should probably change it.
-        pdb_id = wildtype_pdb_path.stem.split("_")[0]
+        pdb_id = wildtype_pdb_path.stem.replace("_query_protein_uniquechain_clean", "")
         pdb_filename_for_df = (
             self.working_dir / "parsed" / f"{pdb_id}_coordinate_features.npz"
         )
