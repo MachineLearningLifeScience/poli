@@ -40,7 +40,7 @@ def load_cavity_and_downstream_models(
     best_cavity_model_path = RASP_DIR / "cavity_model_15.pt"
     cavity_model_net = CavityModel(get_latent=True).to(DEVICE)
     cavity_model_net.load_state_dict(
-        torch.load(f"{best_cavity_model_path}", map_location=DEVICE)
+        torch.load(f"{best_cavity_model_path}", map_location=DEVICE, weights_only=True)
     )
     cavity_model_net.eval()
     ds_model_net = DownstreamModel().to(DEVICE)
