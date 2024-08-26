@@ -295,7 +295,9 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
     def parse_pdb_as_residue_strings(self, pdb_file: Path) -> List[str]:
         return parse_pdb_as_residue_strings(pdb_file)
 
-    def _process_mutant_residue_string(self, mutant_residue_string: str) -> float:
+    def _compute_mutant_residue_string_ddg(
+        self, mutant_residue_string: str
+    ) -> np.ndarray:
         (
             closest_wildtype_pdb_file,
             hamming_distance,
@@ -347,7 +349,7 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
                     " https://github.com/MachineLearningLifeScience/poli/issues"
                 )
 
-                result = np.sum(sliced_values_for_mutant)
+                result = np.sum(sliced_values_for_mutant, keepdims=True)
             else:
                 result = sliced_values_for_mutant
         else:
@@ -394,14 +396,10 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
         for x_i in x:
             # Assuming x_i is an array of strings
             mutant_residue_string = "".join(x_i)
-            result = self._process_mutant_residue_string(mutant_residue_string)
+            result = self._compute_mutant_residue_string_ddg(mutant_residue_string)
             results.append(result)
 
-        # To reconstruct the final score, we rely
-        # on mutant_residue_strings, which is a list
-        # of strings IN THE SAME ORDER as the input
-        # vector x.
-        return np.array(results).reshape(-1, 1)
+        return -np.array(results).reshape(-1, 1)
 
 
 if __name__ == "__main__":
