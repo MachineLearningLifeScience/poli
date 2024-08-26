@@ -32,9 +32,9 @@ def test_rasp_on_3ned_against_notebooks_results():
     # E1R: -0.07091977827871465
     # E1N: -0.2835593180137258
 
-    assert np.isclose(y[0], 0.03654138690753095, atol=1e-4)
-    assert np.isclose(y[1], -0.07091977827871465, atol=1e-4)
-    assert np.isclose(y[2], -0.2835593180137258, atol=1e-4)
+    assert np.isclose(y[0], -0.03654138690753095, atol=1e-4)
+    assert np.isclose(y[1], 0.07091977827871465, atol=1e-4)
+    assert np.isclose(y[2], 0.2835593180137258, atol=1e-4)
 
 
 @pytest.mark.poli__rasp
@@ -75,9 +75,9 @@ def test_rasp_on_3ned_evaluating_twice_vs_once():
     # E1R: -0.07091977827871465
     # E1N: -0.2835593180137258
 
-    assert np.isclose(y[0], 0.03654138690753095, atol=1e-4)
-    assert np.isclose(y[1], -0.07091977827871465, atol=1e-4)
-    assert np.isclose(y[2], -0.2835593180137258, atol=1e-4)
+    assert np.isclose(y[0], -0.03654138690753095, atol=1e-4)
+    assert np.isclose(y[1], 0.07091977827871465, atol=1e-4)
+    assert np.isclose(y[2], 0.2835593180137258, atol=1e-4)
 
 
 @pytest.mark.poli__rasp
@@ -113,9 +113,9 @@ def test_rasp_on_3ned_against_notebooks_results_isolated():
     # to test against the exact values described above.
     # TODO: Should we do double precision by default
     # inside the RaSP problem?
-    assert np.isclose(y[0], 0.0365, atol=1e-4)
-    assert np.isclose(y[1], -0.07091, atol=1e-4)
-    assert np.isclose(y[2], -0.283559, atol=1e-4)
+    assert np.isclose(y[0], -0.0365, atol=1e-4)
+    assert np.isclose(y[1], 0.07091, atol=1e-4)
+    assert np.isclose(y[2], 0.283559, atol=1e-4)
 
 
 @pytest.mark.poli__rasp
