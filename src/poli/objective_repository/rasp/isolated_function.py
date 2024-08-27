@@ -17,6 +17,8 @@ Detlef Weigel, Nir Ben-Tal, and Julian Echave. eLife 12
 
 """
 
+from __future__ import annotations
+
 from pathlib import Path
 from time import time
 from typing import List, Union
@@ -88,6 +90,10 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
     chains_to_keep : List[str], optional
         The chains to keep in the PDB file(s), by default we
         keep the chain "A" for all pdbs passed.
+    penalize_unfeasible_with: float, optional
+        The value to return when the input is unfeasible, by default None, which means that we raise an error when
+        an unfeasible sequence (e.g. one with a length different
+        from the wildtypes) is passed.
     alphabet : List[str], optional
         The alphabet for the problem, by default we use
         the amino acid list provided in poli.core.util.proteins.defaults.
@@ -125,6 +131,7 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
         wildtype_pdb_path: Union[Path, List[Path]],
         additive: bool = False,
         chains_to_keep: List[str] = None,
+        penalize_unfeasible_with: float | None = None,
         experiment_id: str = None,
         tmp_folder: Path = None,
     ):
@@ -143,6 +150,10 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
         chains_to_keep : List[str], optional
             The chains to keep in the PDB file(s), by default we
             keep the chain "A" for all pdbs passed.
+        penalize_unfeasible_with: float, optional
+            The value to return when the input is unfeasible, by default None, which means that we raise an error when
+            an unfeasible sequence (e.g. one with a length different
+            from the wildtypes) is passed.
         alphabet : List[str], optional
             The alphabet for the problem, by default we use
             the amino acid list provided in poli.core.util.proteins.defaults.
@@ -218,6 +229,8 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
 
         # At this point, we are sure that chains_to_keep is a list of strings
         self.chains_to_keep = chains_to_keep
+
+        self.penalize_unfeasible_with = penalize_unfeasible_with
 
         if experiment_id is None:
             experiment_id = f"{int(time())}_{str(uuid4())[:8]}"
@@ -298,14 +311,29 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
     def _compute_mutant_residue_string_ddg(
         self, mutant_residue_string: str
     ) -> np.ndarray:
-        (
-            closest_wildtype_pdb_file,
-            hamming_distance,
-        ) = find_closest_wildtype_pdb_file_to_mutant(
-            self.clean_wildtype_pdb_files,
-            mutant_residue_string,
-            return_hamming_distance=True,
-        )
+        try:
+            (
+                closest_wildtype_pdb_file,
+                hamming_distance,
+            ) = find_closest_wildtype_pdb_file_to_mutant(
+                self.clean_wildtype_pdb_files,
+                mutant_residue_string,
+                return_hamming_distance=True,
+            )
+        except ValueError as e:
+            # This means that the mutant is unfeasible
+            if self.penalize_unfeasible_with is not None:
+                # We return the penalization value with a minus sign
+                # since we are maximizing the stability (i.e. there
+                # is a sign flip at the end of the __call__ method).
+                return np.array([-self.penalize_unfeasible_with]).reshape(1, 1)
+            else:
+                raise ValueError(
+                    "The mutant's length does not match any of the wildtypes. If "
+                    "you want to proceed by penalizing this behavior, you should "
+                    "set penalize_unfeasible_with to a value different from None "
+                    "in the create method/black box constructor of RaSP."
+                ) from e
 
         if hamming_distance > 1 and not self.additive:
             raise ValueError(

@@ -145,5 +145,18 @@ def test_rasp_using_additive_flag_on_two_mutations():
     assert np.isclose(y, y1.sum(), atol=1e-4)
 
 
-if __name__ == "__main__":
-    test_rasp_using_additive_flag_on_two_mutations()
+@pytest.mark.poli__rasp
+def test_rasp_penalization_works():
+    problem = objective_factory.create(
+        name="rasp",
+        wildtype_pdb_path=THIS_DIR / "3ned.pdb",
+        additive=True,
+        penalize_unfeasible_with=-100.0,
+    )
+    f, _ = problem.black_box, problem.x0
+
+    # This is an unfeasible mutation, since joining
+    # all the strings would result in a sequence
+    # that is _not_ the same length as the wildtype.
+    problematic_x = np.array([["A"] + [""] * (f.info.max_sequence_length - 1)])
+    assert f(problematic_x) == -100.0
