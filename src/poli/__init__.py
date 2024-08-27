@@ -1,6 +1,6 @@
 """poli, a library for discrete black-box objective functions."""
 
-__version__ = "1.0.0.dev5"
+__version__ = "1.0.0.dev6"
 from .core.util.isolation.instancing import instance_function_as_isolated_process
 
 # from .core import get_problems
