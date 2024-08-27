@@ -17,10 +17,10 @@ Detlef Weigel, Nir Ben-Tal, and Julian Echave. eLife 12
 
 """
 
+from __future__ import annotations
+
 from pathlib import Path
 from typing import List, Union
-
-import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
@@ -90,6 +90,7 @@ class RaspBlackBox(AbstractBlackBox):
         wildtype_pdb_path: Union[Path, List[Path]],
         additive: bool = False,
         chains_to_keep: List[str] = None,
+        penalize_unfeasible_with: float | None = None,
         experiment_id: str = None,
         tmp_folder: Path = None,
         batch_size: int = None,
@@ -113,6 +114,10 @@ class RaspBlackBox(AbstractBlackBox):
         chains_to_keep : List[str], optional
             The chains to keep in the PDB file(s), by default we
             keep the chain "A" for all pdbs passed.
+        penalize_unfeasible_with : float | None, optional
+            The value to penalize unfeasible solutions with, by default None, which means we raise an error when
+            an unfeasible sequence (e.g. a sequence with a length
+            different from the wildtypes) is passed.
         experiment_id : str, optional
             The experiment ID, by default None.
         tmp_folder : Path, optional
@@ -159,6 +164,7 @@ class RaspBlackBox(AbstractBlackBox):
         self.experiment_id = experiment_id
         self.tmp_folder = tmp_folder
         self.additive = additive
+        self.penalize_unfeasible_with = penalize_unfeasible_with
         self.inner_function = get_inner_function(
             isolated_function_name="rasp__isolated",
             class_name="RaspIsolatedLogic",
@@ -167,6 +173,7 @@ class RaspBlackBox(AbstractBlackBox):
             wildtype_pdb_path=self.wildtype_pdb_path,
             additive=self.additive,
             chains_to_keep=self.chains_to_keep,
+            penalize_unfeasible_with=self.penalize_unfeasible_with,
             experiment_id=self.experiment_id,
             tmp_folder=self.tmp_folder,
         )
@@ -204,7 +211,7 @@ class RaspBlackBox(AbstractBlackBox):
         """
         return BlackBoxInformation(
             name="rasp",
-            max_sequence_length=np.inf,
+            max_sequence_length=max([len("".join(x)) for x in self.x0]),
             aligned=True,
             fixed_length=False,
             deterministic=True,
@@ -222,6 +229,7 @@ class RaspProblemFactory(AbstractProblemFactory):
         wildtype_pdb_path: Union[Path, List[Path]],
         additive: bool = False,
         chains_to_keep: List[str] = None,
+        penalize_unfeasible_with: float | None = None,
         experiment_id: str = None,
         tmp_folder: Path = None,
         seed: int = None,
@@ -244,6 +252,13 @@ class RaspProblemFactory(AbstractProblemFactory):
             If you are interested in running this black box with multiple
             mutations, you should set this to True. Otherwise, it will
             raise an error if you pass a sequence with more than one mutation.
+        chains_to_keep : List[str], optional
+            The chains to keep in the PDB file(s), by default we
+            keep the chain "A" for all pdbs passed.
+        penalize_unfeasible_with : float | None, optional
+            The value to penalize unfeasible solutions with, by default None,
+            which means we raise an error when an unfeasible sequence (e.g.
+            a sequence with a length different from the wildtypes) is passed.
         experiment_id : str, optional
             The experiment ID, by default None.
         tmp_folder : Path, optional
