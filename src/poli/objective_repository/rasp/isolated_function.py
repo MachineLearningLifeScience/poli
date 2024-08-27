@@ -326,7 +326,7 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
                 # We return the penalization value with a minus sign
                 # since we are maximizing the stability (i.e. there
                 # is a sign flip at the end of the __call__ method).
-                return np.array([-self.penalize_unfeasible_with]).reshape(1, 1)
+                return np.array([-self.penalize_unfeasible_with])
             else:
                 raise ValueError(
                     "The mutant's length does not match any of the wildtypes. If "
