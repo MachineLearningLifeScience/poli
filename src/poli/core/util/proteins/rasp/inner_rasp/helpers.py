@@ -573,6 +573,7 @@ def ds_pred(
                     torch.load(
                         RASP_DIR / "ds_models" / f"ds_model_{model_idx}" / "model.pt",
                         map_location=DEVICE,
+                        weights_only=True,
                     )
                 )
                 ds_model_net.eval()

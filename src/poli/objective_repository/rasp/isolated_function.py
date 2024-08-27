@@ -17,7 +17,6 @@ Detlef Weigel, Nir Ben-Tal, and Julian Echave. eLife 12
 
 """
 
-from collections import defaultdict
 from pathlib import Path
 from time import time
 from typing import List, Union
@@ -296,6 +295,68 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
     def parse_pdb_as_residue_strings(self, pdb_file: Path) -> List[str]:
         return parse_pdb_as_residue_strings(pdb_file)
 
+    def _compute_mutant_residue_string_ddg(
+        self, mutant_residue_string: str
+    ) -> np.ndarray:
+        (
+            closest_wildtype_pdb_file,
+            hamming_distance,
+        ) = find_closest_wildtype_pdb_file_to_mutant(
+            self.clean_wildtype_pdb_files,
+            mutant_residue_string,
+            return_hamming_distance=True,
+        )
+
+        if hamming_distance > 1 and not self.additive:
+            raise ValueError(
+                "RaSP is only able to simulate single mutations."
+                " If you want to simulate multiple mutations,"
+                " you should set additive=True in the create method"
+                " or in the black box of RaSP."
+            )
+
+        # Loading the models in preparation for inference
+        cavity_model_net, ds_model_net = load_cavity_and_downstream_models()
+        dataset_key = "predictions"
+
+        df_structure = self.rasp_interface.create_df_structure(
+            closest_wildtype_pdb_file,
+            mutant_residue_strings=[mutant_residue_string],
+        )
+
+        # STEP 3:
+        # Predicting
+        df_ml = self.rasp_interface.predict(
+            cavity_model_net,
+            ds_model_net,
+            df_structure,
+            dataset_key,
+            RASP_NUM_ENSEMBLE,
+            RASP_DEVICE,
+        )
+
+        sliced_values_for_mutant = df_ml["score_ml"][
+            df_ml["mutant_residue_string"] == mutant_residue_string
+        ].values
+        if self.additive:
+            if hamming_distance > 0:
+                assert sliced_values_for_mutant.shape[0] == hamming_distance, (
+                    " The number of predictions made for this mutant"
+                    " is not equal to the Hamming distance between the"
+                    " mutant and the wildtype.\n"
+                    "This is an internal error in `poli`. Please report"
+                    " this issue by referencing the RaSP problem.\n"
+                    " https://github.com/MachineLearningLifeScience/poli/issues"
+                )
+
+                result = np.sum(sliced_values_for_mutant, keepdims=True)
+            else:
+                result = sliced_values_for_mutant
+        else:
+            result = sliced_values_for_mutant
+
+        return result
+
     def __call__(self, x, context=None):
         """
         Computes the stability of the mutant(s) in x.
@@ -328,109 +389,17 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
 
         # closest_wildtypes will be a dictionary
         # of the form {wildtype_path: List[str] of mutations}
-        closest_wildtypes = defaultdict(list)
-        mutant_residue_strings = []
-        mutant_residue_to_hamming_distances = dict()
+        # closest_wildtypes = defaultdict(list)
+        # mutant_residue_strings = []
+        # mutant_residue_to_hamming_distances = dict()
+        results = []
         for x_i in x:
             # Assuming x_i is an array of strings
             mutant_residue_string = "".join(x_i)
-            (
-                closest_wildtype_pdb_file,
-                hamming_distance,
-            ) = find_closest_wildtype_pdb_file_to_mutant(
-                self.clean_wildtype_pdb_files,
-                mutant_residue_string,
-                return_hamming_distance=True,
-            )
+            result = self._compute_mutant_residue_string_ddg(mutant_residue_string)
+            results.append(result)
 
-            if hamming_distance > 1 and not self.additive:
-                raise ValueError(
-                    "RaSP is only able to simulate single mutations."
-                    " If you want to simulate multiple mutations,"
-                    " you should set additive=True in the create method"
-                    " or in the black box of RaSP."
-                )
-
-            closest_wildtypes[closest_wildtype_pdb_file].append(mutant_residue_string)
-            mutant_residue_strings.append(mutant_residue_string)
-            mutant_residue_to_hamming_distances[mutant_residue_string] = (
-                hamming_distance
-            )
-
-        # Loading the models in preparation for inference
-        cavity_model_net, ds_model_net = load_cavity_and_downstream_models()
-        dataset_key = "predictions"
-
-        # STEP 2 and 3:
-        # Creating the dataframe with the relevant mutations
-        # PER wildtype pdb file.
-
-        # We will store the results in a dictionary
-        # of the form {mutant_string: score}.
-        results = {}
-        for (
-            closest_wildtype_pdb_file,
-            mutant_residue_strings_for_wildtype,
-        ) in closest_wildtypes.items():
-            df_structure = self.rasp_interface.create_df_structure(
-                closest_wildtype_pdb_file,
-                mutant_residue_strings=mutant_residue_strings_for_wildtype,
-            )
-
-            # STEP 3:
-            # Predicting
-            df_ml = self.rasp_interface.predict(
-                cavity_model_net,
-                ds_model_net,
-                df_structure,
-                dataset_key,
-                RASP_NUM_ENSEMBLE,
-                RASP_DEVICE,
-            )
-
-            for (
-                mutant_residue_string_for_wildtype
-            ) in mutant_residue_strings_for_wildtype:
-                sliced_values_for_mutant = df_ml["score_ml"][
-                    df_ml["mutant_residue_string"] == mutant_residue_string_for_wildtype
-                ].values
-                results[mutant_residue_string_for_wildtype] = sliced_values_for_mutant
-
-                if self.additive:
-                    assert (
-                        sliced_values_for_mutant.shape[0]
-                        == mutant_residue_to_hamming_distances[
-                            mutant_residue_string_for_wildtype
-                        ]
-                    ), (
-                        " The number of predictions made for this mutant"
-                        " is not equal to the Hamming distance between the"
-                        " mutant and the wildtype.\n"
-                        "This is an internal error in `poli`. Please report"
-                        " this issue by referencing the RaSP problem.\n"
-                        " https://github.com/MachineLearningLifeScience/poli/issues"
-                    )
-
-                    # If we are treating the mutations as additive
-                    # the sliced values for mutant will be an array
-                    # of length equal to the Hamming distance between
-                    # the mutant and the wildtype. These are the individual
-                    # mutation predictions made by RaSP. We need to sum
-                    # them up to get the final score.
-                    results[mutant_residue_string_for_wildtype] = np.sum(
-                        sliced_values_for_mutant
-                    )
-
-        # To reconstruct the final score, we rely
-        # on mutant_residue_strings, which is a list
-        # of strings IN THE SAME ORDER as the input
-        # vector x.
-        return np.array(
-            [
-                results[mutant_residue_string]
-                for mutant_residue_string in mutant_residue_strings
-            ]
-        ).reshape(-1, 1)
+        return -np.array(results).reshape(-1, 1)
 
 
 if __name__ == "__main__":

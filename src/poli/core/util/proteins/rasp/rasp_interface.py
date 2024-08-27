@@ -477,7 +477,7 @@ class RaspInterface:
         """
         # TODO: this is the convention inside the cleaning scripts,
         # but it feels flimsy. We should probably change it.
-        pdb_id = wildtype_pdb_path.stem.split("_")[0]
+        pdb_id = wildtype_pdb_path.stem.replace("_query_protein_uniquechain_clean", "")
         pdb_filename_for_df = (
             self.working_dir / "parsed" / f"{pdb_id}_coordinate_features.npz"
         )
@@ -540,9 +540,10 @@ class RaspInterface:
             df_structure_no_mt.values.repeat(20, axis=0),
             columns=df_structure_no_mt.columns,
         )
+        pos_of_variant_column = df_structure.columns.get_loc("variant")
         for i in range(0, len(df_structure), 20):
             for j in range(20):
-                df_structure.iloc[i + j, :]["variant"] = (
+                df_structure.iloc[i + j, pos_of_variant_column] = (
                     df_structure.iloc[i + j, :]["variant"][:-1] + aa_list[j]
                 )
 
