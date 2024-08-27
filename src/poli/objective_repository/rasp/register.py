@@ -209,11 +209,14 @@ class RaspBlackBox(AbstractBlackBox):
         """
         Returns the black box information for RaSP.
         """
+        is_aligned = False if len(self.wildtype_pdb_path) > 1 else True
+        is_fixed_length = False if len(self.wildtype_pdb_path) > 1 else True
+        max_sequence_length = max([len("".join(x)) for x in self.x0])
         return BlackBoxInformation(
             name="rasp",
-            max_sequence_length=max([len("".join(x)) for x in self.x0]),
-            aligned=True,
-            fixed_length=False,
+            max_sequence_length=max_sequence_length,
+            aligned=is_aligned,
+            fixed_length=is_fixed_length,
             deterministic=True,
             alphabet=AMINO_ACIDS,
             log_transform_recommended=False,
