@@ -540,9 +540,10 @@ class RaspInterface:
             df_structure_no_mt.values.repeat(20, axis=0),
             columns=df_structure_no_mt.columns,
         )
+        pos_of_variant_column = df_structure.columns.get_loc("variant")
         for i in range(0, len(df_structure), 20):
             for j in range(20):
-                df_structure.iloc[i + j, :]["variant"] = (
+                df_structure.iloc[i + j, pos_of_variant_column] = (
                     df_structure.iloc[i + j, :]["variant"][:-1] + aa_list[j]
                 )
 
