@@ -312,6 +312,7 @@ class RaspProblemFactory(AbstractProblemFactory):
             wildtype_pdb_path=wildtype_pdb_path,
             additive=additive,
             chains_to_keep=chains_to_keep,
+            penalize_unfeasible_with=penalize_unfeasible_with,
             experiment_id=experiment_id,
             tmp_folder=tmp_folder,
             batch_size=batch_size,
