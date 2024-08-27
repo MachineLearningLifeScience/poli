@@ -212,7 +212,7 @@ class RaspBlackBox(AbstractBlackBox):
         return BlackBoxInformation(
             name="rasp",
             max_sequence_length=max([len("".join(x)) for x in self.x0]),
-            aligned=True,
+            aligned=False,
             fixed_length=False,
             deterministic=True,
             alphabet=AMINO_ACIDS,
