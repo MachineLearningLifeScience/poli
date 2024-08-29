@@ -134,6 +134,7 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
         penalize_unfeasible_with: float | None = None,
         experiment_id: str = None,
         tmp_folder: Path = None,
+        device: str | torch.device | None = None,
     ):
         """
         Initialize the RaSP Register object.
@@ -262,6 +263,7 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
 
         self.x0 = np.array(x0_pre_array)
         self.additive = additive
+        self.device = device if device is not None else RASP_DEVICE
 
     def _clean_wildtype_pdb_files(self):
         """
@@ -344,7 +346,9 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
             )
 
         # Loading the models in preparation for inference
-        cavity_model_net, ds_model_net = load_cavity_and_downstream_models()
+        cavity_model_net, ds_model_net = load_cavity_and_downstream_models(
+            device=self.device
+        )
         dataset_key = "predictions"
 
         df_structure = self.rasp_interface.create_df_structure(

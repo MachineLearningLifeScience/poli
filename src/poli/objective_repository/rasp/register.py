@@ -91,6 +91,7 @@ class RaspBlackBox(AbstractBlackBox):
         additive: bool = False,
         chains_to_keep: List[str] = None,
         penalize_unfeasible_with: float | None = None,
+        device: str | None = None,
         experiment_id: str = None,
         tmp_folder: Path = None,
         batch_size: int = None,
@@ -118,6 +119,10 @@ class RaspBlackBox(AbstractBlackBox):
             The value to penalize unfeasible solutions with, by default None, which means we raise an error when
             an unfeasible sequence (e.g. a sequence with a length
             different from the wildtypes) is passed.
+        device: str, optional
+            The device to load the models on, by default None, which
+            means that RaSP decides to run on either CUDA or
+            CPU, depending on the availability of CUDA.
         experiment_id : str, optional
             The experiment ID, by default None.
         tmp_folder : Path, optional
@@ -165,6 +170,7 @@ class RaspBlackBox(AbstractBlackBox):
         self.tmp_folder = tmp_folder
         self.additive = additive
         self.penalize_unfeasible_with = penalize_unfeasible_with
+        self.device = device
         self.inner_function = get_inner_function(
             isolated_function_name="rasp__isolated",
             class_name="RaspIsolatedLogic",
@@ -176,6 +182,7 @@ class RaspBlackBox(AbstractBlackBox):
             penalize_unfeasible_with=self.penalize_unfeasible_with,
             experiment_id=self.experiment_id,
             tmp_folder=self.tmp_folder,
+            device=self.device,
         )
         self.x0 = self.inner_function.x0
 
@@ -233,6 +240,7 @@ class RaspProblemFactory(AbstractProblemFactory):
         additive: bool = False,
         chains_to_keep: List[str] = None,
         penalize_unfeasible_with: float | None = None,
+        device: str | None = None,
         experiment_id: str = None,
         tmp_folder: Path = None,
         seed: int = None,
@@ -262,6 +270,10 @@ class RaspProblemFactory(AbstractProblemFactory):
             The value to penalize unfeasible solutions with, by default None,
             which means we raise an error when an unfeasible sequence (e.g.
             a sequence with a length different from the wildtypes) is passed.
+        device: str, optional
+            The device to load the models on, by default None,
+            which means that RaSP decides to run on either CUDA or
+            CPU, depending on the availability of CUDA.
         experiment_id : str, optional
             The experiment ID, by default None.
         tmp_folder : Path, optional
@@ -316,6 +328,7 @@ class RaspProblemFactory(AbstractProblemFactory):
             additive=additive,
             chains_to_keep=chains_to_keep,
             penalize_unfeasible_with=penalize_unfeasible_with,
+            device=device,
             experiment_id=experiment_id,
             tmp_folder=tmp_folder,
             batch_size=batch_size,
