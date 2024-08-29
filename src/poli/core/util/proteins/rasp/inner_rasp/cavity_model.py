@@ -377,7 +377,7 @@ class CavityModel(torch.nn.Module):
                 # on the change from one value to another.
                 change_mask_j = (
                     atom_type_j_data[:, 0][:-1] != atom_type_j_data[:, 0][1:]
-                )
+                ).to(atom_type_j_data.device)
 
                 # Add begin and end indices
                 ranges_i = torch.cat(
