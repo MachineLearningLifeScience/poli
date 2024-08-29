@@ -59,11 +59,16 @@ from poli.core.util.files.download_files_from_github import (
 )
 from poli.core.util.files.integrity import compute_md5_from_filepath
 from poli.core.util.proteins.mutations import edits_between_strings
-
-from .inner_rasp.cavity_model import ResidueEnvironmentsDataset
-from .inner_rasp.helpers import ds_pred
-from .inner_rasp.pdb_parser_scripts.clean_pdb import clean_pdb
-from .inner_rasp.pdb_parser_scripts.extract_environments import extract_environments
+from poli.core.util.proteins.rasp.inner_rasp.cavity_model import (
+    ResidueEnvironmentsDataset,
+)
+from poli.core.util.proteins.rasp.inner_rasp.helpers import ds_pred
+from poli.core.util.proteins.rasp.inner_rasp.pdb_parser_scripts.clean_pdb import (
+    clean_pdb,
+)
+from poli.core.util.proteins.rasp.inner_rasp.pdb_parser_scripts.extract_environments import (
+    extract_environments,
+)
 
 THIS_DIR = Path(__file__).parent.resolve()
 HOME_DIR = THIS_DIR.home()

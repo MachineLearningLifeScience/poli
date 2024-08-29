@@ -5,8 +5,11 @@ from typing import Tuple
 
 import torch
 
-from .inner_rasp.cavity_model import CavityModel, DownstreamModel
-from .inner_rasp.helpers import init_lin_weights
+from poli.core.util.proteins.rasp.inner_rasp.cavity_model import (
+    CavityModel,
+    DownstreamModel,
+)
+from poli.core.util.proteins.rasp.inner_rasp.helpers import init_lin_weights
 
 THIS_DIR = Path(__file__).parent.resolve()
 HOME_DIR = THIS_DIR.home()
