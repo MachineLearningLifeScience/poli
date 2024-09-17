@@ -95,6 +95,7 @@ class ToyContinuousBlackBox(AbstractBlackBox):
             dimensions_to_embed_in=dimensions_to_embed_in,
         )
         self.bounds = self.function.limits
+        self.optima = self.function.optima
 
         super().__init__(
             batch_size=batch_size,
