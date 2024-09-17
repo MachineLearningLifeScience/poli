@@ -314,11 +314,12 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
         self, mutant_residue_string: str
     ) -> np.ndarray:
         for i, char in enumerate(mutant_residue_string):
-            assert char in self.rasp_interface.alphabet, (
-                f"Invalid residue {char} at position {i} in the mutant residue string. "
-                f"Please make sure that all residues are in the alphabet: "
-                f"{self.rasp_interface.alphabet}."
-            )
+            if char not in self.rasp_interface.alphabet:
+                raise ValueError(
+                    f"Invalid residue {char} at position {i} in the mutant "
+                    "residue string. Please make sure that all residues are "
+                    f"in the alphabet: {self.rasp_interface.alphabet}."
+                )
         try:
             (
                 closest_wildtype_pdb_file,
