@@ -108,6 +108,28 @@ class RaspInterface:
         self.download_cavity_and_downstream_models(
             verbose=verbose, verify_integrity_of_download=verify_integrity_of_download
         )
+        self.alphabet = [
+            "A",
+            "C",
+            "D",
+            "E",
+            "F",
+            "G",
+            "H",
+            "I",
+            "K",
+            "L",
+            "M",
+            "N",
+            "P",
+            "Q",
+            "R",
+            "S",
+            "T",
+            "V",
+            "W",
+            "Y",
+        ]
 
     def get_and_compile_reduce(self):
         """
@@ -513,28 +535,7 @@ class RaspInterface:
         df_structure_no_mt["pdbid"] = res_info["pdb_id"]
         df_structure_no_mt["chainid"] = res_info["chain_id"]
         df_structure_no_mt["variant"] = res_info["wt_AA"] + res_info["pos"] + "X"
-        aa_list = [
-            "A",
-            "C",
-            "D",
-            "E",
-            "F",
-            "G",
-            "H",
-            "I",
-            "K",
-            "L",
-            "M",
-            "N",
-            "P",
-            "Q",
-            "R",
-            "S",
-            "T",
-            "V",
-            "W",
-            "Y",
-        ]
+        aa_list = self.alphabet
 
         # Considering ALL single mutations in ALL sites.
         wildtype_residue_string = "".join(
