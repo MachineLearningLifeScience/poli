@@ -179,3 +179,20 @@ def test_rasp_penalization_works_on_multiple_inputs():
     combination = np.vstack([problem.x0, problematic_x])
     y = f(combination)
     assert y[-1] == -100.0
+
+
+@pytest.mark.poli__rasp
+def test_rasp_fails_on_invalid_amino_acids():
+    problem = objective_factory.create(
+        name="rasp",
+        wildtype_pdb_path=THIS_DIR / "3ned.pdb",
+    )
+    f, x0 = problem.black_box, problem.x0
+
+    # This is an unfeasible mutation, since joining
+    # all the strings would result in a sequence
+    # that is _not_ the same length as the wildtype.
+    problematic_x = x0.copy()
+    problematic_x[0][0] = "B"
+    with pytest.raises(ValueError):
+        f(problematic_x)

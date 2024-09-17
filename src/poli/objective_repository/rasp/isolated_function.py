@@ -313,6 +313,13 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
     def _compute_mutant_residue_string_ddg(
         self, mutant_residue_string: str
     ) -> np.ndarray:
+        for i, char in enumerate(mutant_residue_string):
+            if char not in self.rasp_interface.alphabet:
+                raise ValueError(
+                    f"Invalid residue {char} at position {i} in the mutant "
+                    "residue string. Please make sure that all residues are "
+                    f"in the alphabet: {self.rasp_interface.alphabet}."
+                )
         try:
             (
                 closest_wildtype_pdb_file,
