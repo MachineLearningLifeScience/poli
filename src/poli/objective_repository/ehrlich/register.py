@@ -443,6 +443,7 @@ class EhrlichProblemFactory(AbstractProblemFactory):
             n_motifs=n_motifs,
             quantization=quantization,
             seed=seed,
+            return_value_on_unfeasible=return_value_on_unfeasible,
             alphabet=alphabet,
             batch_size=batch_size,
             parallelize=parallelize,
