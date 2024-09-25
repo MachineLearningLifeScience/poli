@@ -1,4 +1,5 @@
-from typing import List
+from pathlib import Path
+from typing import Callable, List
 
 import numpy as np
 
@@ -10,6 +11,31 @@ from poli.core.util.isolation.instancing import instance_function_as_isolated_pr
 from poli.objective_repository.rosetta_energy.information import (
     rosetta_energy_information,
 )
+
+
+CONSENT_FILE = Path(__file__).parent.resolve() / ".pyrosetta_accept.txt"
+
+
+def has_opted_in(consent_file: Path = CONSENT_FILE) -> bool:
+    if consent_file.exists():
+        with open(consent_file, "r") as file:
+            consent_status = file.read().strip()
+            return consent_status == "accepted"
+    return False
+
+
+def opt_in_wrapper(f: Callable, *args, **kwargs):
+    if not has_opted_in():
+        agreement = input("I have read and accept the License Agreements of PyRosetta, subject to the Rosetta™ license. ([Y]es/[N]o) \n See https://www.pyrosetta.org/home/licensing-pyrosetta and https://els2.comotion.uw.edu/product/rosetta .")
+        if agreement.strip().lower() == "yes" or agreement.strip().lower() == "y":
+            with open(CONSENT_FILE, "w") as file:
+                file.write("accepted")
+            return f
+        else:
+            print("You must accept and be in compliance with the original PyRosetta, Rosetta™ license.")
+            raise RuntimeError
+    else:
+        return f
 
 
 class RosettaEnergyBlackBox(AbstractBlackBox):
@@ -34,8 +60,8 @@ class RosettaEnergyBlackBox(AbstractBlackBox):
 
         # Importing the isolated logic if we can:
         try:
-            # from poli.objective_repository.rosetta_energy.isolated_function import
-
+            from poli.objective_repository.rosetta_energy.isolated_function import
+            f = opt_in_wrapper(f)
             self.inner_function = None
         except ImportError:
             # If we weren't able to import it, we can still
