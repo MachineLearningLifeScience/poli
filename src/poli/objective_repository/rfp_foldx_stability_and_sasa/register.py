@@ -54,6 +54,7 @@ class RFPFoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
+        force_isolation: bool = False,
     ) -> Problem:
         """
         Create a RFPFoldXSASABlackBox object and compute the initial values of wildtypes.
@@ -177,6 +178,7 @@ class RFPFoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
+            force_isolation=force_isolation,
         )
 
         # We need to compute the initial values of all wildtypes
