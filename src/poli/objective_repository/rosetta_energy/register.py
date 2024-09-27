@@ -1,3 +1,4 @@
+from ctypes import Union
 from pathlib import Path
 from typing import Callable, List
 
@@ -7,13 +8,13 @@ from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
-from poli.core.util.isolation.instancing import instance_function_as_isolated_process
+from poli.core.util.isolation.instancing import get_inner_function, instance_function_as_isolated_process
 from poli.objective_repository.rosetta_energy.information import (
     rosetta_energy_information,
 )
 
 
-CONSENT_FILE = Path(__file__).parent.resolve() / ".pyrosetta_accept.txt"
+CONSENT_FILE = Path(__file__).parent.resolve() / ".pyrosetta_accept.txt" # TODO: stores under poli repo, should this be a hidden file under home?
 
 
 def has_opted_in(consent_file: Path = CONSENT_FILE) -> bool:
@@ -41,13 +42,14 @@ def opt_in_wrapper(f: Callable, *args, **kwargs):
 class RosettaEnergyBlackBox(AbstractBlackBox):
     def __init__(
         self,
-        your_arg: str,
-        your_second_arg: List[float],
+        wildtype_pdb_path: Union[Path, List[Path]],
+        your_second_arg: List[float], # TODO: account for PyRosetta features here
         your_kwarg: str = ...,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
+        force_isolation: bool = False,
     ):
         super().__init__(
             batch_size=batch_size,
@@ -55,20 +57,19 @@ class RosettaEnergyBlackBox(AbstractBlackBox):
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
         )
+        self.force_isolation = force_isolation
 
         # ... your manipulation of args and kwargs.
 
         # Importing the isolated logic if we can:
-        try:
-            from poli.objective_repository.rosetta_energy.isolated_function import
-            f = opt_in_wrapper(f)
-            self.inner_function = None
-        except ImportError:
-            # If we weren't able to import it, we can still
-            # create it in an isolated process:
-            self.inner_function = instance_function_as_isolated_process(
-                name=self.info.get_problem_name()  # The same name in `isolated_function.py`.
-            )
+        f = get_inner_function(
+            isolated_function_name="rosetta__isolated",
+            class_name="RosettaEnergyIsolatedLogic",
+            module_to_import="poli.objective_repository.rosetta_energy.isolated_function",
+            force_isolation=self.force_isolation
+        )
+        self.inner_function = opt_in_wrapper(f)
+
 
     # Boilerplate for the black box call:
     def _black_box(self, x: np.ndarray, context: dict = None) -> np.ndarray:
