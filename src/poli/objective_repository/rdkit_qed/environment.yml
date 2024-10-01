@@ -2,7 +2,7 @@ name: poli__chem
 channels:
   - defaults
 dependencies:
-  - python=3.9
+  - python=3.10
   - pip
   - pip:
     - numpy<2
