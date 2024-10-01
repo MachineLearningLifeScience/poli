@@ -1,4 +1,4 @@
-name: poli tdc (conda, py3.9)
+name: poli tdc (conda, py3.10)
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
     - name: Set up Python 3.9
       uses: actions/setup-python@v3
       with:
-        python-version: '3.9'
+        python-version: '3.10'
     - name: Add conda to system path
       run: |
         # $CONDA is an environment variable pointing to the root of the miniconda directory
@@ -26,4 +26,4 @@ jobs:
         python -m pip install tox
     - name: Test PyTDC-related black boxes with tox and pytest
       run: |
-        tox -c tox.ini -e poli-tdc-py39
+        tox -c tox.ini -e poli-tdc-py310
