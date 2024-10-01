@@ -57,10 +57,10 @@ def test_force_isolation_on_rasp_using_python_executable():
 
     problem = create(
         name="rasp",
-        python_executable_for_isolation="/Users/sjt972/anaconda3/envs/poli__rasp/bin/python",
         wildtype_pdb_path=Path(__file__).parent.parent
         / "static_files_for_tests"
         / "3ned.pdb",
+        python_executable_for_isolation="/Users/sjt972/anaconda3/envs/poli__rasp/bin/python",
     )
 
     print(problem.black_box(problem.x0))
