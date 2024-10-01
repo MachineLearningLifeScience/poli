@@ -1,13 +1,18 @@
 name: poli protein (conda, py3.10)
 
 on:
-  push:
+  pull_request:
+    branches:
+      - dev
+      - master
   schedule:
     - cron: '0 0 * * 0'
 
 jobs:
   build-linux:
     runs-on: ubuntu-latest
+    timeout-minutes: 8
+    if: github.event.pull_request.draft == false
     strategy:
       max-parallel: 5
 
