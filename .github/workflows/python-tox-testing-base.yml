@@ -2,7 +2,7 @@ name: poli base (conda, py3.10)
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [opened, synchronize, reopened, ready_for_review, closed]
     branches:
       - dev
       - master
