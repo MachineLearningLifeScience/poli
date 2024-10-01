@@ -37,3 +37,34 @@ def test_force_isolation_on_tdc():
         quiet=True,
     )
     assert (problem.black_box(problem.x0) == inner_f(problem.x0)).all()
+
+
+def test_force_isolation_on_tdc_using_python_executable():
+    from poli.objective_factory import create
+
+    problem = create(
+        name="deco_hop",
+        python_executable_for_isolation="/Users/sjt972/anaconda3/envs/poli__tdc/bin/python",
+    )
+
+    print(problem.black_box(problem.x0))
+
+
+def test_force_isolation_on_rasp_using_python_executable():
+    from pathlib import Path
+
+    from poli.objective_factory import create
+
+    problem = create(
+        name="rasp",
+        python_executable_for_isolation="/Users/sjt972/anaconda3/envs/poli__rasp/bin/python",
+        wildtype_pdb_path=Path(__file__).parent.parent
+        / "static_files_for_tests"
+        / "3ned.pdb",
+    )
+
+    print(problem.black_box(problem.x0))
+
+
+if __name__ == "__main__":
+    test_force_isolation_on_rasp_using_python_executable()

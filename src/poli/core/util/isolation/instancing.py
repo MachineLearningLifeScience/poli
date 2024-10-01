@@ -3,11 +3,17 @@ from __future__ import annotations
 import configparser
 import importlib
 import logging
+import os
+import stat
 import subprocess
 from pathlib import Path
+from uuid import uuid4
 
-from poli.core.registry import _ISOLATED_FUNCTION_SCRIPT_LOCATION, _OBSERVER
+from poli.core.registry import _OBSERVER
 from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
+from poli.external_isolated_function_script import (
+    __file__ as external_isolated_function_script_location,
+)
 
 from .external_function import ExternalFunction
 
@@ -238,8 +244,36 @@ def register_isolated_function(name: str, quiet: bool = False):
             config = load_config()
 
 
+def __write_isolated_function_script(
+    python_executable: str,
+    module_to_import: str,
+    class_name: str,
+) -> Path:
+    temp_id = f"{uuid4()}"[:8]
+    template_location = Path(__file__).parent / "new_run_script_template.sht"
+    with open(template_location, "r") as fp:
+        template_string = fp.read()
+        run_script = template_string % (
+            python_executable,
+            external_isolated_function_script_location,
+            f"{module_to_import}.{class_name}",
+        )
+
+    isolated_function_script_path = HOME_DIR / ".poli_objectives" / f"{temp_id}.sh"
+    with open(isolated_function_script_path, "w+") as fp:
+        fp.write(run_script)
+        os.chmod(
+            isolated_function_script_path,
+            os.stat(isolated_function_script_path).st_mode | stat.S_IEXEC,
+        )  # make script file executable
+
+    return isolated_function_script_path
+
+
 def __create_function_as_isolated_process(
-    name: str,
+    python_executable: str,
+    module_to_import: str,
+    class_name: str,
     seed: int = None,
     quiet: bool = False,
     **kwargs_for_isolated_function,
@@ -262,19 +296,15 @@ def __create_function_as_isolated_process(
     **kwargs_for_factory : dict, optional
         Additional keyword arguments for the factory.
     """
-    config = load_config()
-    if name not in config:
-        raise ValueError(
-            f"Objective function '{name.replace('__isolated', '')}' is not registered. "
-        )
-
-    if not quiet:
-        print(
-            f"poli 🧪: Starting the function {name.replace('__isolated', '')} as an isolated process."
-        )
+    # Write the template for this executable name
+    isolated_function_script_path = __write_isolated_function_script(
+        python_executable=python_executable,
+        module_to_import=module_to_import,
+        class_name=class_name,
+    )
 
     process_wrapper = ProcessWrapper(
-        config[name][_ISOLATED_FUNCTION_SCRIPT_LOCATION], **kwargs_for_isolated_function
+        isolated_function_script_path, **kwargs_for_isolated_function
     )
     # TODO: add signal listener that intercepts when proc ends
     # wait for connection from objective process
@@ -302,16 +332,17 @@ def __create_function_as_isolated_process(
 
 
 def instance_function_as_isolated_process(
-    name: str,
+    python_executable: str,
+    module_to_import: str,
+    class_name: str,
     seed: int = None,
     quiet: bool = False,
     **kwargs_for_black_box,
 ) -> ExternalFunction:
-    # Register the problem if it hasn't been registered.
-    register_isolated_function(name=name, quiet=quiet)
-
     f = __create_function_as_isolated_process(
-        name=name,
+        python_executable=python_executable,
+        module_to_import=module_to_import,
+        class_name=class_name,
         seed=seed,
         quiet=quiet,
         **kwargs_for_black_box,
@@ -321,7 +352,7 @@ def instance_function_as_isolated_process(
 
 
 def get_inner_function(
-    isolated_function_name: str,
+    python_executable_for_isolation: str,
     class_name: str,
     module_to_import: str,
     seed: int | None = None,
@@ -361,10 +392,20 @@ def get_inner_function(
             inner_function = InnerFunctionClass(**kwargs)
         except ImportError:
             inner_function = instance_function_as_isolated_process(
-                name=isolated_function_name, seed=seed, quiet=quiet, **kwargs
+                python_executable=python_executable_for_isolation,
+                module_to_import=module_to_import,
+                class_name=class_name,
+                seed=seed,
+                quiet=quiet,
+                **kwargs,
             )
     else:
         inner_function = instance_function_as_isolated_process(
-            name=isolated_function_name, seed=seed, quiet=quiet, **kwargs
+            python_executable=python_executable_for_isolation,
+            module_to_import=module_to_import,
+            class_name=class_name,
+            seed=seed,
+            quiet=quiet,
+            **kwargs,
         )
     return inner_function
