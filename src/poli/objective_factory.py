@@ -49,6 +49,7 @@ def __create_problem_from_repository(
     evaluation_budget: int = float("inf"),
     force_isolation: bool = False,
     observer: AbstractObserver = None,
+    python_executable_for_isolation: str = None,
     **kwargs_for_factory,
 ) -> Problem:
     """Creates the objective function from the repository.
@@ -102,6 +103,7 @@ def __create_problem_from_repository(
         num_workers=num_workers,
         evaluation_budget=evaluation_budget,
         force_isolation=force_isolation,
+        python_executable_for_isolation=python_executable_for_isolation,
         **kwargs_for_factory,
     )
 

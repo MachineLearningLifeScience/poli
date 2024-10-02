@@ -99,6 +99,7 @@ class RaspBlackBox(AbstractBlackBox):
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
         force_isolation: bool = False,
+        python_executable_for_isolation: str | Path = None,
     ):
         """
         Initialize the RaSP Register object.
@@ -172,7 +173,7 @@ class RaspBlackBox(AbstractBlackBox):
         self.penalize_unfeasible_with = penalize_unfeasible_with
         self.device = device
         self.inner_function = get_inner_function(
-            isolated_function_name="rasp__isolated",
+            python_executable_for_isolation=python_executable_for_isolation,
             class_name="RaspIsolatedLogic",
             module_to_import="poli.objective_repository.rasp.isolated_function",
             force_isolation=self.force_isolation,
@@ -249,6 +250,7 @@ class RaspProblemFactory(AbstractProblemFactory):
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
         force_isolation: bool = False,
+        python_executable_for_isolation: str | Path = None,
     ) -> Problem:
         """
         Creates a RaSP black box instance, alongside initial
@@ -336,6 +338,7 @@ class RaspProblemFactory(AbstractProblemFactory):
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
             force_isolation=force_isolation,
+            python_executable_for_isolation=python_executable_for_isolation,
         )
 
         # Constructing x0

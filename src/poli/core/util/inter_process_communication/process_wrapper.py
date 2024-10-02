@@ -6,7 +6,6 @@ import logging
 import subprocess
 import time
 from multiprocessing.connection import Client, Listener
-from pathlib import Path
 from uuid import uuid4
 
 
@@ -95,28 +94,10 @@ class ProcessWrapper:
         # to the shell script. We should instead use a proper IPC library.
         # TODO: if we decide to pass this information in the set-up phase (instead
         # of here), we can remove this.
-        string_for_kwargs = ""
-        for key, value in kwargs_for_factory.items():
-            if isinstance(value, str):
-                string_for_kwargs += f"--{key}={str(value)} "
-            elif isinstance(value, Path):
-                string_for_kwargs += f"--{key}={str(value)} "
-            elif isinstance(value, bool):
-                string_for_kwargs += f"--{key}=bool:{str(value)} "
-            elif isinstance(value, int):
-                string_for_kwargs += f"--{key}=int:{str(value)} "
-            elif isinstance(value, float):
-                string_for_kwargs += f"--{key}=float:{str(value)} "
-            elif isinstance(value, list):
-                string_for_kwargs += (
-                    f"--{key}=list:{','.join([str(v) for v in value])} "
-                )
-            elif value is None:
-                string_for_kwargs += f"--{key}=none:None "
 
         self.run_script = run_script
         self.proc = subprocess.Popen(
-            [run_script, str(self.port), self.password, string_for_kwargs],
+            [run_script, str(self.port), self.password],
             stdout=None,
             stderr=None,
         )

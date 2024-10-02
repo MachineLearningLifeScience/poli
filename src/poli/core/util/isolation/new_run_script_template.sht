@@ -1,0 +1,4 @@
+#!/bin/bash
+PYHON_EXECUTABLE_IN_THIS_ENV=%s  # python executable
+# it is CRUCIAL that the shell script is given port number and password
+$PYHON_EXECUTABLE_IN_THIS_ENV %s --objective-name=%s --port="$1" --password="$2"

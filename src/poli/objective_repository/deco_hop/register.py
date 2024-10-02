@@ -81,6 +81,7 @@ class DecoHopBlackBox(TDCBlackBox):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
+        python_executable_for_isolation: str = None,
     ):
         super().__init__(
             oracle_name="Deco Hop",
@@ -90,6 +91,7 @@ class DecoHopBlackBox(TDCBlackBox):
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
+            python_executable_for_isolation=python_executable_for_isolation,
         )
 
     def get_black_box_info(self) -> BlackBoxInformation:
@@ -137,6 +139,7 @@ class DecoHopProblemFactory(AbstractProblemFactory):
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
         force_isolation: bool = False,
+        python_executable_for_isolation: str = None,
     ) -> Problem:
         """
         Creates a Decorator Hop problem.
@@ -187,6 +190,7 @@ class DecoHopProblemFactory(AbstractProblemFactory):
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
+            python_executable_for_isolation=python_executable_for_isolation,
         )
 
         # Initial example (from the TDC docs)

@@ -16,6 +16,9 @@ References
     https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
 """
 
+from __future__ import annotations
+
+from pathlib import Path
 from typing import Literal
 
 import numpy as np
@@ -74,6 +77,7 @@ class TDCBlackBox(AbstractBlackBox):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
+        python_executable_for_isolation: str | Path = None,
         **kwargs_for_oracle,
     ):
         if parallelize:
@@ -91,7 +95,7 @@ class TDCBlackBox(AbstractBlackBox):
 
         from_smiles = string_representation.upper() == "SMILES"
         self.inner_function = get_inner_function(
-            isolated_function_name="tdc__isolated",
+            python_executable_for_isolation=python_executable_for_isolation,
             class_name="TDCIsolatedFunction",
             module_to_import="poli.core.chemistry.tdc_isolated_function",
             force_isolation=force_isolation,

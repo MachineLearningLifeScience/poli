@@ -16,6 +16,8 @@ protein.
     bioinformatics. Bioinformatics, 25, 1422-1423
 """
 
+from __future__ import annotations
+
 from pathlib import Path
 from typing import List, Union
 
@@ -75,6 +77,7 @@ class FoldXStabilityAndSASABlackBox(AbstractBlackBox):
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
         force_isolation: bool = False,
+        python_executable_for_isolation: str | None = None,
     ):
         super().__init__(
             batch_size=batch_size,
@@ -88,12 +91,13 @@ class FoldXStabilityAndSASABlackBox(AbstractBlackBox):
         self.eager_repair = eager_repair
         self.verbose = verbose
         self.force_isolation = force_isolation
+        self.python_executable_for_isolation = python_executable_for_isolation
         if not (Path.home() / "foldx" / "foldx").exists():
             raise FoldXNotFoundException(
                 "FoldX wasn't found in ~/foldx/foldx. Please install it."
             )
         inner_function = get_inner_function(
-            isolated_function_name="foldx_stability_and_sasa__isolated",
+            python_executable_for_isolation=python_executable_for_isolation,
             class_name="FoldXStabilitityAndSASAIsolatedLogic",
             module_to_import="poli.objective_repository.foldx_stability_and_sasa.isolated_function",
             wildtype_pdb_path=wildtype_pdb_path,
@@ -126,7 +130,7 @@ class FoldXStabilityAndSASABlackBox(AbstractBlackBox):
             The computed stability and SASA score(s) as a numpy array.
         """
         inner_function = get_inner_function(
-            isolated_function_name="foldx_stability_and_sasa__isolated",
+            python_executable_for_isolation=self.python_executable_for_isolation,
             class_name="FoldXStabilitityAndSASAIsolatedLogic",
             module_to_import="poli.objective_repository.foldx_stability_and_sasa.isolated_function",
             quiet=True,
@@ -177,6 +181,7 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
         force_isolation: bool = False,
+        python_executable_for_isolation: str | None = None,
     ) -> Problem:
         """
         Create a FoldXSASABlackBox object and compute the initial values of wildtypes.
@@ -254,6 +259,7 @@ class FoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
             force_isolation=force_isolation,
+            python_executable_for_isolation=python_executable_for_isolation,
         )
 
         # We need to compute the initial values of all wildtypes
