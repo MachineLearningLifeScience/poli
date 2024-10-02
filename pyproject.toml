@@ -44,17 +44,6 @@ tdc = [
 dockstring = [
     "dockstring"
 ]
-rasp = [
-    "biopython==1.72",
-    "torch",
-    "pandas",
-    "matplotlib==3.8.1",
-    "pdb-tools",
-    "ptitprince",
-    "scikit-learn",
-    "pyyaml",
-    "PyGithub",
-]
 rmf = [
     "scipy",
 ]
