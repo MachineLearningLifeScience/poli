@@ -1,6 +1,10 @@
 name: poli rasp (conda, py3.10)
 
 on:
+  push:
+    branches:
+      - dev
+      - master
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     branches:
