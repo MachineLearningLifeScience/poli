@@ -28,6 +28,25 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+foldx = [
+    "biopython",
+    "python-levenshtein",
+    "pdb-tools",
+]
+protein = [
+    "biopython",
+    "python-levenshtein",
+    "pdb-tools",
+]
+tdc = [
+    "pytdc",
+]
+dockstring = [
+    "dockstring"
+]
+rmf = [
+    "scipy",
+]
 dev = ["black", "tox", "pytest", "bump-my-version"]
 docs = ["sphinx", "furo"]
 
