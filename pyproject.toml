@@ -28,6 +28,11 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+foldx = [
+    "biopython",
+    "python-levenshtein",
+    "pdb-tools",
+]
 dev = ["black", "tox", "pytest", "bump-my-version"]
 docs = ["sphinx", "furo"]
 
