@@ -11,8 +11,6 @@ from poli.core.util.isolation.instancing import get_inner_function
 from poli.core.util.seeding import seed_python_numpy_and_torch
 from poli.objective_repository.gfp_cbas.information import AA
 
-from .isolated_function import GFPCBasIsolatedLogic
-
 
 class GFPCBasBlackBox(AbstractBlackBox):
     def __init__(
@@ -46,6 +44,7 @@ class GFPCBasBlackBox(AbstractBlackBox):
         self.negate = negate
 
         # NOTE: do NOT us get_inner_function -> importlib resets existing tf import and we CANNOT recover tf.v1 eager execution
+        from .isolated_function import GFPCBasIsolatedLogic  # encapsulate as to not break poli imports
         inner_function = GFPCBasIsolatedLogic(
             problem_type=self.problem_type,
             info=self.get_black_box_info(),
