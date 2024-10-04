@@ -121,7 +121,7 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
         evaluation_budget: int = float("inf"),
         negate: bool = False,
         force_isolation: bool = False,
-        force_register: bool = False,
+        force_register: bool = False, # TODO: this is not functional requires correction
     ) -> Problem:
         """
         Seed value required to shuffle the data, otherwise CSV asset data index unchanged.
@@ -131,7 +131,7 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
         self.problem_type = problem_type
         if seed is not None:
             seed_python_numpy_and_torch(seed)
-        problem_info = self.get_problem_name()
+
         f = GFPCBasBlackBox(
             problem_type=problem_type,
             functional_only=functional_only,
@@ -144,7 +144,6 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
             evaluation_budget=evaluation_budget,
             negate=negate,
             force_isolation=force_isolation,
-            force_register=force_register,
         )
         x0 = f.x0
 
