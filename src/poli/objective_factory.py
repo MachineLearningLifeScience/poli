@@ -175,7 +175,7 @@ def create(
 
     f = problem.black_box
     # instantiate observer (if desired)
-    if observer is not None:
+    if observer_name is not None:
         observer = _instantiate_observer(observer_name, quiet)
         observer_info = observer.initialize_observer(
             problem.black_box.info, observer_init_info, seed
