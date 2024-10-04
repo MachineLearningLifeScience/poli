@@ -147,5 +147,3 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
         problem = Problem(f, x0)
 
         return problem
-
-
