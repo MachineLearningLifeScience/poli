@@ -120,6 +120,8 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
         negate: bool = False,
+        force_isolation: bool = False,
+        force_register: bool = False,
     ) -> Problem:
         """
         Seed value required to shuffle the data, otherwise CSV asset data index unchanged.
@@ -141,6 +143,8 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
             seed=seed,
             evaluation_budget=evaluation_budget,
             negate=negate,
+            force_isolation=force_isolation,
+            force_register=force_register,
         )
         x0 = f.x0
 
