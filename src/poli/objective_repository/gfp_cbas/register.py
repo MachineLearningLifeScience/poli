@@ -121,7 +121,7 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
         evaluation_budget: int = float("inf"),
         negate: bool = False,
         force_isolation: bool = False,
-        force_register: bool = False, # TODO: this is not functional requires correction
+        force_register: bool = False,  # TODO: this is not functional requires correction
     ) -> Problem:
         """
         Seed value required to shuffle the data, otherwise CSV asset data index unchanged.
