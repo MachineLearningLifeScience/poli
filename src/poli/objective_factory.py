@@ -173,16 +173,16 @@ def create(
         **kwargs_for_factory,
     )
 
-    # instantiate observer (if desired)
-    observer = _instantiate_observer(observer_name, quiet)
-    observer_info = observer.initialize_observer(
-        problem.black_box.info, observer_init_info, seed
-    )
-
     f = problem.black_box
-    f.set_observer(observer)
-    f.set_observer_info(observer_info)
-    problem.set_observer(AlgorithmObserverWrapper(observer), observer_info)
+    # instantiate observer (if desired)
+    if observer is not None:
+        observer = _instantiate_observer(observer_name, quiet)
+        observer_info = observer.initialize_observer(
+            problem.black_box.info, observer_init_info, seed
+        )
+        f.set_observer(observer)
+        f.set_observer_info(observer_info)
+        problem.set_observer(AlgorithmObserverWrapper(observer), observer_info)
 
     return problem
 
