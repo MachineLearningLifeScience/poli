@@ -164,6 +164,9 @@ class EhrlichHoloBlackBox(AbstractBlackBox):
 
         return np.array(["".join([self.alphabet[i] for i in optimal_solution_as_ints])])
 
+    def transition_matrix(self) -> np.ndarray:
+        return self.inner_function.transition_matrix
+
     def _black_box(self, x: np.ndarray, context=None) -> np.ndarray:
         """
         Evaluates the sequences in x by checking maximal matches and multiplying.
