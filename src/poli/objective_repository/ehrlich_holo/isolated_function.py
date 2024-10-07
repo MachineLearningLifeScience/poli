@@ -80,5 +80,5 @@ if __name__ == "__main__":
     register_isolated_function(
         EhrlichIsolatedLogic,
         name="ehrlich_holo__isolated",
-        conda_environment_name="poli__ehrlich",
+        conda_environment_name="poli__ehrlich_holo",
     )

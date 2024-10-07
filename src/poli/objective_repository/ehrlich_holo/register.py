@@ -90,6 +90,7 @@ class EhrlichHoloBlackBox(AbstractBlackBox):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
+        force_isolation: bool = False,
     ):
         super().__init__(batch_size, parallelize, num_workers, evaluation_budget)
         self.alphabet = alphabet
@@ -126,6 +127,7 @@ class EhrlichHoloBlackBox(AbstractBlackBox):
             isolated_function_name="ehrlich_holo__isolated",
             class_name="EhrlichIsolatedLogic",
             module_to_import="poli.objective_repository.ehrlich_holo.isolated_function",
+            force_isolation=force_isolation,
             sequence_length=sequence_length,
             motif_length=motif_length,
             n_motifs=n_motifs,
@@ -265,6 +267,7 @@ class EhrlichHoloProblemFactory(AbstractProblemFactory):
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
+            force_isolation=force_isolation,
         )
         x0 = f.initial_solution()
 
