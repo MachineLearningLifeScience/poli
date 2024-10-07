@@ -324,7 +324,6 @@ def get_inner_function(
     isolated_function_name: str,
     class_name: str,
     module_to_import: str,
-    seed: int | None = None,
     force_isolation: bool = False,
     quiet: bool = False,
     **kwargs,
@@ -354,6 +353,7 @@ def get_inner_function(
     **kwargs : dict
         Additional keyword arguments for the isolated function.
     """
+    seed = kwargs.get("seed", None)
     if not force_isolation:
         try:
             module = importlib.import_module(module_to_import)

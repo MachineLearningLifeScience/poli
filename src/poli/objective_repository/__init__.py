@@ -22,6 +22,7 @@ from .drd3_docking.register import DRD3BlackBox, DRD3ProblemFactory
 
 # Discrete toy examples
 from .ehrlich.register import EhrlichBlackBox, EhrlichProblemFactory
+from .ehrlich_holo.register import EhrlichHoloBlackBox, EhrlichHoloProblemFactory
 from .fexofenadine_mpo.register import (
     FexofenadineMPOBlackBox,
     FexofenadineMPOProblemFactory,
@@ -129,6 +130,7 @@ AVAILABLE_OBJECTIVES = sorted(AVAILABLE_OBJECTIVES)
 AVAILABLE_PROBLEM_FACTORIES = {
     "aloha": AlohaProblemFactory,
     "ehrlich": EhrlichProblemFactory,
+    "ehrlich_holo": EhrlichHoloProblemFactory,
     "dockstring": DockstringProblemFactory,
     "drd3_docking": DRD3ProblemFactory,
     "foldx_rfp_lambo": FoldXRFPLamboProblemFactory,
@@ -174,6 +176,7 @@ AVAILABLE_PROBLEM_FACTORIES = {
 AVAILABLE_BLACK_BOXES = {
     "aloha": AlohaBlackBox,
     "ehrlich": EhrlichBlackBox,
+    "ehrlich_holo": EhrlichHoloBlackBox,
     "dockstring": DockstringBlackBox,
     "drd3_docking": DRD3BlackBox,
     "foldx_rfp_lambo": FoldXRFPLamboBlackBox,
