@@ -1,5 +1,5 @@
 """
-Stanton et al. [1] implementation of Ehrlich functions.
+Stanton et al.'s [1] implementation of Ehrlich functions using Holo-bench.
 
 References
 ----------
@@ -47,9 +47,14 @@ class EhrlichHoloBlackBox(AbstractBlackBox):
         The quantization parameter. This parameter must be between 1 and the
         motif length, and the motif length must be divisible by the quantization.
         By default, it is None (which corresponds to the motif length).
+    noise_std : float, optional
+        The noise that gets injected into botorch's SyntheticTestFunction.
+        By default, it is 0.0.
     seed : int, optional
         The seed for the random number generator. By default, it is None
-        (i.e. no seed is set).
+        (i.e. a random seed is set using np.random.randint(0, 1000)).
+    epistasis_factor : float, optional
+        The epistasis factor. By default, it is 0.0.
     return_value_on_unfeasible : float, optional
         The value to be returned when an unfeasible sequence is evaluated.
         By default, it is -np.inf.
@@ -181,7 +186,7 @@ class EhrlichHoloBlackBox(AbstractBlackBox):
 
 class EhrlichHoloProblemFactory(AbstractProblemFactory):
     """
-    A factory for creating Ehrlich functions and initial conditions.
+    A factory for creating Ehrlich functions.
 
     References
     ----------
@@ -224,9 +229,14 @@ class EhrlichHoloProblemFactory(AbstractProblemFactory):
             The quantization parameter. This parameter must be between 1 and the
             motif length, and the motif length must be divisible by the quantization.
             By default, it is None (which corresponds to the motif length).
+        noise_std : float, optional
+            The noise that gets injected into botorch's SyntheticTestFunction.
+            By default, it is 0.0.
         seed : int, optional
             The seed for the random number generator. By default, it is None
-            (i.e. no seed is set).
+            (i.e. a random seed is set using np.random.randint(0, 1000)).
+        epistasis_factor : float, optional
+            The epistasis factor. By default, it is 0.0.
         return_value_on_unfeasible : float, optional
             The value to be returned when an unfeasible sequence is evaluated.
             By default, it is -np.inf.

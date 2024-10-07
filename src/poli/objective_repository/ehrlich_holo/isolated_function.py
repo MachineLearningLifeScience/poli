@@ -1,3 +1,7 @@
+"""
+The isolation entry-point for Ehrlich, as implemented in Holo.
+"""
+
 from __future__ import annotations
 
 import numpy as np
@@ -10,7 +14,10 @@ from poli.core.util.proteins.defaults import AMINO_ACIDS
 
 
 class EhrlichIsolatedLogic(AbstractIsolatedFunction):
-    """ """
+    """
+    An isolated logic which uses Holo-bench's implementation
+    of Ehrlich functions.
+    """
 
     def __init__(
         self,
@@ -34,15 +41,6 @@ class EhrlichIsolatedLogic(AbstractIsolatedFunction):
 
         if seed is None:
             raise ValueError("The seed parameter must be set.")
-
-        # if quantization is None:
-        #     self.quantization = motif_length
-
-        # if not (1 <= quantization <= motif_length) or motif_length % quantization != 0:
-        #     raise ValueError(
-        #         "The quantization parameter must be between 1 and the motif length, "
-        #         "and the motif length must be divisible by the quantization."
-        #     )
 
         self.noise_std = noise_std
         self.quantization = quantization
