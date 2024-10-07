@@ -163,7 +163,25 @@ class EhrlichHoloBlackBox(AbstractBlackBox):
         """
         Evaluates the sequences in x by checking maximal matches and multiplying.
         """
-        return self.inner_function(x, context=context)
+        inner_function = get_inner_function(
+            isolated_function_name="ehrlich_holo__isolated",
+            class_name="EhrlichIsolatedLogic",
+            module_to_import="poli.objective_repository.ehrlich_holo.isolated_function",
+            force_isolation=self.force_isolation,
+            sequence_length=self.sequence_length,
+            motif_length=self.motif_length,
+            n_motifs=self.n_motifs,
+            quantization=self.quantization,
+            noise_std=self.noise_std,
+            seed=self.seed,
+            epistasis_factor=self.epistasis_factor,
+            return_value_on_unfeasible=self.return_value_on_unfeasible,
+            alphabet=self.alphabet,
+            parallelize=self.parallelize,
+            num_workers=self.num_workers,
+            evaluation_budget=self.evaluation_budget,
+        )
+        return inner_function(x, context=context)
 
     def get_black_box_info(self) -> BlackBoxInformation:
         return BlackBoxInformation(
