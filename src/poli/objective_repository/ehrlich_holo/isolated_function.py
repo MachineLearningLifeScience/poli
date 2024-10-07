@@ -69,11 +69,10 @@ class EhrlichIsolatedLogic(AbstractIsolatedFunction):
         batch_size = x.shape[0]
         x_ = np.array([[self.alphabet.index(c) for c in s] for s in x.flatten()])
 
-        return (
-            self.inner_ehrlich(torch.from_numpy(x_))
-            .numpy(force=True)
-            .reshape(batch_size, 1)
-        )
+        values = self.inner_ehrlich(torch.from_numpy(x_)).numpy(force=True)
+        values[values == -np.inf] = self.return_value_on_unfeasible
+
+        return values.reshape(batch_size, 1)
 
     @property
     def initial_solution(self):
