@@ -84,6 +84,10 @@ class EhrlichIsolatedLogic(AbstractIsolatedFunction):
     def random_solution(self):
         return self.inner_ehrlich.random_solution()
 
+    @property
+    def transition_matrix(self):
+        return self.inner_ehrlich.transition_matrix.numpy(force=True)
+
 
 if __name__ == "__main__":
     register_isolated_function(
