@@ -272,6 +272,7 @@ def __create_function_as_isolated_process(
             f"poli 🧪: Starting the function {name.replace('__isolated', '')} as an isolated process."
         )
 
+    seed = kwargs_for_isolated_function.get("seed", None)
     process_wrapper = ProcessWrapper(
         config[name][_ISOLATED_FUNCTION_SCRIPT_LOCATION], **kwargs_for_isolated_function
     )

@@ -1,0 +1,9 @@
+name: poli__ehrlich_holo
+channels:
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+    - "git+https://github.com/MachineLearningLifeScience/poli.git@dev"
+    - pytorch-holo
