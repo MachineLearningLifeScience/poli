@@ -65,6 +65,7 @@ markers = [
     "poli__protein: marks tests that run in the poli__protein environment",
     "poli__rasp: marks tests that run in the poli__rasp environment",
     "poli__rmf: marks tests that run in poli__rmf environment",
+    "poli__ehrlich_holo: marks tests that run in poli__ehrlich_holo environment",
     "unmarked: All other tests, which usually run in the base environment",
 ]
 

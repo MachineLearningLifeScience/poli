@@ -353,17 +353,18 @@ def get_inner_function(
     **kwargs : dict
         Additional keyword arguments for the isolated function.
     """
-    seed = kwargs.get("seed", None)
     if not force_isolation:
         try:
             module = importlib.import_module(module_to_import)
             InnerFunctionClass = getattr(module, class_name)
             inner_function = InnerFunctionClass(**kwargs)
         except ImportError:
+            seed = kwargs.pop("seed", None)
             inner_function = instance_function_as_isolated_process(
                 name=isolated_function_name, seed=seed, quiet=quiet, **kwargs
             )
     else:
+        seed = kwargs.pop("seed", None)
         inner_function = instance_function_as_isolated_process(
             name=isolated_function_name, seed=seed, quiet=quiet, **kwargs
         )
