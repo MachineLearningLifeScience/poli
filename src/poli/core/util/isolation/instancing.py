@@ -276,6 +276,7 @@ def __create_function_as_isolated_process(
     process_wrapper = ProcessWrapper(
         config[name][_ISOLATED_FUNCTION_SCRIPT_LOCATION], **kwargs_for_isolated_function
     )
+    seed = kwargs_for_isolated_function.get("seed", None)
     # TODO: add signal listener that intercepts when proc ends
     # wait for connection from objective process
     # TODO: potential (unlikely) race condition! (process might try to connect before listener is ready!)
@@ -303,7 +304,6 @@ def __create_function_as_isolated_process(
 
 def instance_function_as_isolated_process(
     name: str,
-    seed: int = None,
     quiet: bool = False,
     **kwargs_for_black_box,
 ) -> ExternalFunction:
@@ -312,7 +312,6 @@ def instance_function_as_isolated_process(
 
     f = __create_function_as_isolated_process(
         name=name,
-        seed=seed,
         quiet=quiet,
         **kwargs_for_black_box,
     )
@@ -343,8 +342,6 @@ def get_inner_function(
     module_to_import : str
         The full name of the module to import the class from (e.g.
         "poli.objective_repository.foldx_stability.isolated_function").
-    seed : int, optional
-        The seed value for random number generation, passed to the isolated function.
     force_isolation : bool, optional
         If True, then the function is forced to run in isolation, even if the module can be imported.
     quiet : bool, optional
@@ -361,11 +358,11 @@ def get_inner_function(
         except ImportError:
             seed = kwargs.pop("seed", None)
             inner_function = instance_function_as_isolated_process(
-                name=isolated_function_name, seed=seed, quiet=quiet, **kwargs
+                name=isolated_function_name, quiet=quiet, **kwargs
             )
     else:
         seed = kwargs.pop("seed", None)
         inner_function = instance_function_as_isolated_process(
-            name=isolated_function_name, seed=seed, quiet=quiet, **kwargs
+            name=isolated_function_name, quiet=quiet, **kwargs
         )
     return inner_function
