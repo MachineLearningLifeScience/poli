@@ -75,6 +75,18 @@ class EhrlichIsolatedLogic(AbstractIsolatedFunction):
             .reshape(batch_size, 1)
         )
 
+    @property
+    def initial_solution(self):
+        return self.inner_ehrlich.initial_solution()
+
+    @property
+    def optimal_solution(self):
+        return self.inner_ehrlich.optimal_solution()
+
+    @property
+    def random_solution(self):
+        return self.inner_ehrlich.random_solution()
+
 
 if __name__ == "__main__":
     register_isolated_function(

@@ -144,18 +144,18 @@ class EhrlichHoloBlackBox(AbstractBlackBox):
 
     def initial_solution(self) -> np.ndarray:
         # This is a sequence of ints.
-        initial_solution_as_ints = self.inner_function.inner_ehrlich.initial_solution()
+        initial_solution_as_ints = self.inner_function.initial_solution
 
         # We convert it to a sequence of strings.
         return np.array(["".join([self.alphabet[i] for i in initial_solution_as_ints])])
 
     def random_solution(self) -> np.ndarray:
-        random_solution_as_ints = self.inner_function.inner_ehrlich.random_solution()
+        random_solution_as_ints = self.inner_function.random_solution
 
         return np.array(["".join([self.alphabet[i] for i in random_solution_as_ints])])
 
     def optimal_solution(self) -> np.ndarray:
-        optimal_solution_as_ints = self.inner_function.inner_ehrlich.optimal_solution()
+        optimal_solution_as_ints = self.inner_function.optimal_solution
 
         return np.array(["".join([self.alphabet[i] for i in optimal_solution_as_ints])])
 
@@ -163,25 +163,7 @@ class EhrlichHoloBlackBox(AbstractBlackBox):
         """
         Evaluates the sequences in x by checking maximal matches and multiplying.
         """
-        inner_function = get_inner_function(
-            isolated_function_name="ehrlich_holo__isolated",
-            class_name="EhrlichIsolatedLogic",
-            module_to_import="poli.objective_repository.ehrlich_holo.isolated_function",
-            force_isolation=self.force_isolation,
-            sequence_length=self.sequence_length,
-            motif_length=self.motif_length,
-            n_motifs=self.n_motifs,
-            quantization=self.quantization,
-            noise_std=self.noise_std,
-            seed=self.seed,
-            epistasis_factor=self.epistasis_factor,
-            return_value_on_unfeasible=self.return_value_on_unfeasible,
-            alphabet=self.alphabet,
-            parallelize=self.parallelize,
-            num_workers=self.num_workers,
-            evaluation_budget=self.evaluation_budget,
-        )
-        return inner_function(x, context=context)
+        return self.inner_function(x, context=context)
 
     def get_black_box_info(self) -> BlackBoxInformation:
         return BlackBoxInformation(
