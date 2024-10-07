@@ -356,12 +356,10 @@ def get_inner_function(
             InnerFunctionClass = getattr(module, class_name)
             inner_function = InnerFunctionClass(**kwargs)
         except ImportError:
-            seed = kwargs.pop("seed", None)
             inner_function = instance_function_as_isolated_process(
                 name=isolated_function_name, quiet=quiet, **kwargs
             )
     else:
-        seed = kwargs.pop("seed", None)
         inner_function = instance_function_as_isolated_process(
             name=isolated_function_name, quiet=quiet, **kwargs
         )
