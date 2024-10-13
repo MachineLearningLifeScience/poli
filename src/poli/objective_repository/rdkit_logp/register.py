@@ -9,6 +9,8 @@ descriptors. We allow for both SMILES and SELFIES
 strings.
 """
 
+from __future__ import annotations
+
 from typing import Literal
 
 import numpy as np
@@ -41,6 +43,12 @@ class LogPBlackBox(AbstractBlackBox):
     ----------
     string_representation : Literal["SMILES", "SELFIES"], optional
         The string representation to use, by default "SMILES".
+    alphabet : list[str] | None, optional
+        The alphabet to be used for the SMILES or SELFIES representation.
+        It is common that the alphabet depends on the dataset used, so
+        it is recommended to pass it as an argument. Default is None.
+    max_sequence_length : int, optional
+        The maximum length of the sequence. Default is infinity.
     batch_size : int, optional
         The batch size for processing multiple inputs simultaneously, by default None.
     parallelize : bool, optional
@@ -67,6 +75,8 @@ class LogPBlackBox(AbstractBlackBox):
     def __init__(
         self,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
+        alphabet: list[str] | None = None,
+        max_sequence_length: int = np.inf,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
@@ -80,6 +90,12 @@ class LogPBlackBox(AbstractBlackBox):
         ----------
         string_representation : Literal["SMILES", "SELFIES"], optional
             The string representation to use, by default "SMILES".
+        alphabet : list[str] | None, optional
+            The alphabet to be used for the SMILES or SELFIES representation.
+            It is common that the alphabet depends on the dataset used, so
+            it is recommended to pass it as an argument. Default is None.
+        max_sequence_length : int, optional
+            The maximum length of the sequence. Default is infinity.
         batch_size : int, optional
             The batch size for processing multiple inputs simultaneously, by default None.
         parallelize : bool, optional
@@ -92,6 +108,8 @@ class LogPBlackBox(AbstractBlackBox):
         assert string_representation.upper() in ["SMILES", "SELFIES"]
         self.from_selfies = string_representation.upper() == "SELFIES"
         self.from_smiles = string_representation.upper() == "SMILES"
+        self.alphabet = alphabet
+        self.max_sequence_length = max_sequence_length
 
         super().__init__(
             batch_size=batch_size,
@@ -145,11 +163,11 @@ class LogPBlackBox(AbstractBlackBox):
     def get_black_box_info(self) -> BlackBoxInformation:
         return BlackBoxInformation(
             name="rdkit_logp",
-            max_sequence_length=np.inf,
+            max_sequence_length=self.max_sequence_length,
             aligned=False,
             fixed_length=False,
             deterministic=True,
-            alphabet=None,  # TODO: add once we settle for one
+            alphabet=self.alphabet,  # TODO: add once we settle for one
             log_transform_recommended=False,
             discrete=True,
             fidelity=None,
@@ -161,6 +179,8 @@ class LogPProblemFactory(AbstractProblemFactory):
     def create(
         self,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
+        alphabet: list[str] | None = None,
+        max_sequence_length: int = np.inf,
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
@@ -202,6 +222,8 @@ class LogPProblemFactory(AbstractProblemFactory):
 
         f = LogPBlackBox(
             string_representation=string_representation.upper(),
+            alphabet=alphabet,
+            max_sequence_length=max_sequence_length,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
@@ -210,9 +232,9 @@ class LogPProblemFactory(AbstractProblemFactory):
 
         # The sequence "C"
         if string_representation.upper() == "SMILES":
-            x0 = np.array([["C"]])
+            x0 = np.array([["C" * 10]])
         else:
-            x0 = np.array([["[C]"]])
+            x0 = np.array([["[C]" * 10]])
 
         problem = Problem(f, x0)
 

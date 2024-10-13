@@ -13,6 +13,8 @@ References
     https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
 """
 
+from __future__ import annotations
+
 from typing import Literal
 
 import numpy as np
@@ -38,6 +40,12 @@ class SitagliptinMPOBlackBox(TDCBlackBox):
     string_representation : Literal["SMILES", "SELFIES"], optional
         A string (either "SMILES" or "SELFIES") specifying which
         molecule representation you plan to use.
+    alphabet : list[str] | None, optional
+        The alphabet to be used for the SMILES or SELFIES representation.
+        It is common that the alphabet depends on the dataset used, so
+        it is recommended to pass it as an argument. Default is None.
+    max_sequence_length : int, optional
+        The maximum length of the sequence. Default is infinity.
     batch_size : int, optional
         The batch size for simultaneous execution, by default None.
     parallelize : bool, optional
@@ -71,6 +79,8 @@ class SitagliptinMPOBlackBox(TDCBlackBox):
     def __init__(
         self,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
+        alphabet: list[str] | None = None,
+        max_sequence_length: int = np.inf,
         force_isolation: bool = False,
         batch_size: int = None,
         parallelize: bool = False,
@@ -80,6 +90,8 @@ class SitagliptinMPOBlackBox(TDCBlackBox):
         super().__init__(
             oracle_name="Sitagliptin_MPO",
             string_representation=string_representation,
+            alphabet=alphabet,
+            max_sequence_length=max_sequence_length,
             force_isolation=force_isolation,
             batch_size=batch_size,
             parallelize=parallelize,
@@ -90,11 +102,11 @@ class SitagliptinMPOBlackBox(TDCBlackBox):
     def get_black_box_info(self) -> BlackBoxInformation:
         return BlackBoxInformation(
             name="sitagliptin_mpo",
-            max_sequence_length=np.inf,
+            max_sequence_length=self.max_sequence_length,
             aligned=False,
             fixed_length=False,
             deterministic=True,  # ?
-            alphabet=None,  # TODO: add alphabet once we settle for one for SMLIES/SELFIES.
+            alphabet=self.alphabet,  # TODO: add alphabet once we settle for one for SMLIES/SELFIES.
             log_transform_recommended=False,
             discrete=True,
             padding_token="",
@@ -126,6 +138,8 @@ class SitagliptinMPOProblemFactory(AbstractProblemFactory):
     def create(
         self,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
+        alphabet: list[str] | None = None,
+        max_sequence_length: int = np.inf,
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
@@ -140,6 +154,12 @@ class SitagliptinMPOProblemFactory(AbstractProblemFactory):
         ----------
         string_representation : str, optional
             The string representation of the molecules. Must be either 'SMILES' or 'SELFIES'. Default is 'SMILES'.
+        alphabet : list[str] | None, optional
+            The alphabet to be used for the SMILES or SELFIES representation.
+            It is common that the alphabet depends on the dataset used, so
+            it is recommended to pass it as an argument. Default is None.
+        max_sequence_length : int, optional
+            The maximum length of the sequence. Default is infinity.
         seed : int, optional
             Seed for random number generators. If None, no seed is set.
         batch_size : int, optional
@@ -177,6 +197,8 @@ class SitagliptinMPOProblemFactory(AbstractProblemFactory):
 
         f = SitagliptinMPOBlackBox(
             string_representation=string_representation,
+            alphabet=alphabet,
+            max_sequence_length=max_sequence_length,
             force_isolation=force_isolation,
             batch_size=batch_size,
             parallelize=parallelize,

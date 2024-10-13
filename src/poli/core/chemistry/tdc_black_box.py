@@ -36,6 +36,12 @@ class TDCBlackBox(AbstractBlackBox):
     string_representation : Literal["SMILES", "SELFIES"], optional
         A string (either "SMILES" or "SELFIES") specifying which
         molecule representation you plan to use.
+    alphabet : list[str] | None, optional
+        The alphabet to be used for the SMILES or SELFIES representation.
+        It is common that the alphabet depends on the dataset used, so
+        it is recommended to pass it as an argument. Default is None.
+    max_sequence_length : int, optional
+        The maximum length of the sequence. Default is infinity.
     batch_size : int, optional
         The batch size for simultaneous execution, by default None.
     parallelize : bool, optional
@@ -69,6 +75,8 @@ class TDCBlackBox(AbstractBlackBox):
         self,
         oracle_name: str,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
+        alphabet: list[str] | None = None,
+        max_sequence_length: int = np.inf,
         force_isolation: bool = False,
         batch_size: int = None,
         parallelize: bool = False,
@@ -88,6 +96,8 @@ class TDCBlackBox(AbstractBlackBox):
             evaluation_budget=evaluation_budget,
         )
         self.oracle_name = oracle_name
+        self.alphabet = alphabet
+        self.max_sequence_length = max_sequence_length
 
         from_smiles = string_representation.upper() == "SMILES"
         self.inner_function = get_inner_function(
