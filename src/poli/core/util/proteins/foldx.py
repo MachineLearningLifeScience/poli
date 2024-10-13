@@ -194,8 +194,12 @@ class FoldxInterface:
             )
         except subprocess.CalledProcessError as e:
             raise RuntimeError(
-                f"FoldX failed to repair the pdb file {pdb_file}. "
-                f"Please check the working directory: {self.working_dir}. "
+                f"FoldX failed to repair the pdb file {pdb_file}. " + "\n"
+                "This can happen because: \n"
+                "- the foldx license (which has a 1-year turnaround) expired, or"
+                "- the PDB file is not repaired. \n"
+                "If you want to dig deeper, you can check the FoldX output in the working directory: "
+                f"{self.working_dir}."
             ) from e
 
         # Checking that the file was generated
