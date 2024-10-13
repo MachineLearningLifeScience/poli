@@ -27,11 +27,13 @@ class Problem:
         self,
         black_box: AbstractBlackBox,
         x0: np.ndarray,
+        strict_validation: bool = True,
     ):
         self.black_box: AbstractBlackBox = black_box
         self.x0: np.ndarray = x0
         self.black_box_information = black_box.info
-        self._validate()
+        if strict_validation:
+            self._validate()
         self.observer: AlgorithmObserverWrapper = AlgorithmObserverWrapper(
             DefaultObserver()
         )

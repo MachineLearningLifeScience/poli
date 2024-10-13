@@ -114,6 +114,17 @@ class AbstractBlackBox:
     def info(self) -> BlackBoxInformation:
         return self.get_black_box_info()
 
+    def set_evaluation_budget(self, evaluation_budget: int):
+        """
+        Set the evaluation budget for the black box function.
+
+        Parameters
+        ----------
+        evaluation_budget : int
+            The maximum number of evaluations allowed for the black box function.
+        """
+        self.evaluation_budget = evaluation_budget
+
     def set_observer(self, observer: AbstractObserver):
         """
         Set the observer object for recording observations during evaluation.
