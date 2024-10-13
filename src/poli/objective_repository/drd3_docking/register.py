@@ -7,6 +7,8 @@ References
     Huang, K., Fu, T., Gao, W. et al.  Nat Chem Biol 18, 1033-1036 (2022). https://doi.org/10.1038/s41589-022-01131-2
 """
 
+from __future__ import annotations
+
 from typing import Literal
 
 import numpy as np
@@ -54,6 +56,8 @@ class DRD3BlackBox(TDCBlackBox):
     def __init__(
         self,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
+        alphabet: list[str] | None = None,
+        max_sequence_length: int = np.inf,
         force_isolation: bool = False,
         batch_size: int = None,
         parallelize: bool = False,
@@ -63,6 +67,8 @@ class DRD3BlackBox(TDCBlackBox):
         super().__init__(
             oracle_name="3pbl_docking",
             string_representation=string_representation,
+            alphabet=alphabet,
+            max_sequence_length=max_sequence_length,
             force_isolation=force_isolation,
             batch_size=batch_size,
             parallelize=parallelize,
@@ -73,11 +79,11 @@ class DRD3BlackBox(TDCBlackBox):
     def get_black_box_info(self) -> BlackBoxInformation:
         return BlackBoxInformation(
             name="drd3_docking",
-            max_sequence_length=np.inf,
+            max_sequence_length=self.max_sequence_length,
             aligned=False,
             fixed_length=False,
             deterministic=True,  # ?
-            alphabet=None,  # TODO: add alphabet once we settle for one for SMLIES/SELFIES.
+            alphabet=self.alphabet,  # TODO: add alphabet once we settle for one for SMLIES/SELFIES.
             log_transform_recommended=False,
             discrete=True,
             padding_token="",
@@ -99,6 +105,8 @@ class DRD3ProblemFactory(AbstractProblemFactory):
     def create(
         self,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
+        alphabet: list[str] | None = None,
+        max_sequence_length: int = np.inf,
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
@@ -150,6 +158,8 @@ class DRD3ProblemFactory(AbstractProblemFactory):
 
         f = DRD3BlackBox(
             string_representation=string_representation,
+            alphabet=alphabet,
+            max_sequence_length=max_sequence_length,
             force_isolation=force_isolation,
             batch_size=batch_size,
             parallelize=parallelize,

@@ -69,6 +69,8 @@ class TDCBlackBox(AbstractBlackBox):
         self,
         oracle_name: str,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
+        alphabet: list[str] | None = None,
+        max_sequence_length: int = np.inf,
         force_isolation: bool = False,
         batch_size: int = None,
         parallelize: bool = False,
@@ -88,6 +90,8 @@ class TDCBlackBox(AbstractBlackBox):
             evaluation_budget=evaluation_budget,
         )
         self.oracle_name = oracle_name
+        self.alphabet = alphabet
+        self.max_sequence_length = max_sequence_length
 
         from_smiles = string_representation.upper() == "SMILES"
         self.inner_function = get_inner_function(

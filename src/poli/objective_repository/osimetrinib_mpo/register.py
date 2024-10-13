@@ -13,6 +13,8 @@ References
     https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
 """
 
+from __future__ import annotations
+
 from typing import Literal
 
 import numpy as np
@@ -72,6 +74,8 @@ class OsimetrinibMPOBlackBox(TDCBlackBox):
     def __init__(
         self,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
+        alphabet: list[str] | None = None,
+        max_sequence_length: int = np.inf,
         force_isolation: bool = False,
         batch_size: int = None,
         parallelize: bool = False,
@@ -81,6 +85,8 @@ class OsimetrinibMPOBlackBox(TDCBlackBox):
         super().__init__(
             oracle_name="Osimetrinib_MPO",
             string_representation=string_representation,
+            alphabet=alphabet,
+            max_sequence_length=max_sequence_length,
             force_isolation=force_isolation,
             batch_size=batch_size,
             parallelize=parallelize,
@@ -91,11 +97,11 @@ class OsimetrinibMPOBlackBox(TDCBlackBox):
     def get_black_box_info(self) -> BlackBoxInformation:
         return BlackBoxInformation(
             name="osimetrinib_mpo",
-            max_sequence_length=np.inf,
+            max_sequence_length=self.max_sequence_length,
             aligned=False,
             fixed_length=False,
             deterministic=True,  # ?
-            alphabet=None,  # TODO: add alphabet once we settle for one for SMLIES/SELFIES.
+            alphabet=self.alphabet,  # TODO: add alphabet once we settle for one for SMLIES/SELFIES.
             log_transform_recommended=False,
             discrete=True,
             padding_token="",
@@ -127,6 +133,8 @@ class OsimetrinibMPOProblemFactory(AbstractProblemFactory):
     def create(
         self,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
+        alphabet: list[str] | None = None,
+        max_sequence_length: int = np.inf,
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
@@ -178,6 +186,8 @@ class OsimetrinibMPOProblemFactory(AbstractProblemFactory):
 
         f = OsimetrinibMPOBlackBox(
             string_representation=string_representation,
+            alphabet=alphabet,
+            max_sequence_length=max_sequence_length,
             force_isolation=force_isolation,
             batch_size=batch_size,
             parallelize=parallelize,

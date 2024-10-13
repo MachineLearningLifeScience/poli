@@ -17,6 +17,8 @@ References
     https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
 """
 
+from __future__ import annotations
+
 from typing import Literal
 
 import numpy as np
@@ -78,6 +80,8 @@ class AlbuterolSimilarityBlackBox(TDCBlackBox):
     def __init__(
         self,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
+        alphabet: list[str] | None = None,
+        max_sequence_length: int = np.inf,
         force_isolation: bool = False,
         batch_size: int = None,
         parallelize: bool = False,
@@ -87,6 +91,8 @@ class AlbuterolSimilarityBlackBox(TDCBlackBox):
         super().__init__(
             oracle_name="Albuterol_Similarity",
             string_representation=string_representation,
+            alphabet=alphabet,
+            max_sequence_length=max_sequence_length,
             force_isolation=force_isolation,
             batch_size=batch_size,
             parallelize=parallelize,
@@ -97,11 +103,11 @@ class AlbuterolSimilarityBlackBox(TDCBlackBox):
     def get_black_box_info(self) -> BlackBoxInformation:
         return BlackBoxInformation(
             name="albuterol_similarity",
-            max_sequence_length=np.inf,  # TODO: How should we determine this?
+            max_sequence_length=self.max_sequence_length,  # TODO: How should we determine this?
             aligned=False,
             fixed_length=False,
             deterministic=True,
-            alphabet=None,  # TODO: add default alphabet
+            alphabet=self.alphabet,  # TODO: add default alphabet
             log_transform_recommended=False,
             discrete=True,
             padding_token="",
@@ -133,6 +139,8 @@ class AlbuterolSimilarityProblemFactory(AbstractProblemFactory):
     def create(
         self,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
+        alphabet: list[str] | None = None,
+        max_sequence_length: int = np.inf,
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
@@ -184,6 +192,8 @@ class AlbuterolSimilarityProblemFactory(AbstractProblemFactory):
 
         f = AlbuterolSimilarityBlackBox(
             string_representation=string_representation,
+            alphabet=alphabet,
+            max_sequence_length=max_sequence_length,
             force_isolation=force_isolation,
             batch_size=batch_size,
             parallelize=parallelize,

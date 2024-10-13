@@ -15,6 +15,8 @@ References
     https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
 """
 
+from __future__ import annotations
+
 from typing import Literal
 
 import numpy as np
@@ -74,6 +76,8 @@ class ThiothixeneRediscoveryBlackBox(TDCBlackBox):
     def __init__(
         self,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
+        alphabet: list[str] | None = None,
+        max_sequence_length: int = np.inf,
         force_isolation: bool = False,
         batch_size: int = None,
         parallelize: bool = False,
@@ -83,6 +87,8 @@ class ThiothixeneRediscoveryBlackBox(TDCBlackBox):
         super().__init__(
             oracle_name="Thiothixene_Rediscovery",
             string_representation=string_representation,
+            alphabet=alphabet,
+            max_sequence_length=max_sequence_length,
             force_isolation=force_isolation,
             batch_size=batch_size,
             parallelize=parallelize,
@@ -93,11 +99,11 @@ class ThiothixeneRediscoveryBlackBox(TDCBlackBox):
     def get_black_box_info(self) -> BlackBoxInformation:
         return BlackBoxInformation(
             name="thiothixene_rediscovery",
-            max_sequence_length=np.inf,
+            max_sequence_length=self.max_sequence_length,
             aligned=False,
             fixed_length=False,
             deterministic=True,  # ?
-            alphabet=None,  # TODO: add alphabet once we settle for one for SMLIES/SELFIES.
+            alphabet=self.alphabet,  # TODO: add alphabet once we settle for one for SMLIES/SELFIES.
             log_transform_recommended=False,
             discrete=True,
             padding_token="",
@@ -128,6 +134,8 @@ class ThiothixeneRediscoveryProblemFactory(AbstractProblemFactory):
     def create(
         self,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
+        alphabet: list[str] | None = None,
+        max_sequence_length: int = np.inf,
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
@@ -179,6 +187,8 @@ class ThiothixeneRediscoveryProblemFactory(AbstractProblemFactory):
 
         f = ThiothixeneRediscoveryBlackBox(
             string_representation=string_representation,
+            alphabet=alphabet,
+            max_sequence_length=max_sequence_length,
             force_isolation=force_isolation,
             batch_size=batch_size,
             parallelize=parallelize,

@@ -10,6 +10,8 @@ Chem.QED.qed function, which returns a float between
 0 and 1. We allow for both SMILES and SELFIES strings.
 """
 
+from __future__ import annotations
+
 from typing import Literal
 
 import numpy as np
@@ -68,6 +70,8 @@ class QEDBlackBox(AbstractBlackBox):
     def __init__(
         self,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
+        alphabet: list[str] | None = None,
+        max_sequence_length: int = np.inf,
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
@@ -98,6 +102,9 @@ class QEDBlackBox(AbstractBlackBox):
         assert string_representation.upper() in ["SMILES", "SELFIES"]
         self.from_selfies = string_representation.upper() == "SELFIES"
         self.from_smiles = string_representation.upper() == "SMILES"
+
+        self.alphabet = alphabet
+        self.max_sequence_length = max_sequence_length
 
         super().__init__(
             batch_size=batch_size,
@@ -167,11 +174,11 @@ class QEDBlackBox(AbstractBlackBox):
         """
         return BlackBoxInformation(
             name="rdkit_qed",
-            max_sequence_length=np.inf,
+            max_sequence_length=self.max_sequence_length,
             aligned=False,
             fixed_length=False,
             deterministic=True,
-            alphabet=None,  # TODO: add once we settle for one
+            alphabet=self.alphabet,  # TODO: add once we settle for one
             log_transform_recommended=False,
             discrete=True,
             fidelity=None,
@@ -196,6 +203,8 @@ class QEDProblemFactory(AbstractProblemFactory):
     def create(
         self,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
+        alphabet: list[str] | None = None,
+        max_sequence_length: int = np.inf,
         seed: int = None,
         batch_size: int = None,
         parallelize: bool = False,
@@ -237,6 +246,8 @@ class QEDProblemFactory(AbstractProblemFactory):
 
         f = QEDBlackBox(
             string_representation=string_representation.upper(),
+            alphabet=alphabet,
+            max_sequence_length=max_sequence_length,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
@@ -245,8 +256,8 @@ class QEDProblemFactory(AbstractProblemFactory):
 
         # The sequence "C"
         if string_representation.upper() == "SMILES":
-            x0 = np.array([["C"]])
+            x0 = np.array([["C" * 10]])
         else:
-            x0 = np.array([["[C]"]])
+            x0 = np.array([["[C]" * 10]])
 
         return Problem(f, x0)
