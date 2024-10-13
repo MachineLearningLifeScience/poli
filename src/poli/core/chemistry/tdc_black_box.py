@@ -16,6 +16,8 @@ References
     https://pubs.acs.org/doi/10.1021/acs.jcim.8b00839
 """
 
+from __future__ import annotations
+
 from typing import Literal
 
 import numpy as np
