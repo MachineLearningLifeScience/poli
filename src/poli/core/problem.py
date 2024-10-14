@@ -15,9 +15,12 @@ includes the following information:
   allowed.
 """
 
+from __future__ import annotations
+
 import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
+from poli.core.data_package import DataPackage
 from poli.core.util.algorithm_observer_wrapper import AlgorithmObserverWrapper
 from poli.core.util.default_observer import DefaultObserver
 
@@ -27,10 +30,12 @@ class Problem:
         self,
         black_box: AbstractBlackBox,
         x0: np.ndarray,
+        data_package: DataPackage | None = None,
         strict_validation: bool = True,
     ):
         self.black_box: AbstractBlackBox = black_box
         self.x0: np.ndarray = x0
+        self.data_package: DataPackage | None = data_package
         self.black_box_information = black_box.info
         if strict_validation:
             self._validate()
@@ -64,7 +69,7 @@ class Problem:
         return self.black_box.info
 
     def __str__(self):
-        return f"<Problem: {self.black_box.info.get_problem_name()} x0: {self.x0}>"
+        return f"<Problem: {self.black_box.info.get_problem_name()} x0: {self.x0} data_package: {self.data_package}>"
 
     def __repr__(self):
-        return f"<Problem: {self.black_box.info.get_problem_name()} x0: {self.x0} discrete={self.is_discrete()} deterministic={self.is_deterministic()}>"
+        return f"<Problem: {self.black_box.info.get_problem_name()} x0: {self.x0} data_package: {self.data_package} discrete={self.is_discrete()} deterministic={self.is_deterministic()}>"

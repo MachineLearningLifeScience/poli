@@ -100,6 +100,7 @@ class TDCBlackBox(AbstractBlackBox):
         self.oracle_name = oracle_name
         self.alphabet = alphabet
         self.max_sequence_length = max_sequence_length
+        self.string_representation = string_representation
 
         from_smiles = string_representation.upper() == "SMILES"
         self.inner_function = get_inner_function(
