@@ -43,13 +43,9 @@ class GFPCBasBlackBox(AbstractBlackBox):
         self.seed = seed
         self.negate = negate
 
-        inner_function = get_inner_function(
-            isolated_function_name="gfp_cbas__isolated",
-            class_name="GFPCBasIsolatedLogic",
-            module_to_import="poli.objective_repository.gfp_cbas.isolated_function",
-            seed=self.seed,
-            force_isolation=self.force_isolation,
-            quiet=False,
+        # NOTE: do NOT us get_inner_function -> importlib resets existing tf import and we CANNOT recover tf.v1 eager execution
+        from .isolated_function import GFPCBasIsolatedLogic  # encapsulate as to not break poli imports
+        inner_function = GFPCBasIsolatedLogic(
             problem_type=self.problem_type,
             info=self.get_black_box_info(),
             n_starting_points=self.n_starting_points,
@@ -120,6 +116,8 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
         negate: bool = False,
+        force_isolation: bool = False,
+        force_register: bool = False,  # TODO: this is not functional requires correction
     ) -> Problem:
         """
         Seed value required to shuffle the data, otherwise CSV asset data index unchanged.
@@ -129,7 +127,7 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
         self.problem_type = problem_type
         if seed is not None:
             seed_python_numpy_and_torch(seed)
-        problem_info = self.get_problem_name()
+
         f = GFPCBasBlackBox(
             problem_type=problem_type,
             functional_only=functional_only,
@@ -141,6 +139,7 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
             seed=seed,
             evaluation_budget=evaluation_budget,
             negate=negate,
+            force_isolation=force_isolation,
         )
         x0 = f.x0
 
