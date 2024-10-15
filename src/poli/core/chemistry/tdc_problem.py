@@ -1,4 +1,4 @@
-from poli.core.chemistry.data_packages import TenMoleculesDataPackage
+from poli.core.chemistry.data_packages import RandomMoleculesDataPackage
 from poli.core.chemistry.tdc_black_box import TDCBlackBox
 from poli.core.problem import Problem
 
@@ -8,7 +8,7 @@ class TDCProblem(Problem):
         self, black_box: TDCBlackBox, x0, data_package=None, strict_validation=True
     ):
         if data_package is None:
-            data_package = TenMoleculesDataPackage(black_box.string_representation)
+            data_package = RandomMoleculesDataPackage(black_box.string_representation)
 
         super().__init__(
             black_box=black_box,

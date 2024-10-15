@@ -221,6 +221,8 @@ class LogPProblemFactory(AbstractProblemFactory):
                 "String representation must be either 'SMILES' or 'SELFIES'."
             )
 
+        self.string_representation = string_representation
+
         f = LogPBlackBox(
             string_representation=string_representation.upper(),
             alphabet=alphabet,

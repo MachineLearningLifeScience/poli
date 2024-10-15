@@ -257,6 +257,8 @@ class QEDProblemFactory(AbstractProblemFactory):
                 "String representation must be either 'SMILES' or 'SELFIES'."
             )
 
+        self.string_representation = string_representation
+
         f = QEDBlackBox(
             string_representation=string_representation.upper(),
             alphabet=alphabet,
