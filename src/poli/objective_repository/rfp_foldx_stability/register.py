@@ -2,6 +2,7 @@ from pathlib import Path
 
 from poli.core.problem import Problem
 from poli.core.proteins.data_packages import RFPFoldXStabilitySupervisedDataPackage
+from poli.core.util.seeding import seed_python_numpy_and_torch
 from poli.objective_repository.foldx_stability.register import (
     FoldXStabilityBlackBox,
     FoldXStabilityProblemFactory,
@@ -59,12 +60,14 @@ class RFPFoldXStabilityProblemFactory(FoldXStabilityProblemFactory):
         evaluation_budget=float("inf"),
         force_isolation=False,
     ):
+        if seed is not None:
+            seed_python_numpy_and_torch(seed)
+
         rfp_foldx = RFPFoldXStabilityBlackBox(
             experiment_id=experiment_id,
             tmp_folder=tmp_folder,
             eager_repair=eager_repair,
             verbose=verbose,
-            seed=seed,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
