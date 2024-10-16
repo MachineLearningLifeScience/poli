@@ -115,6 +115,7 @@ class QEDBlackBox(AbstractBlackBox):
         assert string_representation.upper() in ["SMILES", "SELFIES"]
         self.from_selfies = string_representation.upper() == "SELFIES"
         self.from_smiles = string_representation.upper() == "SMILES"
+        self.string_representation = string_representation
 
         self.alphabet = alphabet
         self.max_sequence_length = max_sequence_length

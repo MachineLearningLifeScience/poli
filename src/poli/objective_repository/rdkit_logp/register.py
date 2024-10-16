@@ -111,6 +111,7 @@ class LogPBlackBox(AbstractBlackBox):
         self.from_smiles = string_representation.upper() == "SMILES"
         self.alphabet = alphabet
         self.max_sequence_length = max_sequence_length
+        self.string_representation = string_representation
 
         super().__init__(
             batch_size=batch_size,

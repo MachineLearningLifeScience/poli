@@ -12,7 +12,12 @@ class RFPFoldXStabilitySupervisedDataPackage(DataPackage):
             PROTEIN_DATA_PACKAGES_DIR / "rfp_sequences.txt", dtype=str
         )
         rasp_scores = np.loadtxt(PROTEIN_DATA_PACKAGES_DIR / "rfp_foldx_scores.txt")
-        unsupervised_data = sequences
-        supervised_data = sequences, rasp_scores
+        padding_token = ""
+        max_sequence_length = max(len(sequence) for sequence in sequences)
+        unsupervised_data = np.array([
+            list(sequence) + [padding_token] * (max_sequence_length - len(sequence))
+            for sequence in sequences
+        ])
+        supervised_data = unsupervised_data, rasp_scores.reshape(-1, 1)
 
         super().__init__(unsupervised_data, supervised_data)

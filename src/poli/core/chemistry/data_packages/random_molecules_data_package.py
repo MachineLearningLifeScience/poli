@@ -20,6 +20,7 @@ class RandomMoleculesDataPackage(DataPackage):
         string_representation: Literal["SMILES", "SELFIES"],
         n_molecules: int = 10,
         seed: int | None = None,
+        tokenize_with: Callable[[str], list[str]] = None,
     ):
         assert (
             n_molecules <= 5000
@@ -44,5 +45,8 @@ class RandomMoleculesDataPackage(DataPackage):
             five_thousand_molecules, (n_molecules,), replace=False
         )
         supervised_data = None
+
+        if tokenize_with is not None:
+            unsupervised_data = np.array([tokenize_with(mol) for mol in unsupervised_data if mol is not None])
 
         super().__init__(unsupervised_data, supervised_data)

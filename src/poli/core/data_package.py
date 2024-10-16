@@ -16,3 +16,15 @@ class DataPackage:
     ):
         self.unsupervised_data = unsupervised_data
         self.supervised_data = supervised_data
+
+    def __repr__(self) -> str:
+        unsupervised_data = (
+            self.unsupervised_data.shape if self.unsupervised_data is not None else None
+        )
+        supervised_data = (
+            self.supervised_data[0].shape if self.supervised_data is not None else None
+        )
+        return f"DataPackage(unsupervised_data={unsupervised_data}, supervised_data={supervised_data})"
+    
+    def __str__(self) -> str:
+        return self.__repr__()
