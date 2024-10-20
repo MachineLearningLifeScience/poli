@@ -65,6 +65,9 @@ class EhrlichIsolatedLogic(AbstractIsolatedFunction):
     def __call__(self, x: np.ndarray, context: None) -> np.ndarray:
         # First, we transform the strings into integers using the alphabet
         batch_size = x.shape[0]
+        if len(x.shape) > 1:
+            # Flattening each element
+            x = np.array(["".join(x_i) for x_i in x])
         x_ = np.array([[self.alphabet.index(c) for c in s] for s in x.flatten()])
 
         values = self.inner_ehrlich(torch.from_numpy(x_)).numpy(force=True)
@@ -72,9 +75,8 @@ class EhrlichIsolatedLogic(AbstractIsolatedFunction):
 
         return values.reshape(batch_size, 1)
 
-    @property
-    def initial_solution(self):
-        return self.inner_ehrlich.initial_solution()
+    def initial_solution(self, n_samples: int = 1):
+        return self.inner_ehrlich.initial_solution(n=n_samples)
 
     @property
     def optimal_solution(self):

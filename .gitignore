@@ -6,6 +6,7 @@ src/poli.egg-info/
 temp
 build
 .tox
+dist/
 
 # Ignore the registered objectives
 src/poli/registered_objectives/*.sh
