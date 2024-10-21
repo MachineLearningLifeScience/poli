@@ -1,6 +1,2 @@
-from poli.objective_repository import AVAILABLE_PROBLEM_FACTORIES, AVAILABLE_BLACK_BOXES
 from poli.objective_repository.rosetta_energy.register import RosettaEnergyBlackBox, RosettaEnergyProblemFactory
 from poli.objective_repository.rosetta_energy.information import rosetta_energy_information
-
-AVAILABLE_PROBLEM_FACTORIES[rosetta_energy_information.get_problem_name()] = RosettaEnergyProblemFactory
-AVAILABLE_BLACK_BOXES[rosetta_energy_information.get_problem_name()] = RosettaEnergyBlackBox
