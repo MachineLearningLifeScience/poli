@@ -6,3 +6,7 @@ channels:
 dependencies:
   - python=3.9
   - pyrosetta
+  - pip:
+    - numpy
+    - "git+https://github.com/MachineLearningLifeScience/poli.git@dev"
+    - biopython==1.72
