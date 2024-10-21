@@ -16,6 +16,7 @@ from pyrosetta.rosetta.protocols.minimization_packing import MinMover, PackRotam
 from pyrosetta.rosetta.core.pack.task import TaskFactory
 
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
+from poli.core.util.proteins.pdb_parsing import parse_pdb_as_residue_strings
 
 pyrosetta.init()
 
@@ -116,7 +117,7 @@ class RosettaEnergyIsolatedLogic(AbstractIsolatedFunction):
         self.energy_function.set_weight(pyrosetta.rosetta.core.scoring.ScoreType.atom_pair_constraint, self.constraint_weight)
         self.energy_function.set_weight(pyrosetta.rosetta.core.scoring.ScoreType.coordinate_constraint, self.constraint_weight)
         self.energy_function.set_weight(pyrosetta.rosetta.core.scoring.ScoreType.angle_constraint, self.constraint_weight)
-        self.x0 = np.array([parse_pdb_as_residue_strings(pdb_path)])
+        self.x0 = np.array([parse_pdb_as_residue_strings(wildtype_pdb_path)])
         if not isinstance(wildtype_pdb_path, Path):
             raise TypeError(f"{wildtype_pdb_path} is not a Path")
         if clean:
