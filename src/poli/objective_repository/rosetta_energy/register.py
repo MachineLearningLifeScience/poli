@@ -1,3 +1,4 @@
+from __future__ import annotations
 from pathlib import Path
 from typing import Callable, List
 
@@ -78,8 +79,7 @@ class RosettaEnergyBlackBox(AbstractBlackBox):
 
         try:
             from poli.objective_repository.rosetta_energy.isolated_function import RosettaEnergyIsolatedLogic
-            f = opt_in_wrapper(f)
-            self.inner_function = get_inner_function(
+            inner_function = get_inner_function(
                 isolated_function_name="rosetta_energy__isolated",
                 class_name="RosettaEnergyIsolatedLogic",
                 module_to_import="poli.objective_repository.rosetta_energy.isolated_function",
@@ -95,6 +95,7 @@ class RosettaEnergyBlackBox(AbstractBlackBox):
                 cycle=self.cycle,
                 n_threads=self.n_threads,
             )
+            self.inner_function = opt_in_wrapper(inner_function)
             self.x0 = self.inner_function.x0
         except ImportError:
             # If we weren't able to import it, we can still
@@ -147,6 +148,7 @@ class RosettaEnergyProblemFactory(AbstractProblemFactory):
         parallelize: bool = False,
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
+        force_isolation: bool = False,
     ) -> Problem:
         # Creating your black box function
         f = RosettaEnergyBlackBox(
@@ -164,6 +166,7 @@ class RosettaEnergyProblemFactory(AbstractProblemFactory):
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
+            force_isolation=force_isolation
         )
 
         # Your first input (an np.array[str] of shape [b, L] or [b,])
