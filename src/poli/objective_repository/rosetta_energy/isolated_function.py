@@ -1,4 +1,5 @@
 from __future__ import annotations
+from inspect import istraceback
 from pathlib import Path
 from typing import List
 import logging
@@ -6,9 +7,9 @@ import os
 
 import numpy as np
 import pyrosetta
-from pyrosetta.toolbox import cleanATOM
-from pyrosetta.rosetta.core.scoring import fa_rep
-from pyrosetta.rosetta.core.scoring import get_score_function
+from pyrosetta.toolbox import cleanATOM, mutate_residue
+from pyrosetta.rosetta.core.scoring import fa_rep, get_score_function, ScoreFunctionFactory
+from pyrosetta.rosetta.core.pose import deep_copy
 from pyrosetta.rosetta.protocols.relax import FastRelax
 from pyrosetta.rosetta.protocols.loops import get_fa_scorefxn
 from pyrosetta.rosetta.protocols.minimization_packing import MinMover, PackRotamersMover
@@ -27,8 +28,9 @@ class RosettaEnergyIsolatedLogic(AbstractIsolatedFunction):
 
     Parameters
     ----------
-    wildtype_pdb_path : Union[Path, List[Path]]
-        The path(s) to the wildtype PDB file(s), by default None.
+    wildtype_pdb_path : Path
+        The path to the wildtype PDB file(s), by default None.
+        NOTE: currently only for single PDB files implemented -- List of Paths not yet supported!
     score_function : str, optional
         Which Rosetta score function to use. Options are [ref2015 , default , centroid , fa].
         The default function references ref2015.
@@ -49,12 +51,26 @@ class RosettaEnergyIsolatedLogic(AbstractIsolatedFunction):
     clean : bool, optional
         Flag whether to apply PDB cleaning routine prior to pose loading of reference.
         Default is True.
+    relax: bool, optional
+        Flag whether to apply relaxation protocol. Default enabled.
+        NOTE: disable if fast compute required 
+    pack: bool, optional
+        Flag whether to apply packing protocol. Default enabled.
+        NOTE: disable if fast compute required
+    cycle: int, optional
+        Number of relaxation cycles applied.
+    constraint_weight: int, optional
+        Constraint on scoring function for atom-pair, angles, coordinates.
 
     Methods
     -------
     _apply_on_sequence(x, context=None)
         The main black box method that performs the computation, i.e.
         it computes the energy units of the mutant(s) in x.
+    _check_pose_steric_clashes(mutant_pose)
+        Checks for steric clashes of variant pose against WT pose, returns boolean.
+    _apply_relax_pack(mutant_pose)
+        Apply pack and relax routines on pose.
 
     Raises
     ------
@@ -70,8 +86,8 @@ class RosettaEnergyIsolatedLogic(AbstractIsolatedFunction):
     """
     def __init__(
         self,
-        wildtype_pdb_path: Path | List[Path],
-        score_function: str = "ref2015",
+        wildtype_pdb_path: Path,
+        score_function: str = "default",
         seed: int = 0,
         unit: str = "DDG",
         conversion_factor: float = 2.9,
@@ -79,14 +95,16 @@ class RosettaEnergyIsolatedLogic(AbstractIsolatedFunction):
         relax: bool = True,
         pack: bool = True,
         cycle: int = 3,
+        constraint_weight: float | int = 5,
         n_threads: int = 4,
     ):
         # set number of threads prior to initializing Rosetta
         os.environ["OMP_NUM_THREADS"] = str(n_threads)
-        pyrosetta.init(extra_options=f"-corre.pack:omp_threads {n_threads}")
+        pyrosetta.init(extra_options=f"-nthreads {n_threads}")
         self.conversion_factor = conversion_factor  # iff ddGs computed from REUs
         self.relax = relax  # do we use FastRelax?
         self.cycle = cycle  # iterations on relax protocol
+        self.constraint_weight = constraint_weight
         valid_units = ["DDG", "REU", "DREU"]
         if unit.upper() not in valid_units:
             raise AssertionError(f"Output unit {unit} not a valid unit: {valid_units}")
@@ -95,8 +113,12 @@ class RosettaEnergyIsolatedLogic(AbstractIsolatedFunction):
             pyrosetta.rosetta.basic.random.init_random_generators(seed, "mt19937")
         self.score_function_identifier = score_function
         self.energy_function = self.__get_score_fn(score_function)
-        self.energy_function.set_weight(pyrosetta.rosetta.core.scoring.ScoreType.atom_pair_constraint, 3)
-        self.energy_function.set_weight(pyrosetta.rosetta.core.scoring.ScoreType.coordinate_constraint, 5)
+        self.energy_function.set_weight(pyrosetta.rosetta.core.scoring.ScoreType.atom_pair_constraint, self.constraint_weight)
+        self.energy_function.set_weight(pyrosetta.rosetta.core.scoring.ScoreType.coordinate_constraint, self.constraint_weight)
+        self.energy_function.set_weight(pyrosetta.rosetta.core.scoring.ScoreType.angle_constraint, self.constraint_weight)
+        self.x0 = np.array([parse_pdb_as_residue_strings(pdb_path)])
+        if not isinstance(wildtype_pdb_path, Path):
+            raise TypeError(f"{wildtype_pdb_path} is not a Path")
         if clean:
             cleanATOM(wildtype_pdb_path)
             self.pose = pyrosetta.pose_from_pdb(str(wildtype_pdb_path.with_suffix(".clean.pdb")))
@@ -110,14 +132,18 @@ class RosettaEnergyIsolatedLogic(AbstractIsolatedFunction):
             self.packer = PackRotamersMover(self.energy_function, pack_task)
             self.packer.apply(self.pose)
         self.relax = None
+        # set MinMover; NOTE: suitable for small changes to structure
+        self.mover = MinMover()
+        # self.mover.min_type("lbfgs_armijo_nonmonotone")
+        self.mover.score_function(self.energy_function)
         # set relax protocol; NOTE: relax & pack required when larger/destabilizing changes are introduced
         if relax:
             self.relax = FastRelax(self.energy_function, self.cycle)
+            cartesian_scoring = bool("cart" in self.score_function_identifier)
+            self.relax.cartesian(cartesian_scoring)
+            self.relax.minimize_bond_angles(cartesian_scoring)
+            self.relax.minimize_bond_lengths(cartesian_scoring)
             self.relax.apply(self.pose)
-        # set MinMover; NOTE: suitable for small changes to structure
-        self.mover = MinMover()
-        self.mover.min_type("lbfgs_armijo_nonmonotone")
-        self.mover.score_function(self.energy_function)
         self.wt_score = self.energy_function.score(self.pose)
         self.wt_fa_rep = self.pose.energies().total_energies()[fa_rep]
     
@@ -126,40 +152,49 @@ class RosettaEnergyIsolatedLogic(AbstractIsolatedFunction):
             return get_score_function(True)
         elif score_function_identifier == "ref2015":
             return get_score_function(True)
+        elif score_function_identifier == "ref2015_cart":
+            return ScoreFunctionFactory.create_score_function(score_function_identifier)
         elif score_function_identifier == "centroid":
             return get_score_function(False)
+        elif score_function_identifier == "franklin2019":
+            # TODO: requires AddMembraneMover , not yet functional!
+            return ScoreFunctionFactory.create_score_function(score_function_identifier)
         elif score_function_identifier == "fa":
             return get_fa_scorefxn()
         else:
-            raise NotImplementedError
+            raise NotImplementedError("Invalid scoring function!")
 
     def __call__(self, x: np.ndarray, context=None) -> np.ndarray:
         y = np.empty([x.shape[0], 1])
         for i in range(x.shape[0]):
-            seq = "".join(x[i, :].tolist())
-            y[i, 0] = self._apply_on_sequence(seq)
+            y[i, 0] = self._apply_on_sequence(x[i, :])
         return y
 
-    def _apply_on_sequence(self, seq: str) -> float:
-        protein_pose = pyrosetta.pose_from_sequence(seq)
-        self.mover.apply(protein_pose)
-        REU = self.energy_function.score(protein_pose)
+    def _apply_on_sequence(self, seq_arr: str | np.ndarray) -> float:
+        if not isinstance(seq_arr, np.ndarray):
+            seq_arr = np.array(list(seq_arr))
+        seq_arr = np.atleast_2d(seq_arr)
+        pose_mutant = deep_copy(self.pose)
+        diff_rosetta_idx = np.where(self.x0 != seq_arr)[1] + 1  # get diff indices (Rosetta indexes at 1)
+        diff_residues = seq_arr[self.x0 != seq_arr]  # get residue mutant diff to WT
+        for idx, res in zip(diff_rosetta_idx, diff_residues):
+            mutate_residue(pose_mutant, idx, res)  # inplace mutation on pose copy
+        self.mover.apply(pose_mutant)
+        REU = self.energy_function.score(pose_mutant)
         clashes = False
         if self.relax is not None and self.pack is not None:
-            clashes = self._check_pose_steric_clashes(mutant_pose=protein_pose)
+            clashes = self._check_pose_steric_clashes(mutant_pose=pose_mutant)
         if clashes:
             logging.info("Steric clashes detected, attempt recovery by relax and pack-minimize...")
-            self._apply_relax_pack(protein_pose)
+            self._apply_relax_pack(pose_mutant)
             logging.info("Recompute energy function")
-            REU = self.energy_function.score(protein_pose)
+            REU = self.energy_function.score(pose_mutant)
         if self.unit == "REU":
             return REU
         elif self.unit == "DREU":
             print(self.wt_score)
             return REU - self.wt_score
         elif self.unit == "DDG":
-            print("WT")
-            print(self.wt_score)
             return ( REU - self.wt_score ) / self.conversion_factor
         else:
             RuntimeError("Output unit not specified correctly!")
@@ -189,6 +224,7 @@ if __name__ == "__main__":
     isolated_logic = RosettaEnergyIsolatedLogic(unit="DDG", wildtype_pdb_path=pdb_path)
 
     y = isolated_logic._apply_on_sequence("".join(seq))
+    print(isolated_logic.x0)
     print(y)
     print("batched")
     seq_arr = np.vstack([np.array(seq) for i in range(5)])
