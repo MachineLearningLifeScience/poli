@@ -192,7 +192,6 @@ class RosettaEnergyIsolatedLogic(AbstractIsolatedFunction):
         if self.unit == "REU":
             return REU
         elif self.unit == "DREU":
-            print(self.wt_score)
             return REU - self.wt_score
         elif self.unit == "DDG":
             return ( REU - self.wt_score ) / self.conversion_factor
@@ -209,26 +208,11 @@ class RosettaEnergyIsolatedLogic(AbstractIsolatedFunction):
 
 
 if __name__ == "__main__":
-    # from poli.core.registry import register_isolated_function
+    from poli.core.registry import register_isolated_function
 
-    # register_isolated_function(
-    #     RosettaEnergyIsolatedLogic,  # Your function, designed to be isolated
-    #     name=rosetta_energy_information.get_problem_name() + "__isolated",  #  Same name as the problem and folder, ending on __isolated.
-    #     conda_environment_name="poli__rosetta_energy",  # The name of the conda env inside environment.yml.
-    # )
-    from poli.core.util.proteins.pdb_parsing import parse_pdb_as_residue_strings
-
-    pdb_path = Path(ROSETTA_ENERGY_DIR) / "1ggx.pdb"
-    seq = parse_pdb_as_residue_strings(pdb_path)
-    
-    isolated_logic = RosettaEnergyIsolatedLogic(unit="DDG", wildtype_pdb_path=pdb_path)
-
-    y = isolated_logic._apply_on_sequence("".join(seq))
-    print(isolated_logic.x0)
-    print(y)
-    print("batched")
-    seq_arr = np.vstack([np.array(seq) for i in range(5)])
-    for i in range(seq_arr.shape[0]):
-        seq_arr[i,10+i] = "A"
-    y = isolated_logic(seq_arr)
-    print(y)
+    register_isolated_function(
+        RosettaEnergyIsolatedLogic,
+        name="rosetta_energy__isolated",
+        conda_environment_name="poli__rosetta_energy",
+        force=True,
+    )
