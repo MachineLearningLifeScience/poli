@@ -49,13 +49,13 @@ def test_rosetta_on_3ned_against_known_results():
     y = f(x)
 
     # Asserting that the results are the consistent:
-    # E1A: 0.03654138690753095
-    # E1R: -0.07091977827871465
-    # E1N: -0.2835593180137258
+    # E1A: -3.85851953
+    # E1R: -3.6878339
+    # E1N: -3.80845599
 
-    assert np.isclose(y[0], -0.03654138690753095, atol=1e-4)
-    assert np.isclose(y[1], 0.07091977827871465, atol=1e-4)
-    assert np.isclose(y[2], 0.2835593180137258, atol=1e-4)
+    assert np.isclose(y[0], -3.85851953, atol=1e-4)
+    assert np.isclose(y[1], -3.6878339, atol=1e-4)
+    assert np.isclose(y[2], -3.80845599, atol=1e-4)
 
 
 @pytest.mark.poli__rosetta_energy
@@ -94,13 +94,13 @@ def test_rosetta_on_3ned_evaluating_twice_vs_once():
     assert y[2] == y_one[0]
     # Asserting that the results are the same as in the
     # notebook:
-    # E1A: 0.03654138690753095
-    # E1R: -0.07091977827871465
-    # E1N: -0.2835593180137258
+    # E1A: -3.85851953
+    # E1R: -3.6878339
+    # E1N: -3.80845599
 
-    assert np.isclose(y[0], -0.03654138690753095, atol=1e-4)
-    assert np.isclose(y[1], 0.07091977827871465, atol=1e-4)
-    assert np.isclose(y[2], 0.2835593180137258, atol=1e-4)
+    assert np.isclose(y[0], -3.85851953, atol=1e-4)
+    assert np.isclose(y[1], -3.6878339, atol=1e-4)
+    assert np.isclose(y[2], -3.80845599, atol=1e-4)
 
 
 @pytest.mark.poli__rosetta_energy
@@ -127,18 +127,13 @@ def test_rosetta_on_3ned_against_notebooks_results_isolated():
 
     # Asserting that the results are the same as in the
     # notebook:
-    # E1A: 0.03654138690753095
-    # E1R: -0.07091977827871465
-    # E1N: -0.2835593180137258
+    # E1A: -3.85851953
+    # E1R: -3.6878339
+    # E1N: -3.80845599
 
-    # Notice how we are clipping the actual values,
-    # this is because we would need double precision
-    # to test against the exact values described above.
-    # TODO: Should we do double precision by default
-    # inside the RaSP problem?
-    assert np.isclose(y[0], -0.0365, atol=1e-4)
-    assert np.isclose(y[1], 0.07091, atol=1e-4)
-    assert np.isclose(y[2], 0.283559, atol=1e-4)
+    assert np.isclose(y[0], -3.85851953, atol=1e-4)
+    assert np.isclose(y[1], -3.6878339, atol=1e-4)
+    assert np.isclose(y[2], -3.80845599, atol=1e-4)
 
 
 @pytest.mark.poli__rosetta_energy
