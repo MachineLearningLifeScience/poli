@@ -15,14 +15,17 @@ def test_rosetta_wt_zero_ddg(unit):
     """
     problem = objective_factory.create(
         name="rosetta_energy",
-        wildtype_pdb_path=THIS_DIR / "1ggx.pdb",
+        wildtype_pdb_path=THIS_DIR / "3ned.pdb",
         relax=False,  # fast compute
         pack=False,
         unit = unit
     )
     f, x0 = problem.black_box, problem.x0
     y0 = f(x0)
-    assert f.wt_score == y0
+    if unit == "REU":
+        assert f.inner_function.wt_score == y0
+    else:
+        assert np.isclose(y0, 0.)
 
 
 @pytest.mark.poli__rosetta_energy
