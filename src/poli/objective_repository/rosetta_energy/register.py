@@ -204,7 +204,7 @@ class RosettaEnergyBlackBox(AbstractBlackBox):
         Returns the black box information for Rosetta.
         """
         is_fixed_length = True
-        max_sequence_length = len("".join(self.x0))
+        max_sequence_length = len("".join(list(self.x0[0])))
         return BlackBoxInformation(
             name="rosetta_energy",
             max_sequence_length=max_sequence_length,
