@@ -84,6 +84,9 @@ def test_rosetta_on_3ned_sequence_mutations_correct():
         wildtype_sequence[:9] + "N" + wildtype_sequence[10:],
     ]
 
+    x = np.array([list(mutation) for mutation in three_mutations])
+    f(x) # function call required to populate x_t property
+
     # Asserting that the mutations are according to expectations
     # E1A
     # M5R
