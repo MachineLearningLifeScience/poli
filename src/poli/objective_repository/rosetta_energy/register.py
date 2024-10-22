@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from pathlib import Path
 from typing import Callable, List
 
@@ -15,7 +16,6 @@ from poli.core.util.isolation.instancing import (
 from poli.objective_repository.rosetta_energy.information import (
     rosetta_energy_information,
 )
-
 
 CONSENT_FILE = Path(__file__).parent.resolve() / ".pyrosetta_accept.txt"
 

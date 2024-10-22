@@ -1,23 +1,24 @@
 from __future__ import annotations
+
+import logging
+import os
 from inspect import istraceback
 from pathlib import Path
 from typing import List
-import logging
-import os
 
 import numpy as np
 import pyrosetta
-from pyrosetta.toolbox import cleanATOM, mutate_residue
+from pyrosetta.rosetta.core.pack.task import TaskFactory
+from pyrosetta.rosetta.core.pose import deep_copy
 from pyrosetta.rosetta.core.scoring import (
+    ScoreFunctionFactory,
     fa_rep,
     get_score_function,
-    ScoreFunctionFactory,
 )
-from pyrosetta.rosetta.core.pose import deep_copy
-from pyrosetta.rosetta.protocols.relax import FastRelax
 from pyrosetta.rosetta.protocols.loops import get_fa_scorefxn
 from pyrosetta.rosetta.protocols.minimization_packing import MinMover, PackRotamersMover
-from pyrosetta.rosetta.core.pack.task import TaskFactory
+from pyrosetta.rosetta.protocols.relax import FastRelax
+from pyrosetta.toolbox import cleanATOM, mutate_residue
 
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
 from poli.core.util.proteins.pdb_parsing import parse_pdb_as_residue_strings
