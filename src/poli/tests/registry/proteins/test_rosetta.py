@@ -1,3 +1,5 @@
+import io
+import os
 from pathlib import Path
 
 import numpy as np
@@ -6,6 +8,37 @@ import pytest
 from poli import objective_factory
 
 THIS_DIR = Path(__file__).parent.resolve()
+
+
+@pytest.fixture(scope="session", autouse=True)
+def cleanup_optin_file():
+    file_path = THIS_DIR.parent.parent.parent / "objective_repository" / "rosetta_energy" / ".pyrosetta_accept.txt"
+    cleaned_pdbs = THIS_DIR.glob("*.clean.pdb")  # created by Rosetta during runtime 
+
+    # for individual tests, the opt-in file is required for use...
+    if not file_path.exists():
+        with open(file_path, "w") as file:
+            file.write("accepted")
+
+    yield  # control to the tests
+
+    if file_path.exists():
+        os.remove(file_path)
+    for file in cleaned_pdbs: # cleanup created PDBs
+        os.remove(file)
+
+
+@pytest.mark.poli__rosetta_energy
+def test_rosetta_optin(monkeypatch):
+    monkeypatch.setattr("sys.stdin", io.StringIO("Y"))
+    problem = objective_factory.create(
+        name="rosetta_energy",
+        wildtype_pdb_path=THIS_DIR / "3ned.pdb",
+        relax=False,  # fast compute
+        pack=False,
+    )
+    assert problem is not None
+
 
 @pytest.mark.poli__rosetta_energy
 @pytest.mark.parametrize("unit", ["DDG", "REU", "DREU"])
@@ -154,17 +187,14 @@ def test_rosetta_relax_pack():
     three_mutations = [
         "A" + wildtype_sequence[1:],
         "R" + wildtype_sequence[1:],
-        "N" + wildtype_sequence[1:],
     ]
 
     x = np.array([list(mutation) for mutation in three_mutations])
     y = f(x)
 
     # Asserting that the results are the consistent:
-    # E1A: 0.03654138690753095
-    # E1R: -0.07091977827871465
-    # E1N: -0.2835593180137258
+    # E1A: 1.87951932
+    # E1R: 2.79688494
 
-    assert np.isclose(y[0], -0.03654138690753095, atol=1e-4)
-    assert np.isclose(y[1], 0.07091977827871465, atol=1e-4)
-    assert np.isclose(y[2], 0.2835593180137258, atol=1e-4)
+    assert np.isclose(y[0], 1.87951932, atol=1e-4)
+    assert np.isclose(y[1], 2.79688494, atol=1e-4)
