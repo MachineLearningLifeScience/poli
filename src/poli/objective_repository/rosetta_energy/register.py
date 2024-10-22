@@ -104,7 +104,7 @@ class RosettaEnergyBlackBox(AbstractBlackBox):
             )
             self.inner_function = opt_in_wrapper(inner_function)
             self.x0 = self.inner_function.x0
-            
+
         except ImportError:
             # If we weren't able to import it, we can still
             # create it in an isolated process:
