@@ -26,10 +26,8 @@ from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
-from poli.core.util.isolation.instancing import (
-    get_inner_function,
-    instance_function_as_isolated_process,
-)
+from poli.core.util.isolation.instancing import get_inner_function
+from poli.core.util.proteins.defaults import AMINO_ACIDS
 from poli.objective_repository.rosetta_energy.information import (
     rosetta_energy_information,
 )
@@ -163,34 +161,25 @@ class RosettaEnergyBlackBox(AbstractBlackBox):
         self.constraint_weight = constraint_weight
         self.n_threads = n_threads
 
-        try:
-
-            inner_function = get_inner_function(
-                isolated_function_name="rosetta_energy__isolated",
-                class_name="RosettaEnergyIsolatedLogic",
-                module_to_import="poli.objective_repository.rosetta_energy.isolated_function",
-                force_isolation=self.force_isolation,
-                wildtype_pdb_path=self.wildtype_pdb_path,
-                score_function=self.score_function,
-                seed=self.seed,
-                unit=self.unit,
-                conversion_factor=self.conversion_factor,
-                clean=self.clean,
-                relax=self.relax,
-                pack=self.pack,
-                cycle=self.cycle,
-                constraint_weight=self.constraint_weight,
-                n_threads=self.n_threads,
-            )
-            self.inner_function = opt_in_wrapper(inner_function)
-            self.x0 = self.inner_function.x0
-
-        except ImportError:
-            # If we weren't able to import it, we can still
-            # create it in an isolated process:
-            self.inner_function = instance_function_as_isolated_process(
-                name=self.info.get_problem_name()  # The same name in `isolated_function.py`.
-            )
+        inner_function = get_inner_function(
+            isolated_function_name="rosetta_energy__isolated",
+            class_name="RosettaEnergyIsolatedLogic",
+            module_to_import="poli.objective_repository.rosetta_energy.isolated_function",
+            force_isolation=self.force_isolation,
+            wildtype_pdb_path=self.wildtype_pdb_path,
+            score_function=self.score_function,
+            seed=self.seed,
+            unit=self.unit,
+            conversion_factor=self.conversion_factor,
+            clean=self.clean,
+            relax=self.relax,
+            pack=self.pack,
+            cycle=self.cycle,
+            constraint_weight=self.constraint_weight,
+            n_threads=self.n_threads,
+        )
+        self.inner_function = opt_in_wrapper(inner_function)
+        self.x0 = self.inner_function.x0
 
     def _black_box(self, x: np.ndarray, context: dict = None) -> np.ndarray:
         """
@@ -210,13 +199,24 @@ class RosettaEnergyBlackBox(AbstractBlackBox):
         """
         return self.inner_function(x, context)
 
-    # A static method that gives you access to the information.
-    @staticmethod
-    def get_black_box_info() -> BlackBoxInformation:
+    def get_black_box_info(self) -> BlackBoxInformation:
         """
         Returns the black box information for Rosetta.
         """
-        return rosetta_energy_information
+        is_fixed_length = True
+        max_sequence_length = len("".join(self.x0))
+        return BlackBoxInformation(
+            name="rosetta_energy",
+            max_sequence_length=max_sequence_length,
+            aligned=False,
+            fixed_length=is_fixed_length,
+            deterministic=False,
+            alphabet=AMINO_ACIDS,
+            log_transform_recommended=False,
+            discrete=True,
+            fidelity="high",
+            padding_token="",
+        )
 
 
 class RosettaEnergyProblemFactory(AbstractProblemFactory):
