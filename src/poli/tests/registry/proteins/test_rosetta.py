@@ -67,6 +67,36 @@ def test_rosetta_wt_zero_ddg(unit):
 
 
 @pytest.mark.poli__rosetta_energy
+def test_rosetta_on_3ned_sequence_mutations_correct():
+    problem = objective_factory.create(
+        name="rosetta_energy",
+        wildtype_pdb_path=THIS_DIR / "3ned.pdb",
+        relax=False,  # fast compute
+        pack=False,
+        clean=False,  # keep sequences as loaded for consistent testing against PDB
+    )
+    f, x0 = problem.black_box, problem.x0
+
+    wildtype_sequence = "".join(x0[0])
+    three_mutations = [
+        "A" + wildtype_sequence[1:],
+        wildtype_sequence[:4] + "R" + wildtype_sequence[5:],
+        wildtype_sequence[:9] + "N" + wildtype_sequence[10:],
+    ]
+
+    x = np.array([list(mutation) for mutation in three_mutations])
+    y = f(x)
+
+    # Asserting that the mutations are according to expectations
+    # E1A
+    # M5R
+    # E10N
+
+    for i, mutant in enumerate(three_mutations):
+        assert mutant[:20] == f.inner_function.x_t[i][:20]
+
+
+@pytest.mark.poli__rosetta_energy
 def test_rosetta_on_3ned_against_known_results():
     problem = objective_factory.create(
         name="rosetta_energy",

@@ -162,6 +162,7 @@ class RosettaEnergyIsolatedLogic(AbstractIsolatedFunction):
             self.relax.apply(self.pose)
         self.wt_score = self.energy_function.score(self.pose)
         self.wt_fa_rep = self.pose.energies().total_energies()[fa_rep]
+        self.x_t = None  # track sequences as property
 
     def __get_score_fn(self, score_function_identifier: str):
         if score_function_identifier == "default":
@@ -181,6 +182,7 @@ class RosettaEnergyIsolatedLogic(AbstractIsolatedFunction):
             raise NotImplementedError("Invalid scoring function!")
 
     def __call__(self, x: np.ndarray, context=None) -> np.ndarray:
+        self.x_t = []
         y = np.empty([x.shape[0], 1])
         for i in range(x.shape[0]):
             y[i, 0] = self._apply_on_sequence(x[i, :])
@@ -197,6 +199,7 @@ class RosettaEnergyIsolatedLogic(AbstractIsolatedFunction):
         diff_residues = seq_arr[self.x0 != seq_arr]  # get residue mutant diff to WT
         for idx, res in zip(diff_rosetta_idx, diff_residues):
             mutate_residue(pose_mutant, idx, res)  # inplace mutation on pose copy
+        self.x_t.append(pose_mutant.sequence())
         self.mover.apply(pose_mutant)
         REU = self.energy_function.score(pose_mutant)
         clashes = False
