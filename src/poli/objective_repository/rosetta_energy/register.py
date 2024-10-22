@@ -85,9 +85,6 @@ class RosettaEnergyBlackBox(AbstractBlackBox):
         self.n_threads = n_threads
 
         try:
-            from poli.objective_repository.rosetta_energy.isolated_function import (
-                RosettaEnergyIsolatedLogic,
-            )
 
             inner_function = get_inner_function(
                 isolated_function_name="rosetta_energy__isolated",
@@ -107,6 +104,7 @@ class RosettaEnergyBlackBox(AbstractBlackBox):
             )
             self.inner_function = opt_in_wrapper(inner_function)
             self.x0 = self.inner_function.x0
+            
         except ImportError:
             # If we weren't able to import it, we can still
             # create it in an isolated process:

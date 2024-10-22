@@ -2,9 +2,7 @@ from __future__ import annotations
 
 import logging
 import os
-from inspect import istraceback
 from pathlib import Path
-from typing import List
 
 import numpy as np
 import pyrosetta
