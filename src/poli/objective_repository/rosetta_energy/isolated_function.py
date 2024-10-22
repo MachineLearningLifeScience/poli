@@ -8,7 +8,11 @@ import os
 import numpy as np
 import pyrosetta
 from pyrosetta.toolbox import cleanATOM, mutate_residue
-from pyrosetta.rosetta.core.scoring import fa_rep, get_score_function, ScoreFunctionFactory
+from pyrosetta.rosetta.core.scoring import (
+    fa_rep,
+    get_score_function,
+    ScoreFunctionFactory,
+)
 from pyrosetta.rosetta.core.pose import deep_copy
 from pyrosetta.rosetta.protocols.relax import FastRelax
 from pyrosetta.rosetta.protocols.loops import get_fa_scorefxn
@@ -39,14 +43,14 @@ class RosettaEnergyIsolatedLogic(AbstractIsolatedFunction):
         Overwrite Rosetta random seed with own integer, uses mt19937 RT reference (as per Rosetta default).
     unit : str, optional
         Output unit of black-box. Default is delta REU, which is difference between variant and wild-type.
-        Alternatives are: 
-            REU -- raw energy function computed value, 
+        Alternatives are:
+            REU -- raw energy function computed value,
             DDG -- scaled delta REU
     conversion_factor : float, optional
-        Scaling factor applied when computing DDGs (DDG=deltaREU/conversion_factor). Only applies to DDG conversion. 
+        Scaling factor applied when computing DDGs (DDG=deltaREU/conversion_factor). Only applies to DDG conversion.
         Default is '2.9' following:
-            Park, Hahnbeom, et al. 
-            "Simultaneous optimization of biomolecular energy functions on features from small molecules and macromolecules." 
+            Park, Hahnbeom, et al.
+            "Simultaneous optimization of biomolecular energy functions on features from small molecules and macromolecules."
             Journal of chemical theory and computation 12.12 (2016): 6201-6212.
             DOI: https://doi.org/10.1021/acs.jctc.6b00819
     clean : bool, optional
@@ -54,7 +58,7 @@ class RosettaEnergyIsolatedLogic(AbstractIsolatedFunction):
         Default is True.
     relax: bool, optional
         Flag whether to apply relaxation protocol. Default enabled.
-        NOTE: disable if fast compute required 
+        NOTE: disable if fast compute required
     pack: bool, optional
         Flag whether to apply packing protocol. Default enabled.
         NOTE: disable if fast compute required
@@ -85,6 +89,7 @@ class RosettaEnergyIsolatedLogic(AbstractIsolatedFunction):
     -----
     - The wildtype_pdb_path is a single Path object.
     """
+
     def __init__(
         self,
         wildtype_pdb_path: Path,
@@ -114,15 +119,26 @@ class RosettaEnergyIsolatedLogic(AbstractIsolatedFunction):
             pyrosetta.rosetta.basic.random.init_random_generators(seed, "mt19937")
         self.score_function_identifier = score_function
         self.energy_function = self.__get_score_fn(score_function)
-        self.energy_function.set_weight(pyrosetta.rosetta.core.scoring.ScoreType.atom_pair_constraint, self.constraint_weight)
-        self.energy_function.set_weight(pyrosetta.rosetta.core.scoring.ScoreType.coordinate_constraint, self.constraint_weight)
-        self.energy_function.set_weight(pyrosetta.rosetta.core.scoring.ScoreType.angle_constraint, self.constraint_weight)
+        self.energy_function.set_weight(
+            pyrosetta.rosetta.core.scoring.ScoreType.atom_pair_constraint,
+            self.constraint_weight,
+        )
+        self.energy_function.set_weight(
+            pyrosetta.rosetta.core.scoring.ScoreType.coordinate_constraint,
+            self.constraint_weight,
+        )
+        self.energy_function.set_weight(
+            pyrosetta.rosetta.core.scoring.ScoreType.angle_constraint,
+            self.constraint_weight,
+        )
         self.x0 = np.array([parse_pdb_as_residue_strings(wildtype_pdb_path)])
         if not isinstance(wildtype_pdb_path, Path):
             raise TypeError(f"{wildtype_pdb_path} is not a Path")
         if clean:
             cleanATOM(wildtype_pdb_path)
-            self.pose = pyrosetta.pose_from_pdb(str(wildtype_pdb_path.with_suffix(".clean.pdb")))
+            self.pose = pyrosetta.pose_from_pdb(
+                str(wildtype_pdb_path.with_suffix(".clean.pdb"))
+            )
         else:
             self.pose = pyrosetta.pose_from_pdb(str(wildtype_pdb_path))
         # set packing protocol
@@ -147,7 +163,7 @@ class RosettaEnergyIsolatedLogic(AbstractIsolatedFunction):
             self.relax.apply(self.pose)
         self.wt_score = self.energy_function.score(self.pose)
         self.wt_fa_rep = self.pose.energies().total_energies()[fa_rep]
-    
+
     def __get_score_fn(self, score_function_identifier: str):
         if score_function_identifier == "default":
             return get_score_function(True)
@@ -176,7 +192,9 @@ class RosettaEnergyIsolatedLogic(AbstractIsolatedFunction):
             seq_arr = np.array(list(seq_arr))
         seq_arr = np.atleast_2d(seq_arr)
         pose_mutant = deep_copy(self.pose)
-        diff_rosetta_idx = np.where(self.x0 != seq_arr)[1] + 1  # get diff indices (Rosetta indexes at 1)
+        diff_rosetta_idx = (
+            np.where(self.x0 != seq_arr)[1] + 1
+        )  # get diff indices (Rosetta indexes at 1)
         diff_residues = seq_arr[self.x0 != seq_arr]  # get residue mutant diff to WT
         for idx, res in zip(diff_rosetta_idx, diff_residues):
             mutate_residue(pose_mutant, idx, res)  # inplace mutation on pose copy
@@ -186,7 +204,9 @@ class RosettaEnergyIsolatedLogic(AbstractIsolatedFunction):
         if self.relax is not None and self.pack is not None:
             clashes = self._check_pose_steric_clashes(mutant_pose=pose_mutant)
         if clashes:
-            logging.info("Steric clashes detected, attempt recovery by relax and pack-minimize...")
+            logging.info(
+                "Steric clashes detected, attempt recovery by relax and pack-minimize..."
+            )
             self._apply_relax_pack(pose_mutant)
             logging.info("Recompute energy function")
             REU = self.energy_function.score(pose_mutant)
@@ -195,14 +215,14 @@ class RosettaEnergyIsolatedLogic(AbstractIsolatedFunction):
         elif self.unit == "DREU":
             return REU - self.wt_score
         elif self.unit == "DDG":
-            return ( REU - self.wt_score ) / self.conversion_factor
+            return (REU - self.wt_score) / self.conversion_factor
         else:
             RuntimeError("Output unit not specified correctly!")
 
     def _check_pose_steric_clashes(self, mutant_pose: object) -> bool:
         mutant_fa_rep = mutant_pose.energies().total_energies()[fa_rep]
         return bool(mutant_fa_rep > self.wt_fa_rep)
-    
+
     def _apply_relax_pack(self, mutant_pose: object) -> None:
         self.pack.apply(mutant_pose)
         self.relax.apply(mutant_pose)

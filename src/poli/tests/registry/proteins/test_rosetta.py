@@ -12,8 +12,13 @@ THIS_DIR = Path(__file__).parent.resolve()
 
 @pytest.fixture(scope="session", autouse=True)
 def cleanup_optin_file():
-    file_path = THIS_DIR.parent.parent.parent / "objective_repository" / "rosetta_energy" / ".pyrosetta_accept.txt"
-    cleaned_pdbs = THIS_DIR.glob("*.clean.pdb")  # created by Rosetta during runtime 
+    file_path = (
+        THIS_DIR.parent.parent.parent
+        / "objective_repository"
+        / "rosetta_energy"
+        / ".pyrosetta_accept.txt"
+    )
+    cleaned_pdbs = THIS_DIR.glob("*.clean.pdb")  # created by Rosetta during runtime
 
     # for individual tests, the opt-in file is required for use...
     if not file_path.exists():
@@ -24,7 +29,7 @@ def cleanup_optin_file():
 
     if file_path.exists():
         os.remove(file_path)
-    for file in cleaned_pdbs: # cleanup created PDBs
+    for file in cleaned_pdbs:  # cleanup created PDBs
         os.remove(file)
 
 
@@ -51,14 +56,14 @@ def test_rosetta_wt_zero_ddg(unit):
         wildtype_pdb_path=THIS_DIR / "3ned.pdb",
         relax=False,  # fast compute
         pack=False,
-        unit = unit
+        unit=unit,
     )
     f, x0 = problem.black_box, problem.x0
     y0 = f(x0)
     if unit == "REU":
         assert f.inner_function.wt_score == y0
     else:
-        assert np.isclose(y0, 0.)
+        assert np.isclose(y0, 0.0)
 
 
 @pytest.mark.poli__rosetta_energy

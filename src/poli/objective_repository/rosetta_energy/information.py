@@ -10,5 +10,5 @@ rosetta_energy_information = BlackBoxInformation(
     fixed_length=True,
     discrete=True,
     deterministic=False,
-    padding_token=""
+    padding_token="",
 )

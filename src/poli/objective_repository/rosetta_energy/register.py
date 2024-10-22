@@ -8,7 +8,10 @@ from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
-from poli.core.util.isolation.instancing import get_inner_function, instance_function_as_isolated_process
+from poli.core.util.isolation.instancing import (
+    get_inner_function,
+    instance_function_as_isolated_process,
+)
 from poli.objective_repository.rosetta_energy.information import (
     rosetta_energy_information,
 )
@@ -27,13 +30,17 @@ def has_opted_in(consent_file: Path = CONSENT_FILE) -> bool:
 
 def opt_in_wrapper(f: Callable, *args, **kwargs):
     if not has_opted_in():
-        agreement = input("I have read and accept the License Agreements of PyRosetta, subject to the Rosetta™ license. ([Y]es/[N]o) \n See https://www.pyrosetta.org/home/licensing-pyrosetta and https://els2.comotion.uw.edu/product/rosetta .")
+        agreement = input(
+            "I have read and accept the License Agreements of PyRosetta, subject to the Rosetta™ license. ([Y]es/[N]o) \n See https://www.pyrosetta.org/home/licensing-pyrosetta and https://els2.comotion.uw.edu/product/rosetta ."
+        )
         if agreement.strip().lower() == "yes" or agreement.strip().lower() == "y":
             with open(CONSENT_FILE, "w") as file:
                 file.write("accepted")
             return f
         else:
-            print("You must accept and be in compliance with the original PyRosetta, Rosetta™ license.")
+            print(
+                "You must accept and be in compliance with the original PyRosetta, Rosetta™ license."
+            )
             raise RuntimeError
     else:
         return f
@@ -78,7 +85,10 @@ class RosettaEnergyBlackBox(AbstractBlackBox):
         self.n_threads = n_threads
 
         try:
-            from poli.objective_repository.rosetta_energy.isolated_function import RosettaEnergyIsolatedLogic
+            from poli.objective_repository.rosetta_energy.isolated_function import (
+                RosettaEnergyIsolatedLogic,
+            )
+
             inner_function = get_inner_function(
                 isolated_function_name="rosetta_energy__isolated",
                 class_name="RosettaEnergyIsolatedLogic",
@@ -166,7 +176,7 @@ class RosettaEnergyProblemFactory(AbstractProblemFactory):
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
-            force_isolation=force_isolation
+            force_isolation=force_isolation,
         )
 
         # Your first input (an np.array[str] of shape [b, L] or [b,])
