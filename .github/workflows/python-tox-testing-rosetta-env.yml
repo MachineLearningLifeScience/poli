@@ -1,0 +1,39 @@
+name: poli rosetta (conda, py3.9)
+
+on:
+  push:
+    branches:
+      - dev
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, closed]
+    branches:
+      - dev
+      - master
+  schedule:
+    - cron: '0 0 * * 0'
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    if: github.event.pull_request.draft == false
+    strategy:
+      max-parallel: 5
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.10'
+    - name: Add conda to system path
+      run: |
+        # $CONDA is an environment variable pointing to the root of the miniconda directory
+        echo $CONDA/bin >> $GITHUB_PATH
+    - name: Install dependencies
+      run: |
+        python -m pip install tox
+    - name: Test rasp-related black boxes with tox and pytest
+      run: |
+        tox -c tox.ini -e poli-rosetta_energy-py310
