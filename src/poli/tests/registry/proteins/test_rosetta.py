@@ -85,7 +85,6 @@ def test_rosetta_on_3ned_sequence_mutations_correct():
     ]
 
     x = np.array([list(mutation) for mutation in three_mutations])
-    y = f(x)
 
     # Asserting that the mutations are according to expectations
     # E1A
