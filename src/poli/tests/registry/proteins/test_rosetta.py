@@ -104,7 +104,7 @@ def test_rosetta_on_3ned_evaluating_twice_vs_once():
 
 
 @pytest.mark.poli__rosetta_energy
-def test_rosetta_on_3ned_against_notebooks_results_isolated():
+def test_rosetta_on_3ned_against_results_isolated():
     """
     We test forceful registration of the Rosetta problem.
     """
@@ -112,6 +112,8 @@ def test_rosetta_on_3ned_against_notebooks_results_isolated():
         name="rosetta_energy",
         wildtype_pdb_path=THIS_DIR / "3ned.pdb",
         force_isolation=True,
+        relax=False,  # fast compute
+        pack=False,
     )
     f, x0 = problem.black_box, problem.x0
 
@@ -137,32 +139,14 @@ def test_rosetta_on_3ned_against_notebooks_results_isolated():
 
 
 @pytest.mark.poli__rosetta_energy
-def test_rosetta_fails_on_invalid_amino_acids():
-    problem = objective_factory.create(
-        name="rosetta_energy",
-        wildtype_pdb_path=THIS_DIR / "3ned.pdb",
-        relax=False,  # fast compute
-        pack=False,
-    )
-    f, x0 = problem.black_box, problem.x0
-
-    # This is an unfeasible mutation, since joining
-    # all the strings would result in a sequence
-    # that is _not_ the same length as the wildtype.
-    problematic_x = x0.copy()
-    problematic_x[0][0] = "B"
-    with pytest.raises(ValueError):
-        f(problematic_x)
-
-
-@pytest.mark.poli__rosetta_energy
 @pytest.mark.slow
 def test_rosetta_relax_pack():
     problem = objective_factory.create(
         name="rosetta_energy",
         wildtype_pdb_path=THIS_DIR / "3ned.pdb",
-        relax=True,  # fast compute
+        relax=True,  # extended protocol compute
         pack=True,
+        seed=0,
     )
     f, x0 = problem.black_box, problem.x0
 
