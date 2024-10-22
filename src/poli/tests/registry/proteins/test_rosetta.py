@@ -101,7 +101,7 @@ def test_rosetta_on_3ned_cartesian_against_known_results():
     problem = objective_factory.create(
         name="rosetta_energy",
         wildtype_pdb_path=THIS_DIR / "3ned.pdb",
-        score_function = "ref2015_cart",
+        score_function="ref2015_cart",
         relax=False,  # fast compute
         pack=False,
     )
@@ -125,7 +125,6 @@ def test_rosetta_on_3ned_cartesian_against_known_results():
     assert np.isclose(y[0], -4.06154293, atol=1e-4)
     assert np.isclose(y[1], -3.95461636, atol=1e-4)
     assert np.isclose(y[2], -4.08711725, atol=1e-4)
-
 
 
 @pytest.mark.poli__rosetta_energy
