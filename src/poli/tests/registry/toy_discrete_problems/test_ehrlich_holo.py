@@ -40,11 +40,13 @@ properties/methods of the underlying ExternalIsolatedFunction.
 
 These issues will be addressed by the new isolation interface,
 and if the user installs this black box with
-`pip install poli[ehrlich_holo]` they won't face these issues.
+`pip install poli[ehrlich]` they won't face these issues.
+
+The error we currently get is the following:
+multiprocessing.context.AuthenticationError: digest sent was rejected
 
 Testing it locally seems to work well.
 TODO: install in Colab and test.
-TODO: fix.
 """
 # @pytest.mark.poli__ehrlich_holo
 # def test_ehrlich_holo_works_on_isolation():
@@ -57,7 +59,7 @@ TODO: fix.
 #         epistasis_factor=0.0,
 #         force_isolation=True,
 #     )
-#     x0 = black_box.initial_solution()
+#     x0 = black_box.initial_solution(100)
 #     print(black_box(x0))
 
 #     x_final = black_box.optimal_solution()
