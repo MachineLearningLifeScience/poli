@@ -38,7 +38,10 @@ protein = [
     "python-levenshtein",
     "pdb-tools",
 ]
-ehrlich_holo = [
+ehrlich = [
+    "pytorch-holo",
+]
+ehrlichholo = [
     "pytorch-holo",
 ]
 tdc = [
