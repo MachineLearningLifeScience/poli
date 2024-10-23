@@ -46,22 +46,24 @@ Testing it locally seems to work well.
 TODO: install in Colab and test.
 TODO: fix.
 """
-# @pytest.mark.poli__ehrlich_holo
-# def test_ehrlich_holo_works_on_isolation():
-#     from poli.objective_repository import EhrlichHoloBlackBox
 
-#     black_box = EhrlichHoloBlackBox(
-#         sequence_length=10,
-#         motif_length=3,
-#         n_motifs=2,
-#         epistasis_factor=0.0,
-#         force_isolation=True,
-#     )
-#     x0 = black_box.initial_solution()
-#     print(black_box(x0))
 
-#     x_final = black_box.optimal_solution()
-#     print(black_box(x_final))
+@pytest.mark.poli__ehrlich_holo
+def test_ehrlich_holo_works_on_isolation():
+    from poli.objective_repository import EhrlichHoloBlackBox
+
+    black_box = EhrlichHoloBlackBox(
+        sequence_length=10,
+        motif_length=3,
+        n_motifs=2,
+        epistasis_factor=0.0,
+        force_isolation=True,
+    )
+    x0 = black_box.initial_solution(100)
+    print(black_box(x0))
+
+    x_final = black_box.optimal_solution()
+    print(black_box(x_final))
 
 
 @pytest.mark.poli__ehrlich_holo
@@ -90,3 +92,7 @@ def test_ehrlich_seed_determinism():
 
     assert (black_box(x0) == black_box_2(x0_2)).all()
     assert (x0 == x0_2).all()
+
+
+if __name__ == "__main__":
+    test_ehrlich_holo_works_on_isolation()
