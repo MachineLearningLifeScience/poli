@@ -32,22 +32,6 @@ def test_ehrlich_holo_builds_and_queries():
     print(black_box(x_final))
 
 
-"""
-This test is currently not working on CI. The reason
-seems to be something related to the networking of
-the CI environment, and the fact that we are querying
-properties/methods of the underlying ExternalIsolatedFunction.
-
-These issues will be addressed by the new isolation interface,
-and if the user installs this black box with
-`pip install poli[ehrlich_holo]` they won't face these issues.
-
-Testing it locally seems to work well.
-TODO: install in Colab and test.
-TODO: fix.
-"""
-
-
 @pytest.mark.poli__ehrlich_holo
 def test_ehrlich_holo_works_on_isolation():
     from poli.objective_repository import EhrlichHoloBlackBox
