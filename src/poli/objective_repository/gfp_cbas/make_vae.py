@@ -1,4 +1,7 @@
 import tensorflow as tf
+
+tf.compat.v1.enable_eager_execution()
+
 from tensorflow import keras
 from tensorflow.keras.layers import (
     Add,
@@ -11,9 +14,6 @@ from tensorflow.keras.layers import (
 )
 from tensorflow.keras.models import Model
 from tensorflow.python.keras import backend as K
-
-tf.compat.v1.disable_v2_behavior()
-
 
 MAKE_DETERMINISTIC = True
 
