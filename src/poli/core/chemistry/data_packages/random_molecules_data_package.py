@@ -6,7 +6,7 @@ small molecule optimization: Zinc250k.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Literal
+from typing import Callable, Literal
 
 import numpy as np
 
@@ -47,6 +47,8 @@ class RandomMoleculesDataPackage(DataPackage):
         supervised_data = None
 
         if tokenize_with is not None:
-            unsupervised_data = np.array([tokenize_with(mol) for mol in unsupervised_data if mol is not None])
+            unsupervised_data = np.array(
+                [tokenize_with(mol) for mol in unsupervised_data if mol is not None]
+            )
 
         super().__init__(unsupervised_data, supervised_data)
