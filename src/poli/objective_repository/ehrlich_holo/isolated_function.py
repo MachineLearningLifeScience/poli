@@ -82,11 +82,11 @@ class EhrlichIsolatedLogic(AbstractIsolatedFunction):
 
     @property
     def optimal_solution(self):
-        return self.inner_ehrlich.optimal_solution()
+        return self.inner_ehrlich.optimal_solution().numpy(force=True)
 
     @property
     def random_solution(self):
-        return self.inner_ehrlich.random_solution()
+        return self.inner_ehrlich.random_solution().numpy(force=True)
 
     @property
     def transition_matrix(self):
