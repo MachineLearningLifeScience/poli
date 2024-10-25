@@ -60,9 +60,8 @@ def test_ehrlich_holo_works_on_isolation():
         n_motifs=2,
         epistasis_factor=0.0,
         force_isolation=True,
-        n_initial_points=100,
     )
-    x0 = black_box.initial_solution()
+    x0 = black_box.initial_solution(n_samples=100)
     print(black_box(x0))
 
     x_final = black_box.optimal_solution()
