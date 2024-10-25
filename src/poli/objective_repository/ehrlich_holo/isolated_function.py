@@ -29,6 +29,7 @@ class EhrlichIsolatedLogic(AbstractIsolatedFunction):
         seed: int | None = None,
         epistasis_factor: float = 0.0,
         return_value_on_unfeasible: float = -np.inf,
+        n_initial_points: int = 1,
         alphabet: list[str] = AMINO_ACIDS,
         parallelize: bool = False,
         num_workers: int = None,
@@ -62,6 +63,8 @@ class EhrlichIsolatedLogic(AbstractIsolatedFunction):
             random_seed=seed,
         )
 
+        self.initial_solution = self.inner_ehrlich.initial_solution(n=n_initial_points)
+
     def __call__(self, x: np.ndarray, context: None) -> np.ndarray:
         # First, we transform the strings into integers using the alphabet
         batch_size = x.shape[0]
@@ -74,9 +77,6 @@ class EhrlichIsolatedLogic(AbstractIsolatedFunction):
         values[values == -np.inf] = self.return_value_on_unfeasible
 
         return values.reshape(batch_size, 1)
-
-    def initial_solution(self, n_samples: int = 1):
-        return self.inner_ehrlich.initial_solution(n=n_samples)
 
     @property
     def optimal_solution(self):

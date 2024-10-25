@@ -90,6 +90,7 @@ class EhrlichHoloBlackBox(AbstractBlackBox):
         seed: int = None,
         epistasis_factor: float = 0.0,
         return_value_on_unfeasible: float = -np.inf,
+        n_initial_points: int = 1,
         alphabet: list[str] = AMINO_ACIDS,
         batch_size: int = None,
         parallelize: bool = False,
@@ -101,6 +102,7 @@ class EhrlichHoloBlackBox(AbstractBlackBox):
         self.alphabet = alphabet
         self.sequence_length = sequence_length
         self.return_value_on_unfeasible = return_value_on_unfeasible
+        self.n_initial_points = n_initial_points
 
         if seed is None:
             # In the case of Ehrlich, it's important we
@@ -141,20 +143,19 @@ class EhrlichHoloBlackBox(AbstractBlackBox):
             seed=self.seed,
             epistasis_factor=epistasis_factor,
             return_value_on_unfeasible=return_value_on_unfeasible,
+            n_initial_points=n_initial_points,
             alphabet=alphabet,
             parallelize=parallelize,
             num_workers=num_workers,
             evaluation_budget=evaluation_budget,
         )
 
-    def initial_solution(self, n_samples: int = 1) -> np.ndarray:
+    def initial_solution(self) -> np.ndarray:
         # This is a sequence of ints.
-        initial_solution_as_ints = self.inner_function.initial_solution(
-            n_samples=n_samples
-        )
+        initial_solution_as_ints = self.inner_function.initial_solution
 
         # We convert it to a sequence of strings.
-        if n_samples == 1:
+        if self.n_initial_points == 1:
             return np.array(
                 ["".join([self.alphabet[i] for i in initial_solution_as_ints])]
             )
