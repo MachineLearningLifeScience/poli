@@ -63,7 +63,9 @@ class EhrlichIsolatedLogic(AbstractIsolatedFunction):
             random_seed=seed,
         )
 
-        self.initial_solution = self.inner_ehrlich.initial_solution(n=n_initial_points)
+        self.initial_solution = self.inner_ehrlich.initial_solution(
+            n=n_initial_points
+        ).numpy(force=True)
 
     def __call__(self, x: np.ndarray, context: None) -> np.ndarray:
         # First, we transform the strings into integers using the alphabet
