@@ -311,11 +311,12 @@ def instance_function_as_isolated_process(
     # Check if the user has conda installed
     if shutil.which("conda") is None:
         raise RuntimeError(
-            "Conda is not installed. For poli's isolation mechanisms to work, "
+            "Conda is not installed/not in the PATH. For poli's isolation mechanisms to work, \n"
             "we need conda to be installed.\n"
-            "If you are not interested in using conda, you can install all the "
+            "If you are not interested in using conda, you can install all the \n"
             "relevant dependencies for black boxes using pip and optional arguments.\n"
-            "Check the documentation of the black box you are interested in for more information."
+            "Check the documentation of the black box you are interested in for more information.\n"
+            "https://machinelearninglifescience.github.io/poli-docs/."
         )
 
     # Register the problem if it hasn't been registered.
