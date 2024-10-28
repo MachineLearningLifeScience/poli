@@ -1,4 +1,4 @@
-name: poli lambo (conda, py3.10)
+name: poli lambo (py3.10)
 
 on:
   push:

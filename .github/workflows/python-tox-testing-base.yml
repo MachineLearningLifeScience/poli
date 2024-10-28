@@ -1,4 +1,4 @@
-name: poli base (conda, py3.10)
+name: poli base (py3.10)
 
 on:
   push:
