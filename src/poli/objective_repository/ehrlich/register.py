@@ -110,7 +110,7 @@ class EhrlichBlackBox(AbstractBlackBox):
     ):
         warnings.warn(
             "The EhrlichBlackBox class is deprecated and will be removed in a future version. "
-            " Please use EhrlichHoloBlackBox after installing with pip install poli[ehrlich].",
+            " Please use EhrlichHoloBlackBox after installing with pip install poli-core[ehrlich].",
             DeprecationWarning,
         )
 
@@ -444,7 +444,7 @@ class EhrlichProblemFactory(AbstractProblemFactory):
         """
         warnings.warn(
             "The EhrlichProblemFactory class is deprecated and will be removed in a future version. "
-            " Please use EhrlichHoloProblemFactory after installing with pip install poli[ehrlich].",
+            " Please use EhrlichHoloProblemFactory after installing with pip install poli-core[ehrlich].",
             DeprecationWarning,
         )
         if seed is not None:
