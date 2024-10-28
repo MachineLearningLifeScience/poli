@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "poli"
-version = "1.0.0.dev13"
+version = "1.0.0.dev14"
 description = "poli, a library of discrete objective functions"
 readme = "README.md"
 authors = [{name="Miguel González-Duque", email="miguelgondu@gmail.com"}, {name="Simon Bartels"}]
@@ -128,5 +128,5 @@ replace = 'version = "{new_version}"'
 
 [[tool.bumpversion.files]]
 filename = "CITATION.cff"
-search = 'version = "{current_version}"'
-replace = 'version = "{new_version}"'
+search = 'version: {current_version}'
+replace = 'version: {new_version}'
