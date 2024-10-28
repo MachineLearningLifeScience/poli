@@ -3,7 +3,6 @@ from __future__ import annotations
 import configparser
 import importlib
 import logging
-import shutil
 import subprocess
 from pathlib import Path
 
@@ -308,16 +307,6 @@ def instance_function_as_isolated_process(
     quiet: bool = False,
     **kwargs_for_black_box,
 ) -> ExternalFunction:
-    # Check if the user has conda installed
-    if shutil.which("conda") is None:
-        raise RuntimeError(
-            "Conda is not installed. For poli's isolation mechanisms to work, "
-            "we need conda to be installed.\n"
-            "If you are not interested in using conda, you can install all the "
-            "relevant dependencies for black boxes using pip and optional arguments.\n"
-            "Check the documentation of the black box you are interested in for more information."
-        )
-
     # Register the problem if it hasn't been registered.
     register_isolated_function(name=name, quiet=quiet)
 

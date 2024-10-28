@@ -25,8 +25,6 @@ References
 
 from __future__ import annotations
 
-import warnings
-
 import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
@@ -108,12 +106,6 @@ class EhrlichBlackBox(AbstractBlackBox):
         num_workers: int = None,
         evaluation_budget: int = float("inf"),
     ):
-        warnings.warn(
-            "The EhrlichBlackBox class is deprecated and will be removed in a future version. "
-            " Please use EhrlichHoloBlackBox after installing with pip install poli[ehrlich].",
-            DeprecationWarning,
-        )
-
         super().__init__(batch_size, parallelize, num_workers, evaluation_budget)
         self.alphabet = alphabet
         self.sequence_length = sequence_length
@@ -442,11 +434,6 @@ class EhrlichProblemFactory(AbstractProblemFactory):
             Closed-Form Test Functions for Biophysical Sequence Optimization Algorithms.
             arXiv preprint arXiv:2407.00236. https://arxiv.org/abs/2407.00236
         """
-        warnings.warn(
-            "The EhrlichProblemFactory class is deprecated and will be removed in a future version. "
-            " Please use EhrlichHoloProblemFactory after installing with pip install poli[ehrlich].",
-            DeprecationWarning,
-        )
         if seed is not None:
             seed_python_numpy_and_torch(seed)
 
