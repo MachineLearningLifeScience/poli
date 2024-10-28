@@ -1,4 +1,4 @@
-name: poli rmf (conda, py3.10)
+name: poli rmf (py3.10)
 
 on:
   push:
