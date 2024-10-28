@@ -1,6 +1,6 @@
 """
 This script contains a data package that is frequently used in
-small molecule optimization: Zinc250k.
+small molecule optimization: sampling random molecules from Zinc250k.
 """
 
 from __future__ import annotations
@@ -15,6 +15,26 @@ from poli.core.util.chemistry.string_to_molecule import translate_smiles_to_self
 
 
 class RandomMoleculesDataPackage(DataPackage):
+    """
+    Returns a supervised data package with random molecules from Zinc250k.
+
+    We subsampled 5000 smiles from Zinc250k and stored them in a numpy file,
+    and this data package samples n_molecules from this set.
+
+    Parameters
+    ----------
+    string_representation : Literal["SMILES", "SELFIES"]
+        The string representation of the molecules.
+    n_molecules : int, optional
+        The number of molecules to sample from the dataset, by default 10.
+    seed : int, optional
+        The seed for the random number generator, by default None.
+        If provided, we seed numpy random number generator with this seed.
+    tokenize_with : Callable[[str], list[str]], optional
+        A function that tokenizes the molecules, by default None.
+        If provided, we tokenize the molecules with this function.
+    """
+
     def __init__(
         self,
         string_representation: Literal["SMILES", "SELFIES"],

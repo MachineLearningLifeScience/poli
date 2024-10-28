@@ -94,7 +94,3 @@ def test_ehrlich_seed_determinism():
 
     assert (black_box(x0) == black_box_2(x0_2)).all()
     assert (x0 == x0_2).all()
-
-
-if __name__ == "__main__":
-    test_ehrlich_holo_factory()
