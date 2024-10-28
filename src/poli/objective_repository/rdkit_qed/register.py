@@ -20,6 +20,7 @@ from rdkit.Chem.QED import qed
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
+from poli.core.chemistry.tdc_problem import TDCProblem
 from poli.core.problem import Problem
 from poli.core.util.chemistry.string_to_molecule import strings_to_molecules
 from poli.core.util.seeding import seed_python_numpy_and_torch
@@ -114,6 +115,7 @@ class QEDBlackBox(AbstractBlackBox):
         assert string_representation.upper() in ["SMILES", "SELFIES"]
         self.from_selfies = string_representation.upper() == "SELFIES"
         self.from_smiles = string_representation.upper() == "SMILES"
+        self.string_representation = string_representation
 
         self.alphabet = alphabet
         self.max_sequence_length = max_sequence_length
@@ -256,6 +258,8 @@ class QEDProblemFactory(AbstractProblemFactory):
                 "String representation must be either 'SMILES' or 'SELFIES'."
             )
 
+        self.string_representation = string_representation
+
         f = QEDBlackBox(
             string_representation=string_representation.upper(),
             alphabet=alphabet,
@@ -272,4 +276,4 @@ class QEDProblemFactory(AbstractProblemFactory):
         else:
             x0 = np.array([["[C]" * 10]])
 
-        return Problem(f, x0)
+        return TDCProblem(f, x0)

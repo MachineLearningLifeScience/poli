@@ -149,9 +149,7 @@ class EhrlichHoloBlackBox(AbstractBlackBox):
 
     def initial_solution(self, n_samples: int = 1) -> np.ndarray:
         # This is a sequence of ints.
-        initial_solution_as_ints = self.inner_function.initial_solution(
-            n_samples=n_samples
-        )
+        initial_solution_as_ints = self.inner_function.initial_solution(n_samples)
 
         # We convert it to a sequence of strings.
         if n_samples == 1:
