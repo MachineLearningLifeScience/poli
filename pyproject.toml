@@ -19,7 +19,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Chemistry",
     "Topic :: Scientific/Engineering :: Mathematics",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
-    "Development Status :: 4 - Alpha",
+    "Development Status :: 3 - Alpha",
     "Operating System :: MacOS",
     "Operating System :: Unix",
 ]
