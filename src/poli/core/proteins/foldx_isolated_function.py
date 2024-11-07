@@ -152,6 +152,7 @@ class FoldxIsolatedFunction(AbstractIsolatedFunction):
         self.wildtype_residue_strings = [
             "".join(amino_acids) for amino_acids in self.wildtype_amino_acids
         ]
+        self.x0 = np.array(self.wildtype_residue_strings)
 
     def create_working_directory(self) -> Path:
         """

@@ -110,6 +110,7 @@ class FoldXStabilityBlackBox(AbstractBlackBox):
             eager_repair=eager_repair,
             verbose=verbose,
         )
+        self.x0 = inner_function.x0
         self.wildtype_amino_acids = inner_function.wildtype_amino_acids
 
     def _black_box(self, x: np.ndarray, context: None) -> np.ndarray:

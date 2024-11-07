@@ -14,21 +14,15 @@ from .celecoxib_rediscovery.register import (
     CelecoxibRediscoveryProblemFactory,
 )
 from .deco_hop.register import DecoHopBlackBox, DecoHopProblemFactory
-
-# Chemistry black boxes
 from .dockstring.register import DockstringBlackBox, DockstringProblemFactory
 from .drd2_docking.register import DRD2BlackBox, DRD2ProblemFactory
 from .drd3_docking.register import DRD3BlackBox, DRD3ProblemFactory
-
-# Discrete toy examples
 from .ehrlich.register import EhrlichBlackBox, EhrlichProblemFactory
 from .ehrlich_holo.register import EhrlichHoloBlackBox, EhrlichHoloProblemFactory
 from .fexofenadine_mpo.register import (
     FexofenadineMPOBlackBox,
     FexofenadineMPOProblemFactory,
 )
-
-# Protein black boxes
 from .foldx_rfp_lambo.register import FoldXRFPLamboBlackBox, FoldXRFPLamboProblemFactory
 from .foldx_sasa.register import FoldXSASABlackBox, FoldXSASAProblemFactory
 from .foldx_stability.register import (
@@ -73,9 +67,14 @@ from .ranolazine_mpo.register import RanolazineMPOBlackBox, RanolazineMPOProblem
 from .rasp.register import RaspBlackBox, RaspProblemFactory
 from .rdkit_logp.register import LogPBlackBox, LogPProblemFactory
 from .rdkit_qed.register import QEDBlackBox, QEDProblemFactory
+from .rfp_foldx_stability.register import (
+    RFPFoldXStabilityBlackBox,
+    RFPFoldXStabilityProblemFactory,
+)
 from .rfp_foldx_stability_and_sasa.register import (
     RFPFoldXStabilityAndSASAProblemFactory,
 )
+from .rfp_rasp.register import RFPRaspBlackBox, RFPRaspProblemFactory
 from .rmf_landscape.register import RMFBlackBox, RMFProblemFactory
 from .rosetta_energy.register import RosettaEnergyBlackBox, RosettaEnergyProblemFactory
 from .sa_tdc.register import SABlackBox, SAProblemFactory
@@ -84,8 +83,6 @@ from .sitagliptin_mpo.register import (
     SitagliptinMPOBlackBox,
     SitagliptinMPOProblemFactory,
 )
-
-# Other
 from .super_mario_bros.register import (
     SuperMarioBrosBlackBox,
     SuperMarioBrosProblemFactory,
@@ -106,8 +103,6 @@ from .valsartan_smarts.register import (
     ValsartanSMARTSBlackBox,
     ValsartanSMARTSProblemFactory,
 )
-
-# Toy examples
 from .white_noise.register import WhiteNoiseBlackBox, WhiteNoiseProblemFactory
 from .zaleplon_mpo.register import ZaleplonMPOBlackBox, ZaleplonMPOProblemFactory
 
@@ -144,6 +139,8 @@ AVAILABLE_PROBLEM_FACTORIES = {
     "rasp": RaspProblemFactory,
     "rdkit_logp": LogPProblemFactory,
     "rdkit_qed": QEDProblemFactory,
+    "rfp_rasp": RFPRaspProblemFactory,
+    "rfp_foldx_stability": RFPFoldXStabilityProblemFactory,
     "rfp_foldx_stability_and_sasa": RFPFoldXStabilityAndSASAProblemFactory,
     "rmf_landscape": RMFProblemFactory,
     "rosetta_energy": RosettaEnergyProblemFactory,
@@ -191,6 +188,8 @@ AVAILABLE_BLACK_BOXES = {
     "rasp": RaspBlackBox,
     "rdkit_logp": LogPBlackBox,
     "rdkit_qed": QEDBlackBox,
+    "rfp_rasp": RFPRaspBlackBox,
+    "rfp_foldx_stability": RFPFoldXStabilityBlackBox,
     "rfp_foldx_stability_and_sasa": FoldXStabilityAndSASABlackBox,
     "rmf_landscape": RMFBlackBox,
     "rosetta_energy": RosettaEnergyBlackBox,

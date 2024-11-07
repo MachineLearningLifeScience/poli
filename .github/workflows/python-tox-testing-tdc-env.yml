@@ -1,4 +1,4 @@
-name: poli tdc (conda, py3.10)
+name: poli tdc (py3.10)
 
 on:
   push:

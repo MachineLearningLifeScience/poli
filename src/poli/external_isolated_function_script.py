@@ -114,8 +114,20 @@ def run(objective_name: str, port: int, password: str) -> None:
                 y = f(x, context=context)
                 conn.send(["QUERY", y])
             elif msg_type == "ATTRIBUTE":
-                attribute = getattr(f, msg[0])
+                attribute_name = msg[0]
+                attribute = getattr(f, attribute_name)
                 conn.send(["ATTRIBUTE", attribute])
+            elif msg_type == "IS_METHOD":
+                attribute_name = msg[0]
+                is_method = callable(getattr(f, attribute_name))
+                conn.send(["IS_METHOD", is_method])
+            elif msg_type == "METHOD":
+                method_name = msg[0]
+                method_args = msg[1]
+                method_kwargs = msg[2]
+                method = getattr(f, method_name)
+                result = method(*method_args, **method_kwargs)
+                conn.send(["METHOD", result])
         except Exception as e:
             tb = traceback.format_exc()
             conn.send(["EXCEPTION", e, tb])

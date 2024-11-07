@@ -89,16 +89,51 @@ class ExternalFunction(AbstractIsolatedFunction):
         attribute : Any
             The attribute of the underlying black-box function.
         """
-        self.process_wrapper.send(["ATTRIBUTE", __name])
+        self.process_wrapper.send(["IS_METHOD", __name])
         msg_type, *msg = self.process_wrapper.recv()
         if msg_type == "EXCEPTION":
             e, traceback_ = msg
             print(traceback_)
             raise e
         else:
-            assert msg_type == "ATTRIBUTE"
-            attribute = msg[0]
-            return attribute
+            assert msg_type == "IS_METHOD"
+            is_method = msg[0]
+
+        if is_method:
+            return lambda *args, **kwargs: self._method_call(__name, *args, **kwargs)
+        else:
+            self.process_wrapper.send(["ATTRIBUTE", __name])
+            msg_type, *msg = self.process_wrapper.recv()
+            if msg_type == "EXCEPTION":
+                e, traceback_ = msg
+                print(traceback_)
+                raise e
+            else:
+                assert msg_type == "ATTRIBUTE"
+                attribute = msg[0]
+                return attribute
+
+    def _method_call(self, method_name: str, *args, **kwargs) -> Any:
+        """Calls a method of the underlying isolated function.
+
+        Asks for the method of the underlying
+        isolated function by sending a message
+        to the process w. the msg_type "METHOD".
+
+        Parameters
+        ----------
+        method_name : str
+            The name of the method.
+        """
+        self.process_wrapper.send(["METHOD", method_name, args, kwargs])
+        msg_type, *msg = self.process_wrapper.recv()
+        if msg_type == "EXCEPTION":
+            e, traceback_ = msg
+            print(traceback_)
+            raise e
+        else:
+            assert msg_type == "METHOD"
+            return msg[0]
 
     def __del__(self):
         self.terminate()

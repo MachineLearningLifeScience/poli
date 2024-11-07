@@ -17,6 +17,7 @@ import selfies as sf
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.chemistry.tdc_black_box import TDCBlackBox
+from poli.core.chemistry.tdc_problem import TDCProblem
 from poli.core.problem import Problem
 from poli.core.util.chemistry.string_to_molecule import translate_smiles_to_selfies
 from poli.core.util.seeding import seed_numpy, seed_python
@@ -188,7 +189,7 @@ class DRD3ProblemFactory(AbstractProblemFactory):
         else:
             x0 = np.array([list(sf.split_selfies(x0_selfies))])
 
-        drd3_problem = Problem(
+        drd3_problem = TDCProblem(
             black_box=f,
             x0=x0,
         )
