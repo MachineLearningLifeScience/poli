@@ -76,6 +76,7 @@ from .rfp_foldx_stability_and_sasa.register import (
 )
 from .rfp_rasp.register import RFPRaspBlackBox, RFPRaspProblemFactory
 from .rmf_landscape.register import RMFBlackBox, RMFProblemFactory
+from .rosetta_energy.register import RosettaEnergyBlackBox, RosettaEnergyProblemFactory
 from .sa_tdc.register import SABlackBox, SAProblemFactory
 from .scaffold_hop.register import ScaffoldHopBlackBox, ScaffoldHopProblemFactory
 from .sitagliptin_mpo.register import (
@@ -142,6 +143,7 @@ AVAILABLE_PROBLEM_FACTORIES = {
     "rfp_foldx_stability": RFPFoldXStabilityProblemFactory,
     "rfp_foldx_stability_and_sasa": RFPFoldXStabilityAndSASAProblemFactory,
     "rmf_landscape": RMFProblemFactory,
+    "rosetta_energy": RosettaEnergyProblemFactory,
     "sa_tdc": SAProblemFactory,
     "super_mario_bros": SuperMarioBrosProblemFactory,
     "white_noise": WhiteNoiseProblemFactory,
@@ -190,6 +192,7 @@ AVAILABLE_BLACK_BOXES = {
     "rfp_foldx_stability": RFPFoldXStabilityBlackBox,
     "rfp_foldx_stability_and_sasa": FoldXStabilityAndSASABlackBox,
     "rmf_landscape": RMFBlackBox,
+    "rosetta_energy": RosettaEnergyBlackBox,
     "sa_tdc": SABlackBox,
     "super_mario_bros": SuperMarioBrosBlackBox,
     "white_noise": WhiteNoiseBlackBox,

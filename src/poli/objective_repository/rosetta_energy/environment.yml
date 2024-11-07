@@ -1,0 +1,12 @@
+name: poli__rosetta_energy
+channels:
+  - defaults
+  - conda-forge
+  - https://conda.rosettacommons.org
+dependencies:
+  - python=3.10
+  - pyrosetta
+  - pip:
+    - numpy
+    - "git+https://github.com/MachineLearningLifeScience/poli.git@dev"
+    - biopython==1.72

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "poli-core"
-version = "1.0.1"
+version = "1.1.0"
 description = "poli, a library of discrete objective functions"
 readme = "README.md"
 authors = [{name="Miguel González-Duque", email="miguelgondu@gmail.com"}, {name="Simon Bartels", email="bartels@di.ku.dk"}]
@@ -57,6 +57,10 @@ dockstring = [
 rmf = [
     "scipy",
 ]
+rosetta_energy = [
+    "biopython",
+    "pyrosetta",
+]
 dev = ["black", "tox", "pytest", "bump-my-version"]
 docs = ["sphinx", "furo"]
 
@@ -72,6 +76,7 @@ markers = [
     "poli__protein: marks tests that run in the poli__protein environment",
     "poli__rasp: marks tests that run in the poli__rasp environment",
     "poli__rmf: marks tests that run in poli__rmf environment",
+    "poli__rosetta_energy: marks tests that run in poli__rosetta_energy",
     "poli__ehrlich_holo: marks tests that run in poli__ehrlich_holo environment",
     "unmarked: All other tests, which usually run in the base environment",
 ]
@@ -83,7 +88,7 @@ profile = "black"
 exclude = ["src/poli/core/util/proteins/rasp/inner_rasp", "src/poli/objective_repository/gfp_cbas"]
 
 [tool.bumpversion]
-current_version = "1.0.1"
+current_version = "1.1.0"
 parse = """(?x)
     (?P<major>0|[1-9]\\d*)\\.
     (?P<minor>0|[1-9]\\d*)\\.
