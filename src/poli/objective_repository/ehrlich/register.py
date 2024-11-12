@@ -72,6 +72,13 @@ class EhrlichBlackBox(AbstractBlackBox):
     return_value_on_unfeasible : float, optional
         The value to be returned when an unfeasible sequence is evaluated.
         By default, it is -np.inf.
+    feasibility_matrix_temperature : float, optional
+        The temperature parameter for the feasibility matrix's softmax. By
+        default, it is 0.5.
+    feasibility_matrix_band_length : int, optional
+        The band length for the non-zero values in the feasibility matrix.
+        By default, it is None (i.e. if the alphabet size is v, the band
+        length is v - 2 * (v // 5)).
     alphabet : list of str, optional
         The alphabet to be used for the sequences. By default, it is the
         of 20 amino acids.

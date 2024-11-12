@@ -7,6 +7,16 @@ def _construct_banded_matrix(size: int, band_length: int | None = None) -> np.nd
     """
     Constructs a matrix of zeroes and ones, where
     the ones are bands that can loop around.
+
+    The length of the non-zero band is given by band_length.
+    By default, it is set to size - 2 * (size // 5). This
+    value is taken from the original Ehrlich paper [1].
+
+    References
+    ----------
+    [1] Stanton, S., Alberstein, R., Frey, N., Watkins, A., & Cho, K. (2024).
+    Closed-Form Test Functions for Biophysical Sequence Optimization Algorithms.
+    arXiv preprint arXiv:2407.00236. https://arxiv.org/abs/2407.00236
     """
     matrix = np.zeros((size, size), dtype=int)
     band_index = 0
