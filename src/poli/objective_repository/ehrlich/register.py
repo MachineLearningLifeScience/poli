@@ -215,7 +215,7 @@ class EhrlichBlackBox(AbstractBlackBox):
         for i in range(1, len(sequence)):
             next_state = self.alphabet.index(sequence[i])
 
-            if np.isclose(self.transition_matrix[current_state, next_state], 0.0):
+            if self.transition_matrix[current_state, next_state] == 0.0:
                 return False
             current_state = next_state
 
