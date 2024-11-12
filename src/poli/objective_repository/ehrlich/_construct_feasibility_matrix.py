@@ -10,7 +10,9 @@ def _construct_banded_matrix(size: int, band_length: int | None = None) -> np.nd
     """
     matrix = np.zeros((size, size), dtype=int)
     band_index = 0
-    band_length = (2 * band_length) // 5 if band_length is None else band_length
+    band_length = (
+        size - ((2 * band_length) // 5) if band_length is None else band_length
+    )
     for row_i in range(size):
         indices_for_positions_that_will_be_1 = list(
             range(band_index, band_index + band_length)
