@@ -3,14 +3,14 @@ from __future__ import annotations
 import numpy as np
 
 
-def _construct_banded_matrix(size: int) -> np.ndarray:
+def _construct_banded_matrix(size: int, band_length: int | None = None) -> np.ndarray:
     """
     Constructs a matrix of zeroes and ones, where
     the ones are bands that can loop around.
     """
     matrix = np.zeros((size, size), dtype=int)
     band_index = 0
-    band_length = size - 1
+    band_length = (2 * band_length) // 5 if band_length is None else band_length
     for row_i in range(size):
         indices_for_positions_that_will_be_1 = list(
             range(band_index, band_index + band_length)
@@ -28,8 +28,8 @@ def _construct_banded_matrix(size: int) -> np.ndarray:
     return matrix
 
 
-def _construct_binary_mask(size: int) -> np.ndarray:
-    banded_matrix = _construct_banded_matrix(size)
+def _construct_binary_mask(size: int, band_length: int | None = None) -> np.ndarray:
+    banded_matrix = _construct_banded_matrix(size, band_length=band_length)
 
     # Shuffle its rows
     random_indices_for_rows = np.random.permutation(size)
@@ -43,9 +43,12 @@ def _construct_binary_mask(size: int) -> np.ndarray:
 
 
 def _construct_transition_matrix(
-    size: int, seed: int | None = None, temperature: float = 0.25
+    size: int,
+    seed: int | None = None,
+    temperature: float = 0.5,
+    band_length: int | None = None,
 ) -> np.ndarray:
-    binary_mask_matrix = _construct_binary_mask(size)
+    binary_mask_matrix = _construct_binary_mask(size, band_length=band_length)
 
     # Creating a random state and matrix
     random_state = np.random.RandomState(seed)

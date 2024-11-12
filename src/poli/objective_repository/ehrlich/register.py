@@ -102,6 +102,8 @@ class EhrlichBlackBox(AbstractBlackBox):
         quantization: int | None = None,
         seed: int = None,
         return_value_on_unfeasible: float = -np.inf,
+        feasibility_matrix_temperature: float = 0.5,
+        feasibility_matrix_band_length: int | None = None,
         alphabet: list[str] = AMINO_ACIDS,
         batch_size: int = None,
         parallelize: bool = False,
@@ -143,6 +145,8 @@ class EhrlichBlackBox(AbstractBlackBox):
         self.transition_matrix = _construct_transition_matrix(
             size=len(alphabet),
             seed=seed,
+            temperature=feasibility_matrix_temperature,
+            band_length=feasibility_matrix_band_length,
         )
 
         self.motifs = self.construct_random_motifs(
