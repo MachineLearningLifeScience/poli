@@ -42,15 +42,19 @@ def _construct_binary_mask(size: int) -> np.ndarray:
     return binary_mask_matrix
 
 
-def _construct_transition_matrix(size: int, seed: int | None = None) -> np.ndarray:
+def _construct_transition_matrix(
+    size: int, seed: int | None = None, temperature: float = 0.25
+) -> np.ndarray:
     binary_mask_matrix = _construct_binary_mask(size)
 
     # Creating a random state and matrix
     random_state = np.random.RandomState(seed)
     random_matrix = random_state.randn(size, size)
 
-    # Softmax it
-    transition_matrix = np.exp(random_matrix) / np.sum(np.exp(random_matrix), axis=0)
+    # Softmax it with low temperature
+    transition_matrix = np.exp(random_matrix / temperature) / np.sum(
+        np.exp(random_matrix / temperature), axis=0
+    )
 
     # Mask it
     masked_transition_matrix = transition_matrix * binary_mask_matrix
