@@ -118,9 +118,11 @@ class EhrlichBlackBox(AbstractBlackBox):
         evaluation_budget: int = float("inf"),
     ):
         warnings.warn(
-            "The EhrlichBlackBox class is deprecated and will be removed in a future version. "
-            " Please use EhrlichHoloBlackBox after installing with pip install poli-core[ehrlich].",
-            DeprecationWarning,
+            "This EhrlichBlackBox class is different from the original "
+            "implementation provided by Stanton et al. If you are interested in "
+            "their implementation (for exact comaprisons), please use "
+            "EhrlichHoloBlackBox after installing with pip install poli-core[ehrlich].",
+            UserWarning,
         )
 
         super().__init__(batch_size, parallelize, num_workers, evaluation_budget)
