@@ -72,6 +72,13 @@ class EhrlichBlackBox(AbstractBlackBox):
     return_value_on_unfeasible : float, optional
         The value to be returned when an unfeasible sequence is evaluated.
         By default, it is -np.inf.
+    feasibility_matrix_temperature : float, optional
+        The temperature parameter for the feasibility matrix's softmax. By
+        default, it is 0.5.
+    feasibility_matrix_band_length : int, optional
+        The band length for the non-zero values in the feasibility matrix.
+        By default, it is None (i.e. if the alphabet size is v, the band
+        length is v - 2 * (v // 5)).
     alphabet : list of str, optional
         The alphabet to be used for the sequences. By default, it is the
         of 20 amino acids.
@@ -102,6 +109,8 @@ class EhrlichBlackBox(AbstractBlackBox):
         quantization: int | None = None,
         seed: int = None,
         return_value_on_unfeasible: float = -np.inf,
+        feasibility_matrix_temperature: float = 0.5,
+        feasibility_matrix_band_length: int | None = None,
         alphabet: list[str] = AMINO_ACIDS,
         batch_size: int = None,
         parallelize: bool = False,
@@ -109,9 +118,11 @@ class EhrlichBlackBox(AbstractBlackBox):
         evaluation_budget: int = float("inf"),
     ):
         warnings.warn(
-            "The EhrlichBlackBox class is deprecated and will be removed in a future version. "
-            " Please use EhrlichHoloBlackBox after installing with pip install poli-core[ehrlich].",
-            DeprecationWarning,
+            "This EhrlichBlackBox class is different from the original "
+            "implementation provided by Stanton et al. If you are interested in "
+            "their implementation (for exact comaprisons), please use "
+            "EhrlichHoloBlackBox after installing with pip install poli-core[ehrlich].",
+            UserWarning,
         )
 
         super().__init__(batch_size, parallelize, num_workers, evaluation_budget)
@@ -143,6 +154,8 @@ class EhrlichBlackBox(AbstractBlackBox):
         self.transition_matrix = _construct_transition_matrix(
             size=len(alphabet),
             seed=seed,
+            temperature=feasibility_matrix_temperature,
+            band_length=feasibility_matrix_band_length,
         )
 
         self.motifs = self.construct_random_motifs(
@@ -215,7 +228,7 @@ class EhrlichBlackBox(AbstractBlackBox):
         for i in range(1, len(sequence)):
             next_state = self.alphabet.index(sequence[i])
 
-            if np.isclose(self.transition_matrix[current_state, next_state], 0.0):
+            if self.transition_matrix[current_state, next_state] == 0.0:
                 return False
             current_state = next_state
 
