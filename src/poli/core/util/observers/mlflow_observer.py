@@ -6,6 +6,7 @@ import numpy as np
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.util.abstract_observer import AbstractObserver
 
+TRACKING_URI = "tracking_uri"
 OBJECTIVE = "OBJECTIVE"
 SEQUENCE = "SEQUENCE"
 SEED = "SEED"
@@ -16,9 +17,10 @@ class MLFlowObserver(AbstractObserver):
     This observer uses mlflow as a backend.
     """
 
-    def __init__(self, tracking_uri: Path):
+    def __init__(self, tracking_uri: Path = None):
         self.step = 0
-        mlflow.set_tracking_uri(tracking_uri)
+        if tracking_uri is not None:
+            mlflow.set_tracking_uri(tracking_uri)
 
     def observe(self, x: np.ndarray, y: np.ndarray, context=None) -> None:
         for n in range(y.shape[0]):
@@ -36,9 +38,13 @@ class MLFlowObserver(AbstractObserver):
     def initialize_observer(
         self,
         problem_setup_info: BlackBoxInformation,
-        caller_info: object,
+        caller_info: dict,
         seed: int,
     ) -> object:
+        tracking_uri = caller_info.pop(TRACKING_URI, None)
+        if tracking_uri is not None:
+            mlflow.set_tracking_uri(tracking_uri)
+
         experiment = mlflow.set_experiment(
             experiment_name=problem_setup_info.get_problem_name()
         )
