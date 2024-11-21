@@ -15,6 +15,7 @@ class MLFlowObserver(AbstractObserver):
     """
     This observer uses mlflow as a backend.
     """
+
     def __init__(self, tracking_uri: Path):
         self.step = 0
         mlflow.set_tracking_uri(tracking_uri)
@@ -22,7 +23,10 @@ class MLFlowObserver(AbstractObserver):
     def observe(self, x: np.ndarray, y: np.ndarray, context=None) -> None:
         for n in range(y.shape[0]):
             self.step += 1
-            mlflow.log_metrics({OBJECTIVE + str(i): y[n, i].item() for i in range(y.shape[1])}, step=self.step)
+            mlflow.log_metrics(
+                {OBJECTIVE + str(i): y[n, i].item() for i in range(y.shape[1])},
+                step=self.step,
+            )
             # with mlflow it's unfortunately not so easy to log sequences
             mlflow.log_param(str(self.step) + SEQUENCE, x[n, ...])
 
@@ -38,9 +42,7 @@ class MLFlowObserver(AbstractObserver):
         experiment = mlflow.set_experiment(
             experiment_name=problem_setup_info.get_problem_name()
         )
-        run = mlflow.start_run(
-            experiment_id=experiment.experiment_id
-        )
+        run = mlflow.start_run(experiment_id=experiment.experiment_id)
         mlflow.set_tag(SEED, str(seed))
         mlflow.set_tags(caller_info)
         return run.info.run_id
