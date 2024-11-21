@@ -1,10 +1,10 @@
 from pathlib import Path
-import numpy as np
+
 import mlflow
+import numpy as np
 
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.util.abstract_observer import AbstractObserver
-
 
 OBJECTIVE = "OBJECTIVE"
 SEQUENCE = "SEQUENCE"
