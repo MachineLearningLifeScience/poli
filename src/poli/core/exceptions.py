@@ -17,3 +17,9 @@ class FoldXNotFoundException(PoliException):
     """Exception raised when FoldX wasn't found in ~/foldx/foldx."""
 
     pass
+
+
+class ObserverNotInitializedError(PoliException):
+    """Exception raised when the observer is not initialized."""
+
+    pass
