@@ -1,5 +1,4 @@
-"""This module contains utilities for creating run scripts for problems and observers.
-"""
+"""This module contains utilities for creating run scripts for problems and observers."""
 
 import inspect
 import os

@@ -1,5 +1,4 @@
-"""Script that gets called by the mother process to start an external observer process.
-"""
+"""Script that gets called by the mother process to start an external observer process."""
 
 import argparse
 import sys

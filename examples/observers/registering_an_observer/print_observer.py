@@ -1,5 +1,4 @@
-"""A simple example of how to log objective function calls.
-"""
+"""A simple example of how to log objective function calls."""
 
 import numpy as np
 

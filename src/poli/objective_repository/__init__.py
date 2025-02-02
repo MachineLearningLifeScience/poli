@@ -1,5 +1,4 @@
-"""All objective factories and black boxes inside poli.
-"""
+"""All objective factories and black boxes inside poli."""
 
 from pathlib import Path
 

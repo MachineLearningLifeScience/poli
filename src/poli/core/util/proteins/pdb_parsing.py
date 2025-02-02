@@ -1,5 +1,4 @@
-"""This module contains utilities for loading PDB files and parsing them.
-"""
+"""This module contains utilities for loading PDB files and parsing them."""
 
 from pathlib import Path
 from typing import List

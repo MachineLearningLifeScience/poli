@@ -1,5 +1,4 @@
-"""This module contains utilities for registering problems and observers.
-"""
+"""This module contains utilities for registering problems and observers."""
 
 import configparser
 import warnings
