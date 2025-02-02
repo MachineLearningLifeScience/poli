@@ -5,13 +5,13 @@ using PyRosetta-4 [1].
 Rosetta is a black box that starts
 with one wildtype pdb file, and assesses the
 stability of a variant.
-Two general running-modes are available: 
+Two general running-modes are available:
 i) fast prediction with MinMover and scoring function -- set relax=False, pack=False
 ii) default protocol prediction with pack and relax algorithm -- default .
 
-[1] Chaudhury, Sidhartha, Sergey Lyskov, and Jeffrey J. Gray. 
-"PyRosetta: a script-based interface for implementing molecular modeling algorithms using Rosetta." 
-Bioinformatics 26.5 (2010): 689-691. https://doi.org/10.1093/bioinformatics/btq007 
+[1] Chaudhury, Sidhartha, Sergey Lyskov, and Jeffrey J. Gray.
+"PyRosetta: a script-based interface for implementing molecular modeling algorithms using Rosetta."
+Bioinformatics 26.5 (2010): 689-691. https://doi.org/10.1093/bioinformatics/btq007
 
 """
 
