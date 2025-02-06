@@ -76,8 +76,6 @@ class DMSTrpBIsolatedLogic(AbstractIsolatedFunction):
         self.positions = [183, 184, 227, 228]  # included for completeness
 
         self.dms_df = self._load_dms_data()
-        # Padding all of them to the longest sequence
-        max_len = len(self.wt)
 
         self.x0 = np.array(list(self.dms_df.iloc[self.wt].value))
 

@@ -22,7 +22,6 @@ from __future__ import annotations
 
 from pathlib import Path
 from time import time
-from typing import List, Union
 from uuid import uuid4
 
 import numpy as np
@@ -88,8 +87,6 @@ class DMSGB1IsolatedLogic(AbstractIsolatedFunction):
         self.positions = [39, 40, 41, 54]  # included for completeness
 
         self.dms_df = self._load_dms_data()
-        # Padding all of them to the longest sequence
-        max_len = len(self.wt)
 
         self.x0 = np.array(list(self.dms_df.iloc[self.wt].value))
 

@@ -23,9 +23,6 @@ under the licenses of the provided resources.
 
 from __future__ import annotations
 
-from pathlib import Path
-from typing import List, Union
-
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
