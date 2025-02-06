@@ -34,10 +34,10 @@ def test_running_gb1_negate_fitness():
         negative=True,
     )
     f, x = problem.black_box, problem.x0
-    x[0,0] = "Q"
-    x[0,1] = "R"
-    x[0,2] = "L"
-    x[0,3] = "G"
+    x[0, 0] = "Q"
+    x[0, 1] = "R"
+    x[0, 2] = "L"
+    x[0, 3] = "G"
     y = f(x)
 
     assert np.isclose(y, -2.727247889).all()

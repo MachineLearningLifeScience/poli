@@ -88,13 +88,13 @@ class DMSGB1IsolatedLogic(AbstractIsolatedFunction):
 
         self.dms_df = self._load_dms_data()
 
-        self.x0 = np.array(list(self.wt))[None,:]
+        self.x0 = np.array(list(self.wt))[None, :]
 
     def _load_dms_data(self) -> pd.DataFrame:
         return pd.read_csv(THIS_DIR / "assets" / "fitness.csv")
 
     def _return_dms_val(self, x) -> float:
-        return self.dms_df[self.dms_df.Combo==x].fitness.values[0]
+        return self.dms_df[self.dms_df.Combo == x].fitness.values[0]
 
     def __call__(self, x, context=None):
         """
