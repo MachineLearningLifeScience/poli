@@ -77,7 +77,7 @@ class DMSTrpBIsolatedLogic(AbstractIsolatedFunction):
 
         self.dms_df = self._load_dms_data()
 
-        self.x0 = np.array(list(self.dms_df.iloc[self.wt].value))
+        self.x0 = np.array(list(self.wt))[None,:]
 
     def _load_dms_data(self) -> pd.DataFrame:
         return pd.read_csv(THIS_DIR / "assets" / "fitness.csv")
