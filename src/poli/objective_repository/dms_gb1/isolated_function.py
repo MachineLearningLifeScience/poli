@@ -94,7 +94,7 @@ class DMSGB1IsolatedLogic(AbstractIsolatedFunction):
         return pd.read_csv(THIS_DIR / "assets" / "fitness.csv")
 
     def _return_dms_val(self, x) -> float:
-        return self.dms_df[self.Combo==x].fitness.values[0]
+        return self.dms_df[self.dms_df.Combo==x].fitness.values[0]
 
     def __call__(self, x, context=None):
         """
