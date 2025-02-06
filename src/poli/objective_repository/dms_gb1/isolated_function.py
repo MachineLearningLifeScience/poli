@@ -91,10 +91,10 @@ class DMSGB1IsolatedLogic(AbstractIsolatedFunction):
         self.x0 = np.array(list(self.dms_df.iloc[self.wt].value))
 
     def _load_dms_data(self) -> pd.DataFrame:
-        pd.read_csv(THIS_DIR / "assets" / "fitness.csv")
+        return pd.read_csv(THIS_DIR / "assets" / "fitness.csv")
 
     def _return_dms_val(self, x) -> float:
-        return self.dms_df.iloc[x].value
+        return self.dms_df[self.Combo==x].fitness.values[0]
 
     def __call__(self, x, context=None):
         """
