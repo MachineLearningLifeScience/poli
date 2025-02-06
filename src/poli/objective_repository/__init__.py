@@ -13,6 +13,8 @@ from .celecoxib_rediscovery.register import (
     CelecoxibRediscoveryProblemFactory,
 )
 from .deco_hop.register import DecoHopBlackBox, DecoHopProblemFactory
+from .dms_gb1.register import DMSGB1BlackBox, DMSGB1ProblemFactory
+from .dms_trpb.register import DMSTrpBBlackBox, DMSTrpBProblemFactory
 from .dockstring.register import DockstringBlackBox, DockstringProblemFactory
 from .drd2_docking.register import DRD2BlackBox, DRD2ProblemFactory
 from .drd3_docking.register import DRD3BlackBox, DRD3ProblemFactory
@@ -126,6 +128,8 @@ AVAILABLE_PROBLEM_FACTORIES = {
     "aloha": AlohaProblemFactory,
     "ehrlich": EhrlichProblemFactory,
     "ehrlich_holo": EhrlichHoloProblemFactory,
+    "dms_gb1": DMSGB1ProblemFactory,
+    "dms_trpb": DMSTrpBProblemFactory,
     "dockstring": DockstringProblemFactory,
     "drd3_docking": DRD3ProblemFactory,
     "foldx_rfp_lambo": FoldXRFPLamboProblemFactory,
@@ -175,6 +179,8 @@ AVAILABLE_BLACK_BOXES = {
     "aloha": AlohaBlackBox,
     "ehrlich": EhrlichBlackBox,
     "ehrlich_holo": EhrlichHoloBlackBox,
+    "dms_gb1": DMSGB1BlackBox,
+    "dms_trpb": DMSTrpBBlackBox,
     "dockstring": DockstringBlackBox,
     "drd3_docking": DRD3BlackBox,
     "foldx_rfp_lambo": FoldXRFPLamboBlackBox,
