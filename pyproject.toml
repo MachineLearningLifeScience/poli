@@ -42,6 +42,9 @@ protein = [
     "python-levenshtein",
     "pdb-tools",
 ]
+dms = [
+    "pandas",
+]
 ehrlich = [
     "pytorch-holo",
 ]
@@ -78,6 +81,7 @@ markers = [
     "poli__rmf: marks tests that run in poli__rmf environment",
     "poli__rosetta_energy: marks tests that run in poli__rosetta_energy",
     "poli__ehrlich_holo: marks tests that run in poli__ehrlich_holo environment",
+    "poli__dms: marks tests that run in poli__dms environment",
     "unmarked: All other tests, which usually run in the base environment",
 ]
 
