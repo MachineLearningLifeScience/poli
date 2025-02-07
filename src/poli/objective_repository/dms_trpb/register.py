@@ -9,7 +9,7 @@ The dataset reference is [2].
 
 [1] "A combinatorially complete epistatic fitness landscape in an enzyme active site"
 Kadina E. Johnston, Patrick J. Almhjell, Ella J. Watkins-Dulaney, Grace Liu, Nicholas J. Porter, Jason Yang, and Frances H. Arnold.
-doi: https://doi.org/10.1073/pnas.2400439121 . 
+doi: https://doi.org/10.1073/pnas.2400439121 .
 July 29, 2024.
 [2] "Active learning-assisted directed evolution"
 Jason Yang, Ravi G. Lal, James C. Bowden, Raul Astudillo, Mikhail A. Hameedi, Sukhvinder Kaur, Matthew Hill, Yisong Yue & Frances H. Arnold.

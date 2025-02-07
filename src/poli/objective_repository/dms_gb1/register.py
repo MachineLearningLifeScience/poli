@@ -10,7 +10,7 @@ The dataset reference is [2].
 [1] "Active Learning-Assisted Directed Evolution"
 Jason Yang, Ravi G. Lal, James C. Bowden, Raul Astudillo, Mikhail A. Hameedi, Sukhvinder Kaur, Matthew Hill, Yisong Yue, Frances H. Arnold
 bioRxiv 2024.07.27.605457; doi: https://doi.org/10.1101/2024.07.27.605457.
-[2] "Learning protein fitness landscapes with deep mutational scanning data from multiple sources" 
+[2] "Learning protein fitness landscapes with deep mutational scanning data from multiple sources"
 Lin Chen, Zehong Zhang, Zhenghao Li, Rui Li, Ruifeng Huo, Lifan Chen, Dingyan Wang, Xiaomin Luo, Kaixian Chen, Cangsong Liao, Mingyue Zheng,
 Cell Systems,
 Volume 14, Issue 8, 2023,
