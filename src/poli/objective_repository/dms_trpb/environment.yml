@@ -1,0 +1,10 @@
+name: poli__dms
+channels:
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+    - numpy<2
+    - pandas
+    - "git+https://github.com/MachineLearningLifeScience/poli.git@dev"
