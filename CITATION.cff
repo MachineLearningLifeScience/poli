@@ -8,6 +8,6 @@ authors:
 - family-names: "Michael"
   given-names: "Richard"
 title: "poli: a libary of discrete sequence objectives"
-version: 1.1.1.dev1
+version: 1.2.0
 date-released: 2024-01-23
 url: "https://github.com/MachineLearningLifeScience/poli"
