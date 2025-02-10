@@ -111,10 +111,12 @@ class DMSTrpBIsolatedLogic(AbstractIsolatedFunction):
         - ValueError exception if input is invalid.
         """
         results = []
-        for x_i in x:
+        for i, x_i in enumerate(x):
             # Assuming x_i is an array of strings
             if len(x_i) != 4:
-                raise ValueError("Inputs of L=4 expected!")
+                raise ValueError(
+                    f"Inputs of L=4 expected!\n Curren input length={len(x_i)} at index {i}"
+                )
             mutant_residue_string = "".join(x_i)
             result = self._return_dms_val(mutant_residue_string)
             results.append(result)
