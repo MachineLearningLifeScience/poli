@@ -91,14 +91,6 @@ class DMSGB1BlackBox(AbstractBlackBox):
             The number of workers for parallel evaluation, by default None.
         evaluation_budget : int, optional
             The evaluation budget, by default float("inf").
-
-        Raises:
-        -------
-        ...
-
-        Notes:
-        ------
-        ...
         """
         if parallelize:
             print(

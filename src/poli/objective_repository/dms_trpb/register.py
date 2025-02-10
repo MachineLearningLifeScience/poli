@@ -58,10 +58,6 @@ class DMSTrpBBlackBox(AbstractBlackBox):
         check x exists and return the DMS value.
     _load_dms_data()
         This function loads the datasets, found under assets.
-
-    Notes
-    -----
-    ...
     """
 
     def __init__(
@@ -91,14 +87,6 @@ class DMSTrpBBlackBox(AbstractBlackBox):
             The number of workers for parallel evaluation, by default None.
         evaluation_budget : int, optional
             The evaluation budget, by default float("inf").
-
-        Raises:
-        -------
-        ...
-
-        Notes:
-        ------
-        ...
         """
         if parallelize:
             print(
