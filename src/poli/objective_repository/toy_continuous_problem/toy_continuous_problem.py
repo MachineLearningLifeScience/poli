@@ -26,6 +26,7 @@ from .definitions import (
     easom,
     egg_holder,
     hartmann_6d,
+    himmelblau,
     levy,
     rosenbrock,
     shifted_sphere,
@@ -55,6 +56,7 @@ POSSIBLE_FUNCTIONS = [
     "branin_2d",
     "rosenbrock",
     "levy",
+    "himmelblau",
 ]
 TWO_DIMENSIONAL_PROBLEMS = [
     "easom",
@@ -62,6 +64,7 @@ TWO_DIMENSIONAL_PROBLEMS = [
     "egg_holder",
     "camelback_2d",
     "branin_2d",
+    "himmelblau",
 ]
 SIX_DIMENSIONAL_PROBLEMS = ["hartmann_6d"]
 
@@ -246,6 +249,12 @@ class ToyContinuousProblem:
             self.function = levy
             self.limits = [-10.0, 10.0]
             self.optima_location = np.array([1.0] * n_dims)
+            self.solution_length = n_dims
+            self.x0 = np.array([[0.0] * self.solution_length])
+        elif name == "himmelblau":
+            self.function = himmelblau
+            self.limits = [-5.0, 5.0]
+            self.optima_location = np.array([3.0, 2.0])
             self.solution_length = n_dims
             self.x0 = np.array([[0.0] * self.solution_length])
         else:

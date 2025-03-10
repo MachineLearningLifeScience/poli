@@ -430,6 +430,33 @@ def levy(x: np.ndarray):
     return -(term1 + term2 + term3)
 
 
+def himmelblau(x: np.ndarray):
+    """
+    Compute the Himmelblau function.
+
+    Parameters
+    ----------
+    x (np.ndarray): A 2D numpy array of shape [b, d] where 'b' is the batch size and 'd' is the dimensionality.
+
+    Returns
+    -------
+    np.ndarray: The value of the Himmelblau function at each point in 'x'. Shape is [b,].
+
+    References
+    ----------
+    [1] Surjanovic, S. and Bingham, D. Virtual Library of Simulation Experiments:
+    Test Functions and Datasets. [https://www.sfu.ca/~ssurjano/optimization.html]
+    """
+    assert len(x.shape) == 2, "Input x must be a 2D array."
+    d = x.shape[1]
+    assert d == 2, "Dimensionality must be 2."
+
+    x1 = x[:, 0]
+    x2 = x[:, 1]
+
+    return -((x1**2 + x2 - 11) ** 2 + (x1 + x2**2 - 7) ** 2)
+
+
 if __name__ == "__main__":
     b = branin_2d
     maximal_b = b(np.array([[-np.pi, 12.275], [np.pi, 2.275], [9.42478, 2.475]]))
