@@ -47,6 +47,7 @@ dms = [
 ]
 ehrlich = [
     "pytorch-holo",
+    "botorch<=0.13.0",
 ]
 ehrlichholo = [
     "pytorch-holo",
