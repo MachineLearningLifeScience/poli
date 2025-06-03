@@ -70,7 +70,7 @@ class MestranolSimilarityBlackBox(TDCBlackBox):
 
     Methods
     -------
-    __init__(self, string_representation, force_isolation, batch_size=None, parallelize=False, num_workers=None, evaluation_budget=int("inf"))
+    __init__(self, string_representation, force_isolation, batch_size=None, parallelize=False, num_workers=None, evaluation_budget=None))
         Initializes the black box.
 
     References
@@ -91,7 +91,7 @@ class MestranolSimilarityBlackBox(TDCBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = int("inf"),
+        evaluation_budget: int = None,
     ):
         super().__init__(
             oracle_name="Mestranol_Similarity",
@@ -150,7 +150,7 @@ class MestranolSimilarityProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = int("inf"),
+        evaluation_budget: int = None,
         force_isolation: bool = False,
     ) -> Problem:
         """

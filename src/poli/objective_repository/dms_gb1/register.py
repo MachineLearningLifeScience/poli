@@ -49,7 +49,7 @@ class DMSGB1BlackBox(AbstractBlackBox):
     num_workers : int, optional
         The number of workers for parallel evaluation, by default None.
     evaluation_budget : int, optional
-        The evaluation budget, by default int("inf").
+        The evaluation budget, by default None).
 
     Methods
     -------
@@ -71,7 +71,7 @@ class DMSGB1BlackBox(AbstractBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = int("inf"),
+        evaluation_budget: int = None,
         force_isolation: bool = False,
     ):
         """
@@ -90,7 +90,7 @@ class DMSGB1BlackBox(AbstractBlackBox):
         num_workers : int, optional
             The number of workers for parallel evaluation, by default None.
         evaluation_budget : int, optional
-            The evaluation budget, by default int("inf").
+            The evaluation budget, by default None).
         """
         if parallelize:
             print(
@@ -175,7 +175,7 @@ class DMSGB1ProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = int("inf"),
+        evaluation_budget: int = None,
         force_isolation: bool = False,
     ) -> Problem:
         """
@@ -197,7 +197,7 @@ class DMSGB1ProblemFactory(AbstractProblemFactory):
         num_workers : int, optional
             The number of workers for parallel evaluation, by default None.
         evaluation_budget : int, optional
-            The evaluation budget, by default int("inf").
+            The evaluation budget, by default None).
 
         Returns
         -------

@@ -82,7 +82,7 @@ class QEDBlackBox(AbstractBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = int("inf"),
+        evaluation_budget: int = None,
     ):
         """
         Initialize the QEDBlackBox.
@@ -104,7 +104,7 @@ class QEDBlackBox(AbstractBlackBox):
         num_workers : int, optional
             The number of workers for parallel evaluation, by default None.
         evaluation_budget : int, optional
-            The maximum number of evaluations, by default int("inf").
+            The maximum number of evaluations, by default None).
         """
         super().__init__(
             batch_size=batch_size,
@@ -223,7 +223,7 @@ class QEDProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = int("inf"),
+        evaluation_budget: int = None,
         force_isolation: bool = False,
     ) -> Problem:
         """Creates a QED black box function and initial observations.
@@ -242,7 +242,7 @@ class QEDProblemFactory(AbstractProblemFactory):
         num_workers : int, optional
             The number of workers for parallel evaluation, by default None.
         evaluation_budget : int, optional
-            The maximum number of evaluations, by default int("inf").
+            The maximum number of evaluations, by default None).
 
         Returns
         -------

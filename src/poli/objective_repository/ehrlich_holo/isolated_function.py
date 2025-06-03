@@ -32,7 +32,7 @@ class EhrlichIsolatedLogic(AbstractIsolatedFunction):
         alphabet: list[str] = AMINO_ACIDS,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = int("inf"),
+        evaluation_budget: int = None,
     ):
         self.sequence_length = sequence_length
         self.motif_length = motif_length

@@ -45,7 +45,7 @@ class WhiteNoiseBlackBox(AbstractBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = int("inf"),
+        evaluation_budget: int = None,
     ):
         """
         Initializes a WhiteNoiseBlackBox.
@@ -63,7 +63,7 @@ class WhiteNoiseBlackBox(AbstractBlackBox):
             The number of workers for parallel evaluation, by default None (which
             corresponds to half the CPUs available, rounded downwards).
         evaluation_budget : int, optional
-            The maximum number of evaluations, by default int("inf").
+            The maximum number of evaluations, by default None).
         """
         super().__init__(
             batch_size=batch_size,
@@ -110,7 +110,7 @@ class WhiteNoiseProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = int("inf"),
+        evaluation_budget: int = None,
         force_isolation: bool = False,
     ) -> Problem:
         """

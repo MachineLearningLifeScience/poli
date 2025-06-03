@@ -89,7 +89,7 @@ class FoldxBlackBox(AbstractBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = int("inf"),
+        evaluation_budget: int = None,
         wildtype_pdb_path: Union[Path, List[Path]] = None,
         alphabet: List[str] = None,
         experiment_id: str = None,

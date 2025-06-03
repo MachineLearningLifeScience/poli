@@ -47,7 +47,7 @@ class ToyContinuousBlackBox(AbstractBlackBox):
     num_workers : int, optional
         The number of workers for parallel evaluation, by default None.
     evaluation_budget : int, optional
-        The maximum number of evaluations, by default int("inf").
+        The maximum number of evaluations, by default None).
 
     Attributes
     ----------
@@ -78,7 +78,7 @@ class ToyContinuousBlackBox(AbstractBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = int("inf"),
+        evaluation_budget: int = None,
     ):
 
         assert (
@@ -158,7 +158,7 @@ class ToyContinuousProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = int("inf"),
+        evaluation_budget: int = None,
         force_isolation: bool = False,
     ) -> Problem:
         """

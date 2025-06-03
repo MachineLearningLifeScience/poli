@@ -22,7 +22,7 @@ class FoldXRFPLamboBlackBox(AbstractBlackBox):
         parallelize: bool = False,
         num_workers: int = None,
         batch_size: int = None,
-        evaluation_budget: int = int("inf"),
+        evaluation_budget: int = None,
         force_isolation: bool = False,
     ):
         super().__init__(
@@ -83,7 +83,7 @@ class FoldXRFPLamboProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = int("inf"),
+        evaluation_budget: int = None,
         force_isolation: bool = False,
     ) -> Problem:
         """
@@ -101,7 +101,7 @@ class FoldXRFPLamboProblemFactory(AbstractProblemFactory):
         num_workers : int, optional
             The number of workers for parallel evaluation, by default None.
         evaluation_budget : int, optional
-            The evaluation budget, by default int("inf").
+            The evaluation budget, by default None).
         force_isolation : bool, optional
             Should the problem
         Returns

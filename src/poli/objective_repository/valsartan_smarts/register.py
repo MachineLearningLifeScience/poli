@@ -88,7 +88,7 @@ class ValsartanSMARTSBlackBox(TDCBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = int("inf"),
+        evaluation_budget: int = None,
     ):
         super().__init__(
             oracle_name="Valsartan_SMARTS",
@@ -146,7 +146,7 @@ class ValsartanSMARTSProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = int("inf"),
+        evaluation_budget: int = None,
         force_isolation: bool = False,
     ) -> Problem:
         """

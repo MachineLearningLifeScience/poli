@@ -53,7 +53,7 @@ class RFPFoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
         batch_size: int = 1,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = int("inf"),
+        evaluation_budget: int = None,
         force_isolation: bool = False,
     ) -> Problem:
         """

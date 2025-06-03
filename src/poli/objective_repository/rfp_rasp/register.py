@@ -19,7 +19,7 @@ class RFPRaspBlackBox(RaspBlackBox):
         batch_size=None,
         parallelize=False,
         num_workers=None,
-        evaluation_budget=int("inf"),
+        evaluation_budget=None,
         force_isolation=False,
     ):
         RFP_PDB_PATH = Path(__file__).parent / "assets"
@@ -60,7 +60,7 @@ class RFPRaspProblemFactory(RaspProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = int("inf"),
+        evaluation_budget: int = None,
         force_isolation: bool = False,
     ):
         if seed is not None:

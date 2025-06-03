@@ -8,7 +8,7 @@ class IsolatedBlackBox(AbstractBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = int("inf"),
+        evaluation_budget: int = None,
         **kwargs_for_black_box,
     ):
 
