@@ -63,7 +63,7 @@ rmf = [
 ]
 rosetta_energy = [
     "biopython",
-    "pyrosetta",
+    "pyrosetta-installer",
 ]
 dev = ["black", "tox", "pytest", "bump-my-version"]
 docs = ["sphinx", "furo"]
@@ -144,3 +144,8 @@ replace = 'version = "{new_version}"'
 filename = "CITATION.cff"
 search = 'version: {current_version}'
 replace = 'version: {new_version}'
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.2.0",
+]

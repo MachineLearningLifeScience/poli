@@ -34,3 +34,7 @@ docs/source/generated/
 
 # Ignore slurm scripts
 slurm_scripts/
+
+# Ignore uv-related files
+uv.lock
+.python-version
