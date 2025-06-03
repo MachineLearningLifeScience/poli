@@ -5,11 +5,23 @@ on:
     branches:
       - dev
       - master
+    paths:
+      - 'src/poli/objective_repository/foldx_*/**'
+      - 'src/poli/objective_repository/rfp_foldx_*/**'
+      - 'src/poli/core/proteins/**'
+      - 'src/poli/core/util/proteins/**'
+      - 'src/poli/tests/registry/proteins/**'
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review, closed]
     branches:
       - dev
       - master
+    paths:
+      - 'src/poli/objective_repository/foldx_*/**'
+      - 'src/poli/objective_repository/rfp_foldx_*/**'
+      - 'src/poli/core/proteins/**'
+      - 'src/poli/core/util/proteins/**'
+      - 'src/poli/tests/registry/proteins/**'
   schedule:
     - cron: '0 0 * * 0'
 
