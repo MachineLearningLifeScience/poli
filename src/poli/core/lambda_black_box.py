@@ -43,7 +43,7 @@ class LambdaBlackBox(AbstractBlackBox):
         which uses half of the available CPU cores.
     evaluation_budget : int, optional
         The maximum number of evaluations allowed for the black box function.
-        Default is float("inf").
+        Default is int("inf").
     force_isolation : bool, optional
         Flag indicating whether to force isolation of the black
         box function. In this black box, this flag is ignored.
@@ -56,7 +56,7 @@ class LambdaBlackBox(AbstractBlackBox):
         batch_size=None,
         parallelize=False,
         num_workers=None,
-        evaluation_budget=float("inf"),
+        evaluation_budget=int("inf"),
         force_isolation=False,
     ):
         super().__init__(

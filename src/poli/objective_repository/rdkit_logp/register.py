@@ -81,7 +81,7 @@ class LogPBlackBox(AbstractBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = int("inf"),
         force_isolation: bool = False,
     ):
         """
@@ -187,7 +187,7 @@ class LogPProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = int("inf"),
         force_isolation: bool = False,
     ) -> Problem:
         """Creates a logP problem instance.

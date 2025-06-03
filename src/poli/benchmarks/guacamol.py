@@ -23,6 +23,7 @@ References
     Proceedings of Neural Information Processing Systems, NeurIPS Datasets and Benchmarks, 2021.
 """
 
+import math
 from typing import Literal, Union
 
 from poli.core.abstract_benchmark import AbstractBenchmark
@@ -85,7 +86,7 @@ class GuacaMolGoalDirectedBenchmark(AbstractBenchmark):
         batch_size: Union[int, None] = None,
         parallelize: bool = False,
         num_workers: Union[int, None] = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = int(math.inf),
     ) -> None:
         super().__init__(
             seed=seed,

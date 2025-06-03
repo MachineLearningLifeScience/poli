@@ -49,7 +49,7 @@ class DMSTrpBBlackBox(AbstractBlackBox):
     num_workers : int, optional
         The number of workers for parallel evaluation, by default None.
     evaluation_budget : int, optional
-        The evaluation budget, by default float("inf").
+        The evaluation budget, by default int("inf").
 
     Methods
     -------
@@ -67,7 +67,7 @@ class DMSTrpBBlackBox(AbstractBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = int("inf"),
         force_isolation: bool = False,
     ):
         """
@@ -86,7 +86,7 @@ class DMSTrpBBlackBox(AbstractBlackBox):
         num_workers : int, optional
             The number of workers for parallel evaluation, by default None.
         evaluation_budget : int, optional
-            The evaluation budget, by default float("inf").
+            The evaluation budget, by default int("inf").
         """
         if parallelize:
             print(
@@ -171,7 +171,7 @@ class DMSTrpBProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = int("inf"),
         force_isolation: bool = False,
     ) -> Problem:
         """
@@ -193,7 +193,7 @@ class DMSTrpBProblemFactory(AbstractProblemFactory):
         num_workers : int, optional
             The number of workers for parallel evaluation, by default None.
         evaluation_budget : int, optional
-            The evaluation budget, by default float("inf").
+            The evaluation budget, by default int("inf").
 
         Returns
         -------

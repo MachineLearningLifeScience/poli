@@ -41,7 +41,7 @@ class PenalizedLogPLamboBlackBox(AbstractBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = int("inf"),
         force_isolation: bool = False,
     ):
         super().__init__(
@@ -110,7 +110,7 @@ class PenalizedLogPLamboProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = int("inf"),
         force_isolation: bool = False,
     ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
         if seed is not None:

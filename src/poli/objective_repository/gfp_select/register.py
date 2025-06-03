@@ -15,7 +15,7 @@ class GFPSelectionBlackBox(AbstractBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = int("inf"),
         seed: int = None,
         force_isolation: bool = False,
     ):
@@ -70,7 +70,7 @@ class GFPSelectionProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = int("inf"),
         force_isolation: bool = False,
     ) -> Problem:
         if seed is not None:

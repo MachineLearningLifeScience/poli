@@ -69,7 +69,7 @@ class DRD3BlackBox(TDCBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = int("inf"),
     ):
         super().__init__(
             oracle_name="3pbl_docking",
@@ -118,7 +118,7 @@ class DRD3ProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = int("inf"),
         force_isolation: bool = False,
     ) -> Problem:
         """

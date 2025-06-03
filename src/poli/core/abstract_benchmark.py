@@ -16,7 +16,7 @@ class AbstractBenchmark:
         batch_size: Union[int, None] = None,
         parallelize: bool = False,
         num_workers: Union[int, None] = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = int("inf"),
     ) -> None:
         self.seed = seed
         self.batch_size = batch_size

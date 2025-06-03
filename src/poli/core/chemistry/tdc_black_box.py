@@ -64,7 +64,7 @@ class TDCBlackBox(AbstractBlackBox):
 
     Methods
     -------
-    __init__(self, oracle_name, string_representation="SMILES", force_isolation=False, batch_size=None, parallelize=False, num_workers=None, evaluation_budget=float("inf"), **kwargs_for_oracle
+    __init__(self, oracle_name, string_representation="SMILES", force_isolation=False, batch_size=None, parallelize=False, num_workers=None, evaluation_budget=int("inf"), **kwargs_for_oracle
         Initializes a new instance of the abstract TDC class.
 
     References
@@ -83,7 +83,7 @@ class TDCBlackBox(AbstractBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = int("inf"),
         **kwargs_for_oracle,
     ):
         if parallelize:

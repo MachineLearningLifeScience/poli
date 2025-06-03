@@ -30,7 +30,7 @@ class AbstractBlackBox:
         which uses half of the available CPU cores.
     evaluation_budget : int, optional
         The maximum number of evaluations allowed for the black box function.
-        Default is float("inf").
+        Default is int("inf").
 
     Attributes
     ----------
@@ -74,7 +74,7 @@ class AbstractBlackBox:
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = int("inf"),
         force_isolation: bool = False,
     ):
         """
@@ -89,7 +89,7 @@ class AbstractBlackBox:
         num_workers : int, optional
             The number of workers for parallel execution, by default we use half the available CPUs.
         evaluation_budget : int, optional
-            The maximum number of evaluations allowed for the black box function, by default float("inf").
+            The maximum number of evaluations allowed for the black box function, by default int("inf").
         """
         self.observer = None
         self.observer_info = None

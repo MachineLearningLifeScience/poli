@@ -24,7 +24,7 @@ class GFPCBasBlackBox(AbstractBlackBox):
         parallelize: bool = False,
         num_workers: int = None,
         seed: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = int("inf"),
         force_isolation: bool = False,
         negate: bool = False,
     ):
@@ -118,7 +118,7 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = int("inf"),
         negate: bool = False,
     ) -> Problem:
         """

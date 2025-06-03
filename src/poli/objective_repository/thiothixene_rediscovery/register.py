@@ -68,7 +68,7 @@ class ThiothixeneRediscoveryBlackBox(TDCBlackBox):
 
     Methods
     -------
-    __init__(self, string_representation, force_isolation, batch_size=None, parallelize=False, num_workers=None, evaluation_budget=float("inf"))
+    __init__(self, string_representation, force_isolation, batch_size=None, parallelize=False, num_workers=None, evaluation_budget=int("inf"))
         Initializes the black box.
 
     References
@@ -89,7 +89,7 @@ class ThiothixeneRediscoveryBlackBox(TDCBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = int("inf"),
     ):
         super().__init__(
             oracle_name="Thiothixene_Rediscovery",
@@ -147,7 +147,7 @@ class ThiothixeneRediscoveryProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = int("inf"),
         force_isolation: bool = False,
     ) -> Problem:
         """

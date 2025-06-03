@@ -138,7 +138,7 @@ class RosettaEnergyBlackBox(AbstractBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = int("inf"),
         force_isolation: bool = False,
     ):
         super().__init__(
@@ -239,7 +239,7 @@ class RosettaEnergyProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = int("inf"),
         force_isolation: bool = False,
     ) -> Problem:
         """
@@ -288,7 +288,7 @@ class RosettaEnergyProblemFactory(AbstractProblemFactory):
         num_workers : int, optional
             The number of workers for parallel evaluation, by default None.
         evaluation_budget : int, optional
-            The evaluation budget, by default float("inf").
+            The evaluation budget, by default int("inf").
 
         Returns
         -------
