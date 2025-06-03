@@ -51,7 +51,7 @@ class RMFBlackBox(AbstractBlackBox):
     num_workers : int, optional
         The number of workers for parallel evaluation, by default None.
     evaluation_budget : int, optional
-        The evaluation budget, by default float("inf").
+        The evaluation budget, by default None).
     force_isolation : bool, optional
         Run in an isolated environment and process, by default False.
     """
@@ -67,7 +67,7 @@ class RMFBlackBox(AbstractBlackBox):
         batch_size: int | None = None,
         parallelize: bool | None = False,
         num_workers: int | None = None,
-        evaluation_budget: int | None = float("inf"),
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ) -> None:
         """
@@ -82,7 +82,7 @@ class RMFBlackBox(AbstractBlackBox):
         num_workers : int, optional
             Number of workers for parallel evaluation, default: None.
         evaluation_budget : int, optional
-            Maximum number of evaluations, default: float("inf").
+            Maximum number of evaluations, default: None).
         force_isolation: bool
             Run the blackbox in an isolated environment, default: False.
         """
@@ -178,7 +178,7 @@ class RMFProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = None,
         force_isolation: bool = False,
     ) -> Problem:
         """

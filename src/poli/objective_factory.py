@@ -46,7 +46,7 @@ def __create_problem_from_repository(
     batch_size: int = None,
     parallelize: bool = False,
     num_workers: int = None,
-    evaluation_budget: int = float("inf"),
+    evaluation_budget: int = None,
     force_isolation: bool = False,
     observer: AbstractObserver = None,
     **kwargs_for_factory,
@@ -121,7 +121,7 @@ def create(
     batch_size: int = None,
     parallelize: bool = False,
     num_workers: int = None,
-    evaluation_budget: int = float("inf"),
+    evaluation_budget: int = None,
     quiet: bool = False,
     **kwargs_for_factory,
 ) -> Problem:

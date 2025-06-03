@@ -115,7 +115,7 @@ class EhrlichBlackBox(AbstractBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = None,
     ):
         warnings.warn(
             "This EhrlichBlackBox class is different from the original "
@@ -409,7 +409,7 @@ class EhrlichProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = None,
         force_isolation: bool = False,
     ) -> Problem:
         """

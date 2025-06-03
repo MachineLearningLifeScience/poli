@@ -99,7 +99,7 @@ class JNK3BlackBox(TDCBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = None,
     ):
         super().__init__(
             oracle_name="JNK3",
@@ -163,7 +163,7 @@ class JNK3ProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = None,
         force_isolation: bool = False,
     ) -> Problem:
         """

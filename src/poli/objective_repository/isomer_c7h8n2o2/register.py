@@ -88,7 +88,7 @@ class IsomerC7H8N2O2BlackBox(TDCBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = None,
     ):
         super().__init__(
             oracle_name="Isomers_C7H8N2O2",
@@ -147,7 +147,7 @@ class IsomerC7H8N2O2ProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = None,
         force_isolation: bool = False,
     ) -> Problem:
         """

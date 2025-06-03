@@ -94,7 +94,7 @@ class EhrlichHoloBlackBox(AbstractBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = None,
         force_isolation: bool = False,
     ):
         super().__init__(batch_size, parallelize, num_workers, evaluation_budget)
@@ -222,7 +222,7 @@ class EhrlichHoloProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = None,
         force_isolation: bool = False,
     ) -> Problem:
         """

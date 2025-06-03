@@ -54,7 +54,7 @@ class ToyContinuousFunctionsBenchmark(AbstractBenchmark):
         batch_size: Union[int, None] = None,
         parallelize: bool = False,
         num_workers: Union[int, None] = None,
-        evaluation_budget: Union[int, List[int]] = float("inf"),
+        evaluation_budget: Union[int, List[int]] = None,
     ) -> None:
         super().__init__(
             seed=seed,
@@ -121,7 +121,7 @@ class EmbeddedBranin2D(AbstractBenchmark):
         batch_size: Union[int, None] = None,
         parallelize: bool = False,
         num_workers: Union[int, None] = None,
-        evaluation_budget: Union[int, List[int]] = float("inf"),
+        evaluation_budget: Union[int, List[int]] = None,
     ) -> None:
         super().__init__(
             seed,
@@ -174,7 +174,7 @@ class EmbeddedHartmann6D(AbstractBenchmark):
         batch_size: Union[int, None] = None,
         parallelize: bool = False,
         num_workers: Union[int, None] = None,
-        evaluation_budget: Union[int, List[int]] = float("inf"),
+        evaluation_budget: Union[int, List[int]] = None,
     ) -> None:
         super().__init__(
             seed,

@@ -71,7 +71,7 @@ class FoldXSASABlackBox(AbstractBlackBox):
         batch_size: int = 1,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = None,
         force_isolation: bool = False,
     ):
         super().__init__(
@@ -174,7 +174,7 @@ class FoldXSASAProblemFactory(AbstractProblemFactory):
         batch_size: int = 1,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = None,
         force_isolation: bool = False,
     ) -> Problem:
         """

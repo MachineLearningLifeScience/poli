@@ -55,7 +55,7 @@ class SABlackBox(TDCBlackBox):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = None,
         force_isolation: bool = False,
     ):
         """
@@ -79,7 +79,7 @@ class SABlackBox(TDCBlackBox):
         num_workers : int, optional
             The number of workers for parallel evaluation, by default None.
         evaluation_budget : int, optional
-            The maximum number of evaluations, by default float("inf").
+            The maximum number of evaluations, by default None).
         """
         super().__init__(
             oracle_name="SA",
@@ -125,7 +125,7 @@ class SAProblemFactory(AbstractProblemFactory):
         batch_size: int = None,
         parallelize: bool = False,
         num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: int = None,
         force_isolation: bool = False,
     ) -> Problem:
         """

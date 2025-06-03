@@ -85,7 +85,7 @@ class GuacaMolGoalDirectedBenchmark(AbstractBenchmark):
         batch_size: Union[int, None] = None,
         parallelize: bool = False,
         num_workers: Union[int, None] = None,
-        evaluation_budget: int = float("inf"),
+        evaluation_budget: Union[int, None] = None,
     ) -> None:
         super().__init__(
             seed=seed,

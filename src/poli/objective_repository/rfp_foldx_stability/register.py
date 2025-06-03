@@ -19,7 +19,7 @@ class RFPFoldXStabilityBlackBox(FoldXStabilityBlackBox):
         batch_size=1,
         parallelize=False,
         num_workers=None,
-        evaluation_budget=float("inf"),
+        evaluation_budget=None,
         force_isolation=False,
     ):
         RFP_FOLDX_ASSETS_DIR = Path(__file__).parent / "assets"
@@ -57,7 +57,7 @@ class RFPFoldXStabilityProblemFactory(FoldXStabilityProblemFactory):
         batch_size=1,
         parallelize=False,
         num_workers=None,
-        evaluation_budget=float("inf"),
+        evaluation_budget=None,
         force_isolation=False,
     ):
         if seed is not None:

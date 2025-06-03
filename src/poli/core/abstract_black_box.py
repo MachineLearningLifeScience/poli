@@ -2,6 +2,8 @@
 all objective functions should inherit.
 """
 
+from __future__ import annotations
+
 from multiprocessing import Pool, cpu_count
 from warnings import warn
 
@@ -30,7 +32,7 @@ class AbstractBlackBox:
         which uses half of the available CPU cores.
     evaluation_budget : int, optional
         The maximum number of evaluations allowed for the black box function.
-        Default is float("inf").
+        Default is None).
 
     Attributes
     ----------
@@ -71,10 +73,10 @@ class AbstractBlackBox:
 
     def __init__(
         self,
-        batch_size: int = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = float("inf"),
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ):
         """
@@ -89,12 +91,14 @@ class AbstractBlackBox:
         num_workers : int, optional
             The number of workers for parallel execution, by default we use half the available CPUs.
         evaluation_budget : int, optional
-            The maximum number of evaluations allowed for the black box function, by default float("inf").
+            The maximum number of evaluations allowed for the black box function, by default it is None, which means no limit.
         """
         self.observer = None
         self.observer_info = None
         self.parallelize = parallelize
-        self.evaluation_budget = evaluation_budget
+        self.evaluation_budget = (
+            evaluation_budget if evaluation_budget is not None else float("inf")
+        )
         self.num_evaluations = 0
         self.force_isolation = force_isolation
 
