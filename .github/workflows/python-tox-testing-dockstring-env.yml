@@ -9,6 +9,7 @@ on:
       - 'src/poli/core/chemistry/**'
       - 'src/poli/core/util/chemistry/**'
       - 'src/poli/objective_repository/dockstring/**'
+      - 'src/poli/tests/registry/chemistry/**'
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review, closed]
     branches:
@@ -18,6 +19,7 @@ on:
       - 'src/poli/core/chemistry/**'
       - 'src/poli/core/util/chemistry/**'
       - 'src/poli/objective_repository/dockstring/**'
+      - 'src/poli/tests/registry/chemistry/**'
   schedule:
     - cron: '0 0 * * 0'
 

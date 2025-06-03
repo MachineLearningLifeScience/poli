@@ -8,6 +8,7 @@ on:
     paths:
       - 'src/poli/core/chemistry/**'
       - 'src/poli/core/util/chemistry/**'
+      - 'src/poli/tests/registry/chemistry/**'
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review, closed]
     branches:
@@ -16,6 +17,7 @@ on:
     paths:
       - 'src/poli/core/chemistry/**'
       - 'src/poli/core/util/chemistry/**'
+      - 'src/poli/tests/registry/chemistry/**'
   schedule:
     - cron: '0 0 * * 0'
 

@@ -7,6 +7,7 @@ on:
       - master
     paths:
       - 'src/poli/objective_repository/foldx_rfp_lambo/**'
+      - 'src/poli/tests/registry/proteins/test_foldx_rfp_lambo.py'
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review, closed]
     branches:
@@ -14,6 +15,7 @@ on:
       - master
     paths:
       - 'src/poli/objective_repository/foldx_rfp_lambo/**'
+      - 'src/poli/tests/registry/proteins/test_foldx_rfp_lambo.py'
   schedule:
     - cron: '0 0 * * 0'
 
