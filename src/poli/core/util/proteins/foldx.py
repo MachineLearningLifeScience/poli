@@ -24,12 +24,16 @@ References
 
 """
 
+# pyright: reportMissingImports=false
+
+from __future__ import annotations
+
 import logging
 import os
 import shutil
 import subprocess
 from pathlib import Path
-from typing import List, Union
+from typing import Union
 
 from Bio.PDB import SASA
 from Bio.PDB.Residue import Residue
@@ -263,7 +267,9 @@ class FoldxInterface:
             self.repair(pdb_file)
             return self.working_dir / f"{pdb_file.stem}_Repair.pdb"
 
-    def _simulate_mutations(self, pdb_file: Path, mutations: List[str] = None) -> None:
+    def _simulate_mutations(
+        self, pdb_file: Path, mutations: list[str] | None = None
+    ) -> None:
         """Simulates mutations, starting from a wildtype PDB file.
 
         This method simulates mutations on a PDB file with FoldX.
@@ -281,7 +287,7 @@ class FoldxInterface:
         ----------
         pdb_file : Path
             The path to the PDB file to be repaired.
-        mutations : List[str], optional
+        mutations : list[str], optional
             The list of mutations to simulate. If None, we simulate
             the wildtype. Default is None.
 
@@ -427,7 +433,9 @@ class FoldxInterface:
 
         return mutated_structure.sasa
 
-    def compute_stability(self, pdb_file: Path, mutations: List[str] = None) -> float:
+    def compute_stability(
+        self, pdb_file: Path, mutations: list[str] | None = None
+    ) -> float:
         """
         Compute the stability of a protein structure using FoldX.
 
@@ -435,7 +443,7 @@ class FoldxInterface:
         ----------
         pdb_file : Path
             The path to the PDB file of the protein structure.
-        mutations : List[str], optional
+        mutations : list[str], optional
             A list of mutations to be simulated. Only single mutations are supported. Pass no mutations to compute the energy of the wildtype.
 
         Returns
@@ -462,7 +470,7 @@ class FoldxInterface:
         stability = -self._read_energy(pdb_file)
         return stability
 
-    def compute_sasa(self, pdb_file: Path, mutations: List[str] = None) -> float:
+    def compute_sasa(self, pdb_file: Path, mutations: list[str] | None = None) -> float:
         """
         Compute the solvent-accessible surface area (SASA) score for a given protein structure.
 
@@ -470,7 +478,7 @@ class FoldxInterface:
         ----------
         pdb_file : Path
             The path to the PDB file of the protein structure.
-        mutations : List[str], optional
+        mutations : list[str], optional
             A list of mutations to be simulated on the protein structure. Only single mutations are supported.
             Pass no mutations if you want to compute the SASA of the wildtype.
 
@@ -495,7 +503,9 @@ class FoldxInterface:
         sasa_score = self._compute_sasa(pdb_file)
         return sasa_score
 
-    def compute_stability_and_sasa(self, pdb_file: Path, mutations: List[str] = None):
+    def compute_stability_and_sasa(
+        self, pdb_file: Path, mutations: list[str] | None = None
+    ):
         """Computes stability and sasa with a single foldx run,
         instead of two separate runs.
 
@@ -503,7 +513,7 @@ class FoldxInterface:
         ----------
         pdb_file : Path
             The path to the PDB file of the protein structure.
-        mutations : List[str], optional
+        mutations : list[str], optional
             A list of mutations to be simulated on the protein structure. Only single mutations are supported.
             Pass no mutations if you want to compute the SASA of the wildtype.
         """
@@ -545,16 +555,16 @@ class FoldxInterface:
 
     @staticmethod
     def write_mutations_to_file(
-        wildtype_resiudes: List[Residue], mutations: List[str], output_dir: Path
+        wildtype_resiudes: list[Residue], mutations: list[str], output_dir: Path
     ) -> None:
         """Writes the list of mutations to a file
         in the given directory.
 
         Parameters
         ----------
-        wildtype_resiudes : List[Residue]
+        wildtype_resiudes : list[Residue]
             The list of wildtype residues.
-        mutations : List[str]
+        mutations : list[str]
             The list of mutations to simulate.
         output_dir : Path
             The directory to write the file to.

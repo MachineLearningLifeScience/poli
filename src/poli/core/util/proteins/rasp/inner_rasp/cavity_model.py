@@ -71,7 +71,7 @@ class ResidueEnvironmentsDataset(Dataset):
 
     Parameters
     ----------
-    input_data: Union[List[str], List[ResidueEnvironment]]
+    input_data: Union[list[str], list[ResidueEnvironment]]
         List of parsed pdb filenames in .npz format or list of
         ResidueEnvironment objects
     transform: Callable
@@ -89,7 +89,7 @@ class ResidueEnvironmentsDataset(Dataset):
             self.res_env_objects = self.parse_envs(input_data)
         else:
             raise ValueError(
-                "Input data is not of type" "Union[List[str], List[ResidueEnvironment]]"
+                "Input data is not of type" "Union[list[str], list[ResidueEnvironment]]"
             )
 
         self.transformer = transformer

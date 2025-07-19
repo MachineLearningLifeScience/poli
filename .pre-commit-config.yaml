@@ -21,3 +21,11 @@ repos:
     # Run the linter.
     - id: ruff
       args: [ --fix ]
+- repo: local
+  hooks:
+    - id: pyright
+      name: pyright
+      entry: pyright
+      language: system
+      require_serial: true
+      types: [python]

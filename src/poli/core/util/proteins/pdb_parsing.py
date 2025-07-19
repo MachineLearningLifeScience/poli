@@ -1,7 +1,8 @@
 """This module contains utilities for loading PDB files and parsing them."""
 
+# pyright: reportMissingImports=false
+
 from pathlib import Path
-from typing import List
 
 from Bio import PDB
 from Bio.PDB.Residue import Residue
@@ -38,7 +39,7 @@ def parse_pdb_as_structure(
 
 def parse_pdb_as_residues(
     path_to_pdb: Path, structure_name: str = "pdb", verbose: bool = False
-) -> List[Residue]:
+) -> list[Residue]:
     """
     Parse a PDB file and return a list of Residue objects.
 
@@ -53,7 +54,7 @@ def parse_pdb_as_residues(
 
     Returns
     --------
-        residues: List[Residue]
+        residues: list[Residue]
             A list of Residue objects representing the parsed PDB file.
     """
     structure = parse_pdb_as_structure(path_to_pdb, structure_name, verbose)
@@ -62,7 +63,7 @@ def parse_pdb_as_residues(
 
 def parse_pdb_as_residue_strings(
     path_to_pdb: Path, structure_name: str = "pdb", verbose: bool = False
-) -> List[str]:
+) -> list[str]:
     """
     Parse a PDB file and return a list of residue strings.
 
@@ -77,7 +78,7 @@ def parse_pdb_as_residue_strings(
 
     Returns
     -------
-    List[str]
+    list[str]
         A list of residue strings.
     """
     residues = parse_pdb_as_residues(path_to_pdb, structure_name, verbose)

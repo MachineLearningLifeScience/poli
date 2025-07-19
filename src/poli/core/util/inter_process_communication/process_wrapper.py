@@ -5,12 +5,12 @@ Module that wraps utility functions for interprocess communication.
 import logging
 import subprocess
 import time
-from multiprocessing.connection import Client, Listener
+from multiprocessing.connection import Client, Connection, Listener
 from pathlib import Path
 from uuid import uuid4
 
 
-def get_connection(port: int, password: str) -> Client:
+def get_connection(port: int, password: str) -> Connection:
     """
     Get a connection to a server.
 
@@ -86,7 +86,7 @@ class ProcessWrapper:
         self.listener = Listener(address, authkey=self.password.encode())
 
         # TODO: very hacky way to read out the socket! (but the listener is not very cooperative)
-        self.port = self.listener._listener._socket.getsockname()[1]
+        self.port = self.listener._listener._socket.getsockname()[1]  # type: ignore
         # here is a VERY crucial step
         # we expect the shell script to take port and password as arguments, as well as other arguments passed by the user
         # when calling objective_factory.create

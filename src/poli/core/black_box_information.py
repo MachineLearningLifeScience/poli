@@ -12,6 +12,8 @@ The black box information includes the following information:
 - The alphabet of allowed characters.
 """
 
+from __future__ import annotations
+
 from typing import Literal, Union
 
 import numpy as np
@@ -21,18 +23,20 @@ class BlackBoxInformation:
     def __init__(
         self,
         name: str,
-        max_sequence_length: int,
+        max_sequence_length: int | Literal["inf"] | float,
         aligned: bool,
         fixed_length: bool,
         deterministic: bool,
-        alphabet: list,
-        log_transform_recommended: bool = None,
+        alphabet: list[str] | None = None,
+        log_transform_recommended: bool | None = None,
         discrete: bool = True,
         fidelity: Union[Literal["high", "low"], None] = None,
-        padding_token: str = "",
+        padding_token: str | None = None,
     ):
         self.name = name
-        self.max_sequence_length = max_sequence_length
+        self.max_sequence_length = (
+            max_sequence_length if max_sequence_length != "inf" else np.inf
+        )
         self.aligned = aligned
         self.fixed_length = fixed_length
         self.deterministic = deterministic
@@ -40,7 +44,7 @@ class BlackBoxInformation:
         self.log_transform_recommended = log_transform_recommended
         self.discrete = discrete
         self.fidelity = fidelity
-        self.padding_token = padding_token
+        self.padding_token = padding_token if padding_token is not None else ""
 
     def get_problem_name(self) -> str:
         """Returns the problem's name.
@@ -52,14 +56,15 @@ class BlackBoxInformation:
         """
         return self.name
 
-    def get_max_sequence_length(self) -> int:
+    def get_max_sequence_length(self) -> int | float:
         """
         Returns the maximum sequence length allowed by the black-box.
 
         Returns
         --------
-        max_sequence_length : int
-            The length of the longest sequence.
+        max_sequence_length : int | float
+            The length of the longest sequence. If the maximum sequence length is
+            infinity, it returns np.inf.
         """
         return self.max_sequence_length
 
@@ -116,7 +121,7 @@ class BlackBoxInformation:
         """
         return self.aligned
 
-    def get_alphabet(self) -> list:
+    def get_alphabet(self) -> list[str] | None:
         """
         Returns the alphabet of allowed characters.
 
@@ -127,13 +132,13 @@ class BlackBoxInformation:
         """
         return self.alphabet
 
-    def log_transform_recommended(self) -> bool:
+    def is_log_transform_recommended(self) -> bool | None:
         """
         Returns whether the black-box recommends log-transforming the targets.
 
         Returns
         --------
-        log_transform_recommended : bool
+        log_transform_recommended : bool | None
             Whether the black-box recommends log-transforming the targets.
         """
         return self.log_transform_recommended

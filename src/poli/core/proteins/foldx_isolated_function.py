@@ -1,6 +1,6 @@
 from pathlib import Path
 from time import time
-from typing import List, Union
+from typing import Union
 from uuid import uuid4
 
 import numpy as np
@@ -27,7 +27,7 @@ class FoldxIsolatedFunction(AbstractIsolatedFunction):
 
     Parameters
     -----------
-    wildtype_pdb_path : Union[Path, List[Path]], required
+    wildtype_pdb_path : Union[Path, list[Path]], required
         The path(s) to the wildtype PDB file(s). (default: None)
     experiment_id : str, optional
         The experiment ID. (default: None)
@@ -44,13 +44,13 @@ class FoldxIsolatedFunction(AbstractIsolatedFunction):
         The experiment ID.
     tmp_folder : Path
         The temporary folder path.
-    wildtype_pdb_paths : List[Path]
+    wildtype_pdb_paths : list[Path]
         The list of repaired wildtype PDB file paths.
-    wildtype_residues : List[List[Residue]]
+    wildtype_residues : list[list[Residue]]
         The list of wildtype residues for each PDB file.
-    wildtype_amino_acids : List[List[str]]
+    wildtype_amino_acids : list[list[str]]
         The list of wildtype amino acids for each PDB file.
-    wildtype_residue_strings : List[str]
+    wildtype_residue_strings : list[str]
         The list of wildtype residue strings for each PDB file.
 
     Methods
@@ -62,9 +62,9 @@ class FoldxIsolatedFunction(AbstractIsolatedFunction):
 
     def __init__(
         self,
-        wildtype_pdb_path: Union[Path, List[Path]],
-        experiment_id: str = None,
-        tmp_folder: Path = None,
+        wildtype_pdb_path: Union[Path, list[Path]],
+        experiment_id: str | None = None,
+        tmp_folder: Path | None = None,
         eager_repair: bool = False,
         verbose: bool = False,
     ):
@@ -73,7 +73,7 @@ class FoldxIsolatedFunction(AbstractIsolatedFunction):
 
         Parameters
         -----------
-        wildtype_pdb_path : Union[Path, List[Path]]
+        wildtype_pdb_path : Union[Path, list[Path]]
             The path(s) to the wildtype PDB file(s).
         experiment_id : str, optional
             The experiment ID. (default: None)

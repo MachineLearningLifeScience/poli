@@ -18,11 +18,11 @@ from poli.objective_repository.foldx_rfp_lambo.information import AMINO_ACIDS
 class FoldXRFPLamboBlackBox(AbstractBlackBox):
     def __init__(
         self,
-        seed: int = None,
+        seed: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        batch_size: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        batch_size: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ):
         super().__init__(
@@ -79,11 +79,11 @@ class FoldXRFPLamboProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
-        seed: int = None,
-        batch_size: int = None,
+        seed: int | None = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ) -> Problem:
         """

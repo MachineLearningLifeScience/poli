@@ -1,5 +1,7 @@
 """Utilities for loading up the cavity and downstream models for RaSP."""
 
+# pyright: reportMissingImports=false
+
 from pathlib import Path
 from typing import Tuple
 

@@ -15,7 +15,7 @@ protein.
 """
 
 from pathlib import Path
-from typing import List, Union
+from typing import Union, cast
 
 import numpy as np
 
@@ -35,7 +35,7 @@ class FoldXSASABlackBox(AbstractBlackBox):
 
     Parameters
     -----------
-    wildtype_pdb_path : Union[Path, List[Path]]
+    wildtype_pdb_path : Union[Path, list[Path]]
         The path(s) to the wildtype PDB file(s). Default is None.
     experiment_id : str, optional
         The ID of the experiment. Default is None.
@@ -63,15 +63,15 @@ class FoldXSASABlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        wildtype_pdb_path: Union[Path, List[Path]],
-        experiment_id: str = None,
-        tmp_folder: Path = None,
+        wildtype_pdb_path: Union[Path, list[Path]],
+        experiment_id: str | None = None,
+        tmp_folder: Path | None = None,
         eager_repair: bool = False,
         verbose: bool = False,
         batch_size: int = 1,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ):
         super().__init__(
@@ -165,16 +165,16 @@ class FoldXSASAProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
-        wildtype_pdb_path: Union[Path, List[Path]],
-        experiment_id: str = None,
-        tmp_folder: Path = None,
+        wildtype_pdb_path: Union[Path, list[Path]],
+        experiment_id: str | None = None,
+        tmp_folder: Path | None = None,
         eager_repair: bool = False,
         verbose: bool = False,
-        seed: int = None,
+        seed: int | None = None,
         batch_size: int = 1,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ) -> Problem:
         """
@@ -182,7 +182,7 @@ class FoldXSASAProblemFactory(AbstractProblemFactory):
 
         Parameters
         ----------
-        wildtype_pdb_path : Union[Path, List[Path]]
+        wildtype_pdb_path : Union[Path, list[Path]]
             Path or list of paths to the wildtype PDB files.
         experiment_id : str, optional
             Identifier for the experiment.
@@ -232,7 +232,9 @@ class FoldXSASAProblemFactory(AbstractProblemFactory):
             wildtype_pdb_path = [wildtype_pdb_path]
         elif isinstance(wildtype_pdb_path, list):
             if isinstance(wildtype_pdb_path[0], str):
-                wildtype_pdb_path = [Path(x.strip()) for x in wildtype_pdb_path]
+                wildtype_pdb_path = [
+                    Path(cast(str, x).strip()) for x in wildtype_pdb_path
+                ]
             elif isinstance(wildtype_pdb_path[0], Path):
                 pass
         else:

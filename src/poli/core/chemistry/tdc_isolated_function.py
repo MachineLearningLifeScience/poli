@@ -11,6 +11,8 @@ References
     (October 2022): 1033-36. https://doi.org/10.1038/s41589-022-01131-2.
 """
 
+# pyright: reportMissingImports=false
+
 import numpy as np
 from tdc import Oracle
 

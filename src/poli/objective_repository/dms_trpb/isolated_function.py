@@ -13,6 +13,9 @@ July 29, 2024.
 
 """
 
+# pyright: reportMissingImports=false
+# pyright: reportMissingModuleSource=false
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -51,7 +54,7 @@ class DMSTrpBIsolatedLogic(AbstractIsolatedFunction):
 
     def __init__(
         self,
-        experiment_id: str = None,
+        experiment_id: str | None = None,
     ):
         """
         Initialize the GB1 Register object.

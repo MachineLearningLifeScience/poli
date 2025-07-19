@@ -11,16 +11,16 @@ from poli.objective_repository.rasp.register import RaspBlackBox, RaspProblemFac
 class RFPRaspBlackBox(RaspBlackBox):
     def __init__(
         self,
-        additive=True,
-        penalize_unfeasible_with=None,
-        device=None,
-        experiment_id=None,
-        tmp_folder=None,
-        batch_size=None,
-        parallelize=False,
-        num_workers=None,
-        evaluation_budget=None,
-        force_isolation=False,
+        additive: bool = True,
+        penalize_unfeasible_with: float | None = None,
+        device: str | None = None,
+        experiment_id: str | None = None,
+        tmp_folder: Path | None = None,
+        batch_size: int | None = None,
+        parallelize: bool = False,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
+        force_isolation: bool = False,
     ):
         RFP_PDB_PATH = Path(__file__).parent / "assets"
         wildtype_pdb_path = [
@@ -54,13 +54,13 @@ class RFPRaspProblemFactory(RaspProblemFactory):
         additive: bool = True,
         penalize_unfeasible_with: float | None = None,
         device: str | None = None,
-        experiment_id: str = None,
-        tmp_folder: Path = None,
-        seed: int = None,
-        batch_size: int = None,
+        experiment_id: str | None = None,
+        tmp_folder: Path | None = None,
+        seed: int | None = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ):
         if seed is not None:

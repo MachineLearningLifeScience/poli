@@ -11,8 +11,6 @@ References
 
 from __future__ import annotations
 
-from typing import List
-
 import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
@@ -30,7 +28,7 @@ class RMFBlackBox(AbstractBlackBox):
 
     Parameters
     ----------
-    wildtype : str
+    wildtype : list[str]
         The wildtype amino-acid sequence (aka reference sequence) against which all RMF values are computed against.
     wt_val : float , optional
         The reference value for the WT, zero if observations are standardized, else float value e.g. ddGs
@@ -41,7 +39,7 @@ class RMFBlackBox(AbstractBlackBox):
         Determines what type of distribution will be sampled from exponential family, Weibull, etc.
     seed : int, optional
         Random seed for replicability of results, by default None.
-    alphabet : List[str], optional
+    alphabet : list[str], optional
         Type of alphabet of the sequences, by default Amino Acids.
         Nucleic Acids possible.
     batch_size : int, optional
@@ -58,14 +56,14 @@ class RMFBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        wildtype: str,
+        wildtype: list[str],
         wt_val: float = 0.0,
         c: float | None = None,
         kappa: float = 0.1,
         seed: int | None = None,
-        alphabet: List[str] | None = None,
+        alphabet: list[str] | None = None,
         batch_size: int | None = None,
-        parallelize: bool | None = False,
+        parallelize: bool = False,
         num_workers: int | None = None,
         evaluation_budget: int | None = None,
         force_isolation: bool = False,
@@ -112,7 +110,7 @@ class RMFBlackBox(AbstractBlackBox):
             force_isolation=self.force_isolation,
         )
 
-    def _black_box(self, x: np.ndarray, context: None) -> np.ndarray:
+    def _black_box(self, x: np.ndarray, context: dict | None = None) -> np.ndarray:
         """
         Runs the given input x provided
         in the context with the RMF function and returns the
@@ -169,16 +167,16 @@ class RMFProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
-        wildtype: List[str] | str,
-        wt_val: float | None = 0.0,
+        wildtype: list[str] | str,
+        wt_val: float = 0.0,
         c: float | None = None,
         kappa: float = 0.1,
-        alphabet: List[str] | None = None,
-        seed: int = None,
-        batch_size: int = None,
+        alphabet: list[str] | None = None,
+        seed: int | None = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ) -> Problem:
         """
@@ -186,7 +184,7 @@ class RMFProblemFactory(AbstractProblemFactory):
 
         Parameters
         ----------
-        wildtype : List[str] | str
+        wildtype : list[str] | str
             Reference (wild-type) sequence is pseudo-optimum on start.
         wt_val : float, optional
             Reference function value (standardized observations) of WT.
@@ -195,7 +193,7 @@ class RMFProblemFactory(AbstractProblemFactory):
             If None passed default value is regularizing 1/(len(alphabet)-1) .
         kappa: float
             Determines generalized Pareto continuous RV.
-        alphabet: List[str], optional
+        alphabet: list[str], optional
             Problem alphabet used, if None is passed default: AMINO_ACIDS.
         seed : int, optional
             Seed for random number generators. If None is passed,

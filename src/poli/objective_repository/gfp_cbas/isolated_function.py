@@ -1,3 +1,5 @@
+# pyright: reportMissingImports=false
+# pyright: reportMissingModuleSource=false
 from pathlib import Path
 from typing import Literal
 from warnings import warn
@@ -5,6 +7,7 @@ from warnings import warn
 import numpy as np
 import pandas as pd
 import torch
+from numpy.typing import NDArray
 
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
 from poli.core.black_box_information import BlackBoxInformation
@@ -22,7 +25,7 @@ class GFPCBasIsolatedLogic(AbstractIsolatedFunction):
         problem_type: Literal["gp", "vae", "elbo"],
         info: BlackBoxInformation,
         n_starting_points: int = 1,
-        seed: int = None,
+        seed: int | None = None,
         functional_only: bool = False,
         ignore_stops: bool = True,
         unique=True,
@@ -134,7 +137,7 @@ class GFPCBasIsolatedLogic(AbstractIsolatedFunction):
         oh_x = one_hot_encode_aa_array(x)
         return self.model.predict(oh_x)[0]
 
-    def __call__(self, x: np.array, context=None) -> np.ndarray:
+    def __call__(self, x: NDArray[np.str_], context=None) -> np.ndarray:
         """
         x is encoded sequence return function value given problem name
         """

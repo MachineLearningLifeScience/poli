@@ -88,7 +88,7 @@ def test_rmf_seed_consistent(seed: int):
 @pytest.mark.poli__rmf
 @pytest.mark.parametrize("n_mutations", [1, 2, 3])
 def test_rmf_num_mutations_expected_val(n_mutations: int):
-    from scipy.stats import genpareto
+    from scipy.stats import genpareto  # type: ignore[reportMissingImports]
 
     SEED = 1
     mutation_seq = list(ref_aa_seq)
@@ -108,8 +108,8 @@ def test_rmf_num_mutations_expected_val(n_mutations: int):
     y1 = f(mutation_seq)
 
     rnd_state = np.random.default_rng(SEED)
-    ref_noise_0 = genpareto.rvs(f.kappa, size=1, random_state=rnd_state)
-    ref_noise_1 = genpareto.rvs(f.kappa, size=1, random_state=rnd_state)
+    ref_noise_0 = genpareto.rvs(f.kappa, size=1, random_state=rnd_state)  # type: ignore
+    ref_noise_1 = genpareto.rvs(f.kappa, size=1, random_state=rnd_state)  # type: ignore
 
     # black-box value minus noisy component should be approximately mutational distance if c==1
     assert np.isclose(np.round(y0 - ref_noise_0), 0)

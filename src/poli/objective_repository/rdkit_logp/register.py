@@ -77,11 +77,11 @@ class LogPBlackBox(AbstractBlackBox):
         self,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
         alphabet: list[str] | None = None,
-        max_sequence_length: int = np.inf,
-        batch_size: int = None,
+        max_sequence_length: int | Literal["inf"] = "inf",
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ):
         """
@@ -110,7 +110,9 @@ class LogPBlackBox(AbstractBlackBox):
         self.from_selfies = string_representation.upper() == "SELFIES"
         self.from_smiles = string_representation.upper() == "SMILES"
         self.alphabet = alphabet
-        self.max_sequence_length = max_sequence_length
+        self.max_sequence_length = (
+            max_sequence_length if max_sequence_length != "inf" else float("inf")
+        )
         self.string_representation = string_representation
 
         super().__init__(
@@ -121,7 +123,7 @@ class LogPBlackBox(AbstractBlackBox):
         )
 
     # The only method you have to define
-    def _black_box(self, x: np.ndarray, context: dict = None) -> np.ndarray:
+    def _black_box(self, x: np.ndarray, context: dict | None = None) -> np.ndarray:
         """Computes the logP of a molecule x (array of strings).
 
         Assuming that x is an array of integers of length L,
@@ -147,7 +149,7 @@ class LogPBlackBox(AbstractBlackBox):
 
         for molecule in molecules:
             if molecule is not None:
-                logp_value = Descriptors.MolLogP(molecule)
+                logp_value = Descriptors.MolLogP(molecule)  # type: ignore
 
                 # If the qed value is not a float, return NaN
                 if not isinstance(logp_value, float):
@@ -182,12 +184,12 @@ class LogPProblemFactory(AbstractProblemFactory):
         self,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
         alphabet: list[str] | None = None,
-        max_sequence_length: int = np.inf,
-        seed: int = None,
-        batch_size: int = None,
+        max_sequence_length: int | Literal["inf"] = "inf",
+        seed: int | None = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ) -> Problem:
         """Creates a logP problem instance.
@@ -216,7 +218,7 @@ class LogPProblemFactory(AbstractProblemFactory):
         if seed is not None:
             seed_python_numpy_and_torch(seed)
 
-        if string_representation.upper() not in ["SMILES", "SELFIES"]:
+        if string_representation not in ["SMILES", "SELFIES"]:
             raise ValueError(
                 "Missing required keyword argument: string_representation: str. "
                 "String representation must be either 'SMILES' or 'SELFIES'."
@@ -225,7 +227,7 @@ class LogPProblemFactory(AbstractProblemFactory):
         self.string_representation = string_representation
 
         f = LogPBlackBox(
-            string_representation=string_representation.upper(),
+            string_representation=string_representation,
             alphabet=alphabet,
             max_sequence_length=max_sequence_length,
             batch_size=batch_size,

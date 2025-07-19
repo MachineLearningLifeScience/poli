@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import cast
 
 import numpy as np
 import pytest
@@ -158,7 +159,9 @@ def test_rasp_penalization_works():
     # This is an unfeasible mutation, since joining
     # all the strings would result in a sequence
     # that is _not_ the same length as the wildtype.
-    problematic_x = np.array([["A"] + [""] * (f.info.max_sequence_length - 1)])
+    problematic_x = np.array(
+        [["A"] + [""] * (cast(int, f.info.max_sequence_length) - 1)]
+    )
     assert f(problematic_x) == -100.0
 
 
@@ -175,7 +178,9 @@ def test_rasp_penalization_works_on_multiple_inputs():
     # This is an unfeasible mutation, since joining
     # all the strings would result in a sequence
     # that is _not_ the same length as the wildtype.
-    problematic_x = np.array([["A"] + [""] * (f.info.max_sequence_length - 1)])
+    problematic_x = np.array(
+        [["A"] + [""] * (cast(int, f.info.max_sequence_length) - 1)]
+    )
     combination = np.vstack([problem.x0, problematic_x])
     y = f(combination)
     assert y[-1] == -100.0

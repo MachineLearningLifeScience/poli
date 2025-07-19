@@ -14,7 +14,7 @@ References
 from multiprocessing import cpu_count
 from pathlib import Path
 from time import time
-from typing import List, Union
+from typing import Union
 from uuid import uuid4
 
 from poli.core.abstract_black_box import AbstractBlackBox
@@ -48,9 +48,9 @@ class FoldxBlackBox(AbstractBlackBox):
         Flag indicating whether to parallelize the simulations. (default: False)
     num_workers : int, optional
         The number of workers for parallelization. (default: None)
-    wildtype_pdb_path : Union[Path, List[Path]], required
+    wildtype_pdb_path : Union[Path, list[Path]], required
         The path(s) to the wildtype PDB file(s). (default: None)
-    alphabet : List[str], optional
+    alphabet : list[str], optional
         The list of allowed amino acids. (default: None)
     experiment_id : str, optional
         The experiment ID. (default: None)
@@ -67,13 +67,13 @@ class FoldxBlackBox(AbstractBlackBox):
         The experiment ID.
     tmp_folder : Path
         The temporary folder path.
-    wildtype_pdb_paths : List[Path]
+    wildtype_pdb_paths : list[Path]
         The list of repaired wildtype PDB file paths.
-    wildtype_residues : List[List[Residue]]
+    wildtype_residues : list[list[Residue]]
         The list of wildtype residues for each PDB file.
-    wildtype_amino_acids : List[List[str]]
+    wildtype_amino_acids : list[list[str]]
         The list of wildtype amino acids for each PDB file.
-    wildtype_residue_strings : List[str]
+    wildtype_residue_strings : list[str]
         The list of wildtype residue strings for each PDB file.
 
     Methods
@@ -85,15 +85,15 @@ class FoldxBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        info: BlackBoxInformation = None,
-        batch_size: int = None,
+        info: BlackBoxInformation | None = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
-        wildtype_pdb_path: Union[Path, List[Path]] = None,
-        alphabet: List[str] = None,
-        experiment_id: str = None,
-        tmp_folder: Path = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
+        wildtype_pdb_path: Union[Path, list[Path]] | None = None,
+        alphabet: list[str] | None = None,
+        experiment_id: str | None = None,
+        tmp_folder: Path | None = None,
         eager_repair: bool = False,
         verbose: bool = False,
     ):
@@ -112,9 +112,9 @@ class FoldxBlackBox(AbstractBlackBox):
             The number of workers for parallelization. (default: None)
         evaluation_budget : int, optional
             The evaluation budget. (default: float('inf'))
-        wildtype_pdb_path : Union[Path, List[Path]], optional
+        wildtype_pdb_path : Union[Path, list[Path]], optional
             The path(s) to the wildtype PDB file(s). (default: None)
-        alphabet : List[str], optional
+        alphabet : list[str], optional
             The list of allowed amino acids. (default: None)
         experiment_id : str, optional
             The experiment ID. (default: None)
@@ -151,7 +151,6 @@ class FoldxBlackBox(AbstractBlackBox):
                 batch_size = 1
 
         super().__init__(
-            info=info,
             batch_size=batch_size,
             parallelize=parallelize,
             num_workers=num_workers,
@@ -167,6 +166,11 @@ class FoldxBlackBox(AbstractBlackBox):
         self.tmp_folder = tmp_folder if tmp_folder is not None else DEFAULT_TMP_PATH
 
         if alphabet is None:
+            if info is None:
+                raise ValueError(
+                    "Missing required keyword argument: alphabet: list[str]. "
+                    "Alphabet must be provided if not in info."
+                )
             alphabet = info.alphabet
 
         if isinstance(wildtype_pdb_path, str):

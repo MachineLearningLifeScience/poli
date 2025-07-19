@@ -8,14 +8,19 @@ since some of them assume that the intrinsic dimensionality
 of the problem is lower than the actual dimensionality.
 """
 
+from __future__ import annotations
+
+from typing import cast
+
 import numpy as np
+
+from poli.objective_repository.toy_continuous_problem.register import (
+    ToyContinuousBlackBox,
+)
 
 
 def test_embed_camelback_into_high_dimensions():
     from poli import objective_factory
-    from poli.objective_repository.toy_continuous_problem.register import (
-        ToyContinuousProblem,
-    )
 
     problem = objective_factory.create(
         name="toy_continuous_problem",
@@ -23,7 +28,7 @@ def test_embed_camelback_into_high_dimensions():
         n_dimensions=2,
         embed_in=10,
     )
-    f_camelback: ToyContinuousProblem = problem.black_box
+    f_camelback = cast(ToyContinuousBlackBox, problem.black_box)
 
     dimensions_to_embed_in = f_camelback.function.dimensions_to_embed_in
 
@@ -36,8 +41,8 @@ def test_embed_camelback_into_high_dimensions():
     another_x[0, dimensions_to_embed_in] = [0.0, 0.0]
 
     assert np.allclose(
-        f_camelback(one_x),
-        f_camelback(another_x),
+        f_camelback(one_x),  # type: ignore
+        f_camelback(another_x),  # type: ignore
     )
 
     # Testing whether the output is different if we are
@@ -45,6 +50,10 @@ def test_embed_camelback_into_high_dimensions():
     one_x[0, dimensions_to_embed_in] = [1.0, 1.0]
 
     assert not np.allclose(
-        f_camelback(one_x),
-        f_camelback(another_x),
+        f_camelback(one_x),  # type: ignore
+        f_camelback(another_x),  # type: ignore
     )
+
+
+if __name__ == "__main__":
+    test_embed_camelback_into_high_dimensions()

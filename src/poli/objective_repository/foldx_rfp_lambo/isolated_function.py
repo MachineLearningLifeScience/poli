@@ -1,5 +1,7 @@
 """RFP objective factory and black box function."""
 
+# pyright: reportMissingImports=false
+
 __author__ = "Simon Bartels"
 
 import logging
@@ -172,7 +174,7 @@ def _download_assets_from_lambo():
 class RFPWrapperIsolatedLogic(AbstractIsolatedFunction):
     def __init__(
         self,
-        seed: int = None,
+        seed: int | None = None,
     ):
         self.alphabet = AMINO_ACIDS
         self.problem_sequence = PROBLEM_SEQ

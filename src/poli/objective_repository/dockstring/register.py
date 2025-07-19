@@ -75,10 +75,10 @@ class DockstringBlackBox(AbstractBlackBox):
         self,
         target_name: str,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
-        batch_size: int = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ):
         """
@@ -199,11 +199,11 @@ class DockstringProblemFactory(AbstractProblemFactory):
         self,
         target_name: str,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
-        seed: int = None,
-        batch_size: int = None,
+        seed: int | None = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ) -> Problem:
         """Creates a dockstring black box function and initial observations.

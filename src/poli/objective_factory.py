@@ -42,13 +42,13 @@ def load_config():
 
 def __create_problem_from_repository(
     name: str,
-    seed: int = None,
-    batch_size: int = None,
+    seed: int | None = None,
+    batch_size: int | None = None,
     parallelize: bool = False,
-    num_workers: int = None,
-    evaluation_budget: int = None,
+    num_workers: int | None = None,
+    evaluation_budget: int | None = None,
     force_isolation: bool = False,
-    observer: AbstractObserver = None,
+    observer: AbstractObserver | None = None,
     **kwargs_for_factory,
 ) -> Problem:
     """Creates the objective function from the repository.
@@ -114,14 +114,14 @@ def __create_problem_from_repository(
 def create(
     name: str,
     *,
-    seed: int = None,
-    observer_init_info: dict = None,
-    observer_name: str = None,
+    seed: int | None = None,
+    observer_init_info: dict[str, object] | None = None,
+    observer_name: str | None = None,
     force_isolation: bool = False,
-    batch_size: int = None,
+    batch_size: int | None = None,
     parallelize: bool = False,
-    num_workers: int = None,
-    evaluation_budget: int = None,
+    num_workers: int | None = None,
+    evaluation_budget: int | None = None,
     quiet: bool = False,
     **kwargs_for_factory,
 ) -> Problem:
@@ -189,9 +189,9 @@ def create(
 
 def start(
     name: str,
-    seed: int = None,
-    caller_info: dict = None,
-    observer_name: str = None,
+    seed: int | None = None,
+    caller_info: dict | None = None,
+    observer_name: str | None = None,
     force_isolation: bool = False,
     **kwargs_for_factory,
 ) -> AbstractBlackBox:
@@ -246,7 +246,9 @@ def start(
     return f
 
 
-def _instantiate_observer(observer_name: str, quiet: bool = False) -> AbstractObserver:
+def _instantiate_observer(
+    observer_name: str | None, quiet: bool = False
+) -> AbstractObserver:
     """
     This function attempts to locally instantiate an observer and if that fails starts the observer in the dedicated environment.
 

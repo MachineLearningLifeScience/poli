@@ -1,6 +1,6 @@
 """External observer, which can be run in an isolated process."""
 
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 
@@ -32,7 +32,7 @@ class ExternalObserver(AbstractObserver):
         Retrieves the attribute of the underlying observer.
     """
 
-    def __init__(self, observer_name: str = None, **kwargs_for_observer):
+    def __init__(self, observer_name: str | None = None, **kwargs_for_observer):
         """
         Initialize the ExternalObserver object.
 
@@ -72,10 +72,10 @@ class ExternalObserver(AbstractObserver):
         """
 
         # We send the observation
-        self.process_wrapper.send(["OBSERVATION", x, y, context])
+        cast(ProcessWrapper, self.process_wrapper).send(["OBSERVATION", x, y, context])
 
         # And we make sure the process received and logged it correctly
-        msg_type, *msg = self.process_wrapper.recv()
+        msg_type, *msg = cast(ProcessWrapper, self.process_wrapper).recv()
         if msg_type == "EXCEPTION":
             e, tb = msg
             print(tb)
@@ -136,10 +136,10 @@ class ExternalObserver(AbstractObserver):
 
     def log(self, algorithm_info: dict):
         # We send the observation
-        self.process_wrapper.send(["LOG", algorithm_info])
+        cast(ProcessWrapper, self.process_wrapper).send(["LOG", algorithm_info])
 
         # And we make sure the process received and logged it correctly
-        msg_type, *msg = self.process_wrapper.recv()
+        msg_type, *msg = cast(ProcessWrapper, self.process_wrapper).recv()
         if msg_type == "EXCEPTION":
             e, tb = msg
             print(tb)
@@ -164,8 +164,8 @@ class ExternalObserver(AbstractObserver):
         black-box function by sending a message
         to the process w. the msg_type "ATTRIBUTE".
         """
-        self.process_wrapper.send(["ATTRIBUTE", __name])
-        msg_type, *msg = self.process_wrapper.recv()
+        cast(ProcessWrapper, self.process_wrapper).send(["ATTRIBUTE", __name])
+        msg_type, *msg = cast(ProcessWrapper, self.process_wrapper).recv()
         if msg_type == "EXCEPTION":
             e, tb = msg
             print(tb)

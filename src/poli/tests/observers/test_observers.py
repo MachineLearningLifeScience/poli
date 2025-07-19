@@ -8,8 +8,11 @@ This module implements tests for
   them in isolated processes using `set_observer`.
 """
 
+from __future__ import annotations
+
 import json
 from pathlib import Path
+from typing import cast
 
 import numpy as np
 
@@ -25,10 +28,10 @@ class SimpleObserver(AbstractObserver):
     def initialize_observer(
         self,
         problem_setup_info: BlackBoxInformation,
-        caller_info: object,
-        seed: int,
+        caller_info: dict[str, object],
+        seed: int | None,
     ) -> object:
-        experiment_id = caller_info["experiment_id"]
+        experiment_id = cast(str, caller_info["experiment_id"])
 
         self.experiment_id = experiment_id
 
@@ -98,9 +101,9 @@ def test_simple_observer_logs_properly():
     f(np.array([list("MIGUE")]))
 
     # Checking whether the results were properly logged
-    assert f.observer.results == [{"x": [["M", "I", "G", "U", "E"]], "y": [[0.0]]}]
-    (f.observer.experiment_path / "metadata.json").unlink()
-    f.observer.experiment_path.rmdir()
+    assert f.observer.results == [{"x": [["M", "I", "G", "U", "E"]], "y": [[0.0]]}]  # type: ignore
+    (f.observer.experiment_path / "metadata.json").unlink()  # type: ignore
+    f.observer.experiment_path.rmdir()  # type: ignore
 
 
 def test_observer_registration_and_external_instancing():
@@ -131,15 +134,15 @@ def test_observer_registration_and_external_instancing():
     # the poli__chem environment.
     f.observer  # The same as problem.observer._observer
     try:
-        f.observer.unexisting_attribute
+        f.observer.unexisting_attribute  # type: ignore
     except AttributeError:
         pass
 
     # Cleaning up (and testing whether we can access attributes
     # of the external observer)
-    print(f.observer.experiment_path)
-    (f.observer.experiment_path / "metadata.json").unlink()
-    f.observer.finish()
+    print(f.observer.experiment_path)  # type: ignore
+    (f.observer.experiment_path / "metadata.json").unlink()  # type: ignore
+    f.observer.finish()  # type: ignore
 
 
 def test_multiple_observer_registration():
@@ -177,8 +180,8 @@ def test_multiple_observer_registration():
 
     # Cleaning up (and testing whether we can access attributes
     # of the external observer)
-    (problem_1.observer._observer.experiment_path / "metadata.json").unlink()
-    (problem_2.observer._observer.experiment_path / "metadata.json").unlink()
+    (problem_1.observer._observer.experiment_path / "metadata.json").unlink()  # type: ignore
+    (problem_2.observer._observer.experiment_path / "metadata.json").unlink()  # type: ignore
     problem_1.observer._observer.finish()
     problem_2.observer._observer.finish()
 

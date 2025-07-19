@@ -78,12 +78,12 @@ class TDCBlackBox(AbstractBlackBox):
         oracle_name: str,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
         alphabet: list[str] | None = None,
-        max_sequence_length: int = np.inf,
+        max_sequence_length: int | Literal["inf"] = "inf",
         force_isolation: bool = False,
-        batch_size: int = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         **kwargs_for_oracle,
     ):
         if parallelize:
@@ -99,7 +99,9 @@ class TDCBlackBox(AbstractBlackBox):
         )
         self.oracle_name = oracle_name
         self.alphabet = alphabet
-        self.max_sequence_length = max_sequence_length
+        self.max_sequence_length = (
+            max_sequence_length if max_sequence_length != "inf" else np.inf
+        )
         self.string_representation = string_representation
 
         from_smiles = string_representation.upper() == "SMILES"

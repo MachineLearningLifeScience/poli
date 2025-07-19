@@ -65,7 +65,7 @@ rosetta_energy = [
     "biopython",
     "pyrosetta-installer",
 ]
-dev = ["black", "tox", "pytest", "bump-my-version"]
+dev = ["black", "tox", "pytest", "bump-my-version", "pre-commit", "pyright"]
 docs = ["sphinx", "furo"]
 
 [project.urls]
@@ -83,8 +83,14 @@ markers = [
     "poli__rosetta_energy: marks tests that run in poli__rosetta_energy",
     "poli__ehrlich_holo: marks tests that run in poli__ehrlich_holo environment",
     "poli__dms: marks tests that run in poli__dms environment",
+    "isolation: marks tests that require isolation of the black box function",
     "unmarked: All other tests, which usually run in the base environment",
 ]
+
+[tool.pyright]
+include = ["src/poli"]
+exclude = ["src/poli/core/util/proteins/rasp/inner_rasp", "src/poli/objective_repository/gfp_cbas", "examples"]
+reportIncompatibleMethodOverride = "none"
 
 [tool.isort]
 profile = "black"
@@ -148,4 +154,7 @@ replace = 'version: {new_version}'
 [dependency-groups]
 dev = [
     "pre-commit>=4.2.0",
+    "pyright>=1.1.403",
+    "pytest>=8.4.0",
+    "ruff>=0.12.3",
 ]

@@ -1,12 +1,15 @@
 """This module contains utilities for creating run scripts for problems and observers."""
 
+from __future__ import annotations
+
 import inspect
 import os
 import stat
 import sys
 from os.path import basename, dirname, join
 from pathlib import Path
-from typing import List, Type, Union
+from types import ModuleType
+from typing import Type, Union, cast
 
 from poli import external_isolated_function_script
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
@@ -22,9 +25,14 @@ RUN_SCRIPTS_FOLDER = HOME_DIR / ".poli_objectives"
 
 
 def make_isolated_function_script(
-    isolated_function: AbstractIsolatedFunction,
-    conda_environment_name: Union[str, Path] = None,
-    python_paths: List[str] = None,
+    isolated_function: (
+        type[AbstractIsolatedFunction]
+        | type[AbstractObserver]
+        | AbstractIsolatedFunction
+        | AbstractObserver
+    ),
+    conda_environment_name: Union[str, Path, None] = None,
+    python_paths: list[str] | None = None,
     cwd=None,
     **kwargs,
 ):
@@ -33,12 +41,12 @@ def make_isolated_function_script(
 
     Parameters
     ----------
-    black_box : AbstractBlackBox
-        The black box object to be executed.
+    isolated_function : AbstractIsolatedFunction
+        The isolated function object to be executed.
     conda_environment_name : str or Path, optional
-        The conda environment to activate before running the black box.
-    python_paths : List[str], optional
-        Additional Python paths to be added before running the black box.
+        The conda environment to activate before running the isolated function.
+    python_paths : list[str], optional
+        Additional Python paths to be added before running the isolated function.
     cwd : str or Path, optional
         The current working directory for the script execution.
 
@@ -56,8 +64,8 @@ def make_isolated_function_script(
 
 def make_observer_script(
     observer: Type[AbstractObserver],
-    conda_environment: Union[str, Path] = None,
-    python_paths: List[str] = None,
+    conda_environment: Union[str, Path, None] = None,
+    python_paths: list[str] | None = None,
     cwd=None,
 ):
     """
@@ -69,7 +77,7 @@ def make_observer_script(
         The observer object to be executed.
     conda_environment : str or Path, optional
         The conda environment to activate before running the observer.
-    python_paths : List[str], optional
+    python_paths : list[str], optional
         Additional Python paths to be added before running the observer.
     cwd : str or Path, optional
         The current working directory for the script execution.
@@ -88,9 +96,14 @@ def make_observer_script(
 
 def _make_run_script_from_template(
     command: str,
-    non_instantiated_object,
-    conda_environment_name: Union[str, Path],
-    python_paths: List[str],
+    non_instantiated_object: (
+        type[AbstractIsolatedFunction]
+        | type[AbstractObserver]
+        | AbstractIsolatedFunction
+        | AbstractObserver
+    ),
+    conda_environment_name: Union[str, Path, None],
+    python_paths: list[str] | None,
     cwd=None,
 ):
     """
@@ -104,7 +117,7 @@ def _make_run_script_from_template(
         The instantiated object representing the problem factory.
     conda_environment_name : str or Path
         The name or path of the conda environment to be used.
-    python_paths : List[str]
+    python_paths : list[str]
         The list of python paths to be appended to the run script.
     cwd : str, optional
         The current working directory for the run script. If not provided, the current working directory is used.
@@ -120,10 +133,15 @@ def _make_run_script_from_template(
         cwd = str(os.getcwd())
 
     # class_object = instantiated_object.__class__
-    class_object = non_instantiated_object
+    if isinstance(
+        non_instantiated_object, (AbstractIsolatedFunction, AbstractObserver)
+    ):
+        class_object = non_instantiated_object.__class__
+    else:
+        class_object = non_instantiated_object
     problem_factory_name = class_object.__name__  # TODO: potential vulnerability?
     factory_location = inspect.getfile(class_object)
-    package_name = inspect.getmodule(non_instantiated_object).__name__
+    package_name = cast(ModuleType, inspect.getmodule(non_instantiated_object)).__name__
 
     if package_name == "__main__":
         package_name = basename(factory_location)[:-3]
@@ -159,7 +177,7 @@ def _make_run_script_from_template(
         python_paths = [dirname(factory_location)]
 
     # TODO: check that location exists and is valid environment
-    python_paths = ":".join(python_paths)
+    python_paths_ = ":".join(python_paths)
 
     with open(
         join(dirname(__file__), "run_script_template.sht"), "r"
@@ -171,7 +189,7 @@ def _make_run_script_from_template(
         run_script = run_script_template_file.read() % (
             cwd,
             conda_environment_name,
-            python_paths,
+            python_paths_,
             ADDITIONAL_IMPORT_SEARCH_PATHES_KEY,
             command,
             full_problem_factory_name,

@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from typing import List, Union
+from typing import Union
 
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.problem import Problem
 
 
 class AbstractBenchmark:
-    problem_factories: List[AbstractProblemFactory]
+    problem_factories: list[AbstractProblemFactory]
     index: int = 0
 
     def __init__(
@@ -16,7 +16,7 @@ class AbstractBenchmark:
         batch_size: Union[int, None] = None,
         parallelize: bool = False,
         num_workers: Union[int, None] = None,
-        evaluation_budget: int = None,
+        evaluation_budget: int | None = None,
     ) -> None:
         self.seed = seed
         self.batch_size = batch_size
@@ -46,7 +46,7 @@ class AbstractBenchmark:
         raise NotImplementedError
 
     @property
-    def problem_names(self) -> List[str]:
+    def problem_names(self) -> list[str]:
         return [
             problem_factory.__module__.replace(
                 "poli.objective_repository.", ""

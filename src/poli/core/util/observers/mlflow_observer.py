@@ -1,3 +1,5 @@
+# pyright: reportMissingImports=false
+
 from pathlib import Path
 
 import mlflow
@@ -17,7 +19,7 @@ class MLFlowObserver(AbstractObserver):
     This observer uses mlflow as a backend.
     """
 
-    def __init__(self, tracking_uri: Path = None):
+    def __init__(self, tracking_uri: Path | None = None):
         self.step = 0
         if tracking_uri is not None:
             mlflow.set_tracking_uri(tracking_uri)

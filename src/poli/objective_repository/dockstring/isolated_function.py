@@ -1,3 +1,4 @@
+# pyright: reportMissingImports=false
 from typing import Literal
 
 import numpy as np

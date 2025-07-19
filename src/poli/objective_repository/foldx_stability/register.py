@@ -17,7 +17,7 @@ also use biopython for pre-processing the PDB files [2].
 from __future__ import annotations
 
 from pathlib import Path
-from typing import List, Union
+from typing import Union, cast
 
 import numpy as np
 
@@ -37,7 +37,7 @@ class FoldXStabilityBlackBox(AbstractBlackBox):
 
     Parameters
     ----------
-    wildtype_pdb_path : Union[Path, List[Path]]
+    wildtype_pdb_path : Union[Path, list[Path]]
         The path(s) to the wildtype PDB file(s).
     experiment_id : str, optional
         The ID of the experiment (default is None).
@@ -70,15 +70,15 @@ class FoldXStabilityBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        wildtype_pdb_path: Union[Path, List[Path]],
-        experiment_id: str = None,
-        tmp_folder: Path = None,
+        wildtype_pdb_path: Union[Path, list[Path]],
+        experiment_id: str | None = None,
+        tmp_folder: Path | None = None,
         eager_repair: bool = False,
         verbose: bool = False,
         batch_size: int = 1,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ):
         super().__init__(
@@ -113,7 +113,7 @@ class FoldXStabilityBlackBox(AbstractBlackBox):
         self.x0 = inner_function.x0
         self.wildtype_amino_acids = inner_function.wildtype_amino_acids
 
-    def _black_box(self, x: np.ndarray, context: None) -> np.ndarray:
+    def _black_box(self, x: np.ndarray, context: None = None) -> np.ndarray:
         """
         Runs the given input x and pdb files provided
         in the context through FoldX and returns the
@@ -168,16 +168,16 @@ class FoldXStabilityBlackBox(AbstractBlackBox):
 class FoldXStabilityProblemFactory(AbstractProblemFactory):
     def create(
         self,
-        wildtype_pdb_path: Union[Path, List[Path]],
-        experiment_id: str = None,
-        tmp_folder: Path = None,
+        wildtype_pdb_path: Union[Path, list[Path]],
+        experiment_id: str | None = None,
+        tmp_folder: Path | None = None,
         eager_repair: bool = False,
         verbose: bool = False,
-        seed: int = None,
+        seed: int | None = None,
         batch_size: int = 1,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ) -> Problem:
         """
@@ -185,9 +185,9 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
 
         Parameters
         ----------
-        wildtype_pdb_path : Union[Path, List[Path]]
+        wildtype_pdb_path : Union[Path, list[Path]]
             Path(s) to the wildtype PDB file(s).
-        alphabet : List[str], optional
+        alphabet : list[str], optional
             List of amino acids to use as the alphabet.
         experiment_id : str, optional
             Identifier for the experiment.
@@ -233,7 +233,9 @@ class FoldXStabilityProblemFactory(AbstractProblemFactory):
             wildtype_pdb_path = [wildtype_pdb_path]
         elif isinstance(wildtype_pdb_path, list):
             if isinstance(wildtype_pdb_path[0], str):
-                wildtype_pdb_path = [Path(x.strip()) for x in wildtype_pdb_path]
+                wildtype_pdb_path = [
+                    Path(cast(str, x).strip()) for x in wildtype_pdb_path
+                ]
             elif isinstance(wildtype_pdb_path[0], Path):
                 pass
         else:

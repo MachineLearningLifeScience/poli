@@ -9,23 +9,25 @@ import subprocess
 from pathlib import Path
 
 import numpy as np
-from level_utils import clean_level
+from numpy.typing import NDArray
+
+from poli.objective_repository.super_mario_bros.level_utils import clean_level
 
 filepath = Path(__file__).parent.resolve()
 JARFILE_PATH = f"{filepath}/simulator.jar"
 
 
 def test_level_from_int_array(
-    level: np.ndarray,
+    level: NDArray[np.int_],
     human_player: bool = False,
     max_time: int = 45,
     visualize: bool = False,
 ) -> dict:
-    level = clean_level(level)
-    level = str(level)
+    level_ = clean_level(level)
+    level_ = str(level_)
 
     return run_level(
-        level, human_player=human_player, max_time=max_time, visualize=visualize
+        level_, human_player=human_player, max_time=max_time, visualize=visualize
     )
 
 
@@ -35,10 +37,10 @@ def test_level_from_str_array(
     max_time: int = 45,
     visualize: bool = False,
 ) -> dict:
-    level = str(level)
+    level_ = str(level)
 
     return run_level(
-        level, human_player=human_player, max_time=max_time, visualize=visualize
+        level_, human_player=human_player, max_time=max_time, visualize=visualize
     )
 
 
@@ -68,7 +70,7 @@ def run_level(
             stdout=subprocess.PIPE,
         )
 
-    lines = java.stdout.readlines()
+    lines = java.stdout.readlines()  # type: ignore
     res = lines[-1]
     res = json.loads(res.decode("utf8"))
     res["level"] = level

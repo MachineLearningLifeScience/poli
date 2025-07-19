@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.typing import NDArray
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
@@ -12,11 +13,11 @@ from poli.core.util.seeding import seed_python_numpy_and_torch
 class GFPSelectionBlackBox(AbstractBlackBox):
     def __init__(
         self,
-        batch_size: int = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
-        seed: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
+        seed: int | None = None,
         force_isolation: bool = False,
     ):
         super().__init__(
@@ -41,7 +42,7 @@ class GFPSelectionBlackBox(AbstractBlackBox):
                 name="gfp_select__isolated", seed=seed
             )
 
-    def _black_box(self, x: np.array, context=None) -> np.ndarray:
+    def _black_box(self, x: NDArray[np.str_], context=None) -> np.ndarray:
         """
         x is string sequence which we look-up in avilable df, return median Brightness
         """
@@ -66,11 +67,11 @@ class GFPSelectionProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
-        seed: int = None,
-        batch_size: int = None,
+        seed: int | None = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ) -> Problem:
         if seed is not None:

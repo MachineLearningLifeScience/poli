@@ -82,12 +82,12 @@ class ZaleplonMPOBlackBox(TDCBlackBox):
         self,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
         alphabet: list[str] | None = None,
-        max_sequence_length: int = np.inf,
+        max_sequence_length: int | Literal["inf"] = "inf",
         force_isolation: bool = False,
-        batch_size: int = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
     ):
         super().__init__(
             oracle_name="Zaleplon_MPO",
@@ -139,15 +139,15 @@ class ZaleplonMPOProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
+        seed: int | None = None,
+        batch_size: int | None = None,
+        parallelize: bool = False,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
+        force_isolation: bool = False,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
         alphabet: list[str] | None = None,
-        max_sequence_length: int = np.inf,
-        seed: int = None,
-        batch_size: int = None,
-        parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
-        force_isolation: bool = False,
+        max_sequence_length: int | Literal["inf"] = "inf",
     ) -> Problem:
         """
         Creates a Zaleplon MPO problem.
@@ -160,7 +160,7 @@ class ZaleplonMPOProblemFactory(AbstractProblemFactory):
             The alphabet to be used for the SMILES or SELFIES representation.
             It is common that the alphabet depends on the dataset used, so
             it is recommended to pass it as an argument. Default is None.
-        max_sequence_length : int, optional
+        max_sequence_length : int | Literal["inf"], optional
             The maximum length of the sequence. Default is infinity.
         seed : int, optional
             Seed for random number generators. If None, no seed is set.

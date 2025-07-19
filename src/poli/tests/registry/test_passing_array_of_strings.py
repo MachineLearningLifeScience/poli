@@ -1,12 +1,11 @@
 """This module tests whether giving black boxes an array of b strings
 is equivalent to giving them an array of [b, L] tokens."""
 
-from typing import List
-
 import pytest
 
 
 # TODO: parametrize by all non-aligned blackboxes
+@pytest.mark.isolation
 @pytest.mark.parametrize(
     "black_box_name, example_non_flat_input, example_flat_input, kwargs",
     [
@@ -104,8 +103,8 @@ import pytest
 )
 def test_passing_array_of_strings(
     black_box_name: str,
-    example_non_flat_input: List[List[str]],
-    example_flat_input: List[str],
+    example_non_flat_input: list[list[str]],
+    example_flat_input: list[str],
     kwargs: dict,
 ):
     """This test checks whether passing an array of strings [b,]

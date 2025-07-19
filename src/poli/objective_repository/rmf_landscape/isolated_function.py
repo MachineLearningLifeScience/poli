@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import logging
-from typing import List
 
 import numpy as np
-from scipy.stats import genpareto
+from scipy.stats import genpareto  # type: ignore[reportMissingImports]
 
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
 from poli.core.util.proteins.defaults import AMINO_ACIDS, ENCODING
@@ -16,11 +15,11 @@ class RMFIsolatedLogic(AbstractIsolatedFunction):
 
     Parameters
     ----------
-    wildtype : List[str]
+    wildtype : list[str]
         String sequence of the reference, default: None.
     c : float, optional
 
-    alphabet : List[str]
+    alphabet : list[str]
         Alphabet for the problem, by default AA list provided from poli.core.util.proteins.defaults
     stochasticity: str, optional
     Methods
@@ -36,11 +35,11 @@ class RMFIsolatedLogic(AbstractIsolatedFunction):
 
     def __init__(
         self,
-        wildtype: List[str],
-        wt_val: float | None = 0.0,
+        wildtype: list[str],
+        wt_val: float = 0.0,
         c: float | None = None,
-        kappa: float | None = 0.1,
-        alphabet: List[str] | None = None,
+        kappa: float = 0.1,
+        alphabet: list[str] | None = None,
         seed: int | None = 0,
     ) -> None:
         """
@@ -51,16 +50,18 @@ class RMFIsolatedLogic(AbstractIsolatedFunction):
             "Did you forget to pass it to the create of the black box?"
         )
         if not isinstance(wildtype, np.ndarray):
-            wildtype = np.array(list(wildtype))
-        self.wildtype = wildtype
+            wildtype_ = np.array(list(wildtype))
+        else:
+            wildtype_ = wildtype
+        self.wildtype = wildtype_
         self.seed = seed
         if alphabet is None:
             logging.info("using default alphabet AAs.")
             alphabet = AMINO_ACIDS
         assert all(
-            [aa in ENCODING.keys() for aa in wildtype]
+            [aa in ENCODING.keys() for aa in wildtype_]
         ), "Input wildtype elements not in encoding alphabet."
-        self.wt_int = np.array([ENCODING.get(aa) for aa in wildtype])
+        self.wt_int = np.array([ENCODING.get(aa) for aa in wildtype_])
         if c is None:
             c = 1 / (len(alphabet) - 1)
         else:

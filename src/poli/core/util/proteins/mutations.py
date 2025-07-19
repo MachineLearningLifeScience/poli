@@ -13,8 +13,10 @@ See the "Individual List Mode" of https://foldxsuite.crg.eu/parameter/mutant-fil
 for more details.
 """
 
+# pyright: reportMissingImports=false
+
 from pathlib import Path
-from typing import List, Tuple, Union
+from typing import Literal, Tuple, Union, overload
 
 import numpy as np
 from Bio.PDB.Residue import Residue
@@ -25,7 +27,7 @@ from poli.core.util.proteins.pdb_parsing import parse_pdb_as_residue_strings
 
 def edits_between_strings(
     string_1: str, string_2: str, strict: bool = True
-) -> List[Tuple[str, int, int]]:
+) -> list[Tuple[str, int, int]]:  # type: ignore
     """
     Compute the edit operations between two strings.
 
@@ -41,7 +43,7 @@ def edits_between_strings(
 
     Returns
     -------
-    List[Tuple[str, int, int]]
+    list[Tuple[str, int, int]]
         A list of tuples representing the edit operations between the two strings.
         Each tuple contains the operation type ("replace"), the position in string_1,
         and the position in string_2.
@@ -66,12 +68,12 @@ def edits_between_strings(
         )
     for i, (a, b) in enumerate(zip(string_1, string_2)):
         if a != b:
-            yield ("replace", i, i)
+            yield ("replace", i, i)  # type: ignore
 
 
 def mutations_from_wildtype_residues_and_mutant(
-    wildtype_residues: List[Residue], mutated_residue_string: str
-) -> List[str]:
+    wildtype_residues: list[Residue], mutated_residue_string: str
+) -> list[str]:
     """Computes the mutations from a wildtype list of residues
     and a mutated residue string.
 
@@ -102,14 +104,14 @@ def mutations_from_wildtype_residues_and_mutant(
 
     Parameters
     ----------
-    wildtype_residues : List[Residue]
+    wildtype_residues : list[Residue]
         The list of wildtype residues.
     mutated_residue_string : str
         The mutated residue string.
 
     Returns
     -------
-    mutations: List[str]
+    mutations: list[str]
         The list of mutations in the format foldx expects.
     """
     wildtype_residue_string = "".join(
@@ -156,8 +158,24 @@ def mutations_from_wildtype_residues_and_mutant(
     return mutations_in_line
 
 
+@overload
 def find_closest_wildtype_pdb_file_to_mutant(
-    wildtype_pdb_files: List[Path],
+    wildtype_pdb_files: list[Path],
+    mutated_residue_string: str,
+    return_hamming_distance: Literal[False] = False,
+) -> Path: ...
+
+
+@overload
+def find_closest_wildtype_pdb_file_to_mutant(
+    wildtype_pdb_files: list[Path],
+    mutated_residue_string: str,
+    return_hamming_distance: Literal[True],
+) -> Tuple[Path, int]: ...
+
+
+def find_closest_wildtype_pdb_file_to_mutant(
+    wildtype_pdb_files: list[Path],
     mutated_residue_string: str,
     return_hamming_distance: bool = False,
 ) -> Union[Path, Tuple[Path, int]]:
@@ -166,7 +184,7 @@ def find_closest_wildtype_pdb_file_to_mutant(
 
     Parameters
     ----------
-    wildtype_pdb_files : List[Path]
+    wildtype_pdb_files : list[Path]
         A list of paths to wildtype PDB files.
     mutated_residue_string : str
         The mutated residue string.
@@ -220,6 +238,6 @@ def find_closest_wildtype_pdb_file_to_mutant(
         )
 
     if return_hamming_distance:
-        return best_candidate_pdb_file, min_hamming_distance
+        return best_candidate_pdb_file, int(min_hamming_distance)
     else:
         return best_candidate_pdb_file

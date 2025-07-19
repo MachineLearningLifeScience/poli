@@ -21,11 +21,12 @@ from __future__ import annotations
 
 from pathlib import Path
 from time import time
-from typing import List, Union
+from typing import Union, cast
 from uuid import uuid4
 
 import numpy as np
-import torch
+import torch  # type: ignore[reportMissingImports]
+from numpy.typing import NDArray
 
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
 from poli.core.util.proteins.mutations import find_closest_wildtype_pdb_file_to_mutant
@@ -80,21 +81,21 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
 
     Parameters
     ----------
-    wildtype_pdb_path : Union[Path, List[Path]]
+    wildtype_pdb_path : Union[Path, list[Path]]
         The path(s) to the wildtype PDB file(s), by default None.
     additive : bool, optional
         Whether we treat multiple mutations as additive, by default False.
         If you are interested in running this black box with multiple
         mutations, you should set this to True. Otherwise, it will
         raise an error if you pass a sequence with more than one mutation.
-    chains_to_keep : List[str], optional
+    chains_to_keep : list[str], optional
         The chains to keep in the PDB file(s), by default we
         keep the chain "A" for all pdbs passed.
     penalize_unfeasible_with: float, optional
         The value to return when the input is unfeasible, by default None, which means that we raise an error when
         an unfeasible sequence (e.g. one with a length different
         from the wildtypes) is passed.
-    alphabet : List[str], optional
+    alphabet : list[str], optional
         The alphabet for the problem, by default we use
         the amino acid list provided in poli.core.util.proteins.defaults.
     experiment_id : str, optional
@@ -128,12 +129,12 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
 
     def __init__(
         self,
-        wildtype_pdb_path: Union[Path, List[Path]],
+        wildtype_pdb_path: Union[Path, list[Path]],
         additive: bool = False,
-        chains_to_keep: List[str] = None,
+        chains_to_keep: list[str] | None = None,
         penalize_unfeasible_with: float | None = None,
-        experiment_id: str = None,
-        tmp_folder: Path = None,
+        experiment_id: str | None = None,
+        tmp_folder: Path | None = None,
         device: str | torch.device | None = None,
     ):
         """
@@ -141,21 +142,21 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
 
         Parameters:
         -----------
-        wildtype_pdb_path : Union[Path, List[Path]]
+        wildtype_pdb_path : Union[Path, list[Path]]
             The path(s) to the wildtype PDB file(s).
         additive : bool, optional
             Whether we treat multiple mutations as additive, by default False.
             If you are interested in running this black box with multiple
             mutations, you should set this to True. Otherwise, it will
             raise an error if you pass a sequence with more than one mutation.
-        chains_to_keep : List[str], optional
+        chains_to_keep : list[str], optional
             The chains to keep in the PDB file(s), by default we
             keep the chain "A" for all pdbs passed.
         penalize_unfeasible_with: float, optional
             The value to return when the input is unfeasible, by default None, which means that we raise an error when
             an unfeasible sequence (e.g. one with a length different
             from the wildtypes) is passed.
-        alphabet : List[str], optional
+        alphabet : list[str], optional
             The alphabet for the problem, by default we use
             the amino acid list provided in poli.core.util.proteins.defaults.
         experiment_id : str, optional
@@ -189,7 +190,9 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
         if isinstance(wildtype_pdb_path, list):
             if isinstance(wildtype_pdb_path[0], str):
                 # Assuming that wildtype_pdb_path is a list of strings
-                wildtype_pdb_path = [Path(x.strip()) for x in wildtype_pdb_path]
+                wildtype_pdb_path = [
+                    Path(cast(str, x).strip()) for x in wildtype_pdb_path
+                ]
             elif isinstance(wildtype_pdb_path[0], Path):
                 pass
 
@@ -217,19 +220,22 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
         # Validating the chains to keep
         if isinstance(chains_to_keep, type(None)):
             # Defaulting to always keeping chain A.
-            chains_to_keep = ["A"] * len(self.wildtype_pdb_paths)
-
-        if isinstance(chains_to_keep, str):
-            chains_to_keep = [chains_to_keep] * len(self.wildtype_pdb_paths)
-
-        if isinstance(chains_to_keep, list):
+            chains_to_keep_ = ["A"] * len(self.wildtype_pdb_paths)
+        elif isinstance(chains_to_keep, str):
+            chains_to_keep_ = [chains_to_keep] * len(self.wildtype_pdb_paths)
+        elif isinstance(chains_to_keep, list):
             assert len(chains_to_keep) == len(self.wildtype_pdb_paths), (
                 "The number of chains to keep must be the same as the number of wildtypes."
                 " You can specify a single chain to keep for all wildtypes, or a list of chains."
             )
+            chains_to_keep_ = chains_to_keep
+        else:
+            raise TypeError(
+                "chains_to_keep must be a string, a list of strings, or None."
+            )
 
         # At this point, we are sure that chains_to_keep is a list of strings
-        self.chains_to_keep = chains_to_keep
+        self.chains_to_keep = chains_to_keep_
 
         self.penalize_unfeasible_with = penalize_unfeasible_with
 
@@ -252,7 +258,7 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
         self._clean_wildtype_pdb_files()
 
         x0_pre_array = []
-        for clean_wildtype_pdb_file in self.clean_wildtype_pdb_files:
+        for clean_wildtype_pdb_file in cast(list[Path], self.clean_wildtype_pdb_files):
             # Loads up the wildtype pdb files as strings
             wildtype_string = self.parse_pdb_as_residue_strings(clean_wildtype_pdb_file)
             x0_pre_array.append(list(wildtype_string))
@@ -307,12 +313,12 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
             for wildtype_pdb_path in self.wildtype_pdb_paths
         ]
 
-    def parse_pdb_as_residue_strings(self, pdb_file: Path) -> List[str]:
+    def parse_pdb_as_residue_strings(self, pdb_file: Path) -> list[str]:
         return parse_pdb_as_residue_strings(pdb_file)
 
     def _compute_mutant_residue_string_ddg(
         self, mutant_residue_string: str
-    ) -> np.ndarray:
+    ) -> NDArray[np.float64]:
         for i, char in enumerate(mutant_residue_string):
             if char not in self.rasp_interface.alphabet:
                 raise ValueError(
@@ -321,14 +327,12 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
                     f"in the alphabet: {self.rasp_interface.alphabet}."
                 )
         try:
-            (
-                closest_wildtype_pdb_file,
-                hamming_distance,
-            ) = find_closest_wildtype_pdb_file_to_mutant(
-                self.clean_wildtype_pdb_files,
+            res = find_closest_wildtype_pdb_file_to_mutant(
+                cast(list[Path], self.clean_wildtype_pdb_files),
                 mutant_residue_string,
                 return_hamming_distance=True,
             )
+            closest_wildtype_pdb_file, hamming_distance = cast(tuple[Path, int], res)
         except ValueError as e:
             # This means that the mutant is unfeasible
             if self.penalize_unfeasible_with is not None:
@@ -354,7 +358,7 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
 
         # Loading the models in preparation for inference
         cavity_model_net, ds_model_net = load_cavity_and_downstream_models(
-            device=self.device
+            device=self.device  # type: ignore
         )
         dataset_key = "predictions"
 
@@ -388,13 +392,13 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
                     " https://github.com/MachineLearningLifeScience/poli/issues"
                 )
 
-                result = np.sum(sliced_values_for_mutant, keepdims=True)
+                result = np.sum(sliced_values_for_mutant, keepdims=True)  # type: ignore
             else:
                 result = sliced_values_for_mutant
         else:
             result = sliced_values_for_mutant
 
-        return result
+        return cast(NDArray[np.float64], result)
 
     def __call__(self, x, context=None):
         """
@@ -427,7 +431,7 @@ class RaspIsolatedLogic(AbstractIsolatedFunction):
         # and each of the wildtypes in self.wildtype_residue_strings.
 
         # closest_wildtypes will be a dictionary
-        # of the form {wildtype_path: List[str] of mutations}
+        # of the form {wildtype_path: list[str] of mutations}
         # closest_wildtypes = defaultdict(list)
         # mutant_residue_strings = []
         # mutant_residue_to_hamming_distances = dict()

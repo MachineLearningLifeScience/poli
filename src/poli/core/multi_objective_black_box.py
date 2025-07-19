@@ -4,8 +4,6 @@ by this we mean simply concatenating the results of evaluating individual
 objective functions.
 """
 
-from typing import List
-
 import numpy as np
 
 from poli.core.abstract_black_box import AbstractBlackBox
@@ -22,12 +20,12 @@ class MultiObjectiveBlackBox(AbstractBlackBox):
     -----------
     batch_size : int, optional
         The batch size for evaluating the black box function. Defaults to None.
-    objective_functions : List[AbstractBlackBox], required
+    objective_functions : list[AbstractBlackBox], required
         The list of objective functions to be evaluated. Defaults to None.
 
     Attributes
     ----------
-    objective_functions : List[AbstractBlackBox]
+    objective_functions : list[AbstractBlackBox]
         The list of objective functions to be evaluated.
 
     Methods
@@ -49,15 +47,15 @@ class MultiObjectiveBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        objective_functions: List[AbstractBlackBox],
-        batch_size: int = None,
+        objective_functions: list[AbstractBlackBox],
+        batch_size: int | None = None,
     ) -> None:
         """
         Initialize the MultiObjectiveBlackBox class.
 
         Parameters
         -----------
-        objective_functions : List[AbstractBlackBox]
+        objective_functions : list[AbstractBlackBox]
             The list of objective functions.
         batch_size : int, optional
             The batch size. Defaults to None.

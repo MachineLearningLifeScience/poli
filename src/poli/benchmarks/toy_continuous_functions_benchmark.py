@@ -15,13 +15,14 @@ References
     https://www.sfu.ca/~ssurjano/optimization.html.
 """
 
-from typing import List, Union
+from typing import Sequence, Union, cast
 
 from poli.core.abstract_benchmark import AbstractBenchmark
 from poli.core.problem import Problem
 from poli.objective_repository import ToyContinuousProblemFactory
 from poli.objective_repository.toy_continuous_problem.toy_continuous_problem import (
     POSSIBLE_FUNCTIONS,
+    POSSIBLE_FUNCTIONS_TYPE,
     SIX_DIMENSIONAL_PROBLEMS,
     TWO_DIMENSIONAL_PROBLEMS,
 )
@@ -49,12 +50,12 @@ class ToyContinuousFunctionsBenchmark(AbstractBenchmark):
         self,
         n_dimensions: int = 2,
         embed_in: Union[int, None] = None,
-        dimensions_to_embed_in: Union[List[int], None] = None,
+        dimensions_to_embed_in: Union[list[int], None] = None,
         seed: Union[int, None] = None,
         batch_size: Union[int, None] = None,
         parallelize: bool = False,
         num_workers: Union[int, None] = None,
-        evaluation_budget: Union[int, List[int]] = None,
+        evaluation_budget: int | None = None,
     ) -> None:
         super().__init__(
             seed=seed,
@@ -66,7 +67,7 @@ class ToyContinuousFunctionsBenchmark(AbstractBenchmark):
         self.n_dimensions = n_dimensions
         self.embed_in = embed_in
         self.dimensions_to_embed_in = dimensions_to_embed_in
-        self.function_names = list(
+        self.function_names: Sequence[POSSIBLE_FUNCTIONS_TYPE] = list(  # type: ignore
             (
                 set(POSSIBLE_FUNCTIONS)
                 - set(TWO_DIMENSIONAL_PROBLEMS)
@@ -78,7 +79,9 @@ class ToyContinuousFunctionsBenchmark(AbstractBenchmark):
         )
 
     def _initialize_problem(self, index: int) -> Problem:
-        problem_factory: ToyContinuousProblemFactory = self.problem_factories[index]
+        problem_factory: ToyContinuousProblemFactory = cast(
+            ToyContinuousProblemFactory, self.problem_factories[index]
+        )
 
         problem = problem_factory.create(
             function_name=self.function_names[index],
@@ -121,7 +124,7 @@ class EmbeddedBranin2D(AbstractBenchmark):
         batch_size: Union[int, None] = None,
         parallelize: bool = False,
         num_workers: Union[int, None] = None,
-        evaluation_budget: Union[int, List[int]] = None,
+        evaluation_budget: int | None = None,
     ) -> None:
         super().__init__(
             seed,
@@ -134,7 +137,9 @@ class EmbeddedBranin2D(AbstractBenchmark):
         self.problem_factories = [ToyContinuousProblemFactory()] * len(self.embed_in)
 
     def _initialize_problem(self, index: int) -> Problem:
-        problem_factory: ToyContinuousProblemFactory = self.problem_factories[index]
+        problem_factory: ToyContinuousProblemFactory = cast(
+            ToyContinuousProblemFactory, self.problem_factories[index]
+        )
 
         problem = problem_factory.create(
             function_name="branin_2d",
@@ -174,7 +179,7 @@ class EmbeddedHartmann6D(AbstractBenchmark):
         batch_size: Union[int, None] = None,
         parallelize: bool = False,
         num_workers: Union[int, None] = None,
-        evaluation_budget: Union[int, List[int]] = None,
+        evaluation_budget: int | None = None,
     ) -> None:
         super().__init__(
             seed,
@@ -187,7 +192,9 @@ class EmbeddedHartmann6D(AbstractBenchmark):
         self.problem_factories = [ToyContinuousProblemFactory()] * len(self.embed_in)
 
     def _initialize_problem(self, index: int) -> Problem:
-        problem_factory: ToyContinuousProblemFactory = self.problem_factories[index]
+        problem_factory: ToyContinuousProblemFactory = cast(
+            ToyContinuousProblemFactory, self.problem_factories[index]
+        )
 
         if index == 0:
             problem = problem_factory.create(
