@@ -125,7 +125,7 @@ class GuacaMolGoalDirectedBenchmark(AbstractBenchmark):
         problem_factory = self.problem_factories[index]
 
         problem = problem_factory.create(
-            string_representation=self.string_representation,
+            string_representation=self.string_representation,  # type: ignore
             seed=self.seed,
             batch_size=self.batch_size,
             parallelize=self.parallelize,

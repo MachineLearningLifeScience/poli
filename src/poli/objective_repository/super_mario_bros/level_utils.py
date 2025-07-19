@@ -1,12 +1,14 @@
 """Utilities for transforming levels to arrays and back."""
 
+from __future__ import annotations
+
 from itertools import product
-from typing import List
 
 import numpy as np
+from numpy.typing import NDArray
 
 
-def level_to_list(level_txt: str) -> List[List[str]]:
+def level_to_list(level_txt: str) -> list[list[str]]:
     """
     Takes a level as a string and returns
     a list of lists of individual tokens.
@@ -24,7 +26,9 @@ def level_to_array(level_txt: str) -> np.ndarray:
     return np.array(level_to_list(level_txt))
 
 
-def levels_to_onehot(levels: np.ndarray, n_sprites: int = 11) -> np.ndarray:
+def levels_to_onehot(
+    levels: NDArray[np.int_], n_sprites: int = 11
+) -> NDArray[np.float64]:
     """Transforms an array [b, w, h] of integers into a one-hot array [b, n_sprites, w, h]."""
     batch_size, w, h = levels.shape
     y_onehot = np.zeros((batch_size, n_sprites, h, w))
@@ -45,7 +49,9 @@ def vectorized(prob_matrix, items):
     return items[k]
 
 
-def onehot_to_levels(levels_onehot: np.ndarray, sampling=False, seed=0) -> np.ndarray:
+def onehot_to_levels(
+    levels_onehot: NDArray[np.float64], sampling=False, seed=0
+) -> NDArray[np.int_]:
     """
     Transforms a level from probits to integers.
     """
@@ -77,7 +83,9 @@ def onehot_to_levels(levels_onehot: np.ndarray, sampling=False, seed=0) -> np.nd
     return levels
 
 
-def add_padding_to_level(level: np.ndarray, n_padding: int = 1) -> np.ndarray:
+def add_padding_to_level(
+    level: NDArray[np.int_], n_padding: int = 1
+) -> NDArray[np.int_]:
     """
     Adds padding to the left of the level, giving room
     for the agent to land.
@@ -85,12 +93,12 @@ def add_padding_to_level(level: np.ndarray, n_padding: int = 1) -> np.ndarray:
     h, w = level.shape
     padding = 2 * np.ones((h, n_padding))  # Starting with emptyness.
     padding[-1, :] = 0  # Adding the ground.
-    level_with_padding = np.concatenate((padding, level), axis=1)
+    level_with_padding = np.concatenate((padding, level), axis=1).astype(np.int_)
 
     return level_with_padding
 
 
-def clean_level(level: np.ndarray) -> List[List[int]]:
+def clean_level(level: NDArray[np.int_]) -> list[list[int]]:
     """
     Cleans a level by removing Mario (token id: 11),
     and replacing it with empty space.

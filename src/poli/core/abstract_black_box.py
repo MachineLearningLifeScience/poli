@@ -5,9 +5,11 @@ all objective functions should inherit.
 from __future__ import annotations
 
 from multiprocessing import Pool, cpu_count
+from typing import cast
 from warnings import warn
 
 import numpy as np
+from numpy.typing import NDArray
 
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.exceptions import BudgetExhaustedException
@@ -22,17 +24,17 @@ class AbstractBlackBox:
 
     Parameters
     ----------
-    batch_size : int, optional
+    batch_size : int | None, optional
         The batch size for evaluating the black box function. Default is None.
     parallelize : bool, optional
         Flag indicating whether to evaluate the black box function in parallel.
         Default is False.
-    num_workers : int, optional
+    num_workers : int | None, optional
         The number of workers to use for parallel evaluation. Default is None,
         which uses half of the available CPU cores.
-    evaluation_budget : int, optional
+    evaluation_budget : int | None, optional
         The maximum number of evaluations allowed for the black box function.
-        Default is None).
+        Default is None, which means an infinite budget.
 
     Attributes
     ----------
@@ -44,7 +46,7 @@ class AbstractBlackBox:
         Flag indicating whether to evaluate the black box function in parallel.
     num_workers : int
         The number of workers to use for parallel evaluation.
-    batch_size : int or None
+    batch_size : int | None
         The batch size for evaluating the black box function.
 
     Methods
@@ -84,13 +86,13 @@ class AbstractBlackBox:
 
         Parameters
         ----------
-        batch_size : int, optional
+        batch_size : int | None, optional
             The batch size for parallel execution, by default None.
         parallelize : bool, optional
             Flag indicating whether to parallelize the execution, by default False.
-        num_workers : int, optional
+        num_workers : int | None, optional
             The number of workers for parallel execution, by default we use half the available CPUs.
-        evaluation_budget : int, optional
+        evaluation_budget : int | None, optional
             The maximum number of evaluations allowed for the black box function, by default it is None, which means no limit.
         """
         self.observer = None
@@ -145,13 +147,13 @@ class AbstractBlackBox:
             )
         self.observer = observer
 
-    def set_observer_info(self, observer_info: object):
+    def set_observer_info(self, observer_info: dict[str, object] | None):
         """
         Set the observer information after initialization.
 
         Parameters
         ----------
-        observer_info : object
+        observer_info : dict[str, object]
             The information given by the observer after initialization.
         """
         self.observer_info = observer_info
@@ -160,7 +162,7 @@ class AbstractBlackBox:
         """Resets the evaluation budget by setting the number of evaluations made to 0."""
         self.num_evaluations = 0
 
-    def __call__(self, x: np.array, context=None):
+    def __call__(self, x: NDArray[np.str_], context=None):
         """Calls the black box function.
 
         The purpose of this function is to enforce that inputs are equal across
@@ -340,7 +342,7 @@ class AbstractBlackBox:
         Terminate the black box optimization problem.
         """
         if hasattr(self, "inner_function"):
-            self.inner_function.terminate()
+            self.inner_function.terminate()  # type: ignore
         # if self.observer is not None:
         #     # NOTE: terminating a problem should gracefully end the observer process -> write the last state.
         #     self.observer.finish()
@@ -387,13 +389,13 @@ class NegativeBlackBox(AbstractBlackBox):
             batch_size=f.batch_size,
             parallelize=f.parallelize,
             num_workers=f.num_workers,
-            evaluation_budget=f.evaluation_budget,
+            evaluation_budget=cast(int | None, f.evaluation_budget),
         )
 
-    def __call__(self, x, context=None):
+    def __call__(self, x: NDArray[np.str_], context=None):
         return -self.f.__call__(x, context)
 
-    def _black_box(self, x, context=None):
+    def _black_box(self, x: NDArray[np.str_], context=None):
         return self.f._black_box(x, context)
 
     def __str__(self) -> str:

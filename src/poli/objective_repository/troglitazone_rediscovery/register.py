@@ -84,12 +84,12 @@ class TroglitazoneRediscoveryBlackBox(TDCBlackBox):
         self,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
         alphabet: list[str] | None = None,
-        max_sequence_length: int = np.inf,
+        max_sequence_length: int | Literal["inf"] = "inf",
         force_isolation: bool = False,
-        batch_size: int = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
     ):
         super().__init__(
             oracle_name="Troglitazone_Rediscovery",
@@ -140,15 +140,15 @@ class TroglitazoneRediscoveryProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
+        seed: int | None = None,
+        batch_size: int | None = None,
+        parallelize: bool = False,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
+        force_isolation: bool = False,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
         alphabet: list[str] | None = None,
-        max_sequence_length: int = np.inf,
-        seed: int = None,
-        batch_size: int = None,
-        parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
-        force_isolation: bool = False,
+        max_sequence_length: int | Literal["inf"] = "inf",
     ) -> Problem:
         """
         Creates a Troglitazone rediscovery problem.

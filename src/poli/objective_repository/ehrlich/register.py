@@ -107,15 +107,15 @@ class EhrlichBlackBox(AbstractBlackBox):
         motif_length: int,
         n_motifs: int,
         quantization: int | None = None,
-        seed: int = None,
+        seed: int | None = None,
         return_value_on_unfeasible: float = -np.inf,
         feasibility_matrix_temperature: float = 0.5,
         feasibility_matrix_band_length: int | None = None,
         alphabet: list[str] = AMINO_ACIDS,
-        batch_size: int = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
     ):
         warnings.warn(
             "This EhrlichBlackBox class is different from the original "
@@ -235,7 +235,7 @@ class EhrlichBlackBox(AbstractBlackBox):
         return True
 
     def construct_random_motifs(
-        self, motif_length: int, n_motifs: int, seed: int = None
+        self, motif_length: int, n_motifs: int, seed: int | None = None
     ) -> np.ndarray:
         """
         Creates a given number of random motifs of a certain length.
@@ -265,7 +265,7 @@ class EhrlichBlackBox(AbstractBlackBox):
         self,
         motif_length: int,
         n_motifs: int,
-        seed: int = None,
+        seed: int | None = None,
     ) -> np.ndarray:
         """
         Creates a given number of random offsets for the motifs.
@@ -338,12 +338,12 @@ class EhrlichBlackBox(AbstractBlackBox):
         Counts the maximal motif match.
         """
         assert sequence.ndim == 1 or sequence.shape[0] == 1
-        sequence = "".join(sequence.flatten())
+        sequence_ = "".join(sequence.flatten())
         maximal_match = 0
-        for seq_idx in range(len(sequence) - max(offset)):
+        for seq_idx in range(len(sequence_) - max(offset)):
             matches = 0
             sequence_at_offset = np.array(
-                [sequence[seq_idx + offset_value] for offset_value in offset]
+                [sequence_[seq_idx + offset_value] for offset_value in offset]
             )
             matches = sum(sequence_at_offset == motif)
 
@@ -403,13 +403,13 @@ class EhrlichProblemFactory(AbstractProblemFactory):
         motif_length: int,
         n_motifs: int,
         quantization: int | None = None,
-        seed: int = None,
+        seed: int | None = None,
         return_value_on_unfeasible: float = -np.inf,
         alphabet: list[str] = AMINO_ACIDS,
-        batch_size: int = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ) -> Problem:
         """

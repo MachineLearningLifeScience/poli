@@ -5,9 +5,12 @@ box objectives (i) creates the relevant conda environment, and
 
 import subprocess
 
+import pytest
+
 from poli.core.util.isolation.instancing import get_inner_function
 
 
+@pytest.mark.isolation
 def test_force_isolation_on_tdc():
     from poli import objective_factory
 

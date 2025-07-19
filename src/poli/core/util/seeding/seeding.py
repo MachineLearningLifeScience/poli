@@ -1,11 +1,13 @@
 """Utilities for seeding random number generators."""
 
+# pyright: reportMissingImports=false
+
 import random
 
 import numpy as np
 
 
-def seed_numpy(seed: int = None) -> None:
+def seed_numpy(seed: int | None = None) -> None:
     """
     Seed the NumPy random number generator.
 
@@ -18,7 +20,7 @@ def seed_numpy(seed: int = None) -> None:
         np.random.seed(seed)
 
 
-def seed_python(seed: int = None) -> None:
+def seed_python(seed: int | None = None) -> None:
     """
     Seed the random number generator for Python.
 
@@ -32,7 +34,7 @@ def seed_python(seed: int = None) -> None:
         random.seed(seed)
 
 
-def seed_torch(seed: int = None) -> None:
+def seed_torch(seed: int | None = None) -> None:
     """
     Seed the random number generator for PyTorch.
 
@@ -53,7 +55,7 @@ def seed_torch(seed: int = None) -> None:
             torch.cuda.manual_seed_all(seed)
 
 
-def seed_python_numpy_and_torch(seed: int = None) -> None:
+def seed_python_numpy_and_torch(seed: int | None = None) -> None:
     """
     Seed all random number generators.
 

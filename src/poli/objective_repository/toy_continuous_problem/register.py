@@ -12,7 +12,7 @@ and it uses a conda environment called 'poli__base'
 (see the environment.yml file in this folder).
 """
 
-from typing import List
+from __future__ import annotations
 
 import numpy as np
 
@@ -22,7 +22,11 @@ from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
 from poli.core.util.seeding import seed_python_numpy_and_torch
 
-from .toy_continuous_problem import POSSIBLE_FUNCTIONS, ToyContinuousProblem
+from .toy_continuous_problem import (
+    POSSIBLE_FUNCTIONS,
+    POSSIBLE_FUNCTIONS_TYPE,
+    ToyContinuousProblem,
+)
 
 
 class ToyContinuousBlackBox(AbstractBlackBox):
@@ -38,7 +42,7 @@ class ToyContinuousBlackBox(AbstractBlackBox):
     embed_in : int, optional
         If not None, the continuous problem is randomly embedded in this dimension.
         By default, None.
-    dimensions_to_embed_in: List[int], optional
+    dimensions_to_embed_in: list[int], optional
         The dimensions in which to embed the problem, by default None. Only has an effect if embed_in is not None.
     batch_size : int, optional
         The batch size for parallel evaluation, by default None.
@@ -71,14 +75,14 @@ class ToyContinuousBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        function_name: str,
+        function_name: POSSIBLE_FUNCTIONS_TYPE,
         n_dimensions: int = 2,
-        embed_in: int = None,
-        dimensions_to_embed_in: List[int] = None,
-        batch_size: int = None,
+        embed_in: int | None = None,
+        dimensions_to_embed_in: list[int] | None = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
     ):
 
         assert (
@@ -104,7 +108,7 @@ class ToyContinuousBlackBox(AbstractBlackBox):
             evaluation_budget=evaluation_budget,
         )
 
-    def _black_box(self, x: np.ndarray, context: dict = None) -> np.ndarray:
+    def _black_box(self, x: np.ndarray, context: dict | None = None) -> np.ndarray:
         """
         Evaluates the toy continuous problem on a continuous input x.
 
@@ -150,15 +154,15 @@ class ToyContinuousBlackBox(AbstractBlackBox):
 class ToyContinuousProblemFactory(AbstractProblemFactory):
     def create(
         self,
-        function_name: str,
+        function_name: POSSIBLE_FUNCTIONS_TYPE,
         n_dimensions: int = 2,
-        embed_in: int = None,
-        dimensions_to_embed_in: List[int] = None,
-        seed: int = None,
-        batch_size: int = None,
+        embed_in: int | None = None,
+        dimensions_to_embed_in: list[int] | None = None,
+        seed: int | None = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ) -> Problem:
         """
@@ -173,7 +177,7 @@ class ToyContinuousProblemFactory(AbstractProblemFactory):
         embed_in : int, optional
             If not None, the continuous problem is randomly embedded in this dimension.
             By default, None.
-        dimensions_to_embed_in: List[int], optional
+        dimensions_to_embed_in: list[int], optional
             The dimensions in which to embed the problem, by default None. Only has an effect if embed_in is not None.
         seed : int, optional
             The seed for the random number generator, by default None.

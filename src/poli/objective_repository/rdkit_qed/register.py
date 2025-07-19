@@ -78,11 +78,11 @@ class QEDBlackBox(AbstractBlackBox):
         self,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
         alphabet: list[str] | None = None,
-        max_sequence_length: int = np.inf,
-        batch_size: int = None,
+        max_sequence_length: int | Literal["inf"] = "inf",
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
     ):
         """
         Initialize the QEDBlackBox.
@@ -118,7 +118,9 @@ class QEDBlackBox(AbstractBlackBox):
         self.string_representation = string_representation
 
         self.alphabet = alphabet
-        self.max_sequence_length = max_sequence_length
+        self.max_sequence_length = (
+            max_sequence_length if max_sequence_length != "inf" else float("inf")
+        )
 
         super().__init__(
             batch_size=batch_size,
@@ -128,7 +130,7 @@ class QEDBlackBox(AbstractBlackBox):
         )
 
     # The only method you have to define
-    def _black_box(self, x: np.ndarray, context: dict = None) -> np.ndarray:
+    def _black_box(self, x: np.ndarray, context: dict | None = None) -> np.ndarray:
         """Computes the qed of the molecule in x.
 
         Parameters
@@ -218,12 +220,12 @@ class QEDProblemFactory(AbstractProblemFactory):
         self,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
         alphabet: list[str] | None = None,
-        max_sequence_length: int = np.inf,
-        seed: int = None,
-        batch_size: int = None,
+        max_sequence_length: int | Literal["inf"] = "inf",
+        seed: int | None = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ) -> Problem:
         """Creates a QED black box function and initial observations.
@@ -261,7 +263,7 @@ class QEDProblemFactory(AbstractProblemFactory):
         self.string_representation = string_representation
 
         f = QEDBlackBox(
-            string_representation=string_representation.upper(),
+            string_representation=string_representation,
             alphabet=alphabet,
             max_sequence_length=max_sequence_length,
             batch_size=batch_size,
@@ -276,4 +278,4 @@ class QEDProblemFactory(AbstractProblemFactory):
         else:
             x0 = np.array([["[C]" * 10]])
 
-        return TDCProblem(f, x0)
+        return TDCProblem(f, x0)  # type: ignore

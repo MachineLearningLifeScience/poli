@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Union
+from typing import Union
 
 import numpy as np
 
@@ -15,9 +15,9 @@ class FoldXSASAIsolatedLogic(FoldxIsolatedFunction):
 
     Parameters
     -----------
-    wildtype_pdb_path : Union[Path, List[Path]]
+    wildtype_pdb_path : Union[Path, list[Path]]
         The path(s) to the wildtype PDB file(s). Default is None.
-    alphabet : List[str], optional
+    alphabet : list[str], optional
         The alphabet of amino acids. Default is None.
     experiment_id : str, optional
         The ID of the experiment. Default is None.
@@ -37,9 +37,9 @@ class FoldXSASAIsolatedLogic(FoldxIsolatedFunction):
 
     def __init__(
         self,
-        wildtype_pdb_path: Union[Path, List[Path]],
-        experiment_id: str = None,
-        tmp_folder: Path = None,
+        wildtype_pdb_path: Union[Path, list[Path]],
+        experiment_id: str | None = None,
+        tmp_folder: Path | None = None,
         eager_repair: bool = False,
         verbose: bool = False,
     ):

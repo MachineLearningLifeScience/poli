@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, cast
 
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
 from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
@@ -45,8 +45,8 @@ class ExternalFunction(AbstractIsolatedFunction):
         y : np.ndarray
             The output data points.
         """
-        self.process_wrapper.send(["QUERY", x, context])
-        msg_type, *val = self.process_wrapper.recv()
+        cast(ProcessWrapper, self.process_wrapper).send(["QUERY", x, context])
+        msg_type, *val = cast(ProcessWrapper, self.process_wrapper).recv()
         if msg_type == "EXCEPTION":
             e, traceback_ = val
             print(traceback_)
@@ -89,8 +89,8 @@ class ExternalFunction(AbstractIsolatedFunction):
         attribute : Any
             The attribute of the underlying black-box function.
         """
-        self.process_wrapper.send(["IS_METHOD", __name])
-        msg_type, *msg = self.process_wrapper.recv()
+        cast(ProcessWrapper, self.process_wrapper).send(["IS_METHOD", __name])
+        msg_type, *msg = cast(ProcessWrapper, self.process_wrapper).recv()
         if msg_type == "EXCEPTION":
             e, traceback_ = msg
             print(traceback_)
@@ -102,8 +102,8 @@ class ExternalFunction(AbstractIsolatedFunction):
         if is_method:
             return lambda *args, **kwargs: self._method_call(__name, *args, **kwargs)
         else:
-            self.process_wrapper.send(["ATTRIBUTE", __name])
-            msg_type, *msg = self.process_wrapper.recv()
+            cast(ProcessWrapper, self.process_wrapper).send(["ATTRIBUTE", __name])
+            msg_type, *msg = cast(ProcessWrapper, self.process_wrapper).recv()
             if msg_type == "EXCEPTION":
                 e, traceback_ = msg
                 print(traceback_)
@@ -125,8 +125,10 @@ class ExternalFunction(AbstractIsolatedFunction):
         method_name : str
             The name of the method.
         """
-        self.process_wrapper.send(["METHOD", method_name, args, kwargs])
-        msg_type, *msg = self.process_wrapper.recv()
+        cast(ProcessWrapper, self.process_wrapper).send(
+            ["METHOD", method_name, args, kwargs]
+        )
+        msg_type, *msg = cast(ProcessWrapper, self.process_wrapper).recv()
         if msg_type == "EXCEPTION":
             e, traceback_ = msg
             print(traceback_)

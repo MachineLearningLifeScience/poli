@@ -18,6 +18,9 @@ ISSN 2405-4712; doi: https://doi.org/10.1016/j.cels.2023.07.003.
 
 """
 
+# pyright: reportMissingImports=false
+# pyright: reportMissingModuleSource=false
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -38,7 +41,7 @@ class DMSGB1IsolatedLogic(AbstractIsolatedFunction):
 
     Parameters
     ----------
-    alphabet : List[str], optional
+    alphabet : list[str], optional
         The alphabet for the problem, by default we use
         the amino acid list provided in poli.core.util.proteins.defaults.
     experiment_id : str, optional
@@ -59,7 +62,7 @@ class DMSGB1IsolatedLogic(AbstractIsolatedFunction):
 
     def __init__(
         self,
-        experiment_id: str = None,
+        experiment_id: str | None = None,
     ):
         """
         Initialize the GB1 Register object.

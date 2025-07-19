@@ -67,11 +67,11 @@ class DMSGB1BlackBox(AbstractBlackBox):
     def __init__(
         self,
         negative: bool = False,
-        experiment_id: str = None,
-        batch_size: int = None,
+        experiment_id: str | None = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ):
         """
@@ -170,12 +170,12 @@ class DMSGB1ProblemFactory(AbstractProblemFactory):
     def create(
         self,
         negative: bool = False,
-        experiment_id: str = None,
-        seed: int = None,
-        batch_size: int = None,
+        experiment_id: str | None = None,
+        seed: int | None = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ) -> Problem:
         """

@@ -167,7 +167,7 @@ def __run_file_in_env(env_name: str, file_path: Path):
 def __register_isolated_file(
     environment_file: Path,
     isolated_file: Path,
-    name_for_show: str = None,
+    name_for_show: str | None = None,
     quiet: bool = False,
 ):
     """

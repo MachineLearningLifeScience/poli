@@ -2,6 +2,7 @@ from typing import Literal
 from warnings import warn
 
 import numpy as np
+from numpy.typing import NDArray
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
@@ -20,11 +21,11 @@ class GFPCBasBlackBox(AbstractBlackBox):
         ignore_stops: bool = True,
         unique=True,
         n_starting_points: int = 1,
-        batch_size: int = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        seed: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        seed: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
         negate: bool = False,
     ):
@@ -59,7 +60,7 @@ class GFPCBasBlackBox(AbstractBlackBox):
         )
         self.x0 = inner_function.x0
 
-    def _black_box(self, x: np.array, context=None) -> np.ndarray:
+    def _black_box(self, x: NDArray[np.str_], context=None) -> np.ndarray:
         """
         x is encoded sequence return function value given problem name
         """
@@ -114,11 +115,11 @@ class GFPCBasProblemFactory(AbstractProblemFactory):
         n_starting_points: int = 1,
         functional_only: bool = False,
         unique: bool = True,
-        seed: int = None,
-        batch_size: int = None,
+        seed: int | None = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         negate: bool = False,
     ) -> Problem:
         """

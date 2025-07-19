@@ -1,7 +1,10 @@
+# pyright: reportMissingImports=false
+# pyright: reportMissingModuleSource=false
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from numpy.typing import NDArray
 
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
 
@@ -9,7 +12,7 @@ from poli.core.abstract_isolated_function import AbstractIsolatedFunction
 class GFPSelectIsolatedLogic(AbstractIsolatedFunction):
     def __init__(
         self,
-        seed: int = None,
+        seed: int | None = None,
     ):
         gfp_df_path = Path(__file__).parent.resolve() / "assets" / "gfp_data.csv"
         self.seed = seed
@@ -25,15 +28,15 @@ class GFPSelectIsolatedLogic(AbstractIsolatedFunction):
 
         self.x0 = x0
 
-    def __call__(self, x: np.array, context=None) -> np.ndarray:
+    def __call__(self, x: NDArray[np.str_], context=None) -> np.ndarray:
         """
         x is string sequence which we look-up in avilable df, return median Brightness
         """
         if isinstance(x, np.ndarray):
             _arr = x.copy()
-            x = ["".join(_seq) for _seq in _arr]
+            x_ = ["".join(_seq) for _seq in _arr]
         ys = []
-        for _x in x:
+        for _x in x_:
             seq_subsets = self.gfp_lookup_df[
                 self.gfp_lookup_df.aaSequence.str.lower() == _x.lower()
             ]

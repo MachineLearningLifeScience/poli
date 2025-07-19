@@ -10,7 +10,7 @@ class BenchmarkInformation:
         fixed_length: bool,
         deterministic: bool,
         alphabet: list,
-        log_transform_recommended: bool = None,
+        log_transform_recommended: bool | None = None,
         discrete: bool = True,
         fidelity: Union[Literal["high", "low"], None] = None,
         padding_token: str = "",
@@ -111,7 +111,7 @@ class BenchmarkInformation:
         """
         return self.alphabet
 
-    def log_transform_recommended(self) -> bool:
+    def is_log_transform_recommended(self) -> bool | None:
         """
         Returns whether the black-box recommends log-transforming the targets.
 

@@ -30,11 +30,11 @@ class AbstractProblemFactory(metaclass=MetaProblemFactory):
 
     def create(
         self,
-        seed: int = None,
-        batch_size: int = None,
+        seed: int | None = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ) -> Problem:
         """

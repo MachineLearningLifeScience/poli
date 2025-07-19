@@ -14,10 +14,15 @@ minimizations.
     Test Functions and Datasets. [https://www.sfu.ca/~ssurjano/optimization.html]
 """
 
+from __future__ import annotations
+
+from typing import cast
+
 import numpy as np
+from numpy.typing import NDArray
 
 
-def ackley_function_01(x: np.ndarray) -> np.ndarray:
+def ackley_function_01(x: NDArray[np.float64]) -> NDArray[np.float64]:
     if len(x.shape) == 1:
         # Add a batch dimension if it's missing
         x = x.reshape(-1, x.shape[0])
@@ -38,7 +43,7 @@ def ackley_function_01(x: np.ndarray) -> np.ndarray:
     return res
 
 
-def alpine_01(x: np.ndarray) -> np.ndarray:
+def alpine_01(x: NDArray[np.float64]) -> NDArray[np.float64]:
     if len(x.shape) == 1:
         # Add a batch dimension if it's missing
         x = x.reshape(-1, x.shape[0])
@@ -72,7 +77,7 @@ def alpine_02(x: np.ndarray) -> np.ndarray:
     return res
 
 
-def bent_cigar(x: np.ndarray) -> np.ndarray:
+def bent_cigar(x: NDArray[np.float64]) -> NDArray[np.float64]:
     if len(x.shape) == 1:
         # Add a batch dimension if it's missing
         x = x.reshape(-1, x.shape[0])
@@ -91,7 +96,7 @@ def bent_cigar(x: np.ndarray) -> np.ndarray:
     return res
 
 
-def brown(x: np.ndarray) -> np.ndarray:
+def brown(x: NDArray[np.float64]) -> NDArray[np.float64]:
     if len(x.shape) == 1:
         # Add a batch dimension if it's missing
         x = x.reshape(-1, x.shape[0])
@@ -111,7 +116,7 @@ def brown(x: np.ndarray) -> np.ndarray:
     return res
 
 
-def chung_reynolds(x: np.ndarray) -> np.ndarray:
+def chung_reynolds(x: NDArray[np.float64]) -> NDArray[np.float64]:
     if len(x.shape) == 1:
         # Add a batch dimension if it's missing
         x = x.reshape(-1, x.shape[0])
@@ -128,7 +133,7 @@ def chung_reynolds(x: np.ndarray) -> np.ndarray:
     return res
 
 
-def cosine_mixture(x: np.ndarray) -> np.ndarray:
+def cosine_mixture(x: NDArray[np.float64]) -> NDArray[np.float64]:
     if len(x.shape) == 1:
         # Add a batch dimension if it's missing
         x = x.reshape(-1, x.shape[0])
@@ -148,7 +153,7 @@ def cosine_mixture(x: np.ndarray) -> np.ndarray:
     return res
 
 
-def deb_01(x: np.ndarray) -> np.ndarray:
+def deb_01(x: NDArray[np.float64]) -> NDArray[np.float64]:
     if len(x.shape) == 1:
         # Add a batch dimension if it's missing
         x = x.reshape(-1, x.shape[0])
@@ -166,7 +171,7 @@ def deb_01(x: np.ndarray) -> np.ndarray:
     return res
 
 
-def deb_02(x: np.ndarray) -> np.ndarray:
+def deb_02(x: NDArray[np.float64]) -> NDArray[np.float64]:
     if len(x.shape) == 1:
         # Add a batch dimension if it's missing
         x = x.reshape(-1, x.shape[0])
@@ -185,8 +190,8 @@ def deb_02(x: np.ndarray) -> np.ndarray:
 
 
 def deflected_corrugated_spring(
-    x: np.ndarray, alpha: float = 5.0, k: float = 5.0
-) -> np.ndarray:
+    x: NDArray[np.float64], alpha: float = 5.0, k: float = 5.0
+) -> NDArray[np.float64]:
     if len(x.shape) == 1:
         # Add a batch dimension if it's missing
         x = x.reshape(-1, x.shape[0])
@@ -204,7 +209,9 @@ def deflected_corrugated_spring(
     return res
 
 
-def styblinski_tang(x: np.ndarray, normalize: bool = True) -> np.ndarray:
+def styblinski_tang(
+    x: NDArray[np.float64], normalize: bool = True
+) -> NDArray[np.float64]:
     """
     This function is maximized at (-2.903534, ..., -2.903534), with
     a value of -39.16599 * d.
@@ -222,7 +229,7 @@ def styblinski_tang(x: np.ndarray, normalize: bool = True) -> np.ndarray:
         return -0.5 * np.sum(y, axis=1)
 
 
-def easom(xy: np.ndarray) -> np.ndarray:
+def easom(xy: NDArray[np.float64]) -> NDArray[np.float64]:
     """
     Easom is very flat, with a maxima at (pi, pi).
 
@@ -232,10 +239,11 @@ def easom(xy: np.ndarray) -> np.ndarray:
     assert xy.shape[1] == 2, "Easom only works in 2D. "
     x = xy[..., 0]
     y = xy[..., 1]
-    return np.cos(x) * np.cos(y) * np.exp(-((x - np.pi) ** 2 + (y - np.pi) ** 2))
+    res = np.cos(x) * np.cos(y) * np.exp(-((x - np.pi) ** 2 + (y - np.pi) ** 2))
+    return cast(NDArray[np.float64], res)
 
 
-def cross_in_tray(xy: np.ndarray) -> np.ndarray:
+def cross_in_tray(xy: NDArray[np.float64]) -> NDArray[np.float64]:
     """
     Cross-in-tray has several local maxima in a quilt-like pattern.
 
@@ -251,7 +259,7 @@ def cross_in_tray(xy: np.ndarray) -> np.ndarray:
     )
 
 
-def egg_holder(xy: np.ndarray) -> np.ndarray:
+def egg_holder(xy: NDArray[np.float64]) -> NDArray[np.float64]:
     """
     The egg holder is especially difficult.
 
@@ -266,7 +274,7 @@ def egg_holder(xy: np.ndarray) -> np.ndarray:
     )
 
 
-def shifted_sphere(x: np.ndarray) -> np.ndarray:
+def shifted_sphere(x: NDArray[np.float64]) -> NDArray[np.float64]:
     """
     The usual squared norm, but shifted away from the origin by a bit.
     Maximized at (1, 1, ..., 1)
@@ -287,7 +295,7 @@ def shifted_sphere(x: np.ndarray) -> np.ndarray:
     return res
 
 
-def camelback_2d(x: np.ndarray) -> np.ndarray:
+def camelback_2d(x: NDArray[np.float64]) -> NDArray[np.float64]:
     """
     Taken directly from the LineBO repository [1].
 
@@ -305,7 +313,7 @@ def camelback_2d(x: np.ndarray) -> np.ndarray:
     return np.maximum(-y, -2.5)
 
 
-def hartmann_6d(x: np.ndarray) -> np.ndarray:
+def hartmann_6d(x: NDArray[np.float64]) -> NDArray[np.float64]:
     """
     The 6 dimensional Hartmann function.
 
@@ -351,7 +359,7 @@ def hartmann_6d(x: np.ndarray) -> np.ndarray:
     return np.array(res).reshape(-1, 1)
 
 
-def branin_2d(x: np.ndarray) -> np.ndarray:
+def branin_2d(x: NDArray[np.float64]) -> NDArray[np.float64]:
     """
     The 2D Branin function.
 
@@ -376,7 +384,9 @@ def branin_2d(x: np.ndarray) -> np.ndarray:
     return -y
 
 
-def rosenbrock(x: np.ndarray, a: float = 1.0, b: float = 100.0):
+def rosenbrock(
+    x: NDArray[np.float64], a: float = 1.0, b: float = 100.0
+) -> NDArray[np.float64]:
     """
     Compute the Rosenbrock function.
 
@@ -399,7 +409,7 @@ def rosenbrock(x: np.ndarray, a: float = 1.0, b: float = 100.0):
     )
 
 
-def levy(x: np.ndarray):
+def levy(x: NDArray[np.float64]) -> NDArray[np.float64]:
     """
     Compute the Levy function.
 
@@ -430,7 +440,7 @@ def levy(x: np.ndarray):
     return -(term1 + term2 + term3)
 
 
-def himmelblau(x: np.ndarray):
+def himmelblau(x: NDArray[np.float64]) -> NDArray[np.float64]:
     """
     Compute the Himmelblau function.
 
@@ -455,8 +465,3 @@ def himmelblau(x: np.ndarray):
     x2 = x[:, 1]
 
     return -((x1**2 + x2 - 11) ** 2 + (x1 + x2**2 - 7) ** 2)
-
-
-if __name__ == "__main__":
-    b = branin_2d
-    maximal_b = b(np.array([[-np.pi, 12.275], [np.pi, 2.275], [9.42478, 2.475]]))

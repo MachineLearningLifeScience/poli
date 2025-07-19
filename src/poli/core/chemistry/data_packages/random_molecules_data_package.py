@@ -40,7 +40,7 @@ class RandomMoleculesDataPackage(DataPackage):
         string_representation: Literal["SMILES", "SELFIES"],
         n_molecules: int = 10,
         seed: int | None = None,
-        tokenize_with: Callable[[str], list[str]] = None,
+        tokenize_with: Callable[[str], list[str]] | None = None,
     ):
         assert (
             n_molecules <= 5000

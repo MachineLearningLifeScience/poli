@@ -11,7 +11,7 @@ Emily Delaney, Peyton Greenside, and Andrew Gordon Wilson.
 arXiv, July 12, 2022. http://arxiv.org/abs/2203.12742.
 """
 
-from typing import Literal, Tuple
+from typing import Literal
 
 import numpy as np
 
@@ -38,10 +38,10 @@ class PenalizedLogPLamboBlackBox(AbstractBlackBox):
         self,
         string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
         penalized: bool = True,
-        batch_size: int = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ):
         super().__init__(
@@ -66,7 +66,7 @@ class PenalizedLogPLamboBlackBox(AbstractBlackBox):
             penalized=penalized,
         )
 
-    def _black_box(self, x: np.ndarray, context: dict = None):
+    def _black_box(self, x: np.ndarray, context: dict | None = None):
         """
         Assuming that x is an array of strings (of shape [b,L]),
         we concatenate, translate to smiles if it's
@@ -105,14 +105,14 @@ class PenalizedLogPLamboProblemFactory(AbstractProblemFactory):
     def create(
         self,
         penalized: bool = True,
-        string_representation: str = "SMILES",
-        seed: int = None,
-        batch_size: int = None,
+        string_representation: Literal["SMILES", "SELFIES"] = "SMILES",
+        seed: int | None = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
-    ) -> Tuple[AbstractBlackBox, np.ndarray, np.ndarray]:
+    ) -> Problem:
         if seed is not None:
             seed_python_numpy_and_torch(seed)
 
@@ -123,7 +123,7 @@ class PenalizedLogPLamboProblemFactory(AbstractProblemFactory):
             )
 
         f = PenalizedLogPLamboBlackBox(
-            string_representation=string_representation.upper(),
+            string_representation=string_representation,
             penalized=penalized,
             batch_size=batch_size,
             parallelize=parallelize,

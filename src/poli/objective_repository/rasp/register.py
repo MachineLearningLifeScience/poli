@@ -20,7 +20,7 @@ Detlef Weigel, Nir Ben-Tal, and Julian Echave. eLife 12
 from __future__ import annotations
 
 from pathlib import Path
-from typing import List, Union
+from typing import Union, cast
 
 from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
@@ -37,14 +37,14 @@ class RaspBlackBox(AbstractBlackBox):
 
     Parameters
     ----------
-    wildtype_pdb_path : Union[Path, List[Path]]
+    wildtype_pdb_path : Union[Path, list[Path]]
         The path(s) to the wildtype PDB file(s), by default None.
     additive : bool, optional
         Whether we treat multiple mutations as additive, by default False.
         If you are interested in running this black box with multiple
         mutations, you should set this to True. Otherwise, it will
         raise an error if you pass a sequence with more than one mutation.
-    chains_to_keep : List[str], optional
+    chains_to_keep : list[str], optional
         The chains to keep in the PDB file(s), by default we
         keep the chain "A" for all pdbs passed.
     experiment_id : str, optional
@@ -87,17 +87,17 @@ class RaspBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        wildtype_pdb_path: Union[Path, List[Path]],
+        wildtype_pdb_path: Union[Path, list[Path]],
         additive: bool = False,
-        chains_to_keep: List[str] = None,
+        chains_to_keep: list[str] | None = None,
         penalize_unfeasible_with: float | None = None,
         device: str | None = None,
-        experiment_id: str = None,
-        tmp_folder: Path = None,
-        batch_size: int = None,
+        experiment_id: str | None = None,
+        tmp_folder: Path | None = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ):
         """
@@ -105,14 +105,14 @@ class RaspBlackBox(AbstractBlackBox):
 
         Parameters:
         -----------
-        wildtype_pdb_path : Union[Path, List[Path]]
+        wildtype_pdb_path : Union[Path, list[Path]]
             The path(s) to the wildtype PDB file(s).
         additive : bool, optional
             Whether we treat multiple mutations as additive, by default False.
             If you are interested in running this black box with multiple
             mutations, you should set this to True. Otherwise, it will
             raise an error if you pass a sequence with more than one mutation.
-        chains_to_keep : List[str], optional
+        chains_to_keep : list[str], optional
             The chains to keep in the PDB file(s), by default we
             keep the chain "A" for all pdbs passed.
         penalize_unfeasible_with : float | None, optional
@@ -164,7 +164,11 @@ class RaspBlackBox(AbstractBlackBox):
             evaluation_budget=evaluation_budget,
         )
         self.force_isolation = force_isolation
-        self.wildtype_pdb_path = wildtype_pdb_path
+        self.wildtype_pdb_path = (
+            wildtype_pdb_path
+            if isinstance(wildtype_pdb_path, list)
+            else [wildtype_pdb_path]
+        )
         self.chains_to_keep = chains_to_keep
         self.experiment_id = experiment_id
         self.tmp_folder = tmp_folder
@@ -236,18 +240,18 @@ class RaspBlackBox(AbstractBlackBox):
 class RaspProblemFactory(AbstractProblemFactory):
     def create(
         self,
-        wildtype_pdb_path: Union[Path, List[Path]],
+        wildtype_pdb_path: Union[Path, list[Path]],
         additive: bool = False,
-        chains_to_keep: List[str] = None,
+        chains_to_keep: list[str] | None = None,
         penalize_unfeasible_with: float | None = None,
         device: str | None = None,
-        experiment_id: str = None,
-        tmp_folder: Path = None,
-        seed: int = None,
-        batch_size: int = None,
+        experiment_id: str | None = None,
+        tmp_folder: Path | None = None,
+        seed: int | None = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ) -> Problem:
         """
@@ -256,14 +260,14 @@ class RaspProblemFactory(AbstractProblemFactory):
 
         Parameters
         ----------
-        wildtype_pdb_path : Union[Path, List[Path]]
+        wildtype_pdb_path : Union[Path, list[Path]]
             The path(s) to the wildtype PDB file(s).
         additive: bool, optional
             Whether we treat multiple mutations as additive, by default False.
             If you are interested in running this black box with multiple
             mutations, you should set this to True. Otherwise, it will
             raise an error if you pass a sequence with more than one mutation.
-        chains_to_keep : List[str], optional
+        chains_to_keep : list[str], optional
             The chains to keep in the PDB file(s), by default we
             keep the chain "A" for all pdbs passed.
         penalize_unfeasible_with : float | None, optional
@@ -314,7 +318,9 @@ class RaspProblemFactory(AbstractProblemFactory):
             wildtype_pdb_path = [wildtype_pdb_path]
         elif isinstance(wildtype_pdb_path, list):
             if isinstance(wildtype_pdb_path[0], str):
-                wildtype_pdb_path = [Path(x.strip()) for x in wildtype_pdb_path]
+                wildtype_pdb_path = [
+                    Path(cast(str, x).strip()) for x in wildtype_pdb_path
+                ]
             elif isinstance(wildtype_pdb_path[0], Path):
                 pass
         else:

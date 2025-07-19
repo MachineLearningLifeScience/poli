@@ -1,11 +1,12 @@
 """This module contains utilities for registering problems and observers."""
 
+from __future__ import annotations
+
 import configparser
 import warnings
 from pathlib import Path
-from typing import List, Type, Union
+from typing import Type, Union
 
-from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
 from poli.core.util.abstract_observer import AbstractObserver
 from poli.core.util.objective_management.make_run_script import (
@@ -32,9 +33,9 @@ ls = config.read(config_file)
 
 def register_observer(
     observer: Union[AbstractObserver, Type[AbstractObserver]],
-    conda_environment_location: str = None,
-    python_paths: List[str] = None,
-    observer_name: str = None,
+    conda_environment_location: str | None = None,
+    python_paths: list[str] | None = None,
+    observer_name: str | None = None,
     set_as_default_observer: bool = True,
 ):
     """Defines an external observer to be run in a separate process.
@@ -53,7 +54,7 @@ def register_observer(
         The observer to be registered.
     conda_environment_location : str
         The location of the conda environment to be used.
-    python_paths : List[str]
+    python_paths : list[str]
         A list of paths to append to the python path of the run script.
     observer_name : str
         The name of the observer to be registered.
@@ -73,7 +74,7 @@ def register_observer(
     else:
         non_instance_observer = observer.__class__
     if observer_name is None:
-        observer_name = observer.__name__
+        observer_name = non_instance_observer.__name__
     run_script_location = make_observer_script(
         non_instance_observer, conda_environment_location, python_paths
     )
@@ -122,10 +123,10 @@ def remove_default_observer():
 
 
 def register_isolated_function(
-    isolated_function: Union[AbstractBlackBox, AbstractIsolatedFunction],
+    isolated_function: Union[type[AbstractIsolatedFunction], AbstractIsolatedFunction],
     name: str,
-    conda_environment_name: Union[str, Path] = None,
-    python_paths: List[str] = None,
+    conda_environment_name: Union[str, Path, None] = None,
+    python_paths: list[str] | None = None,
     force: bool = True,
     **kwargs,
 ):

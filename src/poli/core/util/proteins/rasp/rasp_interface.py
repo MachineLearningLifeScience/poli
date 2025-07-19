@@ -37,13 +37,15 @@ References
     33(suppl_2), W382-W388.
 """
 
+# pyright: reportMissingImports=false
+# pyright: reportMissingModuleSource=false
+
 import logging
 import os
 import stat
 import subprocess
 import traceback
 from pathlib import Path
-from typing import List
 
 import numpy as np
 import pandas as pd
@@ -478,7 +480,7 @@ class RaspInterface:
         )
 
     def create_df_structure(
-        self, wildtype_pdb_path: Path, mutant_residue_strings: List[str] = None
+        self, wildtype_pdb_path: Path, mutant_residue_strings: list[str] | None = None
     ):
         """
         This function creates a pandas dataframe with the
@@ -549,7 +551,7 @@ class RaspInterface:
         pos_of_variant_column = df_structure.columns.get_loc("variant")
         for i in range(0, len(df_structure), 20):
             for j in range(20):
-                df_structure.iloc[i + j, pos_of_variant_column] = (
+                df_structure.iloc[i + j, pos_of_variant_column] = (  # type: ignore
                     df_structure.iloc[i + j, :]["variant"][:-1] + aa_list[j]
                 )
 

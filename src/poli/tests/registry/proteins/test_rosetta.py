@@ -61,7 +61,7 @@ def test_rosetta_wt_zero_ddg(unit):
     f, x0 = problem.black_box, problem.x0
     y0 = f(x0)
     if unit == "REU":
-        assert f.inner_function.wt_score == y0
+        assert f.inner_function.wt_score == y0  # type: ignore
     else:
         assert np.isclose(y0, 0.0)
 
@@ -93,7 +93,7 @@ def test_rosetta_on_3ned_sequence_mutations_correct():
     # E10N
 
     for i, mutant in enumerate(three_mutations):
-        assert mutant[:20] == f.inner_function.x_t[i][:20]
+        assert mutant[:20] == f.inner_function.x_t[i][:20]  # type: ignore
 
 
 @pytest.mark.poli__rosetta_energy

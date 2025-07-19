@@ -2,15 +2,17 @@
 molecules into molecules in RDKit.
 """
 
-from typing import List
+# pyright: reportAttributeAccessIssue=false
+
+from __future__ import annotations
 
 import selfies as sf
 from rdkit import Chem
 
 
 def translate_smiles_to_selfies(
-    smiles_strings: List[str], strict: bool = False
-) -> List[str]:
+    smiles_strings: list[str], strict: bool = False
+) -> list[str]:
     """Translates a list of SMILES strings to SELFIES strings.
 
     Given a list of SMILES strings, returns the translation
@@ -24,14 +26,14 @@ def translate_smiles_to_selfies(
 
     Parameters
     ----------
-    smiles_strings : List[str]
+    smiles_strings : list[str]
         A list of SMILES strings.
     strict : bool, optional
         If True, raise an error if a SMILES string in the list cannot be parsed.
 
     Returns
     -------
-    List[str]
+    list[str]
         A list of SELFIES strings.
     """
     selfies_strings = []
@@ -48,8 +50,8 @@ def translate_smiles_to_selfies(
 
 
 def translate_selfies_to_smiles(
-    selfies_strings: List[str], strict: bool = False
-) -> List[str]:
+    selfies_strings: list[str], strict: bool = False
+) -> list[str]:
     """Translates a list of SELFIES strings to SMILES strings.
 
     Given a list of SELFIES strings, returns the translation
@@ -62,14 +64,14 @@ def translate_selfies_to_smiles(
 
     Parameters
     ----------
-    selfies_strings : List[str]
+    selfies_strings : list[str]
         A list of SELFIES strings.
     strict : bool, optional
         If True, raise an error if a SELFIES string in the list cannot be parsed.
 
     Returns
     -------
-    smiles_strings : List[str]
+    smiles_strings : list[str]
         A list of SMILES strings.
     """
     smiles_strings = []
@@ -85,7 +87,9 @@ def translate_selfies_to_smiles(
     return smiles_strings
 
 
-def smiles_to_molecules(smiles_strings: List[str], strict: bool = False) -> Chem.Mol:
+def smiles_to_molecules(
+    smiles_strings: list[str], strict: bool = False
+) -> list[Chem.Mol]:
     """Converts a list of SMILES strings to RDKit molecules.
 
     Converts a list of SMILES strings to RDKit molecules. If strict is True,
@@ -93,7 +97,7 @@ def smiles_to_molecules(smiles_strings: List[str], strict: bool = False) -> Chem
 
     Parameters
     ----------
-    smiles : List[str]
+    smiles : list[str]
         A list of SMILES string.
 
     Returns
@@ -113,7 +117,7 @@ def smiles_to_molecules(smiles_strings: List[str], strict: bool = False) -> Chem
     return molecules
 
 
-def selfies_to_molecules(selfies_strings: List[str]) -> Chem.Mol:
+def selfies_to_molecules(selfies_strings: list[str]) -> list[Chem.Mol]:
     """Converts a list of selfies strings to RDKit molecules.
 
     Parameters
@@ -133,7 +137,7 @@ def selfies_to_molecules(selfies_strings: List[str]) -> Chem.Mol:
     return molecule
 
 
-def strings_to_molecules(molecule_strings: List[str], from_selfies: bool = False):
+def strings_to_molecules(molecule_strings: list[str], from_selfies: bool = False):
     """
     Convert a string representation of a molecule to an RDKit molecule.
 

@@ -55,9 +55,9 @@ class AbstractObserver:
     def initialize_observer(
         self,
         problem_setup_info: BlackBoxInformation,
-        caller_info: object,
-        seed: int,
-    ) -> object:
+        caller_info: dict[str, object] | None,
+        seed: int | None,
+    ) -> dict[str, object]:
         """
         Initialize the observer.
 

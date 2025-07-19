@@ -42,10 +42,10 @@ class WhiteNoiseBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        batch_size: int = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
     ):
         """
         Initializes a WhiteNoiseBlackBox.
@@ -72,7 +72,7 @@ class WhiteNoiseBlackBox(AbstractBlackBox):
             evaluation_budget=evaluation_budget,
         )
 
-    def _black_box(self, x: np.ndarray, context: dict = None) -> np.ndarray:
+    def _black_box(self, x: np.ndarray, context: dict | None = None) -> np.ndarray:
         """Returns standard Gaussian noise.
 
         Parameters
@@ -106,11 +106,11 @@ class WhiteNoiseBlackBox(AbstractBlackBox):
 class WhiteNoiseProblemFactory(AbstractProblemFactory):
     def create(
         self,
-        seed: int = None,
-        batch_size: int = None,
+        seed: int | None = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ) -> Problem:
         """

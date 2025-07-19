@@ -7,8 +7,10 @@ level playable.
 
 """
 
+from __future__ import annotations
+
 from pathlib import Path
-from typing import List
+from typing import cast
 
 import numpy as np
 
@@ -58,7 +60,7 @@ class SMBIsolatedLogic(AbstractIsolatedFunction):
 
     def __init__(
         self,
-        alphabet: List[str] = smb_info.alphabet,
+        alphabet: list[str] = cast(list[str], smb_info.alphabet),
         max_time: int = 30,
         visualize: bool = False,
         value_on_unplayable: float = np.nan,

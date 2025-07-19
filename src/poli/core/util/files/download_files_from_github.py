@@ -8,6 +8,9 @@ Most of this code was taken and adapted from:
 https://gist.github.com/pdashford/2e4bcd4fc2343e2fd03efe4da17f577d?permalink_comment_id=4274705#gistcomment-4274705
 """
 
+# pyright: reportMissingImports=false
+# pyright: reportMissingModuleSource=false
+
 import base64
 import os
 from pathlib import Path
@@ -63,9 +66,9 @@ def get_sha_for_tag(repository: Repository, tag: str) -> str:
 def download_file_from_github_repository(
     repository_name: str,
     file_path_in_repository: str,
-    download_path_for_file: str,
+    download_path_for_file: str | Path,
     tag: str = "master",
-    commit_sha: str = None,
+    commit_sha: str | None = None,
     exist_ok: bool = False,
     parent_folders_exist_ok: bool = True,
     verbose: bool = False,
@@ -134,7 +137,7 @@ def _download_file_from_github_repo(
     repository: Repository,
     commit_sha: str,
     file_path_in_repository: str,
-    download_path_for_file: str,
+    download_path_for_file: str | Path,
     exist_ok: bool = False,
     parent_folders_exist_ok: bool = True,
     verbose: bool = False,

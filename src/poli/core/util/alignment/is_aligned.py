@@ -5,7 +5,9 @@ problem is indeed aligned.
 import numpy as np
 
 
-def is_aligned_input(x: np.ndarray, maximum_sequence_length: int = None) -> bool:
+def is_aligned_input(
+    x: np.ndarray, maximum_sequence_length: int | float | None = None
+) -> bool:
     """Utility function to check if the input to an "aligned"
     problem is indeed aligned.
 

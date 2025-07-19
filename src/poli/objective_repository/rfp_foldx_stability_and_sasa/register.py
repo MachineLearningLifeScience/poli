@@ -18,7 +18,7 @@ protein.
 
 import warnings
 from pathlib import Path
-from typing import List, Union
+from typing import List, Union, cast
 
 import numpy as np
 
@@ -42,18 +42,18 @@ class RFPFoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
-        wildtype_pdb_path: Union[Path, List[Path]],
-        n_starting_points: int = None,
+        wildtype_pdb_path: Union[Path, list[Path]],
+        n_starting_points: int | None = None,
         strict: bool = False,
-        experiment_id: str = None,
-        tmp_folder: Path = None,
+        experiment_id: str | None = None,
+        tmp_folder: Path | None = None,
         eager_repair: bool = False,
         verbose: bool = False,
-        seed: int = None,
+        seed: int | None = None,
         batch_size: int = 1,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ) -> Problem:
         """
@@ -61,7 +61,7 @@ class RFPFoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
 
         Parameters
         ----------
-        wildtype_pdb_path : Union[Path, List[Path]]
+        wildtype_pdb_path : Union[Path, list[Path]]
             Path or list of paths to the wildtype PDB files.
         n_starting_points: int, optional
             Size of D_0. Default is all available data.
@@ -113,7 +113,9 @@ class RFPFoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
             wildtype_pdb_path = [wildtype_pdb_path]
         elif isinstance(wildtype_pdb_path, list):
             if isinstance(wildtype_pdb_path[0], str):
-                wildtype_pdb_path = [Path(x.strip()) for x in wildtype_pdb_path]
+                wildtype_pdb_path = [
+                    Path(cast(str, x).strip()) for x in wildtype_pdb_path
+                ]
             elif isinstance(wildtype_pdb_path[0], Path):
                 pass
         else:
@@ -162,7 +164,7 @@ class RFPFoldXStabilityAndSASAProblemFactory(AbstractProblemFactory):
         remaining_wildtype_pdb_files = list(
             set(wildtype_pdb_path) - set(pareto_pdb_files)
         )
-        np.random.shuffle(remaining_wildtype_pdb_files)
+        np.random.shuffle(remaining_wildtype_pdb_files)  # type: ignore
         remaining_wildtype_pdb_files = remaining_wildtype_pdb_files[
             :remaining_n_starting_points
         ]  # subselect w.r.t. requested number of sequences

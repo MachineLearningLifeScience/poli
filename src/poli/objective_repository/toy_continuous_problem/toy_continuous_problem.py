@@ -5,9 +5,12 @@ See for more examples:
 https://en.wikipedia.org/wiki/Test_functions_for_optimization
 """
 
-from typing import List, Literal
+from __future__ import annotations
+
+from typing import Literal
 
 import numpy as np
+from numpy.typing import NDArray
 
 from .definitions import (
     ackley_function_01,
@@ -68,6 +71,30 @@ TWO_DIMENSIONAL_PROBLEMS = [
 ]
 SIX_DIMENSIONAL_PROBLEMS = ["hartmann_6d"]
 
+POSSIBLE_FUNCTIONS_TYPE = Literal[
+    "ackley_function_01",
+    "alpine_01",
+    "alpine_02",
+    "bent_cigar",
+    "brown",
+    "chung_reynolds",
+    "cosine_mixture",
+    "deb_01",
+    "deb_02",
+    "deflected_corrugated_spring",
+    "styblinski_tang",
+    "shifted_sphere",
+    "easom",
+    "cross_in_tray",
+    "egg_holder",
+    "camelback_2d",
+    "hartmann_6d",
+    "branin_2d",
+    "rosenbrock",
+    "levy",
+    "himmelblau",
+]
+
 
 class ToyContinuousProblem:
     """
@@ -80,31 +107,10 @@ class ToyContinuousProblem:
 
     def __init__(
         self,
-        name: Literal[
-            "ackley_function_01",
-            "alpine_01",
-            "alpine_02",
-            "bent_cigar",
-            "brown",
-            "chung_reynolds",
-            "cosine_mixture",
-            "deb_01",
-            "deb_02",
-            "deflected_corrugated_spring",
-            "styblinski_tang",
-            "shifted_sphere",
-            "easom",
-            "cross_in_tray",
-            "egg_holder",
-            "camelback_2d",
-            "branin_2d",
-            "hartmann_6d",
-            "rosenbrock",
-            "levy",
-        ],
+        name: POSSIBLE_FUNCTIONS_TYPE,
         n_dims: int = 2,
-        embed_in: int = None,
-        dimensions_to_embed_in: List[int] = None,
+        embed_in: int | None = None,
+        dimensions_to_embed_in: list[int] | None = None,
     ) -> None:
         self.maximize = True
         self.known_optima = True
@@ -300,8 +306,10 @@ class ToyContinuousProblem:
                 f" but received {n_dims}."
             )
 
-    def evaluate_objective(self, x: np.array, **kwargs) -> np.array:
+    def evaluate_objective(
+        self, x: NDArray[np.float64], **kwargs
+    ) -> NDArray[np.float64]:
         return self.function(x)
 
-    def __call__(self, x: np.array) -> np.array:
+    def __call__(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
         return self.function(x).reshape(-1, 1)

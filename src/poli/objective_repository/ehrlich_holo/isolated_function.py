@@ -2,6 +2,8 @@
 The isolation entry-point for Ehrlich, as implemented in Holo.
 """
 
+# pyright: reportMissingImports=false
+
 from __future__ import annotations
 
 import numpy as np
@@ -31,8 +33,8 @@ class EhrlichIsolatedLogic(AbstractIsolatedFunction):
         return_value_on_unfeasible: float = -np.inf,
         alphabet: list[str] = AMINO_ACIDS,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
     ):
         self.sequence_length = sequence_length
         self.motif_length = motif_length

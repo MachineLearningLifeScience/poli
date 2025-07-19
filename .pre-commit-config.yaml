@@ -1,6 +1,6 @@
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.2.0
+    rev: v5.0.0
     hooks:
     -   id: trailing-whitespace
         exclude: '.*\.pdb$'
@@ -21,3 +21,11 @@ repos:
     # Run the linter.
     - id: ruff
       args: [ --fix ]
+- repo: local
+  hooks:
+    - id: pyright
+      name: pyright
+      entry: pyright
+      language: system
+      require_serial: true
+      types: [python]

@@ -7,6 +7,8 @@ level playable.
 
 """
 
+from __future__ import annotations
+
 from pathlib import Path
 
 import numpy as np
@@ -61,10 +63,10 @@ class SuperMarioBrosBlackBox(AbstractBlackBox):
         max_time: int = 30,
         visualize: bool = False,
         value_on_unplayable: float = np.nan,
-        batch_size: int = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ):
         """
@@ -146,11 +148,11 @@ class SuperMarioBrosProblemFactory(AbstractProblemFactory):
         max_time: int = 30,
         visualize: bool = False,
         value_on_unplayable: float = np.nan,
-        seed: int = None,
-        batch_size: int = None,
+        seed: int | None = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ) -> Problem:
         """Creates a new instance of the Super Mario Bros problem.

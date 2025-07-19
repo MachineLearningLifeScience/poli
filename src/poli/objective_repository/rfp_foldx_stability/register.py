@@ -12,15 +12,15 @@ from poli.objective_repository.foldx_stability.register import (
 class RFPFoldXStabilityBlackBox(FoldXStabilityBlackBox):
     def __init__(
         self,
-        experiment_id=None,
-        tmp_folder=None,
-        eager_repair=False,
-        verbose=False,
-        batch_size=1,
-        parallelize=False,
-        num_workers=None,
-        evaluation_budget=None,
-        force_isolation=False,
+        experiment_id: str | None = None,
+        tmp_folder: Path | None = None,
+        eager_repair: bool = False,
+        verbose: bool = False,
+        batch_size: int = 1,
+        parallelize: bool = False,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
+        force_isolation: bool = False,
     ):
         RFP_FOLDX_ASSETS_DIR = Path(__file__).parent / "assets"
 

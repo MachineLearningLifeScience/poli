@@ -18,7 +18,7 @@ Bioinformatics 26.5 (2010): 689-691. https://doi.org/10.1093/bioinformatics/btq0
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Callable, List
+from typing import Callable
 
 import numpy as np
 
@@ -124,7 +124,7 @@ class RosettaEnergyBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        wildtype_pdb_path: Path | List[Path],
+        wildtype_pdb_path: Path | list[Path],
         score_function: str = "default",
         seed: int = 0,
         unit: str = "DDG",
@@ -135,10 +135,10 @@ class RosettaEnergyBlackBox(AbstractBlackBox):
         cycle: int = 3,
         constraint_weight: float = 5.0,
         n_threads: int = 4,
-        batch_size: int = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ):
         super().__init__(
@@ -179,9 +179,9 @@ class RosettaEnergyBlackBox(AbstractBlackBox):
             n_threads=self.n_threads,
         )
         self.inner_function = opt_in_wrapper(inner_function)
-        self.x0 = self.inner_function.x0
+        self.x0 = self.inner_function.x0  # type: ignore
 
-    def _black_box(self, x: np.ndarray, context: dict = None) -> np.ndarray:
+    def _black_box(self, x: np.ndarray, context: dict | None = None) -> np.ndarray:
         """
         Computes the stability of the mutant(s) in x.
 
@@ -225,7 +225,7 @@ class RosettaEnergyProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
-        wildtype_pdb_path: Path | List[Path],
+        wildtype_pdb_path: Path | list[Path],
         score_function: str = "default",
         seed: int = 0,
         unit: str = "DDG",
@@ -236,10 +236,10 @@ class RosettaEnergyProblemFactory(AbstractProblemFactory):
         cycle: int = 3,
         constraint_weight: int | float = 5,
         n_threads: int = 4,
-        batch_size: int = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ) -> Problem:
         """
@@ -324,6 +324,6 @@ class RosettaEnergyProblemFactory(AbstractProblemFactory):
         )
 
         # Your first input (an np.array[str] of shape [b, L] or [b,])
-        x0 = f.inner_function.x0
+        x0 = f.inner_function.x0  # type: ignore
 
         return Problem(f, x0)

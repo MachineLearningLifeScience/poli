@@ -55,10 +55,10 @@ class AlohaBlackBox(AbstractBlackBox):
 
     def __init__(
         self,
-        batch_size: int = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
     ):
         """
         Initialize the aloha black box object.
@@ -95,7 +95,7 @@ class AlohaBlackBox(AbstractBlackBox):
         )
 
     # The only method you have to define
-    def _black_box(self, x: np.ndarray, context: dict = None) -> np.ndarray:
+    def _black_box(self, x: np.ndarray, context: dict | None = None) -> np.ndarray:
         """
         Compute the distance of x to the sequence "ALOHA".
 
@@ -143,11 +143,11 @@ class AlohaProblemFactory(AbstractProblemFactory):
 
     def create(
         self,
-        seed: int = None,
-        batch_size: int = None,
+        seed: int | None = None,
+        batch_size: int | None = None,
         parallelize: bool = False,
-        num_workers: int = None,
-        evaluation_budget: int = None,
+        num_workers: int | None = None,
+        evaluation_budget: int | None = None,
         force_isolation: bool = False,
     ) -> Problem:
         """

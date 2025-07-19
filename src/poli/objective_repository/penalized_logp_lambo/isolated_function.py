@@ -11,6 +11,8 @@ Emily Delaney, Peyton Greenside, and Andrew Gordon Wilson.
 arXiv, July 12, 2022. http://arxiv.org/abs/2203.12742.
 """
 
+# pyright: reportMissingImports=false
+
 import logging
 import os
 from pathlib import Path
@@ -75,7 +77,7 @@ class PenalizedLogPIsolatedLogic(AbstractIsolatedFunction):
         self.penalized = penalized
         _download_assets_from_lambo()
 
-    def __call__(self, x: np.ndarray, context: dict = None):
+    def __call__(self, x: np.ndarray, context: dict | None = None):
         """
         Assuming that x is an array of strings (of shape [b,L]),
         we concatenate, translate to smiles if it's
