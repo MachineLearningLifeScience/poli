@@ -242,6 +242,6 @@ class LogPProblemFactory(AbstractProblemFactory):
         else:
             x0 = np.array([["[C]" * 10]])
 
-        problem = TDCProblem(f, x0)
+        problem = TDCProblem(f, x0)  # type: ignore
 
         return problem

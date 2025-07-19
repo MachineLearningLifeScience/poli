@@ -278,4 +278,4 @@ class QEDProblemFactory(AbstractProblemFactory):
         else:
             x0 = np.array([["[C]" * 10]])
 
-        return TDCProblem(f, x0)
+        return TDCProblem(f, x0)  # type: ignore
