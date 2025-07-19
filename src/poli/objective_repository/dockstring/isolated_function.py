@@ -1,4 +1,6 @@
 # pyright: reportMissingImports=false
+# pyright: reportAttributeAccessIssue=false
+
 from typing import Literal
 
 import numpy as np

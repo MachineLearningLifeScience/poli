@@ -89,7 +89,7 @@ markers = [
 
 [tool.pyright]
 include = ["src/poli"]
-exclude = ["src/poli/core/util/proteins/rasp/inner_rasp", "src/poli/objective_repository/gfp_cbas", "examples"]
+exclude = ["src/poli/core/util/proteins/rasp/inner_rasp", "src/poli/objective_repository/gfp_cbas", "examples", "src/poli/tests"]
 reportIncompatibleMethodOverride = "none"
 
 [tool.isort]
