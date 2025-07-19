@@ -63,6 +63,16 @@ There are several different environments (depending on the black boxes we test).
 
 If you want to run tests in all environments, remove `-e poli-base-py39` and just run `tox`. This might take a while, and several conda envs will be created.
 
+## Testing each environment manually using `pytest`
+
+What `tox` does is essentially running certain `pytest` commands after creating relevant `conda` environments. You can usually run these by hand from the relevant environments by doing something like
+
+```bash
+pytest -v -m "unmarked"  # for the base env.
+
+pytest -v -m "poli__<relevant-env>"  # for whichever environment
+```
+
 ## Bump the version!
 
 Your last commit in your branch should be a bump version.
