@@ -222,7 +222,7 @@ class RFPWrapperIsolatedLogic(AbstractIsolatedFunction):
 
     def __call__(self, x, context=None):
         best_b_cand = None
-        min_hd = np.infty  # Hamming distance of best_b_cand to x
+        min_hd = np.inf  # Hamming distance of best_b_cand to x
 
         # TODO: this assumes a batch_size of 1. Is that clear in the docs?
         seq = "".join(x[0])  # take out the string from the np array

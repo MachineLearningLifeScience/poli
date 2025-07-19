@@ -2,6 +2,8 @@
 molecules into molecules in RDKit.
 """
 
+# pyright: reportAttributeAccessIssue=false
+
 from __future__ import annotations
 
 import selfies as sf
