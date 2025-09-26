@@ -1,5 +1,7 @@
 from typing import Any, cast
 
+import numpy as np
+
 from poli.core.abstract_isolated_function import AbstractIsolatedFunction
 from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
 
@@ -22,7 +24,7 @@ class ExternalFunction(AbstractIsolatedFunction):
         super().__init__()
         self.process_wrapper = process_wrapper
 
-    def __call__(self, x, context=None):
+    def __call__(self, x: np.ndarray, context=None):
         """
         Evaluates the black-box function.
 

@@ -9,7 +9,9 @@ from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.exceptions import FoldXNotFoundException
 from poli.core.problem import Problem
-from poli.core.util.isolation.instancing import instance_function_as_isolated_process
+from poli.core.util.isolation.instancing import (
+    instance_function_as_isolated_process_using_conda,
+)
 from poli.core.util.seeding import seed_python_numpy_and_torch
 from poli.objective_repository.foldx_rfp_lambo import CORRECT_SEQ, PROBLEM_SEQ
 from poli.objective_repository.foldx_rfp_lambo.information import AMINO_ACIDS
@@ -46,11 +48,11 @@ class FoldXRFPLamboBlackBox(AbstractBlackBox):
 
                 self.inner_function = RFPWrapperIsolatedLogic(seed=seed)
             except (ImportError, FileNotFoundError):
-                self.inner_function = instance_function_as_isolated_process(
+                self.inner_function = instance_function_as_isolated_process_using_conda(
                     name="foldx_rfp_lambo__isolated",
                 )
         else:
-            self.inner_function = instance_function_as_isolated_process(
+            self.inner_function = instance_function_as_isolated_process_using_conda(
                 name="foldx_rfp_lambo__isolated",
             )
 

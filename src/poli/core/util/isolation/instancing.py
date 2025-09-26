@@ -3,9 +3,12 @@ from __future__ import annotations
 import configparser
 import importlib
 import logging
+import os
 import shutil
 import subprocess
 from pathlib import Path
+
+import yaml
 
 from poli.core.registry import _ISOLATED_FUNCTION_SCRIPT_LOCATION, _OBSERVER
 from poli.core.util.inter_process_communication.process_wrapper import ProcessWrapper
@@ -37,6 +40,40 @@ def load_config():
     return config
 
 
+def __check_if_conda_is_installed() -> bool:
+    """Checks if conda is installed."""
+    return shutil.which("conda") is not None
+
+
+def __check_if_uv_is_installed() -> bool:
+    """Checks if uv is installed."""
+    return shutil.which("uv") is not None
+
+
+def __raise_if_conda_is_not_installed() -> None:
+    if not __check_if_conda_is_installed():
+        raise RuntimeError(
+            "Conda is not installed/not in the PATH. For poli's isolation mechanisms to work, \n"
+            "we need conda to be installed.\n"
+            "If you are not interested in using conda, you can install all the \n"
+            "relevant dependencies for black boxes using pip and optional arguments.\n"
+            "Check the documentation of the black box you are interested in for more information.\n"
+            "https://machinelearninglifescience.github.io/poli-docs/."
+        )
+
+
+def __raise_if_uv_is_not_installed() -> None:
+    if not __check_if_uv_is_installed():
+        raise RuntimeError(
+            "uv is not installed/not in the PATH. For poli's isolation mechanisms to work, \n"
+            "we need uv to be installed.\n"
+            "If you are not interested in using uv, you can install all the \n"
+            "relevant dependencies for black boxes using pip and optional arguments.\n"
+            "Check the documentation of the black box you are interested in for more information.\n"
+            "https://machinelearninglifescience.github.io/poli-docs/."
+        )
+
+
 def __read_env_name(environment_file: Path) -> str:
     with open(environment_file, "r") as f:
         # This is a really crude way of doing this,
@@ -55,6 +92,7 @@ def __read_env_name(environment_file: Path) -> str:
 
 
 def __create_conda_env(environment_file: Path, quiet: bool = False):
+    __raise_if_conda_is_not_installed()
     env_name = __read_env_name(environment_file=environment_file)
 
     # 1. create the environment from the yaml file
@@ -73,6 +111,82 @@ def __create_conda_env(environment_file: Path, quiet: bool = False):
                 print(f"poli 🧪: {env_name} already exists.")
         else:
             raise e
+
+
+def __parse_environment_file(environment_file: Path) -> tuple[list[str], str]:
+    with open(environment_file, "r") as f:
+        # This is a really crude way of doing this,
+        # but it works. We should probably use a
+        # yaml parser instead, but the idea is to keep
+        # the dependencies to a minimum.
+        with open(environment_file, "r") as f:
+            env = yaml.safe_load(f)
+
+    python_version = None
+    pip_requirements = []
+    if "dependencies" not in env:
+        raise ValueError(
+            f"The environment file {environment_file} does not contain a 'dependencies' key."
+        )
+
+    for dep in env["dependencies"]:
+        if isinstance(dep, str) and dep.startswith("python="):
+            python_version = dep.split("=")[1]
+        elif isinstance(dep, dict) and "pip" in dep:
+            if isinstance(dep["pip"], list):
+                pip_requirements.extend(dep["pip"])
+            else:
+                raise ValueError(
+                    f"Expected 'pip' to be a list in {environment_file}, but got {dep['pip']}"
+                )
+
+    if python_version is None:
+        raise ValueError(
+            f"The environment file {environment_file} does not specify a Python version."
+        )
+
+    return pip_requirements, python_version
+
+
+def __create_uv_env(environment_file: Path, quiet: bool = False):
+    """Creates a UV venv from the environment name."""
+    __raise_if_uv_is_not_installed()
+
+    env_name = __read_env_name(environment_file=environment_file)
+    requirements, python_version = __parse_environment_file(environment_file)
+
+    if not quiet:
+        print(f"poli 🧪: creating uv venv {env_name}")
+
+    subprocess.run(
+        f"uv venv ~/.poli_objectives/.{env_name}-venv --python={python_version}",
+        shell=True,
+        check=True,
+        capture_output=True,
+    )
+
+    requirement_args = ""
+    for req in requirements:
+        requirement_args += f" '{req}'"
+
+    subprocess.run(
+        f"uv pip install --python ~/.poli_objectives/.{env_name}-venv {requirement_args}",
+        shell=True,
+        check=True,
+        capture_output=True,
+    )
+
+
+def __create_env(environment_file: Path, quiet: bool = False):
+    if os.environ.get("POLI_ISOLATION_BACKEND", "conda") == "conda":
+        __create_conda_env(environment_file, quiet=quiet)
+    elif os.environ.get("POLI_ISOLATION_BACKEND") == "uv":
+        __create_uv_env(environment_file, quiet=quiet)
+    else:
+        raise ValueError(
+            f"Unknown isolation backend: {os.environ.get('POLI_ISOLATION_BACKEND')}. "
+            "Supported backends are 'conda' and 'uv'."
+        )
 
 
 def __register_isolated_function_from_repository(
@@ -150,7 +264,7 @@ def __register_isolated_function_from_core(name: str, quiet: bool = False) -> No
         )
 
 
-def __run_file_in_env(env_name: str, file_path: Path):
+def __run_file_in_conda_env(env_name: str, file_path: Path):
     """
     Runs a file from a given conda env.
     """
@@ -164,6 +278,43 @@ def __run_file_in_env(env_name: str, file_path: Path):
         ) from e
 
 
+def __run_file_in_uv_env(env_name: str, file_path: Path):
+    """
+    Runs a file from a given uv venv.
+    """
+    command = " ".join(
+        [
+            "uv",
+            "run",
+            "--python",
+            f"~/.poli_objectives/.{env_name}-venv",
+            str(file_path),
+        ]
+    )
+    try:
+        subprocess.run(command, check=True, shell=True, capture_output=True)
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(
+            f"Found error when running {file_path} from environment {env_name}: \n"
+            f"{e.stderr.decode()}"
+        ) from e
+
+
+def __run_file_in_isolation(env_name: str, file_path: Path):
+    """
+    Runs a file from a given isolation environment.
+    """
+    if os.environ.get("POLI_ISOLATION_BACKEND", "conda") == "conda":
+        __run_file_in_conda_env(env_name, file_path)
+    elif os.environ.get("POLI_ISOLATION_BACKEND") == "uv":
+        __run_file_in_uv_env(env_name, file_path)
+    else:
+        raise ValueError(
+            f"Unknown isolation backend: {os.environ.get('POLI_ISOLATION_BACKEND')}. "
+            "Supported backends are 'conda' and 'uv'."
+        )
+
+
 def __register_isolated_file(
     environment_file: Path,
     isolated_file: Path,
@@ -175,7 +326,7 @@ def __register_isolated_file(
     runs the isolated file.
     """
     # 1. Create the conda env.
-    __create_conda_env(environment_file, quiet=quiet)
+    __create_env(environment_file, quiet=quiet)
     env_name = __read_env_name(environment_file)
 
     # 2. Running the file
@@ -187,7 +338,7 @@ def __register_isolated_file(
         else:
             print(f"poli 🧪: running {isolated_file} from environment {env_name}")
 
-    __run_file_in_env(env_name, isolated_file)
+    __run_file_in_isolation(env_name, isolated_file)
 
 
 def register_isolated_function(name: str, quiet: bool = False):
@@ -308,16 +459,50 @@ def instance_function_as_isolated_process(
     quiet: bool = False,
     **kwargs_for_black_box,
 ) -> ExternalFunction:
-    # Check if the user has conda installed
-    if shutil.which("conda") is None:
-        raise RuntimeError(
-            "Conda is not installed/not in the PATH. For poli's isolation mechanisms to work, \n"
-            "we need conda to be installed.\n"
-            "If you are not interested in using conda, you can install all the \n"
-            "relevant dependencies for black boxes using pip and optional arguments.\n"
-            "Check the documentation of the black box you are interested in for more information.\n"
-            "https://machinelearninglifescience.github.io/poli-docs/."
+    if os.environ.get("POLI_ISOLATION_BACKEND", "conda") == "conda":
+        f = instance_function_as_isolated_process_using_conda(
+            name=name, quiet=quiet, **kwargs_for_black_box
         )
+    elif os.environ.get("POLI_ISOLATION_BACKEND") == "uv":
+        f = instance_function_as_isolated_process_using_uv(
+            name=name, quiet=quiet, **kwargs_for_black_box
+        )
+    else:
+        raise ValueError(
+            f"Unknown isolation backend: {os.environ.get('POLI_ISOLATION_BACKEND')}. "
+            "Supported backends are 'conda' and 'uv'."
+        )
+
+    return f
+
+
+def instance_function_as_isolated_process_using_conda(
+    name: str,
+    quiet: bool = False,
+    **kwargs_for_black_box,
+) -> ExternalFunction:
+    # Check if the user has conda installed
+    __raise_if_conda_is_not_installed()
+
+    # Register the problem if it hasn't been registered.
+    register_isolated_function(name=name, quiet=quiet)
+
+    f = __create_function_as_isolated_process(
+        name=name,
+        quiet=quiet,
+        **kwargs_for_black_box,
+    )
+
+    return f
+
+
+def instance_function_as_isolated_process_using_uv(
+    name: str,
+    quiet: bool = False,
+    **kwargs_for_black_box,
+):
+    # Check if the user has uv installed
+    __raise_if_uv_is_not_installed()
 
     # Register the problem if it hasn't been registered.
     register_isolated_function(name=name, quiet=quiet)

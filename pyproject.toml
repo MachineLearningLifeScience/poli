@@ -25,9 +25,9 @@ classifiers = [
 ]
 keywords = ["optimization", "molecular", "discrete", "proteins"]
 dependencies = [
-    "numpy<2",
-    "rdkit",
-    "selfies"
+    "numpy>=1.26.4",
+    "rdkit>=2023.9.6",
+    "selfies>=2.2.0",
 ]
 requires-python = ">=3.9"
 
@@ -153,6 +153,7 @@ replace = 'version: {new_version}'
 
 [dependency-groups]
 dev = [
+    "ipython>=8.18.1",
     "pre-commit>=4.2.0",
     "pyright>=1.1.403",
     "pytest>=8.4.0",

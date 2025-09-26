@@ -5,7 +5,9 @@ from poli.core.abstract_black_box import AbstractBlackBox
 from poli.core.abstract_problem_factory import AbstractProblemFactory
 from poli.core.black_box_information import BlackBoxInformation
 from poli.core.problem import Problem
-from poli.core.util.isolation.instancing import instance_function_as_isolated_process
+from poli.core.util.isolation.instancing import (
+    instance_function_as_isolated_process_using_conda,
+)
 from poli.core.util.proteins.defaults import AMINO_ACIDS
 from poli.core.util.seeding import seed_python_numpy_and_torch
 
@@ -34,11 +36,11 @@ class GFPSelectionBlackBox(AbstractBlackBox):
 
                 self.inner_function = GFPSelectIsolatedLogic(seed=seed)
             except ImportError:
-                self.inner_function = instance_function_as_isolated_process(
+                self.inner_function = instance_function_as_isolated_process_using_conda(
                     name="gfp_select__isolated", seed=seed
                 )
         else:
-            self.inner_function = instance_function_as_isolated_process(
+            self.inner_function = instance_function_as_isolated_process_using_conda(
                 name="gfp_select__isolated", seed=seed
             )
 
