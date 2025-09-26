@@ -72,7 +72,11 @@ def __create_conda_env(environment_file: Path, quiet: bool = False):
             if not quiet:
                 print(f"poli 🧪: {env_name} already exists.")
         else:
-            raise e
+            raise RuntimeError(
+                "Failed to create the underlying conda environment."
+                " Try to create the environment manually by running:\n"
+                f"conda env create -f {environment_file}\n"
+            ) from e
 
 
 def __register_isolated_function_from_repository(
