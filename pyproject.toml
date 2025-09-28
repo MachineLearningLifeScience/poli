@@ -2,9 +2,12 @@
 requires = ["setuptools<=68"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools]
+license-files = []
+
 [project]
 name = "poli-core"
-version = "1.2.0"
+version = "1.3.1"
 description = "poli, a library of discrete objective functions"
 readme = "README.md"
 authors = [{name="Miguel González-Duque", email="miguelgondu@gmail.com"}, {name="Simon Bartels", email="bartels@di.ku.dk"}]
