@@ -27,7 +27,7 @@ project_root = os.path.dirname(os.path.dirname(project_root_file))
 LAMBO_IN_POLI_OBJECTIVES_PATH = Path.home() / ".poli_objectives" / "lambo"
 LAMBO_IN_POLI_OBJECTIVES_PATH.mkdir(parents=True, exist_ok=True)
 
-LAMBO_PACKAGE_ROOT = Path(lambo.__file__).parent.resolve()
+LAMBO_PACKAGE_ROOT = Path(lambo.__file__).parent.resolve()  # type: ignore
 
 LAMBO_FOLDX_ASSETS_PDBS = [
     "1uis_A",

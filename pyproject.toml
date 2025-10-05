@@ -28,7 +28,7 @@ classifiers = [
 ]
 keywords = ["optimization", "molecular", "discrete", "proteins"]
 dependencies = [
-    "numpy<2",
+    "numpy",
     "rdkit",
     "selfies"
 ]
@@ -54,9 +54,6 @@ ehrlich = [
 ]
 ehrlichholo = [
     "pytorch-holo",
-]
-tdc = [
-    "pytdc==1.1.14",
 ]
 dockstring = [
     "dockstring"
