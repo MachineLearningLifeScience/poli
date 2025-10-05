@@ -24,7 +24,7 @@ on:
 jobs:
   build-linux:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 16
     if: github.event.pull_request.draft == false
     strategy:
       max-parallel: 5
