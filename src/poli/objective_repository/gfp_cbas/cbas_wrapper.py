@@ -13,6 +13,10 @@ from collections import OrderedDict
 from pathlib import Path
 
 import numpy as np
+import tensorflow as tf
+
+tf.compat.v1.enable_eager_execution()
+tf.config.run_functions_eagerly(True)
 import torch
 import torch.nn as nn
 from scipy.stats import norm as StandardNormal
